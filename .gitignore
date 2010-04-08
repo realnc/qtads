@@ -1,0 +1,10 @@
+*.[oa]
+/src/charmap_inst_dir.h
+/src/doc_inst_dir.h
+/src/i18n_inst_dir.h
+/tmp/
+/obj/
+/Makefile
+/qmake_image_collection.cpp
+/qtads
+/qtads.pro.user

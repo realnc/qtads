@@ -1,0 +1,169 @@
+This file contains tips and additional information about QTads.
+
+
+On-line Documentation
+=====================
+
+The configuration dialog's settings are documented; just click on the
+"What's This" button (usually represented by a question mark '?' or a
+small 'i' on the top right of the dialog's window-frame) and then on
+some of the dialog's controls.  You can also right-click on most
+controls and select "What's This?".
+
+
+Registration Keys
+=================
+
+Don't Panic!  QTads isn't shareware.  But some games you'll run with it
+might be (or were in the past).  If a game can be "unlocked" with a
+registration key-file that you received from the game's author, simply
+put that file in the game's directory.  For example, to play the
+registered version of "Losing Your Grip", if the game resides in
+/usr/games/if/grip, simply put the file "regkey.txt" (not included in
+QTads, of course) in that directory.
+
+
+Unicode
+=======
+
+QTads uses Unicode to draw text when playing Tads 3 games.  To be able
+to get things like typographical quotes (also called ``curly'' quotes),
+typographical dashes (dashes of different lengths) and in general any
+Multimedia TADS character entity or Unicode value displayed correctly,
+you must use a font that supports these characters.  If the font you
+select lacks these characters, all you will get when the game tries to
+display these characters will be empty boxes.  If this happens, select
+a different font.  You can check for these characters by using the KDE
+program "KCharSelect".  Start it and cycle through the available fonts
+on your system to see which of them display the characters correctly
+(the typographical quotes and dashes are in page 32).  If nothing helps,
+you can disable the use of typographical quotes in the configuration
+dialog.
+
+Keep in mind that the font is *not* required to be in Unicode format.
+Most fonts out there use either an ISO-Latin encoding, or a
+Microsoft-specific one.  QTads will automaticly convert the Unicode
+characters to the font's internal encoding.  For example, you can use
+the "Times New Roman" font from a MS-Windows installation in a Unix-X11
+system.  The only requirement is that the font has the glyphs for these
+"special" characters.  For example, the aforementioned "Times" font
+from Microsoft has them, while the "Lucida Bright" font that comes with
+my Linux distribution doesn't.
+
+Note that typographical spaces (en-space and em-space for example)
+aren't supported by QTads.  There are two reasons for this:  a) The
+Tads 3 VM does not allow text-only GUI interpreters to display them,
+and b) even if the VM allowed it, the Qt library isn't able yet to
+display them.  Sorry.  All I can say is that I'll try to work around
+these limitations.  Until then, en- and em-spaces will be displayed by
+using two ordinary spaces.
+
+
+Multimedia TADS Character Entities in Tads 2
+============================================
+
+Although the Tads 2 VM is not able to use Unicode for I/O (and this is
+not likely to change now that we have Tads 3), QTads is nonetheless
+able to work around this limitation by using a variation of UTF-8
+encoded Unicode for Tads 2 I/O (how this works is described in
+src/osqt.cc).  This means that QTads can display typographical quotes
+and dashes even in Tads 2 games if the font you use supports it (not
+only quotes and dashes; the full set of Multimedia TADS character
+entities is supported).  Note though, that the game itself must support
+these characters.  If the game just prints normal ASCII (") quotes,
+QTads can't change this.  Here's an incomplete list of Tads 2 games that
+support typographical quotes and/or other special characters:
+
+  Arrival
+  Common Ground
+  The Erudition Chamber
+  The Plant
+  The Recruit
+  Till Death Makes A Monk-Fish Out Of Me
+
+Here is a very incomplete list of games that do *not* support this
+feature and simply use plain ASCII:
+
+  Aayela
+  Babel
+  Bliss
+  Deep Space Drifter
+  Glowgrass
+  Kaged
+  Losing Your Grip
+  Lost New York
+  Once and Future
+  Perdition's Flames
+  Small World
+  Sunset Over Savannah
+  The Beetmonger's Journal (only the intro has curly quotes)
+  The Legend Lives
+  The Light: Shelby's Addendum
+  Toonesia
+  Uncle Zebulons Will
+  Worlds Apart
+  Zero Sum Game
+
+As you can see, the majority of Tads 2 games doesn't support these
+special characters.  Some of them due to the false assumption that only
+HTML-enabled interpreters can do this.  Others simply because they are
+old, written at a time where Tads didn't have any of these features.
+If you're a game author and use HTML-tags only on HTML-enabled terps,
+please consider updating your old games to print typographical quotes
+and dashes even in text-only interpreters, since these interpreters are
+able to map these special characters to ASCII equivalents; for example,
+if the game tries to print an em-dash, text-mode interpreters will
+print two ordinary dashes.  There's nothing to gain by not using these
+characters in text-only terps.  For example, don't do this:
+
+  "\"Hello,\" he said. "
+
+but rather:
+
+  "<q>Hello,</q> he said. "
+
+This gives interpreters like QTads or WinTADS a chance to use curly
+quotes.  Other text-only terps will simply use regular ASCII quotes.
+
+
+Supported HTML Tags
+===================
+
+QTads supports a small HTML subset (but still larger than other
+text-only interpreters).  In particular, it is able to display bold as
+well as italic text.  Text-color in Tads 3 is also supported.
+Horizontal rules are currently displayed using a fixed amount of
+underscores, which is a drawback.
+
+
+Saved Games
+===========
+
+QTads can restore games saved with other non-HTML Tads interpreters.
+You can restore games saved with WinTADS, MaxTADS, MacTADS, GlkTADS,
+and in general any text-only interpreter that has a "Tads" in its name.
+Of course it also works the other way around (or at least I hope it
+does...)  Games saved with Multimedia Tads interpreters (HTML TADS on
+Windows and HyperTADS on the Mac) are a different story.  Sometimes it
+works, sometimes it doesn't; it depends on the game itself.  When not,
+you'll have to play from the beginning (I hope you still remember how
+you got there...)
+
+Games saved with QTads itself are 100% portable between systems.  You
+can save a game with QTads in Linux and load it with the Mac OS X
+version of QTads or vice versa, for example.
+
+
+Colors
+======
+
+The default color scheme on most systems is black text on a white
+background.  This isn't very comfortable for the human eye.  It's best
+to change the backround to something less bright (if you want your eyes
+to do their job well next morning, that is).
+
+
+I have more questions!
+======================
+
+Just send me an email then.  See the README file for an address.

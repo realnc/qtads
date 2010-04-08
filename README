@@ -1,0 +1,226 @@
+QTads - A multimedia interpreter for Tads games.
+Written and maintained by Nikos Chantziaras.  Based on Mike Roberts'
+portable reference implementation of Tads.
+
+This file contains an overview of QTads.  Other documentation files in
+the distribution include:
+
+    AUTHORS
+      People who wrote QTads' code.
+
+    BUGS
+      A list of known bugs.  You shouldn't report them.
+
+    COPYING
+      The GNU General Public License (GPL).  QTads is distributed under
+      the terms and conditions of this license.  (Note that this file
+      might be missing in the Debian distribution; it can be found at
+      /usr/share/common-licenses/GPL-2 or in the "Help->About" menu of
+      the program.)
+
+    CREDITS
+      People who contributed to QTads in one way or another.  Help me
+      make QTads better and your name will appear there too!
+
+    INSTALL
+      Installation and usage instructions.  The first thing you should
+      read (after this README file).
+
+    NEWS
+      Contains the list of changes between QTads versions.
+
+    PORTABILITY
+      A list of systems and compilers where QTads is known to run
+      (few), and also those where it is supposed to run (many).
+
+    SOURCE_README
+      If you want to contribute code, read this.
+
+    TIPS
+      Contains some useful information.  Make sure to check it out.
+
+    TODO
+      Features/enhancements that are planned to be added.  Help is more
+      than welcome.
+
+    qtads.6.gz
+      Manual page (compressed with GNU Zip).  This won't actually get
+      installed.  It's for people who want to create RPM or Debian
+      packages for QTads.  (If you installed QTads by using such a
+      package, it might have been installed.)
+
+The newest version of QTads can be downloaded from its homepage at:
+
+    http://qtads.sourceforge.net
+
+Previous versions can be found at the project page:
+
+    http://sourceforge.net/projects/qtads
+
+
+About Tads and QTads
+====================
+
+QTads is a so called "interpreter" for games created with the Text
+Adventure Development System, or "Tads" for short, a C-like object
+oriented programming language for authoring Interactive Fiction
+(similar to the Infocom or Legend Entertainment games, like "Zork").
+Yes, we are talking about text adventures here.
+
+The Tads compiler creates executables for the Tads Virtual Machine (the
+"Tads VM").  QTads is an implementation of this Virtual Machine; it
+runs Tads VM executables.  One can also say that QTads is a Tads VM
+emulator.  This is similar to Java; the Java compiler creates JavaVM
+programs which must be executed with a JavaVM implementation.
+
+Both Tads 2 as well as Tads 3 games are supported.
+
+QTads is not written from scratch; it uses Mike Roberts' portable
+reference implementations of the two Tads VMs; the T2 VM (written in C)
+and T3 VM (written in C++).
+
+For more information about Tads, visit its home page:
+
+    http://www.tads.org
+
+
+On what systems does it run?
+============================
+
+Theoretically, it should run on *any* system for which a Qt-port exists
+(many Unices, including Linux and Mac OSX, Windows, even embedded devices like
+cell phones and PDAs).
+
+
+What's Interactive Fiction?
+===========================
+
+Well, this is just a poor README file and therefore not the appropriate
+place for an introduction to Interactive Fiction.  For more information
+about Interactive Fiction (or "IF" for short), just go to the Tads page
+(see above) and follow some links.  Or go to the Google search engine
+(http://www.google.com) and search for "interactive fiction"; you'll be
+amazed about how many results you'll get.  And you'll be even more
+amazed about how active the IF community is.
+
+There are two Usenet newsgroups for IF related things.  The first is
+RGIF, which is short for:
+
+    rec.games.int-fiction
+
+where people are talking about IF games in general; things they like in
+games, things they don't like, things they hope to see in future games,
+requests for hints and solutions, reviews of games, announcements of
+new games/software or happenings, flames (mostly funny ones; keep
+this in mind when you "flame" ;-).  Stuff like that.
+
+The other newsgroup is RAIF, which stands for:
+
+    rec.arts.int-fiction
+
+This newsgroup is for everyone who is interested in creating games.
+Most IF authors use to hang around there, so this newsgroup is an
+excellent place to post questions about IF theory, authorship and
+programming.
+
+
+Where do I find games for QTads?
+================================
+
+As I said above, the IF community is a very active one.  New games are
+released all the time.  There's a large repository for IF-related stuff
+(with *lots* of games!) called "The Interactive Fiction Archive".  You
+can access it by HTTP:
+
+    http://www.ifarchive.org (very slow)
+
+or by FTP:
+
+    ftp://ftp.ifarchive.org (also very slow)
+
+The archive has mirrors that are usually much, much faster, like:
+
+    http://mirror.ifarchive.org (faster than light)
+
+Which, at the time of this writing, is the fastest of all.  Please use
+the mirrors instead of the main archive!  You'll save yourself (and
+others) quite a few headaches.  (The full list of mirrors is displayed
+in the main archive's title-page.)
+
+Since the archive is actually just a (huge) bunch of data thrown
+together (more or less), a nice fellow has created a site that will
+guide you through the archive.  The site is called "Baf's Guide to the
+IF Archive" and is located at:
+
+    http://wurb.com/if
+
+It contains many cool things, like a "Genre Map" for the games
+located in the archive along with descriptions, reviews and ratings, as
+well as many useful links.
+
+
+I don't like QTads.  It sucks.
+==============================
+
+Then help me improve it.  Send me suggestions and bug reports, or even
+code if you know C++ and Qt.  Now!  Don't be afraid to do it.  Thank
+you.
+
+
+OK, I'll send some code.  How do I do this?
+===========================================
+
+If you decide to send me code, please read the SOURCE_README file first
+(not needed for small amounts of code).  Also, drop me a mail to inform
+me on what you're working on (this is to ensure that we won't be trying
+to solve the same problem or add the same feature).
+
+Files should be compressed with bzip2 or gzip (or even zip or rar)
+using the highest compression level and sent to my email address at
+SourceForge:
+
+	realnc@gmail.com
+
+You can send whole files or simply diffs created with (guess) the
+`diff' utility.  I also accept diffs created with `xdelta'.  With
+`diff', use either the -c or -u option, *not* the default (-e) to
+generate the patches.  Here's an example, where "qtads-1.7" is the
+directory containing the original 1.7 sources, and "qtads-modified" the
+directory with your modified sources:
+
+  diff -Naur qtads-1.7 qtads-modified > patch
+  bzip2 patch
+
+This will create a file "patch.bz2" containing your modifications.  The
+general format of the `diff' command is:
+
+  diff -Naur ORIGINAL_DIRECTORY MODIFIED_DIRECTORY > PATCH_FILENAME
+
+Do not include a slash ("/") when specifying the directories.
+
+If your code is good (which means: if it doesn't suck the way my own
+does ;-), I'll include it in the next version.  Note that your code
+will be placed under the GPL and you will maintain your copyright.  Since
+QTads is a simple interpreter for Tads games and not a nuclear war
+simulator, I'm not requesting signed forms from your boss/school/etc.
+Just send the damn code, will ya? ;-)
+
+
+Copyright
+=========
+
+QTads is Copyright (C) 2010 by Nikos Chantziaras.
+
+QTads is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2 of the License, or (at your
+option) any later version.
+
+QTads is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA  02111-1307  USA

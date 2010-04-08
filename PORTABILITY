@@ -1,0 +1,42 @@
+Note: The below is outdated and still refers to QTads 1.x.  Qt 4 has
+dropped support for some of the below platforms and compilers and
+introduced support for others.
+
+
+Although QTads has only been tested on Linux, FreeBSD and Mac OS X
+(all with the GNU C++ compiler), it should build and run on many more.
+This is the list of systems that are able to run the Qt library:
+
+    (System - Compilers)
+
+    aix        - g++, xlc
+    bsdi       - g++
+    dgux       - g++
+    freebsd    - g++
+    hpux       - acc, cc, g++, n64, o64
+    hurd       - g++
+    irix       - g++, cc, cc-64, cc-o32
+    linux      - g++, cxx, kcc
+    mac os x   - g++, project builder
+    netbsd     - g++
+    openbsd    - g++
+    openunix   - cc, g++
+    qnx        - g++
+    reliant    - 64, cds
+    sco        - g++
+    solaris    - 64, cc, g++
+    tru64      - cxx, g++
+    ultrix     - g++
+    unixware   - g++
+    unixware 7 - g++, cc
+    ms-windows - borland, msvc, msvc.net, mingw
+
+Now don't take it for granted that QTads will run in each and every one
+of these systems.  But, if you're using one of them and QTads doesn't
+compile/run, there's a big chance that the modifications required are
+minimal, since -- to the best of my knowledge -- the source code is
+pure ANSI-C and C++, and no other third-party libraries other than Qt
+are required; please report back to the maintainer (see the file
+AUTHORS) if you try to build on one of the untested systems.  The rule
+is: if you have the Qt library available on your system, QTads should
+build and run without problems.

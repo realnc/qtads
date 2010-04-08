@@ -1,0 +1,607 @@
+2.0 - 2010/??/??
+================
+
+QTads 2 is a new major version, bringing multimedia capabilities (HTML Tads)
+and is based on Qt version 4 (4.6.2 was used during development).  Lots of
+stuff had to go during the rewrite of major parts of the code, so it looks
+pretty bare-bone right now.  This was necessary in order to decrease the
+initial porting effort and to release something that works in a reasonable
+time frame.  I'm hoping to bring everything back bit by bit as development
+progresses.
+
+Note that the "2.0" version is following "1.9" just by coincidence; it is
+possible that further updates will be released in the 1.x series (like 1.10)
+fixing issues for people who still prefer a text-only GUI interpreter.
+
+
+1.9 - 2009/06/24
+================
+
+  - A bug where HTML character entities would appear in the window title has
+    been fixed (for example QTads would display "Lydia&rsquo;s Heart" instead
+    of "Lydia's Heart".)
+
+  - The "Recent Games" list no longer displays games that are no longer
+    accessible (due to deletion or file permissions or other factors.)
+
+  - Fixed some visual glitches in the main window and status line.
+
+
+1.8 - 2009/05/27
+================
+
+  - Updated the Tads virtual machine to version 2.5.14/3.0.18.1
+
+  - Fixed Unicode filename problems.  Running games from directories that
+    contain Unicode characters as well as saving and loading gamestates in
+    such directories should work now.
+
+  - Fixed a compilation problem on BSD systems.
+
+  - Fixed a display problem with Tads 2 games that use non-latin characters
+    and don't make use of character mapping files.  The system's local
+    character encoding will now be used by default for Tads 2.  Russian games
+    for example that are written in the CP1251 character set using the "RTADS"
+    libraries will now display correctly if the system's character set is also
+    CP1251 ("ru_RU.CP1251" in Linux for example; note that "ru_RU.UTF-8" won't
+    work since the character set must match the one of the game.)
+
+    Tads 2 games should really use mapping files though; this is just a
+    work-around to allow for those that don't to display correctly.
+
+
+1.7 - 2008/03/31
+================
+
+Wow, over 3 years since the last update :P
+
+  - Updated the Tads virtual machine to version 2.5.10/3.0.15.3
+
+  - The amount of turns the player can UNDO in Tads 3 games has been
+    increased.  In previous versions, the player could only UNDO a few
+    turns (about 6 or so; it varies by game).  Now you can undo more
+    than 100 turns.  Note that there's an upper-limit of turns that the
+    player can UNDO (255) imposed by the T3 VM.
+
+  - Fixed some non-working shortcuts in the configuration dialog.
+
+  - QTads is now able to parse the meta-information resource embedded in
+    a game (Tads 2 as well as Tads 3).  For this, a new menu entry has
+    been added ("Game->Game Information").  HTML code in the meta-info
+    tags (if it exists) is supported and displayed correctly.
+
+  - Fixed compilation errors with recent compilers.
+
+  - The interpreter will now correctly restore the window coordinates
+    and size of the previous session even when starting in fullscreen
+    mode.  Changing from fullscreen to windowed mode will now use the
+    geometry that was set in the previous session before entering
+    fullscreen mode.
+
+  - The "File Open" dialog will now correctly show both Tads 2 as well
+    as Tads 3 games.
+
+
+1.6c - 2004/12/15
+=================
+
+Due do a stupidity-related mistake, version 1.6 wouldn't compile nor run
+with versions lower than 3.3 of Qt.  The problem was in the user
+interface files (forms/*.ui); they were saved in the new Qt Designer 3.3
+format, which is *so* not compatible with prior versions.  This problem
+has been fixed in this release.  Another quite important change is the
+compile-time detection of the system's endianess (big vs little endian).
+QTads should now run almost everywhere (at least I hope it does).
+
+  - Fixed compilation problems with Qt versions lower than 3.3.
+
+  - The system's endianess now shouldn't matter when compiling QTads.
+
+  - Enhanced the way icons are loaded.  In previous versions, they
+    didn't use the alpha channel for transparency effects, resulting in
+    pixelized and blocky appearance.  This has been fixed.  (You can now
+    find the icons in the images/ directory.  They won't get installed,
+    but will be embedded into the executable at build time.)
+
+
+1.6 - 2004/11/21
+================
+
+I feel like I'll never implement that darn Tads 3 banner-support!  I
+tried it -- really -- but the implementation was chaotic, buggy, didn't
+work most of the time, and who knows what else.  All I can say is that
+I'm still working on it.  Help is *really* more than welcome, as my Real
+World life changed completely in the last few months.  No, it's not
+marriage (thank God); not imprisonment; didn't die either.  It's worse:
+I'm a student now!  (And probably will remain in this state for the next
+five years, give but not take a few.  And if you're curious about what
+I'm studying, it's "information and communication systems engineering",
+which is kind of a funny coincidence since the impression I had about
+software engineers wasn't the most flattering one.)
+
+  - QTads now has text-color support for Tads 3 games (foreground only).
+    For example, "I Must Play" (an IF-Comp 2004 entry) is playable in
+    color.
+
+  - A non-bug (long story; don't even ask) caused transcript files to
+    be saved in UTF-8 encoded Unicode.  This has been fixed; transcript
+    files will now use the system's local character set.  Furthermore,
+    the bug where Tads 2 transcripts contained spurious 01 bytes among
+    the text has been fixed.
+
+    Mac OS X will still use UTF-8, since, as it happens, that's the
+    "native" character set on this system.  Same goes for modern Linux
+    systems that use UTF-8 for everything (SuSE 9.1, for example).
+
+  - The clock's state is now preserved between sessions.
+
+  - The TadsVM file I/O safety levels are now supported and can be
+    adjusted in the configuration dialog.  There are 5 safety levels:
+
+      0: Safety mechanism disabled; unlimited read/write access.
+      1: Read everywhere, write to current (game's) directory only.
+      2: Reading/writing is only allowed in the current directory.
+      3: Read in current directory only; no writing allowed.
+      4: Completely disable file I/O.
+
+    The default level is 2.  This change doesn't affect the saving and
+    restoring of games, since safety levels only apply to file I/O
+    initiated by the game, not by the VM.
+
+  - In Mac OS X, the interpreter's title bar got hidden behind the menu
+    bar on start-up (when QTads was started for the first time).  This
+    has been fixed; now the OS decides where to put the window.
+
+  - Fixed another bug where game-text could be modified by the player.
+    I really need to replace the default input-handlers offered by Qt,
+    since this kind of bug keeps showing up and the work-arounds create
+    quite a mess in the sources (yeah, OK, they're already a mess, but
+    that's no reason to ignore the problem).
+
+  - The context menu ("right-click menu") now pops up even when the
+    click was inside the left/right margin, and the menu and tool bar
+    don't have a context menu anymore; the tool bar can be hidden/shown
+    using the game-window's context menu ("Show/hide toolbar").
+    Furthermore, the items in the context menu now have accelerators;
+    F1 to show/hide the menu bar, F2 for the tool bar, and F3 for the
+    scroll bar.
+
+  - The most important change: new icons!  They're also smaller than the
+    previous ones (16x16 instead of 22x22).
+
+  - Added some German translations that were missing.
+
+  - Updated the Tads virtual machine to version 2.5.9/3.0.8.
+
+  - Other minor fixes and enhancements here and there.
+
+
+1.5 - 2004/06/04
+================
+
+Guess what?  Still no Tads 3 banners.  ("Avalon" anyone?)  At least we
+have plenty of bug-fixes and enhancements.  The most important addition
+is the timed input-event support; "The Recruit" (an IF Comp 2003 entry
+by M. Sousa and R. Sherwin) is now playable and won't crash anymore.
+
+IMPORTANT: The T3 VM is known to crash with some versions of the GNU
+Compiler (3.3.x and maybe 3.4.x).  This seems to be either a problem
+with GCC's optimizer, or with T3's code.  Probably the former.  When
+QTads aborts with a segmentation fault or similar, add the
+"-fno-strict-aliasing" option to the CFLAGS and CXXFLAGS variables when
+building the interpreter (see the INSTALL file for details).
+
+  - QTads now fully supports timed input-events.  It works 100% with
+    Tads 2 games; Tads 3 timed *input* (as opposed to timed input
+    *events*, which are available now) is still not implemented.  Let's
+    hope for one of the next versions.
+
+  - In Mac OS X, the Carbon Preferences mechanism is now used to store
+    the settings.  (Linux and other Unices will still use the
+    "$HOME/.qt/qtadsrc" file.
+
+  - Soft scrolling can now be disabled.  Default is enabled.
+
+  - Fixed a bug where it was necessary to click on the "Open new game"
+    button twice if a game was specified as a command-line argument.
+
+  - Drag&dropping text inside the game window was broken (game text was
+    being overriden).  This has been fixed.
+
+  - Fixed a text-redraw bug when the current text-alignment was
+    changed.
+
+  - In previous versions, it wasn't possible to scroll the text with
+    the PageUp/PageDown keys if the game had stopped running, and it
+    was possible to modify game-text when using them.
+
+  - PageUp/PageDown now also works when in a "more" prompt.
+
+  - File-extension recognition didn't work.  The game extension
+    (.gam or .t3) can be omitted now.
+
+  - The warning dialog that said "The QTDIR environment variable is not
+    set ..." is no more.  If Qt's translation-files can't be found,
+    QTads will silently fall-back to the default English versions.
+
+  - The Tads 3 version and copyright information at the start of a game
+    won't appear anymore.
+
+  These changes don't affect functionality:
+
+  - In Mac OS X, the application is now called "QTads" instead of
+    "qtads", since capitalization of program names seems to be
+    considered a Good Thing (ugh!)
+
+  - Added a manual page (qtads.6.gz).  This won't get installed or
+    anything; it's mainly for the Debian package (maintained by Daniel
+    Schepler), since Debian considers the lack of a man page to be a
+    "bug".
+
+
+1.4 - 2004/05/13
+================
+
+(This version was never officially released, mainly due to lack of
+time; at the time the release could be made, v1.5 was already waiting
+to be tarballed and sourceforged.)
+
+The good news is that this version introduces support for Mac OS X.  A
+big "thank you" to Matt Herberg, who also is the maintainer of the Mac
+OS X distribution and co-developer, and Curt Siffert.  Thanks guys!
+
+The bad news is that we still don't have Tads 3 banner support.  I hope
+we'll have it in the next version.
+
+  - Added Mac OS X support.
+
+  - Fixed a bug where files requested by the game could not be accessed
+    if the interpreter was not started from the game's directory.  For
+    example, you can now put the registration key-file of "Losing Your
+    Grip" (regkey.txt) in the same directory as the game itself, and
+    the game will find it.
+
+  - Prompting for a game to run at startup is now optional; it can be
+    enabled/disabled in the configuration dialog.
+
+  - The directory where the documentation is installed no longer has a
+    version number attached.  Every time you install a new version of
+    the interpreter, the new documentation will simply replace the
+    older files.  Opinions differ if this is better or worse, but I
+    think it's somewhat awkward to having to delete the old directory
+    manually after installing a new version.
+
+  - Updated the Tads virtual machine to version 2.5.8/3.0.6p.
+
+
+1.3a - 2003/09/28
+=================
+
+Oops, I did a mistake in the last release; the "Recent Games" menu was
+behaving very weird (newly loaded games didn't show up until QTads was
+restarted).  This release only fixes this bug; nothing else.
+
+
+1.3 - 2003/09/26
+================
+
+Although this version lacks enough changes to justify a new release, I
+nonetheless decided to release it because of the upcoming IF
+competition (http://www.ifcomp.org).
+
+  - Added a "Recent Games" menu.  (Was about time this got added.)
+
+  - Fixed a bug where the mouse cursor was staying invisible when it
+    shouldn't (when the window was losing keyboard focus, for example).
+
+  - Enhanced the documentation in the sources, since several people
+    have found QTads' code quite useful.  (Where "several" is any
+    number between 1 and 2.)
+
+  - Updated the Tads virtual machine to version 2.5.8/3.0.6k.
+
+
+1.2 - 2003/08/10
+================
+
+  - QTads now supports italic text.  Previously, the <em> tag was
+    rendered in bold, and <i> was ignored; both are now rendered in
+    italics (as in HTML TADS).  Furthermore, the <strong> tag is now
+    recognized and rendered in bold italics ("strong emphasis").
+
+  - Every pair of ASCII dashes ("--") is now replaced with a
+    typographical em-dash in Tads 2 games (Tads 3 games don't need
+    this, since they already display em-dashes on their own).  This is
+    useful for games that don't make use of the "&mdash;" Multimedia
+    Tads character entity, or make the false assumption that character
+    entities are not supported in text-only interpreters.  This feature
+    can be enabled/disabled in the configuration dialog, and it works
+    only in Tads 2 games.  (Tip: Try it with "Worlds Apart.")
+
+  - Fixed two cosmetic bugs in the command history.
+
+      1) When using the up/down key to cycle through the previous
+         inputs, they were displayed using the game window's font
+         settings, not the user input settings.
+
+      2) The current command is not saved in the history anymore if it
+         is the same as the previous one.
+
+  - Fixed the (hopefully) last remaining bugs where it was possible to
+    modify game-text.  (Leif Huhn provided this fix.)
+
+  - Added "Help->Version Information" menu.
+
+  - Changed some icons.  I hope you like them.
+
+  - The documentation has been restructured.
+
+  - Updated the Tads virtual machine to version 2.5.8/3.0.6j.
+
+
+1.1 - 2003/05/28
+================
+
+The QTads homepage has moved from Tripod to SourceForge.  The new
+location is: http://qtads.sourceforge.net (the old page at
+http://members.lycos.co.uk/realnc/qtads still exists, but contains
+nothing except a pointer to the new location).  If you had links to the
+old site, please update them.
+
+  - QTads now uses Unicode when running Tads 3 games.  This means that
+    Multimedia TADS character entities like typographical (``curly'')
+    quotes and dashes of different lengths (en- and em-dashes) are
+    displayed correctly.  The only limitation is that the font you use
+    must support these characters; most fonts out there support them,
+    but I saw a few ones that don't.
+
+  - QTads is also able to display typographical quotes and dashes in
+    Tads 2 games.  Note that this feature must be supported by the game
+    itself; if the game simply prints out a normal (") quote instead of
+    a typographical one, QTads can do nothing about it.  See the TIPS
+    file for a list of games that use typographical quotes instead of
+    normal ones.
+
+  - Support for Tads 2 character mapping files has been added.  QTads
+    now provides mapping files for every ISO 8859 (known as ISO Latin)
+    character set that Tads 2 is able to use (located in the charmaps/
+    subdirectory).  Note that QTads doesn't provide (or need) mapping
+    files for Tads 3 games, since it uses Unicode.
+
+  - QTads can display curly apostrophes in every game.  This can be
+    disabled in the configuration dialog.
+
+  - The "Curly quotes" setting in the configuration dialog has been
+    implemented.
+
+
+1.0 - 2003/05/05
+================
+
+This is the first "stable" version of QTads (not that the previous one
+was unstable or something).
+
+  - User input can now be displayed in any combination of bold, italic
+    or underline.
+
+  - Added a clock that keeps track of how much time a game is running.
+
+  - Added internationalization support and translated everything to
+    German.  (Hmm, no Greek yet.)  This also includes support for
+    translations of the Qt library itself (as documented in the INSTALL
+    file now).
+
+  - Ctrl+C (Copy), Ctrl+V (Paste) and similar shortcuts are working
+    now.  (In earlier versions, the selection got removed as soon as
+    Ctrl was pressed.)
+
+  - QTads doesn't eat up CPU cycles when idle now, which means you can
+    let it run in the background and it won't slow the system down.
+    In earlier versions, QTads was using about 30% of CPU time on my
+    system when idle; now it uses only 0.1%.  (Christophe Antoine
+    provided this fix.)
+
+  - Fixed the fix of the fix of the statusline.  (It's obvious that I
+    can't code.)  It should not word-wrap without need now and not
+    resize its height the first time it prints something.
+
+  - Fixed Tads 2 doublespacing problems.  Note that the new T3 VM
+    doesn't support doublespacing anymore; it's handled by the game
+    file itself.  This means that older games (compiled with earlier
+    Tads 3 versions) will never use doublespacing while new ones will
+    always use it, no matter how QTads is configured.  This raises a
+    problem I don't know how to fix; doublespacing in block-justified
+    text doesn't work as it should.  This is a bug in Qt's text
+    renderer.
+
+  - Fullscreen-mode is saved when quitting QTads.
+
+  - Millisecond precision is now supported when the VM asks QTads for
+    the elapsed time (os_get_sys_clock_ms()).
+
+
+1.0 beta - 2003/03/21
+=====================
+
+This is the first public release of QTads.
+
+  - Theme support added.
+    A "theme" is a set of preferences (colors, margins, fonts, etc)
+    that can be saved and then activated at runtime.  The themes can be
+    edited in the configuration dialog and then activated using the new
+    Display->Theme menu.
+
+  - Fixed a bug where QTads was trying to restore a saved game when
+    loading Tads 3 games and failed with a message saying that "this
+    interpreter can't restore [...]"
+
+  - Tads 3 text rendering is more "smooth" now.  This fixes the
+    "scrolling in steps" problem.
+
+  - Changed the frame around the game window.  This fixes some visual
+    bugs related to margins.
+
+  - Fixed a bug in the statusline where both parts of it (text and
+    score) were equally wide, no matter how much text they contained.
+
+  - Further reduced the statusline's height.
+
+  - The makefile's "dist" target should now be able to create a working
+    source archive of QTads.
+
+  - Improved dependency tracking in the project file.  All files should
+    correctly be recompiled, no matter how deep the dependency-nesting
+    is in each case.  This eliminates the problem where a
+    "touch tads2/os.h" (or similar) was required in order to achieve a
+    recompilation.
+
+  - The PageUp and PageDown keys can now be used to scroll up or down.
+
+  - Added a few more keyboard shortcuts (like restoring, restarting,
+    saving, scrolling, etc) and documented them in a new dialog
+    (Help->Shortcuts).
+
+
+1.0 alpha 3 - 2003/03/17
+========================
+
+This version was a private beta-testing release.
+
+The main change in this version is the included T3 VM.  It's a bit
+difficult to test QTads with Tads 3 games, since only a few have been
+released.  The games I tested with are:
+
+  * The Tads 3 Library Sample Game (Mike Roberts)
+  * Forever Always (Iain Merrick)
+  * Eric's Gift (Joao Mendes)
+  * The Demon's Eye, 2003/03/01 (Guilherme De Sousa, not released yet)
+  * Lost In Somewhere (my own WIP, not released yet)
+
+QTads lacks banner-support, so the library sample game is
+semi-functional in QTads.  I hope to add banners in the next version.
+Note that Tads 3 doesn't use HTML for banners.  It uses an API, so
+banners can be implemented even in non-HTML interpreters.
+
+As far as I know, at the time of this writing QTads is the only X11
+non-KDE interpreter with Tads 3 support!  Wheee... :)
+
+Overview of changes:
+
+  - Basic support for Tads 3 games.
+
+  - Restructured source directory layout.
+    QTads is now built from and in the distribution's root directory,
+    not tads2/qt.
+
+
+1.0 alpha 2 - 2003/03/14
+========================
+
+This version was a private beta-testing release.
+
+QTads has got a homepage: http://members.lycos.co.uk/realnc/qtads/
+This is now the main distribution point for new versions.
+
+Thanks to the betatesters (listed in the interpreter's "About" dialog),
+this version has many improvements over the previous one.  The list
+below includes the most visible and/or useful changes.
+
+  - Now compiles with GCC 2.95.x.
+    Tested with 2.95.3.
+
+  - Fixed a bug in the random-number generator.
+    Games that make heavy use of random numbers should now behave as in
+    most other interpreters.
+
+  - Fixed a few bugs that allowed the user to modify game text.
+
+  - The game window no longer performs a top-to-bottom scroll when
+    exiting the configuration dialog.
+
+  - The "Doublespace" option in the configuration dialog is now saved
+    when quitting QTads.
+
+  - "About" dialog.
+    "No program should be without one! [sic]"
+
+  - More menus as well as a toolbar have been added.
+    QTads is now almost useable! ;)
+
+  - Fixed a compilation problem in src/missing.cc.
+    Some systems were unable to compile QTads because a system-header
+    #include was missing.
+
+  - Window position and size are now preserved between QTads sessions.
+    If this doesn't work as expected, please report it (some window
+    managers are broken, but I can include special code for them; if I
+    know how they behave, that is).
+
+  - Text rendering is now less noticeable.
+    This eliminates the delay when switching to bold text and back.
+
+  - The "Top" and "Bottom" margins are no more.
+    Most people found them annoying.  The rest (including me)
+    considered them useless toys.
+
+  - The DEBUG variable has been removed from the project file.
+    To compile the debug version of QTads, the BUILD variable must be
+    used.  Like this:
+
+        qmake BUILD=debug
+
+    The default is "BUILD=release".
+
+  - QTads now builds successfully on systems that lack the
+    single-threaded Qt library.
+    The project file now uses the threaded library by default, since
+    that's the one KDE is using.  If the threaded lib cannot be found,
+    the single-threaded lib will be used.
+
+  - The game window's context menu (also known as "right-click menu")
+    has been removed completely.
+    It didn't work anyway.  I hope to fix this in the next version.
+    Suggestions as what the menu should contain (or not) are welcome.
+
+  - Improved configuration dialog design (more compact).
+    This includes a fix that prevents the preview from growing too
+    large when selecting huge font sizes.
+
+  - Command editing (including history) optimized to the speed of
+    light.
+    This should lower QTads' system requirements a bit; try it on a P60
+    or similar.
+
+  - QTads now prompts for a game when none has been specified in the
+    command line.
+
+  - A nicely formatted message is now shown when the current game ends.
+
+  - It is no longer possible to close the application without the game
+    being notified.
+    Previously, it was possible that the TADS VM was still executing
+    although the window has been closed, requiring the user to do a
+    Ctrl+C or send a kill-signal.
+
+  - It is no longer possible to choose a unit for the margin values.
+    Values are now always in pixels.  Being able to choose between
+    "characters" and "pixels" was, more or less, a useless feature.
+
+  - Command-line options have been removed.
+    Since the default command-line options of the TADS VM were a bit
+    wacky to handle, they have been removed completely.  I'll implement
+    native options in the next version.  The only option still
+    recognized is the game's filename.
+
+  - Statusline: decreased the height, disabled text-selection, and
+    changed appearance (a bit more flat).
+
+  - Typing text while the mouse cursor is inside the game's text will
+    hide the mouse cursor.  Just move it to make it visible again.
+
+  - Lots of other things not worth mentioning here.
+
+
+1.0 alpha - 2003/02/01
+======================
+
+This version was a private beta-testing release.
