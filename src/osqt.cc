@@ -26,6 +26,7 @@
 
 #include "config.h"
 
+#include <QApplication>
 #include <QDir>
 #include <QDateTime>
 #include <QTextCodec>
@@ -645,8 +646,15 @@ os_get_sys_clock_ms( void )
  * TODO: Implement it.
  */
 void
-os_sleep_ms( long /*delay_in_milliseconds*/ )
+os_sleep_ms( long ms )
 {
+	QTime time;
+	time.start();
+	while (time.elapsed() < ms) {
+		qApp->sendPostedEvents();
+		qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents, ms - time.elapsed());
+		qApp->sendPostedEvents();
+	}
 }
 
 
