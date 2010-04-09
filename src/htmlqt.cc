@@ -43,18 +43,21 @@ CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 void
 CHtmlSysSoundWavQt::add_crossfade( CHtmlSysWin* win, long ms )
 {
+	qDebug() << Q_FUNC_INFO;
 }
 
 
 void
 CHtmlSysSoundWavQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
 {
+	qDebug() << Q_FUNC_INFO;
 }
 
 
 void
 CHtmlSysSoundWavQt::resume()
 {
+	qDebug() << Q_FUNC_INFO;
 }
 
 
@@ -74,18 +77,21 @@ CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 void
 CHtmlSysSoundOggQt::add_crossfade( CHtmlSysWin* win, long ms )
 {
+	qDebug() << Q_FUNC_INFO;
 }
 
 
 void
 CHtmlSysSoundOggQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
 {
+	qDebug() << Q_FUNC_INFO;
 }
 
 
 void
 CHtmlSysSoundOggQt::resume()
 {
+	qDebug() << Q_FUNC_INFO;
 }
 
 
@@ -106,18 +112,21 @@ CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 void
 CHtmlSysSoundMpegQt::add_crossfade( CHtmlSysWin* win, long ms )
 {
+	qDebug() << Q_FUNC_INFO;
 }
 
 
 void
 CHtmlSysSoundMpegQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
 {
+	qDebug() << Q_FUNC_INFO;
 }
 
 
 void
 CHtmlSysSoundMpegQt::resume()
 {
+	qDebug() << Q_FUNC_INFO;
 }
 
 

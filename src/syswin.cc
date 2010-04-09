@@ -48,7 +48,7 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QWidget* parent )
 
 CHtmlSysWinQt::~CHtmlSysWinQt()
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	// Don't allow the formatter to reference us anymore, since
 	// we're about to be deleted.
@@ -148,11 +148,11 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other
 	layout->setSpacing(0);
 	layout->setContentsMargins(0, 0, 0, 0);
 
-	qDebug() << "INDEX INSIDE LAYOUT:" << layout->indexOf(this);
+	//qDebug() << "INDEX INSIDE LAYOUT:" << layout->indexOf(this);
 
 	switch (where) {
 	  case OS_BANNER_FIRST:
-		qDebug() << "OS_BANNER_FIRST";
+		//qDebug() << "OS_BANNER_FIRST";
 		if (pos == HTML_BANNERWIN_POS_TOP or pos == HTML_BANNERWIN_POS_LEFT) {
 			layout->insertWidget(layout->indexOf(this), banner);
 		} else {
@@ -161,12 +161,12 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other
 		break;
 
 	  case OS_BANNER_LAST:
-		qDebug() << "OS_BANNER_LAST";
+		//qDebug() << "OS_BANNER_LAST";
 		if (pos == HTML_BANNERWIN_POS_TOP or pos == HTML_BANNERWIN_POS_LEFT) {
-			qDebug() << "TOP or LEFT";
+			//qDebug() << "TOP or LEFT";
 			layout->insertWidget(layout->indexOf(this), banner);
 		} else {
-			qDebug() << "BOTTOM or RIGHT";
+			//qDebug() << "BOTTOM or RIGHT";
 			layout->insertWidget(layout->indexOf(this) + 2, banner);
 		}
 		break;
@@ -196,7 +196,7 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other
 void
 CHtmlSysWinQt::notify_clear_contents()
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 }
 
 
@@ -341,8 +341,13 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 
 	// We make the view a bit higher (5 pixels) then required by the real
 	// document height so that we get a bit of extra space under the input
-	// prompt because it looks nicer.
-	this->fDispWidget->resize(this->formatter_->get_outer_max_line_width(), this->formatter_->get_max_y_pos());
+	// prompt because it looks nicer.  This is only done if we're the main game
+	// window.
+	unsigned long height = this->formatter_->get_max_y_pos();
+	if (this == qFrame->gameWindow()) {
+		height += 5;
+	}
+	this->fDispWidget->resize(this->formatter_->get_outer_max_line_width(), height);
 
 	// Unfreeze the display if we froze it before.
 	if (freeze_display) {
@@ -578,9 +583,7 @@ CHtmlSysWinQt::map_system_color( HTML_color_t color )
 	  case HTML_COLOR_INPUT:      return HTML_make_color(0, 0, 0);
 	  case HTML_COLOR_HLINK:      return HTML_make_color(0, 0, 255);
 	  default:
-		// Return black for anything else.  This is not supposed to happen, so
-		// print a warning in that case.
-		qWarning() << Q_FUNC_INFO << "Unknown HTML_color_t value";
+		// Return black for anything else.
 		return 0;
 	}
 }
@@ -652,7 +655,7 @@ CHtmlSysWinQt::get_html_show_graphics() const
 void
 CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	if (image == 0 or image->get_image() == 0) {
 		if (this->fBgImage != 0) {
@@ -700,10 +703,7 @@ void
 CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,
 								long height, HTML_BannerWin_Units_t height_units, int use_height )
 {
-	qDebug() << Q_FUNC_INFO;
-
-	qDebug() << "*** Game Window:" << qFrame->gameWindow() << "Parent:" << this->parentWidget()
-			<< "Size:" << this->parentWidget()->size();
+	//qDebug() << Q_FUNC_INFO;
 
 	if (this == qFrame->gameWindow()) {
 		// We're the main game window.  Ignore the call.
@@ -717,14 +717,14 @@ CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, 
 			return;
 		}
 		if (height_units == HTML_BANNERWIN_UNITS_PCT) {
-			qDebug() << "Setting banner height (percent) of" << this << "to" << height;
+			//qDebug() << "Setting banner height (percent) of" << this << "to" << height;
 			castLayout->setStretchFactor(this, height);
 		} else if (height_units == HTML_BANNERWIN_UNITS_CHARS) {
-			qDebug() << "Setting banner height (height of '0') of" << this << "to" << height;
+			//qDebug() << "Setting banner height (height of '0') of" << this << "to" << height;
 			this->setMaximumHeight(this->fontMetrics().boundingRect('0').height() * height);
 			this->setMinimumHeight(this->fontMetrics().boundingRect('0').height() * height);
 		} else if (height_units == HTML_BANNERWIN_UNITS_PIX) {
-			qDebug() << "Setting banner height (pixels) of" << this << "to" << height;
+			//qDebug() << "Setting banner height (pixels) of" << this << "to" << height;
 			this->setMaximumHeight(height);
 			this->setMinimumHeight(height);
 		}
@@ -734,14 +734,14 @@ CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, 
 			return;
 		}
 		if (width_units == HTML_BANNERWIN_UNITS_PCT) {
-			qDebug() << "Setting banner width (percent) of" << this << "to" << width;
+			//qDebug() << "Setting banner width (percent) of" << this << "to" << width;
 			castLayout->setStretchFactor(this, width);
 		} else if (width_units == HTML_BANNERWIN_UNITS_CHARS) {
-			qDebug() << "Setting banner width (width of '0') of" << this << "to" << width;
+			//qDebug() << "Setting banner width (width of '0') of" << this << "to" << width;
 			this->setMaximumWidth(this->fontMetrics().boundingRect('0').width() * width);
 			this->setMinimumWidth(this->fontMetrics().boundingRect('0').width() * width);
 		} else if (width_units == HTML_BANNERWIN_UNITS_PIX) {
-			qDebug() << "Setting banner width (pixels) of" << this << "to" << width;
+			//qDebug() << "Setting banner width (pixels) of" << this << "to" << width;
 			this->setMaximumWidth(width);
 			this->setMinimumWidth(width);
 		}
@@ -752,7 +752,7 @@ CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, 
 void
 CHtmlSysWinQt::set_banner_info( HTML_BannerWin_Pos_t pos, unsigned long style )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	this->fBannerPos = pos;
 	this->fStyle = style;
