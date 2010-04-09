@@ -5,16 +5,15 @@ QT += phonon
 CONFIG += debug
 #CONFIG += release
 
-QMAKE_CFLAGS_DEBUG += -O0
-QMAKE_CXXFLAGS_DEBUG += -O0
-
 # We use warn_off to allow only default warnings, not to supress them all.
 QMAKE_CXXFLAGS_WARN_OFF =
 QMAKE_CFLAGS_WARN_OFF =
 
-# Tads 3 has problems with strict aliasing rules in GCC
 *-g++* {
+	# Tads 3 has problems with strict aliasing rules in GCC
 	QMAKE_CXXFLAGS += -fno-strict-aliasing
+
+	# Avoid a flood of "unused paramater" warnings.
 	QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter
 	QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter
 }
