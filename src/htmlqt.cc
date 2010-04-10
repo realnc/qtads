@@ -26,6 +26,50 @@
 CHtmlSysFrameQt* qFrame = 0;
 CHtmlSysWinGroupQt* qWinGroup = 0;
 
+/* --------------------------------------------------------------------
+ * QTadsMediaObject
+ */
+QTadsMediaObject::QTadsMediaObject( QObject* parent )
+  : Phonon::MediaObject(parent), fDone_func(0), fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
+{
+	connect(this, SIGNAL(aboutToFinish()), this, SLOT(fLoop()));
+	connect(this, SIGNAL(finished()), this, SLOT(fFinish()));
+}
+
+
+void
+QTadsMediaObject::fLoop()
+{
+	// Schedule the same source for another playback if we're looping or didn't
+	// reach the wanted repeat count yet.
+	if (this->fRepeatsWanted == 0 or this->fRepeats < this->fRepeatsWanted) {
+		this->enqueue(this->currentSource());
+		++this->fRepeats;
+	}
+}
+
+
+void
+QTadsMediaObject::fFinish()
+{
+	// Invoke the callback, if there is one.
+	if (this->fDone_func != 0) {
+		qDebug() << "INVOKING CALLBACK, REPEAT:" << this->fRepeats;
+		this->fDone_func(this->fDone_func_ctx, this->fRepeats);
+	}
+}
+
+
+void
+QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat )
+{
+	this->fRepeatsWanted = repeat;
+	this->fDone_func = done_func;
+	this->fDone_func_ctx = done_func_ctx;
+	++this->fRepeats;
+	this->play();
+}
+
 
 /* --------------------------------------------------------------------
  * CHtmlSysSoundWavQt
@@ -35,7 +79,7 @@ CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								int repeat, const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade )
 {
 	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	this->play();
+	this->startPlaying(done_func, done_func_ctx, repeat);
 	return 0;
 }
 
@@ -69,7 +113,7 @@ CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								int repeat, const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade )
 {
 	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	this->play();
+	this->startPlaying(done_func, done_func_ctx, repeat);
 	return 0;
 }
 
@@ -104,7 +148,7 @@ CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 								 int crossfade )
 {
 	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	this->play();
+	this->startPlaying(done_func, done_func_ctx, repeat);
 	return 0;
 }
 

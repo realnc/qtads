@@ -225,6 +225,8 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 	this->formatter_->add_line_to_disp_height();
 	return true;
 }
+
+
 int
 CHtmlSysWinInputQt::getKeypress( int timeout, bool* timedOut )
 {
@@ -234,14 +236,13 @@ CHtmlSysWinInputQt::getKeypress( int timeout, bool* timedOut )
 	static bool done = true;
 	static int extKey;
 
-	this->verticalScrollBar()->setValue(this->verticalScrollBar()->maximum());
-	CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(this->formatter_);
-	formatter->prepare_for_input();
-	while (formatter->more_to_do()) {
-		formatter->do_formatting();
-	}
-
 	if (done) {
+		CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(this->formatter_);
+		formatter->prepare_for_input();
+		while (formatter->more_to_do()) {
+			formatter->do_formatting();
+		}
+		this->verticalScrollBar()->setValue(this->verticalScrollBar()->maximum());
 		extKey = 0;
 		this->startKeypressInput();
 		while (not this->inputReady()) {

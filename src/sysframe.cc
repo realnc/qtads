@@ -385,19 +385,19 @@ CHtmlSysFrameQt::get_input_cancel( int reset )
 
 
 int
-CHtmlSysFrameQt::get_input_event( unsigned long timeout_in_milliseconds, int use_timeout, os_event_info_t* info )
+CHtmlSysFrameQt::get_input_event( unsigned long ms, int use_timeout, os_event_info_t* info )
 {
 	qDebug() << Q_FUNC_INFO << "use_timeout:" << use_timeout;
 
 	if (use_timeout) {
-		qWarning() << Q_FUNC_INFO << "timeout was requested by we don't support this yet";
+		qWarning() << Q_FUNC_INFO << "timeout (" << ms << ") was requested by we don't support this yet";
 		//return OS_EVT_TIMEOUT;
-		return OS_EVT_NOTIMEOUT;
+		//return OS_EVT_NOTIMEOUT;
 	}
 
 	bool timedOut = false;
 
-	int res = this->fGameWin->getKeypress(use_timeout ? timeout_in_milliseconds : 0, &timedOut);
+	int res = this->fGameWin->getKeypress(use_timeout ? ms : 0, &timedOut);
 
 	// If the timeout expired, tell TADS about it.
 	if (use_timeout and timedOut) return OS_EVT_TIMEOUT;
@@ -443,7 +443,7 @@ CHtmlSysFrameQt::pause_for_more()
 void
 CHtmlSysFrameQt::dbg_print( const char *msg )
 {
-	qDebug() << "HTML TADS Debug message:" << msg;
+	//qDebug() << "HTML TADS Debug message:" << msg;
 }
 
 

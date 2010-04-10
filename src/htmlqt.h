@@ -206,7 +206,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	get_input_cancel( int reset );
 
 	virtual int
-	get_input_event( unsigned long timeout_in_milliseconds, int use_timeout, os_event_info_t* info );
+	get_input_event( unsigned long ms, int use_timeout, os_event_info_t* info );
 
 	virtual textchar_t
 	wait_for_keystroke( int pause_only );
@@ -675,14 +675,37 @@ class CHtmlSysImageMngQt: public QTadsPixmap, public CHtmlSysImageMng {
 
 namespace Phonon { class AudioOutput; };
 class QTadsMediaObject: public Phonon::MediaObject {
+	Q_OBJECT
+
   private:
 	Phonon::AudioOutput* fOutput;
 	QTemporaryFile* fFile;
 
+	// Callback to invoke on stop.
+	void (*fDone_func)(void*, int repeat_count);
+
+	// CTX to pass to the callback.
+	void* fDone_func_ctx;
+
+	// How many times we repeated the sound.
+	int fRepeats;
+
+	// How many times should we repeat the sound.
+	// 0 means repeat forever.
+	int fRepeatsWanted;
+
+  private slots:
+	void
+	fLoop();
+
+	void
+	fFinish();
+
   public:
-	QTadsMediaObject( QObject* parent )
-	: Phonon::MediaObject(parent)
-	{ }
+	QTadsMediaObject( QObject* parent );
+
+	void
+	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat );
 
 	virtual
 	~QTadsMediaObject()

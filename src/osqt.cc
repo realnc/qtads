@@ -642,8 +642,6 @@ os_get_sys_clock_ms( void )
 
 
 /* Sleep for a while.
- *
- * TODO: Implement it.
  */
 void
 os_sleep_ms( long ms )

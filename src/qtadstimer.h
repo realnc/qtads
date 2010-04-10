@@ -38,7 +38,7 @@ class QTadsTimer: public QTimer, public CHtmlSysTimer {
 	trigger()
 	{
 		// If we have a callback, call it.
-		if (this->fCallback) {
+		if (this->fCallback != 0) {
 			this->fCallback(this->fContext);
 		}
 	}
