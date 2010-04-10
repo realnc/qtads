@@ -28,8 +28,8 @@
 #include "vmmaincn.h"
 
 
-CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], CHtmlParser* parser, const char* appName,
-								  const char* appVersion, const char* orgName, const char* orgDomain )
+CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion,
+								  const char* orgName, const char* orgDomain )
 : QApplication(argc, argv)
 {
 
@@ -44,10 +44,10 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], CHtmlParser* parser, 
 	this->fSettings = new QTadsSettings;
 	this->fSettings->loadFromDisk();
 
+	this->fParser = new CHtmlParser(true);
 	this->fInputBuffer = new textchar_t[1024];
 	this->fTadsBuffer =new CHtmlInputBuf(fInputBuffer, 1024, 100);
-	this->fParser = parser;
-	this->fFormatter = new CHtmlFormatterInput(parser);
+	this->fFormatter = new CHtmlFormatterInput(this->fParser);
 
 	memset(&this->fAppctx, 0, sizeof(this->fAppctx));
 	this->fFormatter->get_res_finder()->init_appctx(&this->fAppctx);
@@ -73,6 +73,7 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 
 	qFrame = 0;
 	this->fFormatter->release_parser();
+	delete this->fParser;
 	delete[] this->fInputBuffer;
 	delete this->fTadsBuffer;
 	delete this->fFormatter;

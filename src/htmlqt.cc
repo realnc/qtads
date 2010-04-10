@@ -45,6 +45,11 @@ QTadsMediaObject::fLoop()
 	if (this->fRepeatsWanted == 0 or this->fRepeats < this->fRepeatsWanted) {
 		this->enqueue(this->currentSource());
 		++this->fRepeats;
+	} else {
+		// The Xine Phonon backend will cut off the sound prematurelly if a
+		// transitionTime of 0 (the default) is used and this is the last sound
+		// in the queue.  We set it to 1ms to work around that bug.
+		this->setTransitionTime(1);
 	}
 }
 
@@ -68,6 +73,14 @@ QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void
 	this->fDone_func_ctx = done_func_ctx;
 	++this->fRepeats;
 	this->play();
+}
+
+
+void
+QTadsMediaObject::cancelPlaying( bool sync )
+{
+	this->clear();
+	emit finished();
 }
 
 
@@ -95,6 +108,8 @@ void
 CHtmlSysSoundWavQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
 {
 	qDebug() << Q_FUNC_INFO;
+
+	this->cancelPlaying(sync);
 }
 
 
@@ -129,6 +144,8 @@ void
 CHtmlSysSoundOggQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
 {
 	qDebug() << Q_FUNC_INFO;
+
+	this->cancelPlaying(sync);
 }
 
 
@@ -164,6 +181,8 @@ void
 CHtmlSysSoundMpegQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
 {
 	qDebug() << Q_FUNC_INFO;
+
+	this->cancelPlaying(sync);
 }
 
 

@@ -62,9 +62,8 @@ int main( int argc, char** argv )
 	}
 
 	CHtmlResType::add_basic_types();
-	CHtmlParser* parser = new CHtmlParser(true);
-	CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, parser,
-											   "QTads", "2.0", "Nikos Chantziaras", "qtads.sourceforge.net");
+	CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", "2.0", "Nikos Chantziaras",
+											   "qtads.sourceforge.net");
 	CHtmlSysFrame::set_frame_obj(app);
 
 	QDir::setCurrent(QFileInfo(gameFileName).path());
@@ -77,6 +76,5 @@ int main( int argc, char** argv )
 	}
 
 	CHtmlSysFrame::set_frame_obj(0);
-	delete parser;
 	delete app;
 }

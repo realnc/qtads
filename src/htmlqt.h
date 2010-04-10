@@ -152,8 +152,8 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	QList<CHtmlSysFontQt*> fFontList;
 
   public:
-	CHtmlSysFrameQt( int& argc, char* argv[], class CHtmlParser* parser, const char* appName, const char* appVersion,
-					 const char* orgName, const char* orgDomain );
+	CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
+					 const char* orgDomain );
 
 	virtual
 	~CHtmlSysFrameQt();
@@ -706,6 +706,9 @@ class QTadsMediaObject: public Phonon::MediaObject {
 
 	void
 	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat );
+
+	void
+	cancelPlaying( bool sync );
 
 	virtual
 	~QTadsMediaObject()
