@@ -34,9 +34,9 @@ int
 CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx,
 								int repeat, const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade )
 {
-	qDebug() << "play_sound url:" << url;
+	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 	this->play();
-	return true;
+	return 0;
 }
 
 
@@ -68,9 +68,9 @@ int
 CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx,
 								int repeat, const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade )
 {
-	qDebug() << "play_sound url:" << url;
+	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 	this->play();
-	return true;
+	return 0;
 }
 
 
@@ -103,9 +103,9 @@ CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 								 int repeat, const textchar_t* url, int vol, long fade_in, long fade_out,
 								 int crossfade )
 {
-	qDebug() << "play_sound url:" << url;
+	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 	this->play();
-	return true;
+	return 0;
 }
 
 
@@ -289,7 +289,7 @@ CHtmlSysSoundWav::create_wav( const CHtmlUrl* url, const textchar_t* filename, u
 
 CHtmlSysResource*
 CHtmlSysSoundMpeg::create_mpeg( const CHtmlUrl* url, const textchar_t* filename,
-					unsigned long seekpos, unsigned long filesize, CHtmlSysWin* win )
+								unsigned long seekpos, unsigned long filesize, CHtmlSysWin* win )
 {
 	return QTadsMediaObject::createSound(url, filename, seekpos, filesize, win, QTadsMediaObject::MPEG);
 }
@@ -297,7 +297,7 @@ CHtmlSysSoundMpeg::create_mpeg( const CHtmlUrl* url, const textchar_t* filename,
 
 CHtmlSysResource*
 CHtmlSysSoundOgg::create_ogg( const CHtmlUrl* url, const textchar_t* filename,
-				  unsigned long seekpos, unsigned long filesize, CHtmlSysWin* win )
+							  unsigned long seekpos, unsigned long filesize, CHtmlSysWin* win )
 {
 	return QTadsMediaObject::createSound(url, filename, seekpos, filesize, win, QTadsMediaObject::OGG);
 }
