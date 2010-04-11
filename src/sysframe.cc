@@ -521,7 +521,9 @@ void
 CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
 {
 	qDebug() << Q_FUNC_INFO;
+	Q_ASSERT(static_cast<CHtmlSysWinQt*>(win)->parentBanner() != 0);
 	this->fBannerList.removeAll(static_cast<CHtmlSysWinQt*>(win));
+	static_cast<CHtmlSysWinQt*>(win)->parentBanner()->setFocus();
 	delete win;
 	// Recalculate the banner layout.
 	QSize siz(qWinGroup->centralWidget()->size());

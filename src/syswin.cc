@@ -72,7 +72,7 @@ CHtmlSysWinQt::~CHtmlSysWinQt()
 void
 CHtmlSysWinQt::calcChildBannerSizes( QSize& parentSize )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 	++this->fDontReformat;
 
 	QSize newSize;
@@ -167,30 +167,35 @@ CHtmlSysWinQt::calcChildBannerSizes( QSize& parentSize )
 		this->fChildBanners.at(i)->calcChildBannerSizes(newSize);
 	}
 
-	// If our new size is 0 or less in any dimension, then we should hide
-	// completely.
-	qDebug() << newSize;
+	// If we're the main game window and our new size is 0 or less in any
+	// dimension, then we should hide completely.
+	//qDebug() << newSize;
 	if (this == qFrame->gameWindow()) {
 		// We're the main game window.
 		if (newSize.height() > 0 and newSize.width() > 0) {
 			if (this->isHidden()) {
 				this->show();
+				this->setFocus();
 			}
 		} else if (not this->isHidden()) {
 			this->hide();
+			// Switch focus to our first child, otherwise it's not possible
+			// for the user to input anything.
+			Q_ASSERT(this->fChildBanners.at(0) != 0);
+			this->fChildBanners.at(0)->setFocus();
 		}
 	} else if (this->fBannerPos == HTML_BANNERWIN_POS_TOP or this->fBannerPos == HTML_BANNERWIN_POS_BOTTOM) {
 		// We're a horizontal banner.
-		if (newSize.height() != this->minimumHeight()) {
+		//if (newSize.height() != this->minimumHeight()) {
 			this->setMinimumHeight(newSize.height());
 			this->setMaximumHeight(newSize.height());
-		}
+		//}
 	} else {
 		// We're a vertical banner.
-		if (newSize.width() != this->minimumWidth()) {
+		//if (newSize.width() != this->minimumWidth()) {
 			this->setMinimumWidth(newSize.width());
 			this->setMaximumWidth(newSize.width());
-		}
+		//}
 	}
 	--this->fDontReformat;
 }
