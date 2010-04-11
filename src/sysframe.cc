@@ -274,6 +274,7 @@ CHtmlSysFrameQt::runT2Game( const QString& fname )
 	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, 0);
 	this->fMainWin->setCentralWidget(this->fGameWin);
 	this->fFormatter->set_t3_mode(false);
+	this->fTads3 = false;
 
 	char argv0[] = "qtads";
 	char* argv1 = new char[fname.toLocal8Bit().size() + 1];
@@ -293,6 +294,7 @@ CHtmlSysFrameQt::runT3Game( const QString& fname )
 	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, 0);
 	this->fMainWin->setCentralWidget(this->fGameWin);
 	this->fFormatter->set_t3_mode(true);
+	this->fTads3 = true;
 	return vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0,
 						0, false, 0, 0, false, false, 0, 0, 0, 0);
 }

@@ -151,6 +151,10 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// responsible for deleting them when they're no longer needed.
 	QList<CHtmlSysFontQt*> fFontList;
 
+	// Is the game we're currently running (if we're running one) a Tads 3
+	// game?
+	bool fTads3;
+
   public:
 	CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
 					 const char* orgDomain );
@@ -174,6 +178,10 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 
 	int
 	runT3Game( const QString& fname );
+
+	bool
+	tads3()
+	{ return this->fTads3; }
 
 	//
 	// CHtmlSysFrame interface implementation.
