@@ -37,7 +37,7 @@ QTadsDisplayWidget::QTadsDisplayWidget( CHtmlSysWinQt* parent )
 	this->setForegroundRole(QPalette::Text);
 	this->setBackgroundRole(QPalette::Base);
 	connect(this->fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
-	this->fBlinkTimer->start(500);
+	this->fBlinkTimer->start(QApplication::cursorFlashTime() / 2);
 }
 
 
