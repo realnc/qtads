@@ -18,6 +18,7 @@
 #include <iostream>
 #include <QScrollArea>
 #include <QFileInfo>
+#include <QFileDialog>
 #include <QDir>
 
 #include "os.h"
@@ -56,15 +57,17 @@ int main( int argc, char** argv )
 			std::cerr << "File `" << argv[1] << "' not found." << std::endl;
 			return 2;
 		}
-	} else {
-		std::cerr << "Usage: qtads gamefile\n";
-		return 1;
 	}
 
 	CHtmlResType::add_basic_types();
 	CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", "2.0", "Nikos Chantziaras",
 											   "qtads.sourceforge.net");
 	CHtmlSysFrame::set_frame_obj(app);
+
+	if (gameFileName.isEmpty()) {
+		gameFileName = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run", "",
+													"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
+	}
 
 	QDir::setCurrent(QFileInfo(gameFileName).path());
 	if (vm_get_game_type(QFileInfo(gameFileName).fileName().toLocal8Bit(), 0, 0, 0, 0) == VM_GGT_TADS2) {

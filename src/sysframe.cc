@@ -273,6 +273,7 @@ CHtmlSysFrameQt::runT2Game( const QString& fname )
 {
 	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, 0);
 	this->fMainWin->setCentralWidget(this->fGameWin);
+	this->fGameWin->setFocus();
 	this->fFormatter->set_t3_mode(false);
 	this->fTads3 = false;
 
@@ -293,6 +294,7 @@ CHtmlSysFrameQt::runT3Game( const QString& fname )
 {
 	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, 0);
 	this->fMainWin->setCentralWidget(this->fGameWin);
+	this->fGameWin->setFocus();
 	this->fFormatter->set_t3_mode(true);
 	this->fTads3 = true;
 	return vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0,
