@@ -183,6 +183,10 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	tads3()
 	{ return this->fTads3; }
 
+	// Return a list of all banners that are childs of 'parent'.
+	const QList<CHtmlSysWinQt*>&
+	childBannersOf( const CHtmlSysWinQt* parent );
+
 	//
 	// CHtmlSysFrame interface implementation.
 	//
@@ -289,11 +293,16 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	HTML_BannerWin_Pos_t fBannerPos;
 	unsigned long fStyle;
 
+	// Banner size information, if we are a banner.  This is either our width
+	// or height, according to our alignment type (vertical or horizontal).
+	long fBannerSize;
+	HTML_BannerWin_Units_t fBannerSizeUnits;
+
 	// Do not attempt to reformat during a resize event.  This is set when in
 	// the process of creating a new banner.  If we reformat during that
 	// process, the formatter will call the banner-creating routine again and
 	// we will crash due to the re-entrancy.
-	bool fDontReformat;
+	int fDontReformat;
 
 	// Frames and layouts for our adjacent banners, if there are any.  We can
 	// have rows and columns of banners attached to us in vertical and
@@ -310,6 +319,9 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 
 	// Our parent banner, if any.  This is 0 if we don't have one.
 	CHtmlSysWinQt* fParentBanner;
+
+	// Our child banners, if any.
+	QList<CHtmlSysWinQt*> fChildBanners;
 
 	// Margins.
 	CHtmlRect fMargins;
@@ -343,9 +355,21 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	class QTadsDisplayWidget* displayWidget()
 	{ return this->fDispWidget; }
 
+	// Calculate and adjust the sizes of our child banners.  On entry,
+	// 'parentSize' contains the size of the full parent window area; on
+	// return, it is updated to indicate the final size of the parent banner's
+	// area after deducting the space carved out for children.
+	void
+	calcChildBannerSizes( QSize& parentSize );
+
 	void
 	addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other, HTML_BannerWin_Pos_t pos,
 			   unsigned long style );
+
+	// Our parent banner, if there is one.
+	CHtmlSysWinQt*
+	parentBanner()
+	{ return this->fParentBanner; }
 
 	//
 	// CHtmlSysWin interface implementation.
@@ -513,8 +537,8 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 			     unsigned int ht );
 
 	virtual void
-	set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,
-			 long height, HTML_BannerWin_Units_t height_units, int use_height );
+	set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width, long height,
+					 HTML_BannerWin_Units_t height_units, int use_height );
 
 	virtual void
 	set_banner_info( HTML_BannerWin_Pos_t pos, unsigned long style );

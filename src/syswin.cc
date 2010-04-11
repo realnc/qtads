@@ -28,9 +28,9 @@
 
 
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QWidget* parent )
-: QScrollArea(parent), CHtmlSysWin(formatter), fDontReformat(false), fVFrame(0), fHFrame(0), fVLine(0), fHLine(0),
-  fVLayout(0), fHLayout(0), fParentBanner(0), fMargins(5, 2, 5, 2), fBgImage(0),
-  fDispWidget(new QTadsDisplayWidget(this))
+: QScrollArea(parent), CHtmlSysWin(formatter), fBannerSize(0), fBannerSizeUnits(HTML_BANNERWIN_UNITS_PIX),
+  fDontReformat(0), fVFrame(0), fHFrame(0), fVLine(0), fHLine(0), fVLayout(0), fHLayout(0), fParentBanner(0),
+  fMargins(5, 2, 5, 2), fBgImage(0), fDispWidget(new QTadsDisplayWidget(this))
 {
 	this->formatter_->set_win(this, &fMargins);
 	this->setForegroundRole(QPalette::Text);
@@ -55,12 +55,144 @@ CHtmlSysWinQt::~CHtmlSysWinQt()
 	// we're about to be deleted.
 	this->formatter_->unset_win();
 
+	// Remove ourselves from our parent banner's child list.
+	if (this->fParentBanner != 0) {
+		this->fParentBanner->fChildBanners.removeAll(this);
+	}
+
 	if (this->fVFrame != 0) delete this->fVFrame;
 	if (this->fVLayout != 0) delete this->fVLayout;
 	if (this->fVLine != 0) delete this->fVLine;
 	if (this->fHFrame != 0) delete this->fHFrame;
 	if (this->fHLayout != 0) delete this->fHLayout;
 	if (this->fHLine != 0) delete this->fHLine;
+}
+
+
+void
+CHtmlSysWinQt::calcChildBannerSizes( QSize& parentSize )
+{
+	qDebug() << Q_FUNC_INFO;
+	++this->fDontReformat;
+
+	QSize newSize;
+	QSize oldSize;
+
+	// Get our current size.
+	oldSize = this->size();
+
+	// Start off assuming we'll take the entire parent area.  If we're a
+	// top-level window, we'll leave it exactly like that.  If we're a banner,
+	// we'll be aligned on three sides with the parent area, since we always
+	// carve out a chunk by splitting the parent area; we'll adjust the fourth
+	// side according to our banner size and alignment specifications.
+	newSize = parentSize;
+
+	// If we're a banner window, carve out our own area from the parent window;
+	// otherwise, we must be a top-level window, so take the entire available
+	// space for ourselves.
+	if (this != qFrame->gameWindow()) {
+		// Calculate our current on-screen size.
+		int wid = oldSize.width();
+		int ht = oldSize.height();
+
+		// Convert the width units to pixels.
+		switch (this->fBannerSizeUnits) {
+		  case HTML_BANNERWIN_UNITS_PIX:
+			// Pixels - use the stored width directly.
+			wid = this->fBannerSize;
+			break;
+
+		  case HTML_BANNERWIN_UNITS_CHARS:
+			// Character cells - calculate the size in terms of the width of a
+			// "0" character in the window's default font.
+			wid = this->fBannerSize * measure_text(get_default_font(), "0", 1, 0).x;
+			break;
+
+		  case HTML_BANNERWIN_UNITS_PCT:
+			// Percentage - calculate the width as a percentage of the parent
+			// size.
+			wid = (this->fBannerSize * parentSize.width()) / 100;
+			break;
+		}
+
+		// Convert the height units to pixels.
+		switch (this->fBannerSizeUnits) {
+		  case HTML_BANNERWIN_UNITS_PIX:
+			// Pixels - use the stored height directly.
+			ht = this->fBannerSize;
+			break;
+
+		  case HTML_BANNERWIN_UNITS_CHARS:
+			// Character cells - calculate the size in terms of the height of a
+			// "0" character in the window's default font.
+			ht = this->fBannerSize * measure_text(get_default_font(), "0", 1, 0).y;
+			break;
+
+		  case HTML_BANNERWIN_UNITS_PCT:
+			// Percentage - calculate the size as a percentage of the parent
+			// size.
+			ht = (this->fBannerSize * parentSize.height()) / 100;
+			break;
+		}
+
+		// Make sure that the banner doesn't exceed the available area.
+		if (wid > parentSize.width()) {
+			wid = parentSize.width();
+		}
+		if (ht > parentSize.height()) {
+			ht = parentSize.height();
+		}
+
+		// Resize our and the parent area according to our alignment type.
+		switch (this->fBannerPos) {
+		  case HTML_BANNERWIN_POS_TOP:
+		  case HTML_BANNERWIN_POS_BOTTOM:
+			newSize.setHeight(ht);
+			parentSize.setHeight(parentSize.height() - ht);
+			break;
+
+		  case HTML_BANNERWIN_POS_LEFT:
+		  case HTML_BANNERWIN_POS_RIGHT:
+			newSize.setWidth(wid);
+			parentSize.setWidth(parentSize.width() - wid);
+			break;
+		}
+	}
+
+	// Now that we know our own full area, lay out our banner children.  This
+	// will update newSize to reflect our actual size after deducting space for
+	// our children.
+	for (int i = 0; i < this->fChildBanners.size(); ++i) {
+		this->fChildBanners.at(i)->calcChildBannerSizes(newSize);
+	}
+
+	// If our new size is 0 or less in any dimension, then we should hide
+	// completely.
+	qDebug() << newSize;
+	if (this == qFrame->gameWindow()) {
+		// We're the main game window.
+		if (newSize.height() > 0 and newSize.width() > 0) {
+			if (this->isHidden()) {
+				this->show();
+			}
+		} else if (not this->isHidden()) {
+			this->hide();
+		}
+	} else if (this->fBannerPos == HTML_BANNERWIN_POS_TOP or this->fBannerPos == HTML_BANNERWIN_POS_BOTTOM) {
+		// We're a horizontal banner.
+		if (newSize.height() != this->minimumHeight()) {
+			this->setMinimumHeight(newSize.height());
+			this->setMaximumHeight(newSize.height());
+		}
+	} else {
+		// We're a vertical banner.
+		if (newSize.width() != this->minimumWidth()) {
+			this->setMinimumWidth(newSize.width());
+			this->setMaximumWidth(newSize.width());
+		}
+	}
+	--this->fDontReformat;
 }
 
 
@@ -74,9 +206,11 @@ CHtmlSysWinQt::keyPressEvent( QKeyEvent* event )
 void
 CHtmlSysWinQt::resizeEvent( QResizeEvent* event )
 {
-	if (not this->fDontReformat) {
+	if (this->fDontReformat == 0) {
 		this->formatter_->start_at_top(false);
 		this->do_formatting(true, false, true);
+		QSize siz(qWinGroup->centralWidget()->size());
+		qFrame->gameWindow()->calcChildBannerSizes(siz);
 	}
 	QScrollArea::resizeEvent(event);
 }
@@ -90,7 +224,7 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other
 	banner->fParentBanner = this;
 
 	// Don't try to reformat while we're in here or we'll crash and burn.
-	this->fDontReformat = true;
+	++this->fDontReformat;
 
 	QWidget* frame;
 	QBoxLayout* layout;
@@ -200,7 +334,9 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other
 
 	qWinGroup->setCentralWidget(frame);
 	qWinGroup->centralWidget()->show();
-	this->fDontReformat = false;
+	Q_ASSERT(not this->fChildBanners.contains(banner));
+	this->fChildBanners.append(banner);
+	--this->fDontReformat;
 }
 
 
@@ -339,6 +475,10 @@ int
 CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_display )
 {
 	//qDebug() << Q_FUNC_INFO;
+
+	if (this->fDontReformat != 0) {
+		return false;
+	}
 
 	// Freeze the display, if requested.
 	if (freeze_display) {
@@ -714,49 +854,39 @@ void
 CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,
 								long height, HTML_BannerWin_Units_t height_units, int use_height )
 {
-	//qDebug() << Q_FUNC_INFO;
+	qDebug() << Q_FUNC_INFO;
 
 	if (this == qFrame->gameWindow()) {
 		// We're the main game window.  Ignore the call.
 		return;
 	}
 
+	Q_ASSERT(this->fParentBanner != 0);
+
 	QBoxLayout* castLayout = static_cast<QBoxLayout*>(this->parentWidget()->layout());
 	if (castLayout->direction() == QBoxLayout::TopToBottom or castLayout->direction() == QBoxLayout::BottomToTop) {
-		// We're a horizontal banner.
+		//if (not use_height or (this->fBannerSize == height and this->fBannerSizeUnits == height_units)) {
 		if (not use_height) {
 			return;
 		}
-		if (height_units == HTML_BANNERWIN_UNITS_PCT) {
-			//qDebug() << "Setting banner height (percent) of" << this << "to" << height;
-			castLayout->setStretchFactor(this, height);
-		} else if (height_units == HTML_BANNERWIN_UNITS_CHARS) {
-			//qDebug() << "Setting banner height (height of '0') of" << this << "to" << height;
-			this->setMaximumHeight(this->fontMetrics().boundingRect('0').height() * height);
-			this->setMinimumHeight(this->fontMetrics().boundingRect('0').height() * height);
-		} else if (height_units == HTML_BANNERWIN_UNITS_PIX) {
-			//qDebug() << "Setting banner height (pixels) of" << this << "to" << height;
-			this->setMaximumHeight(height);
-			this->setMinimumHeight(height);
-		}
+		this->fBannerSize = height;
+		this->fBannerSizeUnits = height_units;
 	} else {
-		// We're a vertical banner.
+		//if (not use_width or (this->fBannerSize == width and this->fBannerSizeUnits == width_units)) {
 		if (not use_width) {
 			return;
 		}
-		if (width_units == HTML_BANNERWIN_UNITS_PCT) {
-			//qDebug() << "Setting banner width (percent) of" << this << "to" << width;
-			castLayout->setStretchFactor(this, width);
-		} else if (width_units == HTML_BANNERWIN_UNITS_CHARS) {
-			//qDebug() << "Setting banner width (width of '0') of" << this << "to" << width;
-			this->setMaximumWidth(this->fontMetrics().boundingRect('0').width() * width);
-			this->setMinimumWidth(this->fontMetrics().boundingRect('0').width() * width);
-		} else if (width_units == HTML_BANNERWIN_UNITS_PIX) {
-			//qDebug() << "Setting banner width (pixels) of" << this << "to" << width;
-			this->setMaximumWidth(width);
-			this->setMinimumWidth(width);
-		}
+		this->fBannerSize = width;
+		this->fBannerSizeUnits = width_units;
 	}
+
+	QSize parentSize(qWinGroup->centralWidget()->size());
+	//if (qFrame->gameWindow()->isHidden()) {
+	//	parentSize.setWidth(0);
+	//	parentSize.setHeight(0);
+	//}
+	qFrame->gameWindow()->calcChildBannerSizes(parentSize);
+	return;
 }
 
 

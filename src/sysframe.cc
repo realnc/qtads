@@ -523,7 +523,9 @@ CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
 	qDebug() << Q_FUNC_INFO;
 	this->fBannerList.removeAll(static_cast<CHtmlSysWinQt*>(win));
 	delete win;
-	//static_cast<CHtmlSysWinQt*>(win)->hide();
+	// Recalculate the banner layout.
+	QSize siz(qWinGroup->centralWidget()->size());
+	qFrame->gameWindow()->calcChildBannerSizes(siz);
 }
 
 
