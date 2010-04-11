@@ -29,7 +29,8 @@
 
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QWidget* parent )
 : QScrollArea(parent), CHtmlSysWin(formatter), fDontReformat(false), fVFrame(0), fHFrame(0), fVLine(0), fHLine(0),
-  fVLayout(0), fHLayout(0), fMargins(5, 2, 5, 2), fBgImage(0), fDispWidget(new QTadsDisplayWidget(this))
+  fVLayout(0), fHLayout(0), fParentBanner(0), fMargins(5, 2, 5, 2), fBgImage(0),
+  fDispWidget(new QTadsDisplayWidget(this))
 {
 	this->formatter_->set_win(this, &fMargins);
 	this->setForegroundRole(QPalette::Text);
@@ -64,6 +65,13 @@ CHtmlSysWinQt::~CHtmlSysWinQt()
 
 
 void
+CHtmlSysWinQt::keyPressEvent( QKeyEvent* event )
+{
+	qFrame->gameWindow()->keyPressEvent(event);
+}
+
+
+void
 CHtmlSysWinQt::resizeEvent( QResizeEvent* event )
 {
 	if (not this->fDontReformat) {
@@ -78,6 +86,9 @@ void
 CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other, HTML_BannerWin_Pos_t pos,
 						  unsigned long style )
 {
+	Q_ASSERT(banner->fParentBanner == 0);
+	banner->fParentBanner = this;
+
 	// Don't try to reformat while we're in here or we'll crash and burn.
 	this->fDontReformat = true;
 

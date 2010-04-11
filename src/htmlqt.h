@@ -308,6 +308,9 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	class QVBoxLayout* fVLayout;
 	class QHBoxLayout* fHLayout;
 
+	// Our parent banner, if any.  This is 0 if we don't have one.
+	CHtmlSysWinQt* fParentBanner;
+
 	// Margins.
 	CHtmlRect fMargins;
 
@@ -324,11 +327,8 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	// The formatter we're associated with.
 	class CHtmlFormatter* fFormatter;
 
-	//virtual void
-	//keyPressEvent( QKeyEvent* event );
-
-	void
-	singleKeyPressEvent( QKeyEvent* event );
+	virtual void
+	keyPressEvent( QKeyEvent* event );
 
 	virtual void
 	resizeEvent( QResizeEvent* event );
@@ -528,6 +528,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
  */
 class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	Q_OBJECT
+	friend class CHtmlSysWinQt;
 
   private:
 	// We have a finished user input.
