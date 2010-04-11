@@ -60,12 +60,12 @@ CHtmlSysWinQt::~CHtmlSysWinQt()
 		this->fParentBanner->fChildBanners.removeAll(this);
 	}
 
-	if (this->fVFrame != 0) delete this->fVFrame;
-	if (this->fVLayout != 0) delete this->fVLayout;
-	if (this->fVLine != 0) delete this->fVLine;
-	if (this->fHFrame != 0) delete this->fHFrame;
-	if (this->fHLayout != 0) delete this->fHLayout;
-	if (this->fHLine != 0) delete this->fHLine;
+	//if (this->fVFrame != 0) delete this->fVFrame;
+	//if (this->fVLayout != 0) delete this->fVLayout;
+	//if (this->fVLine != 0) delete this->fVLine;
+	//if (this->fHFrame != 0) delete this->fHFrame;
+	//if (this->fHLayout != 0) delete this->fHLayout;
+	//if (this->fHLine != 0) delete this->fHLine;
 }
 
 
