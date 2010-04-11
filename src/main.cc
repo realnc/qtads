@@ -62,12 +62,16 @@ int main( int argc, char** argv )
 	CHtmlResType::add_basic_types();
 	CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", "2.0", "Nikos Chantziaras",
 											   "qtads.sourceforge.net");
-	CHtmlSysFrame::set_frame_obj(app);
-
 	if (gameFileName.isEmpty()) {
 		gameFileName = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run", "",
 													"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
+		if (gameFileName.isNull()) {
+			delete app;
+			return 0;
+		}
 	}
+
+	CHtmlSysFrame::set_frame_obj(app);
 
 	QDir::setCurrent(QFileInfo(gameFileName).path());
 	if (vm_get_game_type(QFileInfo(gameFileName).fileName().toLocal8Bit(), 0, 0, 0, 0) == VM_GGT_TADS2) {
