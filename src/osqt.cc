@@ -30,14 +30,15 @@
 #include <QDir>
 #include <QDateTime>
 #include <QTextCodec>
+#include <QFileDialog>
 #include <QDebug>
-
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 
 #include "os.h"
+#include "htmlqt.h"
 
 
 /* --------------------------------------------------------------------
@@ -446,8 +447,7 @@ os_csr_busy( int /*flag*/ )
  * other mechanism.
  */
 int
-os_askfile( const char* prompt, char* fname_buf, int fname_buf_len, int prompt_type,
-	    os_filetype_t file_type )
+os_askfile( const char* prompt, char* fname_buf, int fname_buf_len, int prompt_type, os_filetype_t file_type )
 {
 	Q_ASSERT(prompt_type == OS_AFP_SAVE or prompt_type == OS_AFP_OPEN);
 	Q_ASSERT(prompt != 0);
@@ -459,49 +459,35 @@ os_askfile( const char* prompt, char* fname_buf, int fname_buf_len, int prompt_t
 
 	switch (file_type) {
 	  case OSFTGAME:
-		filter = QObject::tr("TADS 2 Games (*.gam *.Gam *.GAM)");
+		filter = QObject::tr("TADS 2 Games") + " (*.gam *.Gam *.GAM)";
 		break;
 	  case OSFTSAVE:
-		filter = QObject::tr("TADS 2 Saved Games (*.sav *.Sav *.SAV)");
+		filter = QObject::tr("TADS 2 Saved Games") + " (*.sav *.Sav *.SAV)";
 		break;
 	  case OSFTLOG:
-		filter = QObject::tr("Game Transcripts (*.txt *.Txt *.TXT)");
+		filter = QObject::tr("Game Transcripts") + " (*.txt *.Txt *.TXT)";
 		break;
 	  case OSFTT3IMG:
-#ifndef HTMLQT
-		Q_ASSERT(QTadsIO::t3Mode());
-#endif
-		filter = QObject::tr("TADS 3 Games (*.t3 *.T3)");
+		Q_ASSERT(qFrame->tads3());
+		filter = QObject::tr("TADS 3 Games") + " (*.t3 *.T3)";
 		break;
 	  case OSFTT3SAV:
-#ifndef HTMLQT
-		Q_ASSERT(QTadsIO::t3Mode());
-#endif
-		filter = QObject::tr("TADS 3 Saved Games (*.t3v *.T3v *.T3V)");
+		Q_ASSERT(qFrame->tads3());
+		filter = QObject::tr("TADS 3 Saved Games") + " (*.t3v *.T3v *.T3V)";
 		ext = "t3v";
 		break;
 	}
 
 	// Always provide an "All Files" filter.
 	if (not filter.isEmpty()) {
-		filter += QObject::tr(";;All Files (*)");
+		filter += ";;";
+		filter += QObject::tr("All Files") + " (*)";
 	}
 
 	if (prompt_type == OS_AFP_OPEN) {
-#ifndef HTMLQT
-		// TODO: HTML QTads implementation.
-		res = QTadsIO::openFile(QString(), filter,
-					QTadsIO::t3Mode()
-					? QString::fromLocal8Bit(prompt)
-					: ::qtf2QString(prompt));
-#endif
+		res = QFileDialog::getOpenFileName(qFrame->gameWindow(), prompt, QDir::currentPath(), filter);
 	} else {
-#ifndef HTMLQT
-		res = QTadsIO::saveFile(QString(), filter,
-					QTadsIO::t3Mode()
-					? QString::fromLocal8Bit(prompt)
-					: ::qtf2QString(prompt));
-#endif
+		res = QFileDialog::getSaveFileName(qFrame->gameWindow(), prompt, QDir::currentPath(), filter);
 	}
 
 	if (res.isEmpty()) {
@@ -509,14 +495,14 @@ os_askfile( const char* prompt, char* fname_buf, int fname_buf_len, int prompt_t
 		return OS_AFE_CANCEL;
 	}
 
-	Q_ASSERT(fname_buf_len > static_cast<int>(std::strlen(res.toAscii())));
+	Q_ASSERT(fname_buf_len > res.toLocal8Bit().size());
 
 	std::strncpy(fname_buf, res.toLocal8Bit(), fname_buf_len);
 	fname_buf[fname_buf_len - 1] = '\0';
 	if (not ext.isEmpty()) {
 		// Since `ext' is non-empty, an extension should be
 		// appended (if none exists).
-		os_defext(fname_buf, ext.toAscii());
+		os_defext(fname_buf, ext.toLocal8Bit());
 		fname_buf[fname_buf_len - 1] = '\0';
 	}
 	return OS_AFE_SUCCESS;
