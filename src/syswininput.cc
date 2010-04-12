@@ -121,6 +121,7 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* event )
 void
 CHtmlSysWinInputQt::singleKeyPressEvent( QKeyEvent* event )
 {
+	//qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(this->fAcceptInput);
 	Q_ASSERT(this->fSingleKeyInput);
 
@@ -197,10 +198,13 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 	this->fDispWidget->setCursorVisible(true);
 	this->fDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
 	this->startLineInput(tadsBuffer, tag, formatter);
-	while (not this->inputReady()) {
+	while (qFrame->gameRunning() and not this->inputReady()) {
 		qApp->sendPostedEvents();
 		qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 		qApp->sendPostedEvents();
+	}
+	if (not qFrame->gameRunning()) {
+		return false;
 	}
 	tadsBuffer->hide_caret();
 	this->fDispWidget->setCursorVisible(false);
@@ -230,6 +234,7 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 int
 CHtmlSysWinInputQt::getKeypress( int timeout, bool* timedOut )
 {
+	//qDebug() << Q_FUNC_INFO;
 	// If 'done' is false, it means that we have been previously called and
 	// returned 0, so this time we should return the extended key-code we
 	// stored last time in 'extKey'.
@@ -245,7 +250,7 @@ CHtmlSysWinInputQt::getKeypress( int timeout, bool* timedOut )
 		this->verticalScrollBar()->setValue(this->verticalScrollBar()->maximum());
 		extKey = 0;
 		this->startKeypressInput();
-		while (not this->inputReady()) {
+		while (qFrame->gameRunning() and not this->inputReady()) {
 			qApp->sendPostedEvents();
 			qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 			qApp->sendPostedEvents();

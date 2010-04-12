@@ -78,6 +78,13 @@ CHtmlSysWinGroupQt::hideConfDialog()
 }
 
 
+void
+CHtmlSysWinGroupQt::closeEvent( QCloseEvent* event )
+{
+	qFrame->setGameRunning(false);
+}
+
+
 oshtml_charset_id_t
 CHtmlSysWinGroupQt::get_default_win_charset() const
 {

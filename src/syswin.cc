@@ -70,6 +70,26 @@ CHtmlSysWinQt::~CHtmlSysWinQt()
 
 
 void
+CHtmlSysWinQt::keyPressEvent( QKeyEvent* event )
+{
+	qFrame->gameWindow()->keyPressEvent(event);
+}
+
+
+void
+CHtmlSysWinQt::resizeEvent( QResizeEvent* event )
+{
+	if (this->fDontReformat == 0) {
+		this->formatter_->start_at_top(false);
+		this->do_formatting(true, false, true);
+		QSize siz(qWinGroup->centralWidget()->size());
+		qFrame->gameWindow()->calcChildBannerSizes(siz);
+	}
+	QScrollArea::resizeEvent(event);
+}
+
+
+void
 CHtmlSysWinQt::calcChildBannerSizes( QSize& parentSize )
 {
 	//qDebug() << Q_FUNC_INFO;
@@ -198,26 +218,6 @@ CHtmlSysWinQt::calcChildBannerSizes( QSize& parentSize )
 		//}
 	}
 	--this->fDontReformat;
-}
-
-
-void
-CHtmlSysWinQt::keyPressEvent( QKeyEvent* event )
-{
-	qFrame->gameWindow()->keyPressEvent(event);
-}
-
-
-void
-CHtmlSysWinQt::resizeEvent( QResizeEvent* event )
-{
-	if (this->fDontReformat == 0) {
-		this->formatter_->start_at_top(false);
-		this->do_formatting(true, false, true);
-		QSize siz(qWinGroup->centralWidget()->size());
-		qFrame->gameWindow()->calcChildBannerSizes(siz);
-	}
-	QScrollArea::resizeEvent(event);
 }
 
 
@@ -859,7 +859,7 @@ void
 CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,
 								long height, HTML_BannerWin_Units_t height_units, int use_height )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	if (this == qFrame->gameWindow()) {
 		// We're the main game window.  Ignore the call.

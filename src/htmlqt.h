@@ -151,6 +151,9 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// responsible for deleting them when they're no longer needed.
 	QList<CHtmlSysFontQt*> fFontList;
 
+	// Are we currently executing a game?
+	bool fGameRunning;
+
 	// Is the game we're currently running (if we're running one) a Tads 3
 	// game?
 	bool fTads3;
@@ -178,6 +181,14 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 
 	int
 	runT3Game( const QString& fname );
+
+	bool
+	gameRunning()
+	{ return this->fGameRunning; }
+
+	void
+	setGameRunning( bool f )
+	{ this->fGameRunning = f; }
 
 	bool
 	tads3()
@@ -265,9 +276,15 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	void
 	hideConfDialog();
 
+  protected:
+	void
+	closeEvent( QCloseEvent* event );
+
   public:
 	CHtmlSysWinGroupQt();
-	virtual ~CHtmlSysWinGroupQt();
+
+	virtual
+	~CHtmlSysWinGroupQt();
 
 	//
 	// CHtmlSysWinGroup interface implementation.

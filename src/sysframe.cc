@@ -30,7 +30,7 @@
 
 CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion,
 								  const char* orgName, const char* orgDomain )
-: QApplication(argc, argv)
+: QApplication(argc, argv), fGameRunning(false)
 {
 
 	//qDebug() << Q_FUNC_INFO;
@@ -283,7 +283,9 @@ CHtmlSysFrameQt::runT2Game( const QString& fname )
 	char* argv[2] = {argv0, argv1};
 	char savExt[] = "sav";
 
+	this->fGameRunning = true;
 	int ret = trdmain(2, argv, &this->fAppctx, savExt);
+	this->fGameRunning = false;
 
 	delete[] argv1;
 	return ret;
@@ -297,8 +299,11 @@ CHtmlSysFrameQt::runT3Game( const QString& fname )
 	this->fGameWin->setFocus();
 	this->fFormatter->set_t3_mode(true);
 	this->fTads3 = true;
+
+	this->fGameRunning = true;
 	return vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0,
 						0, false, 0, 0, false, false, 0, 0, 0, 0);
+	this->fGameRunning = false;
 }
 
 
@@ -352,7 +357,7 @@ CHtmlSysFrameQt::display_output( const textchar_t *buf, size_t len )
 int
 CHtmlSysFrameQt::check_break_key()
 {
-	//qDebug() << Q_FUNC_INFO;
+	qDebug() << Q_FUNC_INFO;
 
 	return false;
 }
@@ -380,7 +385,13 @@ CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned lon
 	if (use_timeout) {
 		return OS_EVT_NOTIMEOUT;
 	}
+
 	this->get_input(buf, buflen);
+
+	// Return EOF if we're quitting the game.
+	if (not this->fGameRunning) {
+		return OS_EVT_EOF;
+	}
 	return OS_EVT_LINE;
 }
 
@@ -406,6 +417,11 @@ CHtmlSysFrameQt::get_input_event( unsigned long ms, int use_timeout, os_event_in
 	bool timedOut = false;
 
 	int res = this->fGameWin->getKeypress(use_timeout ? ms : 0, &timedOut);
+
+	// Return EOF if we're quitting the game.
+	if (not this->fGameRunning) {
+		return OS_EVT_EOF;
+	}
 
 	// If the timeout expired, tell TADS about it.
 	if (use_timeout and timedOut) return OS_EVT_TIMEOUT;
