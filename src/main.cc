@@ -55,7 +55,6 @@ int main( int argc, char** argv )
 			gameFileName = QString::fromLocal8Bit(argv[1]) + ".t3";
 		} else {
 			std::cerr << "File `" << argv[1] << "' not found." << std::endl;
-			return 2;
 		}
 	}
 
