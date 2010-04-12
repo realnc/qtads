@@ -334,7 +334,16 @@ CHtmlSysFrameQt::start_new_page()
 {
 	qDebug() << Q_FUNC_INFO;
 
+	// Don't bother if the game is quitting.
+	if (not this->fGameRunning) {
+		return;
+	}
+
+	this->flush_txtbuf(true, false);
+	this->fFormatter->cancel_playback();
 	this->fFormatter->remove_all_banners(false);
+	this->fGameWin->notify_clear_contents();
+	this->fFormatter->start_at_top(true);
 }
 
 
