@@ -634,7 +634,7 @@ os_sleep_ms( long ms )
 {
 	QTime time;
 	time.start();
-	while (time.elapsed() < ms) {
+	while (time.elapsed() < ms and qFrame->gameRunning()) {
 		qApp->sendPostedEvents();
 		qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents, ms - time.elapsed());
 		qApp->sendPostedEvents();
