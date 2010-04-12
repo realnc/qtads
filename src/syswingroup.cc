@@ -16,6 +16,7 @@
  */
 
 #include <QMenuBar>
+#include <QCloseEvent>
 
 #include "htmlqt.h"
 #include "qtadsconfdialog.h"
@@ -82,6 +83,7 @@ void
 CHtmlSysWinGroupQt::closeEvent( QCloseEvent* event )
 {
 	qFrame->setGameRunning(false);
+	event->accept();
 }
 
 
