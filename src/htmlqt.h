@@ -632,7 +632,7 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	 * TODO: Timeouts are not handled yet.
 	 */
 	int
-	getKeypress( int timeout = -1, bool* timedOut = 0 );
+	getKeypress( unsigned long timeout = 0, bool useTimeout = false, bool* timedOut = 0 );
 
 	bool
 	inputReady()

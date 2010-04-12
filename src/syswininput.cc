@@ -17,6 +17,7 @@
 
 #include <QKeyEvent>
 #include <QScrollBar>
+#include <QTime>
 
 #include "htmlqt.h"
 #include "qtadsdispwidget.h"
@@ -232,7 +233,7 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 
 
 int
-CHtmlSysWinInputQt::getKeypress( int timeout, bool* timedOut )
+CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* timedOut )
 {
 	//qDebug() << Q_FUNC_INFO;
 	// If 'done' is false, it means that we have been previously called and
@@ -250,10 +251,26 @@ CHtmlSysWinInputQt::getKeypress( int timeout, bool* timedOut )
 		this->verticalScrollBar()->setValue(this->verticalScrollBar()->maximum());
 		extKey = 0;
 		this->startKeypressInput();
-		while (qFrame->gameRunning() and not this->inputReady()) {
+		if (useTimeout) {
+			QTime t;
+			t.start();
+			while (static_cast<unsigned long>(t.elapsed()) < timeout and qFrame->gameRunning()
+				   and not this->inputReady()) {
+				qApp->sendPostedEvents();
+				qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents, timeout - t.elapsed());
+				qApp->sendPostedEvents();
+			}
+		} else while (qFrame->gameRunning() and not this->inputReady()) {
 			qApp->sendPostedEvents();
 			qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 			qApp->sendPostedEvents();
+		}
+
+		// If we're using a timeout and it expired, tell the caller.
+		if (useTimeout and qFrame->gameRunning() and not this->inputReady()) {
+			Q_ASSERT(timedOut != 0);
+			*timedOut = true;
+			return -1;
 		}
 
 		if (this->fLastKeyEvent != 0) {

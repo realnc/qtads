@@ -103,6 +103,8 @@ CHtmlSysWinGroupQt::xlat_html4_entity( textchar_t* result, size_t result_size, u
 	//qDebug() << Q_FUNC_INFO << "called";
 	Q_ASSERT(result != 0);
 
+	// HTML4 entities are Unicode characters, which means the QChar(uint) ctor
+	// will do the right thing.
 	QString s = QString(QChar(charval));
 	strcpy(result, s.toUtf8());
 	if (changed_charset != 0) {

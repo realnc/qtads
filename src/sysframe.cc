@@ -414,19 +414,12 @@ CHtmlSysFrameQt::get_input_cancel( int reset )
 
 
 int
-CHtmlSysFrameQt::get_input_event( unsigned long ms, int use_timeout, os_event_info_t* info )
+CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_event_info_t* info )
 {
 	qDebug() << Q_FUNC_INFO << "use_timeout:" << use_timeout;
 
-	if (use_timeout) {
-		qWarning() << Q_FUNC_INFO << "timeout (" << ms << ") was requested by we don't support this yet";
-		//return OS_EVT_TIMEOUT;
-		//return OS_EVT_NOTIMEOUT;
-	}
-
 	bool timedOut = false;
-
-	int res = this->fGameWin->getKeypress(use_timeout ? ms : 0, &timedOut);
+	int res = this->fGameWin->getKeypress(timeout, use_timeout, &timedOut);
 
 	// Return EOF if we're quitting the game.
 	if (not this->fGameRunning) {
