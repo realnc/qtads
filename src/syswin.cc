@@ -17,6 +17,7 @@
 
 #include <QBoxLayout>
 #include <QPainter>
+#include <QScrollBar>
 
 #include "htmlqt.h"
 #include "qtadsdispwidget.h"
@@ -217,6 +218,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QSize& parentSize )
 			this->setMaximumWidth(newSize.width());
 		//}
 	}
+	qFrame->gameWindow()->verticalScrollBar()->setValue(qFrame->gameWindow()->verticalScrollBar()->maximum());
 	--this->fDontReformat;
 }
 
