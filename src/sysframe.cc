@@ -376,7 +376,7 @@ CHtmlSysFrameQt::display_output( const textchar_t *buf, size_t len )
 int
 CHtmlSysFrameQt::check_break_key()
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	return false;
 }
@@ -535,6 +535,7 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 
 	static_cast<CHtmlSysWinQt*>(parent)->addBanner(banner, where, static_cast<CHtmlSysWinQt*>(other), pos, style);
 	this->fBannerList.append(banner);
+	banner->setFocus();
 	return banner;
 }
 
