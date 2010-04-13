@@ -35,8 +35,10 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	QAction* settingsAct = new QAction(tr("&Settings"), menuBar);
 	editMenu->addAction(settingsAct);
 	connect(settingsAct, SIGNAL(triggered()), this, SLOT(showConfDialog()));
-
 	this->setMenuBar(menuBar);
+
+	// Create a default status bar.
+	this->statusBar();
 
 	qWinGroup = this;
 }
