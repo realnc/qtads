@@ -41,8 +41,11 @@ QTadsMediaObject::QTadsMediaObject( QObject* parent, Phonon::MediaObject* mediaO
 
 QTadsMediaObject::~QTadsMediaObject()
 {
-	this->fMediaObject->deleteLater();
-	//delete this->fFile;
+	this->fMediaObject->clear();
+	if (not QFile::remove(this->fFileName)) {
+		qWarning() << "Failed to delete temporary sound file" << this->fFileName;
+	}
+	delete this->fMediaObject;
 }
 
 
@@ -346,6 +349,8 @@ QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, 
 		cast = static_cast<CHtmlSysSoundMpegQt*>(sound);
 		break;
 	}
+
+	cast->fFileName = fname;
 
 	/* Normally we would load the sound data into a buffer instead of creating
 	 * files, but the Xine backend of Phonon is buggy as hell and this hangs

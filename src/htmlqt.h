@@ -737,7 +737,7 @@ class QTadsMediaObject: public QObject {
 	Q_OBJECT
 
   private:
-	QTemporaryFile* fFile;
+	QString fFileName;
 	Phonon::MediaObject* fMediaObject;
 
 	// Callback to invoke on stop.
