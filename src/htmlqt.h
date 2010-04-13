@@ -733,13 +733,12 @@ class CHtmlSysImageMngQt: public QTadsPixmap, public CHtmlSysImageMng {
 };
 
 
-namespace Phonon { class AudioOutput; };
-class QTadsMediaObject: public Phonon::MediaObject {
+class QTadsMediaObject: public QObject {
 	Q_OBJECT
 
   private:
-	Phonon::AudioOutput* fOutput;
 	QTemporaryFile* fFile;
+	Phonon::MediaObject* fMediaObject;
 
 	// Callback to invoke on stop.
 	void (*fDone_func)(void*, int repeat_count);
@@ -761,18 +760,20 @@ class QTadsMediaObject: public Phonon::MediaObject {
 	void
 	fFinish();
 
+	void
+	fErrorHandler( Phonon::State newState );
+
   public:
-	QTadsMediaObject( QObject* parent );
+	QTadsMediaObject( QObject* parent, Phonon::MediaObject* mediaObject );
+
+	virtual
+	~QTadsMediaObject();
 
 	void
 	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat );
 
 	void
 	cancelPlaying( bool sync );
-
-	virtual
-	~QTadsMediaObject()
-	{ delete this->fFile; }
 
 	enum SoundType { WAV, OGG, MPEG };
 	static CHtmlSysSound*
@@ -783,8 +784,8 @@ class QTadsMediaObject: public Phonon::MediaObject {
 
 class CHtmlSysSoundWavQt: public QTadsMediaObject, public CHtmlSysSoundWav {
   public:
-	CHtmlSysSoundWavQt( QObject* parent )
-	: QTadsMediaObject(parent)
+	CHtmlSysSoundWavQt( QObject* parent, Phonon::MediaObject* mediaObject )
+	: QTadsMediaObject(parent, mediaObject)
 	{ }
 
 	//
@@ -813,8 +814,8 @@ class CHtmlSysSoundWavQt: public QTadsMediaObject, public CHtmlSysSoundWav {
 
 class CHtmlSysSoundOggQt: public QTadsMediaObject, public CHtmlSysSoundOgg {
   public:
-	CHtmlSysSoundOggQt( QObject* parent )
-	: QTadsMediaObject(parent)
+	CHtmlSysSoundOggQt( QObject* parent, Phonon::MediaObject* mediaObject )
+	: QTadsMediaObject(parent, mediaObject)
 	{ }
 
 	//
@@ -843,8 +844,8 @@ class CHtmlSysSoundOggQt: public QTadsMediaObject, public CHtmlSysSoundOgg {
 
 class CHtmlSysSoundMpegQt: public QTadsMediaObject, public CHtmlSysSoundMpeg {
   public:
-	CHtmlSysSoundMpegQt( QObject* parent )
-	: QTadsMediaObject(parent)
+	CHtmlSysSoundMpegQt( QObject* parent, Phonon::MediaObject* mediaObject )
+	: QTadsMediaObject(parent, mediaObject)
 	{ }
 
 	//
