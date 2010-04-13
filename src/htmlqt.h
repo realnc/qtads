@@ -117,6 +117,8 @@ class CHtmlSysFontQt: public QFont, public CHtmlSysFont {
 
 
 class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
+	Q_OBJECT
+
   private:
 	// Preferences (fonts, colors, etc.)
 	class QTadsSettings* fSettings;
@@ -158,6 +160,9 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// game?
 	bool fTads3;
 
+  signals:
+	void gameQuitting();
+
   public:
 	CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
 					 const char* orgDomain );
@@ -188,7 +193,12 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 
 	void
 	setGameRunning( bool f )
-	{ this->fGameRunning = f; }
+	{
+		this->fGameRunning = f;
+		if (f == false) {
+			emit gameQuitting();
+		}
+	}
 
 	bool
 	tads3()
