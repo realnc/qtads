@@ -632,13 +632,17 @@ os_get_sys_clock_ms( void )
 void
 os_sleep_ms( long ms )
 {
-	QTime time;
-	time.start();
-	while (time.elapsed() < ms and qFrame->gameRunning()) {
-		qApp->sendPostedEvents();
-		qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents, ms - time.elapsed());
-		qApp->sendPostedEvents();
+	if (not qFrame->gameRunning()) {
+		return;
 	}
+
+	QEventLoop idleLoop;
+	QTimer timer;
+	timer.setSingleShot(true);
+	QObject::connect(&timer, SIGNAL(timeout()), &idleLoop, SLOT(quit()));
+	QObject::connect(qFrame, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
+	timer.start(ms);
+	idleLoop.exec();
 }
 
 
