@@ -29,6 +29,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QDateTime>
+#include <QTimer>
 #include <QTextCodec>
 #include <QFileDialog>
 #include <QDebug>
