@@ -16,6 +16,7 @@
  */
 
 #include <QLayout>
+#include <QStatusBar>
 
 #include "htmlqt.h"
 #include "qtadshostifc.h"
@@ -317,7 +318,7 @@ CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 	}
 	// Also flush all banner windows.
 	for (int i = 0; i < this->fBannerList.size(); ++i) {
-		this->fBannerList.at(i)->get_formatter()->flush_txtbuf(fmt);
+		//this->fBannerList.at(i)->get_formatter()->flush_txtbuf(fmt);
 	}
 }
 
@@ -339,12 +340,20 @@ CHtmlSysFrameQt::start_new_page()
 		return;
 	}
 
+	//this->fFormatter->cancel_sound(HTML_Attrib_invalid, 0.0, false, true);
 	this->flush_txtbuf(true, false);
 	this->fFormatter->cancel_playback();
 	this->fParser->clear_page();
 	this->fFormatter->remove_all_banners(false);
 	this->fGameWin->notify_clear_contents();
+	//this->fGameWin->calcChildBannerSizes();
 	this->fFormatter->start_at_top(true);
+
+	this->fGameWin->do_formatting(false, true, false);
+	for (int i = 0; i < this->fBannerList.size(); ++i) {
+		this->fBannerList.at(i)->get_formatter()->start_at_top(true);
+		this->fBannerList.at(i)->do_formatting(false, true, false);
+	}
 }
 
 
@@ -416,7 +425,7 @@ CHtmlSysFrameQt::get_input_cancel( int reset )
 int
 CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_event_info_t* info )
 {
-	qDebug() << Q_FUNC_INFO << "use_timeout:" << use_timeout;
+	//qDebug() << Q_FUNC_INFO << "use_timeout:" << use_timeout;
 
 	bool timedOut = false;
 	int res = this->fGameWin->getKeypress(timeout, use_timeout, &timedOut);
@@ -426,7 +435,7 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
 		return OS_EVT_EOF;
 	}
 
-	// If the timeout expired, tell TADS about it.
+	// If the timeout expired, tell the caller.
 	if (use_timeout and timedOut) return OS_EVT_TIMEOUT;
 
 	if (res == 0) {
@@ -449,7 +458,10 @@ CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
 {
 	qDebug() << Q_FUNC_INFO;
 
-	return '\n';
+	os_event_info_t info;
+	this->get_input_event(0, false, &info);
+	return info.key[0];
+	//return '\n';
 }
 
 
@@ -457,6 +469,8 @@ void
 CHtmlSysFrameQt::pause_for_exit()
 {
 	qDebug() << Q_FUNC_INFO;
+
+	this->wait_for_keystroke(true);
 }
 
 
@@ -464,6 +478,10 @@ void
 CHtmlSysFrameQt::pause_for_more()
 {
 	qDebug() << Q_FUNC_INFO;
+
+	qWinGroup->statusBar()->showMessage(tr("*** MORE ***  [press a key to continue]"));
+	this->wait_for_keystroke(true);
+	qWinGroup->statusBar()->clearMessage();
 }
 
 
