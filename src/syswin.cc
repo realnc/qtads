@@ -511,6 +511,11 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	if (freeze_display) {
 		this->formatter_->freeze_display(false);
 	}
+
+	if (update_win) {
+		this->fDispWidget->update();
+	}
+
 	return false;
 }
 
