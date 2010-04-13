@@ -66,6 +66,10 @@ class CHtmlSysFontQt: public QFont, public CHtmlSysFont {
 	color() const
 	{ return this->fColor; }
 
+	HTML_color_t
+	htmlColor()
+	{ return HTML_make_color(this->fColor.red(), this->fColor.green(), this->fColor.blue()); }
+
 	void
 	color( HTML_color_t color )
 	{ this->fColor = QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)); }
@@ -75,6 +79,10 @@ class CHtmlSysFontQt: public QFont, public CHtmlSysFont {
 	const QColor&
 	bgColor() const
 	{ return this->fBgColor; }
+
+	HTML_color_t
+	htmlBgColor()
+	{ return HTML_make_color(this->fBgColor.red(), this->fBgColor.green(), this->fBgColor.blue()); }
 
 	void
 	bgColor( HTML_color_t color )

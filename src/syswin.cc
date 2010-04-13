@@ -414,14 +414,24 @@ CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const 
 	QPainter painter(this->fDispWidget);
 	const CHtmlSysFontQt& fontCast = *static_cast<CHtmlSysFontQt*>(font);
 	painter.setFont(fontCast);
-	if (fontCast.color().isValid()) {
-		painter.setPen(fontCast.color());
+
+	if (fontCast.use_font_color()) {
+		HTML_color_t color = fontCast.get_font_color();
+		painter.setPen(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
 	}
+
 	if (hilite) {
 		painter.setBackgroundMode(Qt::OpaqueMode);
 		painter.setBackground(QApplication::palette().highlight());
 		painter.setPen(QApplication::palette().color(QPalette::HighlightedText));
 	}
+
+	if (fontCast.use_font_bgcolor()) {
+		painter.setBackgroundMode(Qt::OpaqueMode);
+		HTML_color_t color = fontCast.get_font_bgcolor();
+		painter.setBackground(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
+	}
+
 	painter.drawText(x, y + QFontMetrics(fontCast).ascent(), QString::fromUtf8(str, len));
 }
 
@@ -430,6 +440,20 @@ void
 CHtmlSysWinQt::draw_text_space( int hilite, long x, long y, CHtmlSysFont* font, long wid )
 {
 	//qDebug() << Q_FUNC_INFO;
+	/*
+	QByteArray str;
+	str.append('_');
+	const QFontMetrics& tmpMetr = QFontMetrics(*static_cast<CHtmlSysFontQt*>(font));
+	long res = this->measure_text(font, str.constData(), str.size(), 0).x;
+	qDebug() << "--- til now:" << str;
+	while (res < wid*wid) {
+		str.append('_');
+		res = tmpMetr.boundingRect(str).width();
+		qDebug() << "--- til now:" << str;
+	}
+	//this->draw_text(hilite, x, y, font, str.constData(), str.size());
+	this->draw_text(hilite, x, y, font, "XXXXXXXXX", 9);
+	*/
 }
 
 
@@ -713,6 +737,12 @@ void
 CHtmlSysWinQt::set_html_input_color(HTML_color_t clr, int use_default)
 {
 	//qDebug() << Q_FUNC_INFO;
+	/*
+	int red = HTML_color_red(clr);
+	int green = HTML_color_green(clr);
+	int blue = HTML_color_blue(clr);
+	qFrame->settings()->inputFont.color(clr);
+	*/
 }
 
 
