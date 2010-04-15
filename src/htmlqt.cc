@@ -16,7 +16,7 @@
  */
 
 #include <QDir>
-#include <phonon/audiooutput.h>
+#include <QBuffer>
 
 #include "htmlqt.h"
 
@@ -26,42 +26,36 @@
 CHtmlSysFrameQt* qFrame = 0;
 CHtmlSysWinGroupQt* qWinGroup = 0;
 
+
 /* --------------------------------------------------------------------
  * QTadsMediaObject
  */
-QTadsMediaObject::QTadsMediaObject( QObject* parent, Phonon::MediaObject* mediaObject )
-  : QObject(parent), fMediaObject(mediaObject), fDone_func(0), fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
+QTadsMediaObject::QTadsMediaObject( QObject* parent, const QString& filename, SoundType type )
+  : QObject(parent), fFileName(filename), fChunk(0), fMusic(0), fChannel(-1), fType(type),
+	fDone_func(0), fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
 {
-	connect(this->fMediaObject, SIGNAL(aboutToFinish()), this, SLOT(fLoop()));
-	connect(this->fMediaObject, SIGNAL(finished()), this, SLOT(fFinish()));
-	connect(this->fMediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)),
-			this, SLOT(fErrorHandler(Phonon::State)));
+	this->fFileName = filename;
+	if (type == MPEG) {
+		this->fMusic = Mix_LoadMUS(filename.toLocal8Bit().constData());
+		if (this->fMusic == 0) {
+			qWarning() << "Error: Unable to load sound from" << filename;
+		}
+	} else {
+		this->fChunk = Mix_LoadWAV(filename.toLocal8Bit().constData());
+		if (this->fChunk == 0) {
+			qWarning() << "Error: Unable to load sound from" << filename;
+		}
+	}
+	QFile::remove(this->fFileName);
 }
 
 
 QTadsMediaObject::~QTadsMediaObject()
 {
-	this->fMediaObject->clear();
-	if (not QFile::remove(this->fFileName)) {
-		qWarning() << "Failed to delete temporary sound file" << this->fFileName;
-	}
-	delete this->fMediaObject;
-}
-
-
-void
-QTadsMediaObject::fLoop()
-{
-	// Schedule the same source for another playback if we're looping or didn't
-	// reach the wanted repeat count yet.
-	if (this->fRepeatsWanted == 0 or this->fRepeats < this->fRepeatsWanted) {
-		this->fMediaObject->enqueue(this->fMediaObject->currentSource());
-		++this->fRepeats;
+	if (this->fType == MPEG) {
+		Mix_FreeMusic(this->fMusic);
 	} else {
-		// The Xine Phonon backend will cut off the sound prematurelly if a
-		// transitionTime of 0 (the default) is used and this is the last sound
-		// in the queue.  We set it to 1ms to work around that bug.
-		this->fMediaObject->setTransitionTime(1);
+		Mix_FreeChunk(this->fChunk);
 	}
 }
 
@@ -79,32 +73,83 @@ QTadsMediaObject::fFinish()
 
 
 void
-QTadsMediaObject::fErrorHandler( Phonon::State newState )
-{
-	if (newState == Phonon::ErrorState) {
-		qWarning().nospace() << "Phonon error (type " << this->fMediaObject->errorType()
-				<< "): " << this->fMediaObject->errorString();
-	}
-}
-
-
-void
 QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat )
 {
 	this->fRepeatsWanted = repeat;
 	this->fDone_func = done_func;
 	this->fDone_func_ctx = done_func_ctx;
 	++this->fRepeats;
-	this->fMediaObject->play();
+	if (this->fType == MPEG) {
+		if (Mix_PlayMusic(this->fMusic, repeat - 1) == -1) {
+			qWarning() << "Error: Can't play sound:" << Mix_GetError();
+		}
+	} else {
+		this->fChannel = Mix_PlayChannel(-1, this->fChunk, repeat - 1);
+		if (this->fChannel == -1) {
+			qWarning() << "Error: Can't play sound:" << Mix_GetError();
+		}
+	}
 }
 
 
 void
 QTadsMediaObject::cancelPlaying( bool sync )
 {
-	this->fMediaObject->clear();
+	if (this->fType == MPEG) {
+		Mix_HaltMusic();
+	} else {
+		Mix_HaltChannel(this->fChannel);
+	}
 	this->fFinish();
-	//emit finished();
+}
+
+
+// TODO: Check for I/O errors.
+CHtmlSysSound*
+QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
+							   unsigned long filesize, CHtmlSysWin* win, SoundType type )
+{
+	qDebug() << Q_FUNC_INFO << "called";
+	qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
+			<< "url:" << url->get_url();
+
+	QFile file(filename);
+	file.open(QIODevice::ReadOnly);
+	file.seek(seekpos);
+	QTemporaryFile* tmpFile = new QTemporaryFile(QDir::tempPath() + "/qtads_XXXXXX",
+												 static_cast<CHtmlSysWinQt*>(win));
+	tmpFile->setAutoRemove(false);
+	tmpFile->open();
+	tmpFile->write(file.read(filesize));
+	file.close();
+	QString fname = tmpFile->fileName();
+	tmpFile->close();
+	delete tmpFile;
+	qDebug() << "source filename:" << fname;
+
+	CHtmlSysSound* sound;
+	QTadsMediaObject* cast;
+	switch (type) {
+	  case WAV:
+		qDebug() << "Sound type: WAV";
+		sound = new CHtmlSysSoundWavQt(static_cast<CHtmlSysWinQt*>(win), fname, WAV);
+		cast = static_cast<CHtmlSysSoundWavQt*>(sound);
+		break;
+
+	  case OGG:
+		qDebug() << "Sound type: OGG";
+		sound = new CHtmlSysSoundOggQt(static_cast<CHtmlSysWinQt*>(win), fname, OGG);
+		cast = static_cast<CHtmlSysSoundOggQt*>(sound);
+		break;
+
+	  case MPEG:
+		qDebug() << "Sound type: MPEG";
+		sound = new CHtmlSysSoundMpegQt(static_cast<CHtmlSysWinQt*>(win), fname, MPEG);
+		cast = static_cast<CHtmlSysSoundMpegQt*>(sound);
+		break;
+	}
+	cast->fFileName = fname;
+	return sound;
 }
 
 
@@ -299,75 +344,6 @@ CHtmlSysSoundMidi::create_midi( const CHtmlUrl* url, const textchar_t* filename,
 {
 	qDebug() << Q_FUNC_INFO << "called";
 	return 0;
-}
-
-
-// TODO: Check for I/O errors.
-CHtmlSysSound*
-QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-							   unsigned long filesize, CHtmlSysWin* win, SoundType type )
-{
-	qDebug() << Q_FUNC_INFO << "called";
-	qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
-			<< "url:" << url->get_url();
-
-	QFile file(filename);
-	QTemporaryFile* tmpFile = new QTemporaryFile(QDir::tempPath() + "/qtads_XXXXXX",
-												 static_cast<CHtmlSysWinQt*>(win));
-	tmpFile->setAutoRemove(false);
-	file.open(QIODevice::ReadOnly);
-	file.seek(seekpos);
-	tmpFile->open();
-	tmpFile->write(file.read(filesize));
-	file.close();
-	QString fname = tmpFile->fileName();
-	tmpFile->close();
-	delete tmpFile;
-	Phonon::MediaObject* mObj = Phonon::createPlayer(Phonon::GameCategory, Phonon::MediaSource(fname));
-	qDebug() << "source filename:" << mObj->currentSource().fileName();
-
-	CHtmlSysSound* sound;
-	QTadsMediaObject* cast;
-	switch (type) {
-	  case WAV:
-		qDebug() << "Sound type: WAV";
-		sound = new CHtmlSysSoundWavQt(static_cast<CHtmlSysWinQt*>(win), mObj);
-		cast = static_cast<CHtmlSysSoundWavQt*>(sound);
-		break;
-
-	  case OGG:
-		qDebug() << "Sound type: OGG";
-		sound = new CHtmlSysSoundOggQt(static_cast<CHtmlSysWinQt*>(win), mObj);
-		cast = static_cast<CHtmlSysSoundOggQt*>(sound);
-		break;
-
-	  default:
-		// Assume MPEG.  Even if it's not MPEG, Phonon should be able to play
-		// it since it autodetects the audio format anyway.
-		qDebug() << "Sound type: MPEG";
-		sound = new CHtmlSysSoundMpegQt(static_cast<CHtmlSysWinQt*>(win), mObj);
-		cast = static_cast<CHtmlSysSoundMpegQt*>(sound);
-		break;
-	}
-
-	cast->fFileName = fname;
-
-	/* Normally we would load the sound data into a buffer instead of creating
-	 * files, but the Xine backend of Phonon is buggy as hell and this hangs
-	 * the application.
-	 */
-	/*
-	sound->fData = new QBuffer(sound);
-	sound->fData->setData(file.read(filesize));
-	qDebug() << "bytes read:" << sound->fData->data().length();
-	Phonon::MediaSource source(sound->fData);
-	qDebug() << "source type:" << source.type();
-	sound->setCurrentSource(source);
-	sound->fOutput = new Phonon::AudioOutput(Phonon::GameCategory, sound);
-	Phonon::createPath(sound, sound->fOutput);
-	*/
-
-	return sound;
 }
 
 

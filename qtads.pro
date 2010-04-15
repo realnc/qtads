@@ -1,6 +1,6 @@
 TEMPLATE = app
 CONFIG += qt silent warn_on
-QT += phonon
+LIBS += -lSDL -lSDL_mixer
 
 CONFIG += debug
 #CONFIG += release
@@ -176,6 +176,7 @@ SOURCES += \
 # Tads3 sources.
 SOURCES += \
 	$$T3DIR/askf_os3.cpp \
+	#$$T3DIR/charmap.cpp \
 	$$T3DIR/gameinfo.cpp \
 	$$T3DIR/indlg_os3.cpp \
 	$$T3DIR/resfind.cpp \

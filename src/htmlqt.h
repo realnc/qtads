@@ -31,7 +31,8 @@
 #include <QMainWindow>
 #include <QScrollArea>
 #include <QTemporaryFile>
-#include <phonon/mediaobject.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_mixer.h>
 
 #include "hos_qt.h"
 #include "htmlsys.h"
@@ -744,9 +745,15 @@ class CHtmlSysImageMngQt: public QTadsPixmap, public CHtmlSysImageMng {
 class QTadsMediaObject: public QObject {
 	Q_OBJECT
 
+  public:
+	enum SoundType { WAV, OGG, MPEG };
+
   private:
 	QString fFileName;
-	Phonon::MediaObject* fMediaObject;
+	Mix_Chunk* fChunk;
+	Mix_Music* fMusic;
+	int fChannel;
+	SoundType fType;
 
 	// Callback to invoke on stop.
 	void (*fDone_func)(void*, int repeat_count);
@@ -761,18 +768,11 @@ class QTadsMediaObject: public QObject {
 	// 0 means repeat forever.
 	int fRepeatsWanted;
 
-  private slots:
-	void
-	fLoop();
-
 	void
 	fFinish();
 
-	void
-	fErrorHandler( Phonon::State newState );
-
   public:
-	QTadsMediaObject( QObject* parent, Phonon::MediaObject* mediaObject );
+	QTadsMediaObject( QObject* parent, const QString& filename, SoundType type );
 
 	virtual
 	~QTadsMediaObject();
@@ -783,7 +783,6 @@ class QTadsMediaObject: public QObject {
 	void
 	cancelPlaying( bool sync );
 
-	enum SoundType { WAV, OGG, MPEG };
 	static CHtmlSysSound*
 	createSound( const class CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
 				 unsigned long filesize, CHtmlSysWin* win, SoundType type );
@@ -792,8 +791,8 @@ class QTadsMediaObject: public QObject {
 
 class CHtmlSysSoundWavQt: public QTadsMediaObject, public CHtmlSysSoundWav {
   public:
-	CHtmlSysSoundWavQt( QObject* parent, Phonon::MediaObject* mediaObject )
-	: QTadsMediaObject(parent, mediaObject)
+	CHtmlSysSoundWavQt( QObject* parent, const QString& filename, SoundType type )
+	: QTadsMediaObject(parent, filename, type)
 	{ }
 
 	//
@@ -822,8 +821,8 @@ class CHtmlSysSoundWavQt: public QTadsMediaObject, public CHtmlSysSoundWav {
 
 class CHtmlSysSoundOggQt: public QTadsMediaObject, public CHtmlSysSoundOgg {
   public:
-	CHtmlSysSoundOggQt( QObject* parent, Phonon::MediaObject* mediaObject )
-	: QTadsMediaObject(parent, mediaObject)
+	CHtmlSysSoundOggQt( QObject* parent, const QString& filename, SoundType type )
+	: QTadsMediaObject(parent, filename, type)
 	{ }
 
 	//
@@ -852,8 +851,8 @@ class CHtmlSysSoundOggQt: public QTadsMediaObject, public CHtmlSysSoundOgg {
 
 class CHtmlSysSoundMpegQt: public QTadsMediaObject, public CHtmlSysSoundMpeg {
   public:
-	CHtmlSysSoundMpegQt( QObject* parent, Phonon::MediaObject* mediaObject )
-	: QTadsMediaObject(parent, mediaObject)
+	CHtmlSysSoundMpegQt( QObject* parent, const QString& filename, SoundType type )
+	: QTadsMediaObject(parent, filename, type)
 	{ }
 
 	//

@@ -20,6 +20,8 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QDir>
+#include <SDL/SDL.h>
+#include <SDL/SDL_mixer.h>
 
 #include "os.h"
 #include "trd.h"
@@ -58,6 +60,56 @@ int main( int argc, char** argv )
 		}
 	}
 
+	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
+		qFatal("Unable to initialize sound system: %s", SDL_GetError());
+		return 1;
+	}
+
+	int sdlFormats = MIX_INIT_OGG | MIX_INIT_MP3;
+	if (Mix_Init((sdlFormats & sdlFormats) != sdlFormats)) {
+		qFatal("Unable to load Ogg Vorbis and MP3 support: %s", Mix_GetError());
+		return 1;
+	}
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) != 0) {
+		qFatal("Unable to initialize audio mixer: %s", Mix_GetError());
+		return 1;
+	}
+
+	Mix_AllocateChannels(16);
+
+	/*
+	int numtimesopened, frequency, channels;
+	Uint16 format;
+	numtimesopened=Mix_QuerySpec(&frequency, &format, &channels);
+	if(numtimesopened) {
+		printf("Mix_QuerySpec: %s\n",Mix_GetError());
+	}
+	else {
+		char *format_str="Unknown";
+		switch(format) {
+			case AUDIO_U8: format_str="U8"; break;
+			case AUDIO_S8: format_str="S8"; break;
+			case AUDIO_U16LSB: format_str="U16LSB"; break;
+			case AUDIO_S16LSB: format_str="S16LSB"; break;
+			case AUDIO_U16MSB: format_str="U16MSB"; break;
+			case AUDIO_S16MSB: format_str="S16MSB"; break;
+		}
+		qDebug("opened=%d times  frequency=%dHz  format=%s  channels=%d",
+				numtimesopened, frequency, format_str, channels);
+	}
+	*/
+	/*
+	int max = Mix_GetNumChunkDecoders();
+	for(int i = 0; i < max; ++i) {
+		qDebug() << "Sample chunk decoder" << i << "is for" << Mix_GetChunkDecoder(i);
+	}
+	max = Mix_GetNumMusicDecoders();
+	for(int i = 0; i < max; ++i) {
+		qDebug() << "Sample chunk decoder" << i << "is for" << Mix_GetMusicDecoder(i);
+	}
+	*/
+
 	CHtmlResType::add_basic_types();
 	CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", "2.0", "Nikos Chantziaras",
 											   "qtads.sourceforge.net");
@@ -83,4 +135,6 @@ int main( int argc, char** argv )
 
 	CHtmlSysFrame::set_frame_obj(0);
 	delete app;
+	Mix_CloseAudio();
+	SDL_Quit();
 }
