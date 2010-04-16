@@ -45,6 +45,11 @@ class QTadsHostIfc: public CVmHostIfc {
 		this->fCmapResLoader = new CResLoader("./");
 	}
 
+	~QTadsHostIfc()
+	{
+		delete this->fCmapResLoader;
+	}
+
 	//
 	// CVmHostIfc interface implementation.
 	//
