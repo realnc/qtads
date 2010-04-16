@@ -19,8 +19,11 @@
 #define QTADSHOSTIFC_H
 
 #include <cstddef>
+
 #include "vmhost.h"
+#include "resload.h"
 #include "appctx.h"
+
 #include "osqt.h"
 
 
@@ -32,11 +35,14 @@ class QTadsHostIfc: public CVmHostIfc {
   private:
 	appctxdef* fAppctx;
 	int fIoSafety;
+	CResLoader* fCmapResLoader;
 
   public:
 	QTadsHostIfc( struct appctxdef* appctx )
 	: fAppctx(appctx), fIoSafety(VM_IO_SAFETY_READWRITE_CUR)
 	{
+		// TODO: Use the directory where charmap files are stored.
+		this->fCmapResLoader = new CResLoader("./");
 	}
 
 	//
@@ -68,7 +74,7 @@ class QTadsHostIfc: public CVmHostIfc {
 
 	virtual class CResLoader*
 	get_cmap_res_loader()
-	{ return 0; }
+	{ return this->fCmapResLoader; }
 
 	void
 	set_image_name( const char* fname )
