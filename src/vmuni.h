@@ -26,7 +26,7 @@
 
 #include "config.h"
 
-#include <QString>
+#include <QChar>
 
 /* Character types.  Types are mutually exclusive, so a character has
  * exactly one type.
@@ -41,8 +41,7 @@
 
 /* Get the character type.
  */
-inline
-unsigned char
+inline unsigned char
 t3_get_chartype( wchar_t ch )
 {
 	const QChar c(ch);
@@ -50,16 +49,21 @@ t3_get_chartype( wchar_t ch )
 	switch(c.category()) {
 	  case QChar::Number_DecimalDigit:
 		return T3_CTYPE_DIGIT;
+
 	  case QChar::Separator_Space:
 		return T3_CTYPE_SPACE;
+
 	  case QChar::Letter_Uppercase:
 		return T3_CTYPE_UPPER;
+
 	  case QChar::Letter_Lowercase:
 		return T3_CTYPE_LOWER;
+
 	  case QChar::Letter_Titlecase:
 	  case QChar::Letter_Modifier:
 	  case QChar::Letter_Other:
 		return T3_CTYPE_ALPHA;
+
 	  case QChar::Punctuation_Connector:
 	  case QChar::Punctuation_Dash:
 	  case QChar::Punctuation_Open:
@@ -68,6 +72,7 @@ t3_get_chartype( wchar_t ch )
 	  case QChar::Punctuation_FinalQuote:
 	  case QChar::Punctuation_Other:
 		return T3_CTYPE_PUNCT;
+
 	  default:
 		return T3_CTYPE_NONE;
 	}
@@ -75,8 +80,7 @@ t3_get_chartype( wchar_t ch )
 
 /* Alphabetic?
  */
-inline
-int
+inline int
 t3_is_alpha( wchar_t ch )
 {
 	return QChar(ch).isLetter();
@@ -84,8 +88,7 @@ t3_is_alpha( wchar_t ch )
 
 /* Uppercase?
  */
-inline
-int
+inline int
 t3_is_upper( wchar_t ch )
 {
 	return QChar(ch).category() == QChar::Letter_Uppercase;
@@ -93,8 +96,7 @@ t3_is_upper( wchar_t ch )
 
 /* Lowercase?
  */
-inline
-int
+inline int
 t3_is_lower( wchar_t ch )
 {
 	return QChar(ch).category() == QChar::Letter_Lowercase;
@@ -102,8 +104,7 @@ t3_is_lower( wchar_t ch )
 
 /* Digit?
  */
-inline
-int
+inline int
 t3_is_digit( wchar_t ch )
 {
 	return QChar(ch).isDigit();
@@ -111,8 +112,7 @@ t3_is_digit( wchar_t ch )
 
 /* Whitespace?
  */
-inline
-int
+inline int
 t3_is_space( wchar_t ch )
 {
 	// *Not* QChar.isSpace(), as it includes vertical space.
@@ -121,8 +121,7 @@ t3_is_space( wchar_t ch )
 
 /* Punctuation?
  */
-inline
-int
+inline int
 t3_is_punct( wchar_t ch )
 {
 	return QChar(ch).isPunct();
@@ -130,8 +129,7 @@ t3_is_punct( wchar_t ch )
 
 /* Convert to upper case.
  */
-inline
-wchar_t
+inline wchar_t
 t3_to_upper( wchar_t ch )
 {
 	return QChar::toUpper(sizeof(ch) > 2 ? static_cast<uint>(ch) : static_cast<ushort>(ch));
@@ -139,8 +137,7 @@ t3_to_upper( wchar_t ch )
 
 /* Convert to lower case.
  */
-inline
-wchar_t
+inline wchar_t
 t3_to_lower( wchar_t ch )
 {
 	return QChar::toLower(sizeof(ch) > 2 ? static_cast<uint>(ch) : static_cast<ushort>(ch));
