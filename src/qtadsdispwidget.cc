@@ -26,12 +26,14 @@
 #include "htmlfmt.h"
 #include "tadshtml.h"
 #include "htmlinp.h"
+#include "htmldisp.h"
+#include "htmlurl.h"
 
 #include "qtadsdispwidget.h"
 
 
-QTadsDisplayWidget::QTadsDisplayWidget( CHtmlSysWinQt* parent )
- : QWidget(parent), fParentSysWin(parent), fCursorPos(0, 0), fLastCursorPos(0, 0),
+QTadsDisplayWidget::QTadsDisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
+ : QWidget(parent), fParentSysWin(parent), fFormatter(formatter), fCursorPos(0, 0), fLastCursorPos(0, 0),
    fCursorVisible(false), fBlinkVisible(false), fBlinkTimer(new QTimer(this))
 {
 	this->setForegroundRole(QPalette::Text);
@@ -49,7 +51,7 @@ QTadsDisplayWidget::paintEvent( QPaintEvent* e )
 	//qDebug() << "repainting" << e->rect();
 	const QRect& qRect = e->region().boundingRect();
 	CHtmlRect cRect(qRect.left(), qRect.top(), qRect.left() + qRect.width(), qRect.top() + qRect.height());
-	this->fParentSysWin->get_formatter()->draw(&cRect, false, 0);
+	this->fFormatter->draw(&cRect, false, 0);
 	QPainter painter(this);
 	if (this->fCursorVisible) {
 		if (this->fBlinkVisible) {
@@ -62,10 +64,37 @@ QTadsDisplayWidget::paintEvent( QPaintEvent* e )
 	}
 }
 
-
+/*
 void
 QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 {
+	qDebug() << e->pos();
+}
+*/
+
+void
+QTadsDisplayWidget::mousePressEvent( QMouseEvent* e )
+{
+	// Get the display containing the position.
+	CHtmlPoint pos;
+	pos.set(e->pos().x(), e->pos().y());
+	CHtmlDisp* disp = this->fFormatter->find_by_pos(pos, true);
+
+	// Get the link from the display item, if there is one.
+	CHtmlDispLink* link = 0;
+	if (disp != 0) {
+		link = disp->get_link(this->fFormatter, pos.x, pos.y);
+	}
+
+	// If we found a link, process it.
+	// FIXME: We should track the link and process it at mouseReleaseEvent().
+	if (link != 0 and link->is_clickable_link()) {
+		// Draw all of the items involved in the link in the hilited state.
+		link->set_clicked(this->fParentSysWin, CHtmlDispLink_clicked);
+		const textchar_t* cmd = link->href_.get_url();
+		qFrame->gameWindow()->processCommand(cmd, qstrlen(cmd), link->get_append(),
+											 not link->get_noenter(), OS_CMD_NONE);
+	}
 }
 
 

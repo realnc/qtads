@@ -188,6 +188,7 @@ os_get_exe_filename( char* buf, size_t buflen, const char* argv0 )
 void
 os_get_special_path( char* buf, size_t /*buflen*/, const char* /*argv0*/, int id )
 {
+	qDebug() << "get_special_path. id:" << id;
 	switch (id) {
 	  case OS_GSP_T3_RES:
 		strcpy(buf, "/usr/share/games/frobtads/tads3/res");
@@ -196,7 +197,7 @@ os_get_special_path( char* buf, size_t /*buflen*/, const char* /*argv0*/, int id
 		strcpy(buf, "/usr/share/games/frobtads/tads3/include");
 		break;
 	  case OS_GSP_T3_LIB:
-		strcpy(buf, "/usr/local/share/tads/tads3/lib");
+		strcpy(buf, "/usr/share/games/frobtads/tads3/lib");
 		break;
 	  case OS_GSP_T3_USER_LIBS:
 		strcpy(buf, "./");
@@ -221,6 +222,7 @@ os_get_special_path( char* buf, size_t /*buflen*/, const char* /*argv0*/, int id
 int
 os_locate( const char* fname, int /*flen*/, const char* /*arg0*/, char* buf, size_t bufsiz )
 {
+	qDebug() << Q_FUNC_INFO << "\n Looking for:" << fname;
 	Q_ASSERT(fname != 0);
 	Q_ASSERT(buf != 0);
 
@@ -686,8 +688,8 @@ os_init( int* /*argc*/, char* /*argv*/[], const char* /*prompt*/, char* /*buf*/,
 
 /* Reverse the effect of any changes made in os_init().
  *
- * Not really needed by the Tads 2 portable layer, but we call it from
- * other Qt-code.
+ * Not really needed by the Tads 2 portable layer, but we might use it at some
+ * point.
  */
 void
 os_uninit( void )
@@ -701,6 +703,7 @@ os_uninit( void )
 void
 os_term( int /*status*/ )
 {
+	qDebug() << Q_FUNC_INFO;
 #ifndef HTMLQT
 	// Tell the main-loop to quit the app.
 	QTadsIO::quitApp = true;

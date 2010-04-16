@@ -30,6 +30,9 @@ CHtmlSysWinGroupQt* qWinGroup = 0;
 /* --------------------------------------------------------------------
  * QTadsMediaObject
  */
+void (*QTadsMediaObject::fMusicDone_func )(void*, int repeat_count) = 0;
+void* QTadsMediaObject::fMusicDone_func_ctx = 0;
+
 QTadsMediaObject::QTadsMediaObject( QObject* parent, const QString& filename, SoundType type )
   : QObject(parent), fFileName(filename), fChunk(0), fMusic(0), fChannel(-1), fType(type),
 	fDone_func(0), fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
@@ -73,6 +76,15 @@ QTadsMediaObject::fFinish()
 
 
 void
+QTadsMediaObject::fMusicFinishCallback()
+{
+	if (QTadsMediaObject::fMusicDone_func != 0) {
+		QTadsMediaObject::fMusicDone_func(QTadsMediaObject::fMusicDone_func_ctx, 1);
+	}
+}
+
+
+void
 QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat )
 {
 	this->fRepeatsWanted = repeat;
@@ -82,6 +94,9 @@ QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void
 	if (this->fType == MPEG) {
 		if (Mix_PlayMusic(this->fMusic, repeat - 1) == -1) {
 			qWarning() << "Error: Can't play sound:" << Mix_GetError();
+		} else {
+			Mix_HookMusicFinished(0);
+			Mix_HookMusicFinished(QTadsMediaObject::fMusicFinishCallback);
 		}
 	} else {
 		this->fChannel = Mix_PlayChannel(-1, this->fChunk, repeat - 1);
@@ -96,6 +111,7 @@ void
 QTadsMediaObject::cancelPlaying( bool sync )
 {
 	if (this->fType == MPEG) {
+		Mix_HookMusicFinished(0);
 		Mix_HaltMusic();
 	} else {
 		Mix_HaltChannel(this->fChannel);

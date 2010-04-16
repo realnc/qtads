@@ -606,7 +606,7 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	//
 	// fLastKeyEvent is used in cases where the user pressed a non-text key,
 	// like backspace, space, enter, the up-arrow button, etc.  In that case,
-	// fLastKeyEvent contains that key key press in form of a Qt::Key and
+	// fLastKeyEvent contains that key press in form of a Qt::Key and
 	// fLastKeyText will be a null QChar.
 	//
 	// If the user pressed a text key (for example "C", "8" or "!"), then
@@ -634,6 +634,9 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	virtual
 	~CHtmlSysWinInputQt()
 	{ }
+
+	void
+	processCommand( const textchar_t* cmd, size_t len, int append, int enter, int os_cmd_id );
 
 	// Read a line of input.
 	bool
@@ -755,10 +758,10 @@ class QTadsMediaObject: public QObject {
 	int fChannel;
 	SoundType fType;
 
-	// Callback to invoke on stop.
+	// TADS callback to invoke on stop.
 	void (*fDone_func)(void*, int repeat_count);
 
-	// CTX to pass to the callback.
+	// CTX to pass to the TADS callback.
 	void* fDone_func_ctx;
 
 	// How many times we repeated the sound.
@@ -770,6 +773,12 @@ class QTadsMediaObject: public QObject {
 
 	void
 	fFinish();
+
+	static void (*fMusicDone_func )(void*, int repeat_count);
+	static void* fMusicDone_func_ctx;
+
+	static void
+	fMusicFinishCallback();
 
   public:
 	QTadsMediaObject( QObject* parent, const QString& filename, SoundType type );

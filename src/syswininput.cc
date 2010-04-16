@@ -18,6 +18,8 @@
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QTime>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include "htmlqt.h"
 #include "qtadsdispwidget.h"
@@ -32,6 +34,40 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
 : CHtmlSysWinQt(formatter, parent), fInputReady(false), fAcceptInput(false), fSingleKeyInput(false),
   fLastKeyEvent(Qt::Key_Any)
 { }
+
+
+void
+CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int append, int enter, int os_cmd_id )
+{
+	// If the command starts with "http:", "ftp:", "news:" "mailto:", or
+	// "telnet:", try to open it in the external application that handles it.
+	if (strnicmp(cmd, "http:", 5) == 0
+		|| strnicmp(cmd, "ftp:", 4) == 0
+		|| strnicmp(cmd, "news:", 5) == 0
+		|| strnicmp(cmd, "mailto:", 7) == 0
+		|| strnicmp(cmd, "telnet:", 7) == 0)
+	{
+		QDesktopServices::openUrl(QUrl(cmd));
+		return;
+	}
+
+	// If we're waiting for a single-key input or are't currently reading a
+	// command, ignore this.
+	if (this->fSingleKeyInput or not this->fAcceptInput) {
+		return;
+	}
+
+	// Add the command string.
+	this->fTadsBuffer->add_string(cmd, len, true);
+
+	// If 'enter' is true, indicate that we've finished reading the command, so
+	// that getInput() will return the new command as its result; otherwise,
+	// let the player continue editing this command.
+	if (enter) {
+		this->fInputReady = true;
+		this->fAcceptInput = false;
+	}
+}
 
 
 void

@@ -33,6 +33,9 @@ class QTadsDisplayWidget: public QWidget {
 	// The window we're embeded in.
 	class CHtmlSysWinQt* fParentSysWin;
 
+	// Our parent's formatter, for easy access.
+	class CHtmlFormatter* fFormatter;
+
 	// Position of the text cursor.
 	QPoint fCursorPos;
 
@@ -53,16 +56,19 @@ class QTadsDisplayWidget: public QWidget {
 	virtual void
 	paintEvent( QPaintEvent* e );
 
-	virtual void
-	mouseMoveEvent( QMouseEvent* e );
+	//virtual void
+	//mouseMoveEvent( QMouseEvent* e );
 
-  private slots:
+	virtual void
+	mousePressEvent( QMouseEvent* e );
+
+private slots:
 	// Called by the timer to blink the text cursor.
 	void
 	fBlinkCursor();
 
   public:
-	QTadsDisplayWidget( class CHtmlSysWinQt* parent );
+	QTadsDisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
 
 	// Change the text cursor position.
 	void

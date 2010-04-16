@@ -31,7 +31,7 @@
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QWidget* parent )
 : QScrollArea(parent), CHtmlSysWin(formatter), fBannerSize(0), fBannerSizeUnits(HTML_BANNERWIN_UNITS_PIX),
   fDontReformat(0), fVFrame(0), fHFrame(0), fVLine(0), fHLine(0), fVLayout(0), fHLayout(0), fParentBanner(0),
-  fMargins(5, 2, 5, 2), fBgImage(0), fDispWidget(new QTadsDisplayWidget(this))
+  fMargins(5, 2, 5, 2), fBgImage(0), fDispWidget(new QTadsDisplayWidget(this, formatter))
 {
 	this->formatter_->set_win(this, &fMargins);
 	this->setForegroundRole(QPalette::Text);
@@ -521,7 +521,7 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 		this->formatter_->do_formatting();
 	}
 
-	// We make the view a bit higher (5 pixels) then required by the real
+	// We make the view a bit higher (5 pixels) than required by the real
 	// document height so that we get a bit of extra space under the input
 	// prompt because it looks nicer.  This is only done if we're the main game
 	// window.
@@ -536,10 +536,10 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 		this->formatter_->freeze_display(false);
 	}
 
+	this->verticalScrollBar()->setValue(this->verticalScrollBar()->maximum());
 	if (update_win) {
-		this->fDispWidget->update();
+		this->fDispWidget->repaint();
 	}
-
 	return false;
 }
 
@@ -796,7 +796,7 @@ CHtmlSysWinQt::get_html_alink_color() const
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	return HTML_make_color(0, 0, 255);
+	return HTML_make_color(10, 10, 125);
 }
 
 
