@@ -154,9 +154,6 @@ QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, 
 			buf = static_cast<Uint8*>(realloc(buf, bufSize));
 			memset(buf + (bufSize - 8192), 0, 8192);
 			bytesWritten = SMPEG_playAudio(smpeg, buf + (bufSize - 8192), 8192);
-			// Keep GUI responsive while decoding.
-			qFrame->sendPostedEvents();
-			qFrame->processEvents();
 		}
 		// Done with decoding.
 		SMPEG_stop(smpeg);
