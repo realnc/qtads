@@ -440,7 +440,9 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
 	}
 
 	// If the timeout expired, tell the caller.
-	if (use_timeout and timedOut) return OS_EVT_TIMEOUT;
+	if (use_timeout and timedOut) {
+		return OS_EVT_TIMEOUT;
+	}
 
 	if (res == 0) {
 		// It was an extended character; call again to get the

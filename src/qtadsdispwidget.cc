@@ -40,6 +40,10 @@ QTadsDisplayWidget::QTadsDisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* f
 	this->setBackgroundRole(QPalette::Base);
 	connect(this->fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
 	this->fBlinkTimer->start(QApplication::cursorFlashTime() / 2);
+
+	// Enable mouse tracking, since we need to change the mouse cursor shape
+	// when hovering over hyperlinks.
+	this->setMouseTracking(true);
 }
 
 

@@ -146,11 +146,11 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* event )
 		this->fTadsBuffer->add_string(event->text().toUtf8().constData(), event->text().toUtf8().length(), true);
 	}
 
-	this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->fFormatter), this->fTadsBuffer->getlen());
+	this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
 	if (this->fTag->ready_to_format()) {
-		this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->fFormatter);
+		this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
 	}
-	this->fDispWidget->updateCursorPos(this->fFormatter, this->fTadsBuffer, this->fTag);
+	this->fDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
 	//static_cast<CHtmlSysWinQt*>(this->widget())->do_formatting(false, true, false);
 }
 
@@ -234,7 +234,7 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 	tadsBuffer->show_caret();
 	this->fDispWidget->setCursorVisible(true);
 	this->fDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
-	this->startLineInput(tadsBuffer, tag, formatter);
+	this->startLineInput(tadsBuffer, tag);
 	while (qFrame->gameRunning() and not this->inputReady()) {
 		qApp->sendPostedEvents();
 		qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
@@ -362,13 +362,12 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 
 
 void
-CHtmlSysWinInputQt::startLineInput( CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput* tag, CHtmlFormatter* formatter )
+CHtmlSysWinInputQt::startLineInput( CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput* tag )
 {
 	this->fInputReady = false;
 	this->fAcceptInput = true;
 	this->fSingleKeyInput = false;
 	this->fTag = tag;
-	this->fFormatter = formatter;
 	this->fTadsBuffer = tadsBuffer;
 	tadsBuffer->setbuf(tadsBuffer->getbuf(), 1000, 0);
 	tadsBuffer->set_sel_range(0, 0, 0);

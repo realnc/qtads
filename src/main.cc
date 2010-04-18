@@ -64,18 +64,15 @@ int main( int argc, char** argv )
 		qFatal("Unable to initialize sound system: %s", SDL_GetError());
 		return 1;
 	}
-
 	int sdlFormats = MIX_INIT_OGG | MIX_INIT_MP3;
 	if (Mix_Init((sdlFormats & sdlFormats) != sdlFormats)) {
 		qFatal("Unable to load Ogg Vorbis and MP3 support: %s", Mix_GetError());
 		return 1;
 	}
-
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) != 0) {
 		qFatal("Unable to initialize audio mixer: %s", Mix_GetError());
 		return 1;
 	}
-
 	Mix_AllocateChannels(16);
 
 	/*

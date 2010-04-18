@@ -17,6 +17,7 @@
 
 #include <QDir>
 #include <QBuffer>
+#include <smpeg/smpeg.h>
 
 #include "htmlqt.h"
 
@@ -30,36 +31,16 @@ CHtmlSysWinGroupQt* qWinGroup = 0;
 /* --------------------------------------------------------------------
  * QTadsMediaObject
  */
-void (*QTadsMediaObject::fMusicDone_func )(void*, int repeat_count) = 0;
-void* QTadsMediaObject::fMusicDone_func_ctx = 0;
-
-QTadsMediaObject::QTadsMediaObject( QObject* parent, const QString& filename, SoundType type )
-  : QObject(parent), fFileName(filename), fChunk(0), fMusic(0), fChannel(-1), fType(type),
-	fDone_func(0), fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
+QTadsMediaObject::QTadsMediaObject( QObject* parent, Mix_Chunk* chunk, SoundType type )
+  : QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fDone_func(0),
+	fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
 {
-	this->fFileName = filename;
-	if (type == MPEG) {
-		this->fMusic = Mix_LoadMUS(filename.toLocal8Bit().constData());
-		if (this->fMusic == 0) {
-			qWarning() << "Error: Unable to load sound from" << filename;
-		}
-	} else {
-		this->fChunk = Mix_LoadWAV(filename.toLocal8Bit().constData());
-		if (this->fChunk == 0) {
-			qWarning() << "Error: Unable to load sound from" << filename;
-		}
-	}
-	QFile::remove(this->fFileName);
 }
 
 
 QTadsMediaObject::~QTadsMediaObject()
 {
-	if (this->fType == MPEG) {
-		Mix_FreeMusic(this->fMusic);
-	} else {
-		Mix_FreeChunk(this->fChunk);
-	}
+	Mix_FreeChunk(this->fChunk);
 }
 
 
@@ -76,33 +57,16 @@ QTadsMediaObject::fFinish()
 
 
 void
-QTadsMediaObject::fMusicFinishCallback()
-{
-	if (QTadsMediaObject::fMusicDone_func != 0) {
-		QTadsMediaObject::fMusicDone_func(QTadsMediaObject::fMusicDone_func_ctx, 1);
-	}
-}
-
-
-void
 QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat )
 {
 	this->fRepeatsWanted = repeat;
-	this->fDone_func = done_func;
-	this->fDone_func_ctx = done_func_ctx;
 	++this->fRepeats;
-	if (this->fType == MPEG) {
-		if (Mix_PlayMusic(this->fMusic, repeat - 1) == -1) {
-			qWarning() << "Error: Can't play sound:" << Mix_GetError();
-		} else {
-			Mix_HookMusicFinished(0);
-			Mix_HookMusicFinished(QTadsMediaObject::fMusicFinishCallback);
-		}
+	this->fChannel = Mix_PlayChannel(-1, this->fChunk, repeat - 1);
+	if (this->fChannel == -1) {
+		qWarning() << "Error: Can't play sound:" << Mix_GetError();
 	} else {
-		this->fChannel = Mix_PlayChannel(-1, this->fChunk, repeat - 1);
-		if (this->fChannel == -1) {
-			qWarning() << "Error: Can't play sound:" << Mix_GetError();
-		}
+		this->fDone_func = done_func;
+		this->fDone_func_ctx = done_func_ctx;
 	}
 }
 
@@ -110,12 +74,7 @@ QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void
 void
 QTadsMediaObject::cancelPlaying( bool sync )
 {
-	if (this->fType == MPEG) {
-		Mix_HookMusicFinished(0);
-		Mix_HaltMusic();
-	} else {
-		Mix_HaltChannel(this->fChannel);
-	}
+	Mix_HaltChannel(this->fChannel);
 	this->fFinish();
 }
 
@@ -129,42 +88,82 @@ QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, 
 	qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
 			<< "url:" << url->get_url();
 
+	// Load the sound data into a buffer.
 	QFile file(filename);
 	file.open(QIODevice::ReadOnly);
 	file.seek(seekpos);
-	QTemporaryFile* tmpFile = new QTemporaryFile(QDir::tempPath() + "/qtads_XXXXXX",
-												 static_cast<CHtmlSysWinQt*>(win));
-	tmpFile->setAutoRemove(false);
-	tmpFile->open();
-	tmpFile->write(file.read(filesize));
+	QByteArray data(file.read(filesize));
 	file.close();
-	QString fname = tmpFile->fileName();
-	tmpFile->close();
-	delete tmpFile;
-	qDebug() << "source filename:" << fname;
+
+	Mix_Chunk* chunk;
+	if (type == MPEG) {
+		// The sound is an mp3.  We'll decode it into an SDL_Mixer chunk using
+		// SMPEG.
+		SMPEG* smpeg = SMPEG_new_data(data.data(), data.size(), 0, 0);
+
+		// Set the format we want the decoded raw data to have.
+		SDL_AudioSpec spec;
+		SMPEG_wantedSpec(smpeg, &spec);
+		spec.channels = 2;
+		spec.format = MIX_DEFAULT_FORMAT;
+		spec.freq = 44100;
+		SMPEG_actualSpec(smpeg, &spec);
+
+		// We decode the mpeg stream in steps of 8192kB each and increase the
+		// size of the output buffer after each step.
+		size_t bufSize = 8192;
+		Uint8* buf = static_cast<Uint8*>(malloc(bufSize));
+		// Needs to be set to digital silence because SMPEG is mixing source
+		// and destination.
+		memset(buf, 0, bufSize);
+		// Prepare for decoding and decode the first bunch of data.
+		SMPEG_play(smpeg);
+		int bytesWritten = SMPEG_playAudio(smpeg, buf, 8192);
+		// Decode the rest.  Increase buffer as needed.
+		while (bytesWritten > 0 and bytesWritten <= 8192) {
+			bufSize += 8192;
+			buf = static_cast<Uint8*>(realloc(buf, bufSize));
+			memset(buf + (bufSize - 8192), 0, 8192);
+			bytesWritten = SMPEG_playAudio(smpeg, buf + (bufSize - 8192), 8192);
+			qDebug() << bytesWritten;
+		}
+		// Done with decoding.
+		SMPEG_stop(smpeg);
+		if (SMPEG_error(smpeg) != 0) {
+			qWarning() << "ERROR: cannot decode sound data:" << SMPEG_error(smpeg);
+			free(buf);
+			SMPEG_delete(smpeg);
+			return 0;
+		}
+		SMPEG_delete(smpeg);
+		// Adjust final buffer size to fit the decoded data exactly.
+		buf = static_cast<Uint8*>(realloc(buf, (bufSize - 8192) + bytesWritten));
+		chunk = Mix_QuickLoad_RAW(buf, (bufSize - 8192) + bytesWritten);
+	} else {
+		Q_ASSERT(type == WAV or type == OGG);
+		// The sound is either WAV or Ogg Vorbis data.  We'll just let
+		// SDL_Mixer handle it.
+		SDL_RWops* rw = SDL_RWFromConstMem(data.constData(), data.size());
+		chunk = Mix_LoadWAV_RW(rw, 1);
+	}
 
 	CHtmlSysSound* sound;
-	QTadsMediaObject* cast;
 	switch (type) {
 	  case WAV:
 		qDebug() << "Sound type: WAV";
-		sound = new CHtmlSysSoundWavQt(static_cast<CHtmlSysWinQt*>(win), fname, WAV);
-		cast = static_cast<CHtmlSysSoundWavQt*>(sound);
+		sound = new CHtmlSysSoundWavQt(static_cast<CHtmlSysWinQt*>(win), chunk, WAV);
 		break;
 
 	  case OGG:
 		qDebug() << "Sound type: OGG";
-		sound = new CHtmlSysSoundOggQt(static_cast<CHtmlSysWinQt*>(win), fname, OGG);
-		cast = static_cast<CHtmlSysSoundOggQt*>(sound);
+		sound = new CHtmlSysSoundOggQt(static_cast<CHtmlSysWinQt*>(win), chunk, OGG);
 		break;
 
 	  case MPEG:
 		qDebug() << "Sound type: MPEG";
-		sound = new CHtmlSysSoundMpegQt(static_cast<CHtmlSysWinQt*>(win), fname, MPEG);
-		cast = static_cast<CHtmlSysSoundMpegQt*>(sound);
+		sound = new CHtmlSysSoundMpegQt(static_cast<CHtmlSysWinQt*>(win), chunk, MPEG);
 		break;
 	}
-	cast->fFileName = fname;
 	return sound;
 }
 
@@ -174,7 +173,8 @@ QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, 
  */
 int
 CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx,
-								int repeat, const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade )
+								int repeat, const textchar_t* url, int vol, long fade_in, long fade_out,
+								int crossfade )
 {
 	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 	this->startPlaying(done_func, done_func_ctx, repeat);
@@ -210,7 +210,8 @@ CHtmlSysSoundWavQt::resume()
  */
 int
 CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx,
-								int repeat, const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade )
+								int repeat, const textchar_t* url, int vol, long fade_in, long fade_out,
+								int crossfade )
 {
 	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 	this->startPlaying(done_func, done_func_ctx, repeat);

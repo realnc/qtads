@@ -152,7 +152,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// Tads HTML parser.
 	class CHtmlParser* fParser;
 
-	// Tads HTML formatter.
+	// Tads HTML formatter for the main game window.
 	class CHtmlFormatterInput* fFormatter;
 
 	// List of banners.
@@ -373,7 +373,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	class QTadsDisplayWidget* fDispWidget;
 
 	// The formatter we're associated with.
-	class CHtmlFormatter* fFormatter;
+	//class CHtmlFormatter* fFormatter;
 
 	virtual void
 	keyPressEvent( QKeyEvent* event );
@@ -661,7 +661,7 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	{ return this->fInputReady; }
 
 	void
-	startLineInput( class CHtmlInputBuf* tadsBuffer, class CHtmlTagTextInput* tag, class CHtmlFormatter* formatter );
+	startLineInput( class CHtmlInputBuf* tadsBuffer, class CHtmlTagTextInput* tag );
 
 	void
 	startKeypressInput();
@@ -752,9 +752,7 @@ class QTadsMediaObject: public QObject {
 	enum SoundType { WAV, OGG, MPEG };
 
   private:
-	QString fFileName;
 	Mix_Chunk* fChunk;
-	Mix_Music* fMusic;
 	int fChannel;
 	SoundType fType;
 
@@ -774,14 +772,8 @@ class QTadsMediaObject: public QObject {
 	void
 	fFinish();
 
-	static void (*fMusicDone_func )(void*, int repeat_count);
-	static void* fMusicDone_func_ctx;
-
-	static void
-	fMusicFinishCallback();
-
   public:
-	QTadsMediaObject( QObject* parent, const QString& filename, SoundType type );
+	QTadsMediaObject( QObject* parent, Mix_Chunk* chunk, SoundType type );
 
 	virtual
 	~QTadsMediaObject();
@@ -800,8 +792,8 @@ class QTadsMediaObject: public QObject {
 
 class CHtmlSysSoundWavQt: public QTadsMediaObject, public CHtmlSysSoundWav {
   public:
-	CHtmlSysSoundWavQt( QObject* parent, const QString& filename, SoundType type )
-	: QTadsMediaObject(parent, filename, type)
+	CHtmlSysSoundWavQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
+	: QTadsMediaObject(parent, chunk, type)
 	{ }
 
 	//
@@ -830,8 +822,8 @@ class CHtmlSysSoundWavQt: public QTadsMediaObject, public CHtmlSysSoundWav {
 
 class CHtmlSysSoundOggQt: public QTadsMediaObject, public CHtmlSysSoundOgg {
   public:
-	CHtmlSysSoundOggQt( QObject* parent, const QString& filename, SoundType type )
-	: QTadsMediaObject(parent, filename, type)
+	CHtmlSysSoundOggQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
+	: QTadsMediaObject(parent, chunk, type)
 	{ }
 
 	//
@@ -860,8 +852,8 @@ class CHtmlSysSoundOggQt: public QTadsMediaObject, public CHtmlSysSoundOgg {
 
 class CHtmlSysSoundMpegQt: public QTadsMediaObject, public CHtmlSysSoundMpeg {
   public:
-	CHtmlSysSoundMpegQt( QObject* parent, const QString& filename, SoundType type )
-	: QTadsMediaObject(parent, filename, type)
+	CHtmlSysSoundMpegQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
+	: QTadsMediaObject(parent, chunk, type)
 	{ }
 
 	//
