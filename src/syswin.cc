@@ -52,6 +52,11 @@ CHtmlSysWinQt::~CHtmlSysWinQt()
 {
 	//qDebug() << Q_FUNC_INFO;
 
+	// Remove my reference on the background image if I have one.
+	if (this->fBgImage != 0) {
+		this->fBgImage->remove_ref();
+	}
+
 	this->formatter_->cancel_playback();
 	this->formatter_->cancel_sound(HTML_Attrib_invalid, 0.0, false, true);
 
