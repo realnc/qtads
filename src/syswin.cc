@@ -31,7 +31,7 @@
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QWidget* parent )
 : QScrollArea(parent), CHtmlSysWin(formatter), fBannerSize(0), fBannerSizeUnits(HTML_BANNERWIN_UNITS_PIX),
   fDontReformat(0), fVFrame(0), fHFrame(0), fVLine(0), fHLine(0), fVLayout(0), fHLayout(0), fParentBanner(0),
-  fMargins(5, 2, 5, 2), fBgImage(0), fDispWidget(new QTadsDisplayWidget(this, formatter))
+  fMargins(8, 2, 8, 2), fBgImage(0), fDispWidget(new QTadsDisplayWidget(this, formatter))
 {
 	this->formatter_->set_win(this, &fMargins);
 	this->setForegroundRole(QPalette::Text);
