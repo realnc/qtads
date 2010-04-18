@@ -64,11 +64,20 @@ int main( int argc, char** argv )
 		qFatal("Unable to initialize sound system: %s", SDL_GetError());
 		return 1;
 	}
+
+	// This will preload the needed codecs now instead of constantly loading
+	// and unloading them each time a sound is played/stopped.  This is only
+	// available in SDL_Mixer 1.2.10 and newer.
+#if (MIX_MAJOR_VERSION > 1) \
+	|| ((MIX_MAJOR_VERSION == 1) && (MIX_MINOR_VERSION > 2)) \
+	|| ((MIX_MAJOR_VERSION == 1) && (MIX_MINOR_VERSION == 2) && (MIX_PATCHLEVEL > 9))
 	int sdlFormats = MIX_INIT_OGG | MIX_INIT_MP3;
 	if (Mix_Init((sdlFormats & sdlFormats) != sdlFormats)) {
 		qFatal("Unable to load Ogg Vorbis and MP3 support: %s", Mix_GetError());
 		return 1;
 	}
+#endif
+
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) != 0) {
 		qFatal("Unable to initialize audio mixer: %s", Mix_GetError());
 		return 1;
