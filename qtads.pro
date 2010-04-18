@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += qt silent warn_on
+CONFIG += qt silent warn_off
 LIBS += -lSDL_mixer -lSDL -lsmpeg
 
 # mingw32 static build
