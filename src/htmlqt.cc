@@ -84,7 +84,6 @@ CHtmlSysSound*
 QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
 							   unsigned long filesize, CHtmlSysWin* win, SoundType type )
 {
-	qDebug() << Q_FUNC_INFO << "called";
 	qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
 			<< "url:" << url->get_url();
 
@@ -125,7 +124,6 @@ QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, 
 			buf = static_cast<Uint8*>(realloc(buf, bufSize));
 			memset(buf + (bufSize - 8192), 0, 8192);
 			bytesWritten = SMPEG_playAudio(smpeg, buf + (bufSize - 8192), 8192);
-			qDebug() << bytesWritten;
 		}
 		// Done with decoding.
 		SMPEG_stop(smpeg);
