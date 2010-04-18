@@ -20,8 +20,8 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QDir>
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 #include "os.h"
 #include "trd.h"

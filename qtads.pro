@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += qt silent warn_on
+CONFIG += qt warn_on
 LIBS += -lSDL_mixer -lSDL -lsmpeg
 
 # mingw32 static build
@@ -20,6 +20,11 @@ QMAKE_CFLAGS_WARN_OFF =
 	QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter
 	QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter
 }
+
+QMAKE_CFLAGS += $$system(sdl-config --cflags)
+QMAKE_CXXFLAGS += $$system(sdl-config --cflags)
+QMAKE_CFLAGS += $$system(smpeg-config --cflags)
+QMAKE_CXXFLAGS += $$system(smpeg-config --cflags)
 
 # Where to find the portable Tads sources.
 T2DIR = tads2

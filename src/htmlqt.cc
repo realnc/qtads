@@ -17,7 +17,7 @@
 
 #include <QDir>
 #include <QBuffer>
-#include <smpeg/smpeg.h>
+#include <smpeg.h>
 
 #include "htmlqt.h"
 
@@ -42,6 +42,7 @@ QTadsMediaObject::QTadsMediaObject( QObject* parent, Mix_Chunk* chunk, SoundType
 
 QTadsMediaObject::~QTadsMediaObject()
 {
+	//qDebug() << Q_FUNC_INFO;
 	this->fRepeatsWanted = -1;
 	if (this->fPlaying) {
 		Mix_HaltChannel(this->fChannel);
