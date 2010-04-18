@@ -74,6 +74,7 @@ int main( int argc, char** argv )
 		return 1;
 	}
 	Mix_AllocateChannels(16);
+	Mix_ChannelFinished(QTadsMediaObject::callback);
 
 	/*
 	int numtimesopened, frequency, channels;
@@ -130,6 +131,7 @@ int main( int argc, char** argv )
 		std::cerr << gameFileName.toLocal8Bit().constData() << " is not a TADS game file.\n";
 	}
 
+	Mix_ChannelFinished(0);
 	CHtmlSysFrame::set_frame_obj(0);
 	delete app;
 	Mix_CloseAudio();

@@ -755,6 +755,7 @@ class QTadsMediaObject: public QObject {
 	Mix_Chunk* fChunk;
 	int fChannel;
 	SoundType fType;
+	bool fPlaying;
 
 	// TADS callback to invoke on stop.
 	void (*fDone_func)(void*, int repeat_count);
@@ -769,14 +770,25 @@ class QTadsMediaObject: public QObject {
 	// 0 means repeat forever.
 	int fRepeatsWanted;
 
-	void
-	fFinish();
+	// All QTadsMediaObjects that currently exist.  We need this in order to
+	// implement the SDL_Mixer callback (which in turn needs to call the TADS
+	// callback) that is invoked after a channel has stopped playing.  That
+	// callback has to be a static member (C++ methods can't be C callbacks),
+	// and since there's no 'this' pointer in static member functions, it needs
+	// to invoke the TADS callback based on the channel number.
+	static QList<QTadsMediaObject*> fObjList;
+
+	//void
+	//fFinish();
 
   public:
 	QTadsMediaObject( QObject* parent, Mix_Chunk* chunk, SoundType type );
 
 	virtual
 	~QTadsMediaObject();
+
+	// The SDL_Mixer callback.
+	static void callback( int channel );
 
 	void
 	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat );

@@ -31,8 +31,10 @@ CHtmlSysWinGroupQt* qWinGroup = 0;
 /* --------------------------------------------------------------------
  * QTadsMediaObject
  */
+QList<QTadsMediaObject*> QTadsMediaObject::fObjList;
+
 QTadsMediaObject::QTadsMediaObject( QObject* parent, Mix_Chunk* chunk, SoundType type )
-  : QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fDone_func(0),
+  : QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fPlaying(false), fDone_func(0),
 	fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
 {
 }
@@ -40,31 +42,57 @@ QTadsMediaObject::QTadsMediaObject( QObject* parent, Mix_Chunk* chunk, SoundType
 
 QTadsMediaObject::~QTadsMediaObject()
 {
+	this->fRepeatsWanted = -1;
+	if (this->fPlaying) {
+		Mix_HaltChannel(this->fChannel);
+	}
 	Mix_FreeChunk(this->fChunk);
 }
 
 
 void
-QTadsMediaObject::fFinish()
+QTadsMediaObject::callback( int channel )
 {
-	// Invoke the callback, if there is one.
-	if (this->fDone_func != 0) {
-		qDebug() << "INVOKING CALLBACK, REPEAT:" << this->fRepeats;
-		this->fDone_func(this->fDone_func_ctx, this->fRepeats);
-		this->fDone_func = 0;
+	QTadsMediaObject* mObj = 0;
+	// Find the object that uses the specified channel.
+	for (int i = 0; i < fObjList.size() and mObj == 0; ++i) {
+		if (fObjList.at(i)->fChannel == channel) {
+			mObj = fObjList.at(i);
+		}
 	}
+
+	// If it's an infinite loop sound, or it has not reached the wanted repeat
+	// count yet..  Play again on the same channel.
+	if ((mObj->fRepeatsWanted == 0) or (mObj->fRepeats < mObj->fRepeatsWanted)) {
+		Mix_PlayChannel(channel, mObj->fChunk, 0);
+		++mObj->fRepeats;
+		return;
+	}
+
+	// Sound has repeated enough times, or it has been halted.  In either case,
+	// we need to invoke the TADS callback, if there is one.
+	mObj->fPlaying = false;
+	if (mObj->fDone_func) {
+		qDebug() << "Invoking callback - repeats:" << mObj->fRepeats;
+		mObj->fDone_func(mObj->fDone_func_ctx, mObj->fRepeats);
+	}
+	fObjList.removeAll(mObj);
 }
 
 
 void
 QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat )
 {
+	Q_ASSERT(not this->fPlaying);
+	Q_ASSERT(not QTadsMediaObject::fObjList.contains(this));
 	this->fRepeatsWanted = repeat;
-	++this->fRepeats;
-	this->fChannel = Mix_PlayChannel(-1, this->fChunk, repeat - 1);
+	this->fChannel = Mix_PlayChannel(-1, this->fChunk, 0);
 	if (this->fChannel == -1) {
 		qWarning() << "Error: Can't play sound:" << Mix_GetError();
 	} else {
+		this->fPlaying = true;
+		this->fRepeats = 1;
+		QTadsMediaObject::fObjList.append(this);
 		this->fDone_func = done_func;
 		this->fDone_func_ctx = done_func_ctx;
 	}
@@ -74,8 +102,10 @@ QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void
 void
 QTadsMediaObject::cancelPlaying( bool sync )
 {
-	Mix_HaltChannel(this->fChannel);
-	this->fFinish();
+	if (this->fPlaying) {
+		this->fRepeatsWanted = -1;
+		Mix_HaltChannel(this->fChannel);
+	}
 }
 
 
@@ -124,6 +154,9 @@ QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, 
 			buf = static_cast<Uint8*>(realloc(buf, bufSize));
 			memset(buf + (bufSize - 8192), 0, 8192);
 			bytesWritten = SMPEG_playAudio(smpeg, buf + (bufSize - 8192), 8192);
+			// Keep GUI responsive while decoding.
+			qFrame->sendPostedEvents();
+			qFrame->processEvents();
 		}
 		// Done with decoding.
 		SMPEG_stop(smpeg);
