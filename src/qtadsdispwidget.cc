@@ -18,6 +18,7 @@
 #include <QDebug>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QStatusBar>
 #include <QTimer>
 
 #include "htmlattr.h"
@@ -68,18 +69,54 @@ QTadsDisplayWidget::paintEvent( QPaintEvent* e )
 	}
 }
 
-/*
+
 void
 QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 {
-	qDebug() << e->pos();
+	// Get the display object containing the position.
+	CHtmlPoint pos;
+	pos.set(e->pos().x(), e->pos().y());
+	CHtmlDisp* disp = this->fFormatter->find_by_pos(pos, true);
+
+	// If there's nothing, no need to continue.
+	if (disp == 0) {
+		this->unsetCursor();
+		qWinGroup->statusBar()->clearMessage();
+		return;
+	}
+
+	// It could be a link.
+	CHtmlDispLink* link = disp->get_link(this->fFormatter, pos.x, pos.y);
+
+	// If we found something that has ALT text, show it in the status bar.
+	if (disp->get_alt_text() != 0 and qstrlen(disp->get_alt_text()) > 0) {
+		qWinGroup->statusBar()->showMessage(disp->get_alt_text());
+		// If it's a clickable link, also change the mouse cursor shape.
+		if (link != 0 and link->is_clickable_link()) {
+			this->setCursor(Qt::PointingHandCursor);
+		}
+		return;
+	}
+
+	// It could be a clickable link without any ALT text.  In that case, show
+	// its contents.
+	if (link != 0 and link->is_clickable_link()) {
+		qWinGroup->statusBar()->showMessage(link->href_.get_url());
+		this->setCursor(Qt::PointingHandCursor);
+		return;
+	}
+
+	// We don't know what it was.  Clear status bar message and reset cursor
+	// shape.
+	qWinGroup->statusBar()->clearMessage();
+	this->unsetCursor();
 }
-*/
+
 
 void
 QTadsDisplayWidget::mousePressEvent( QMouseEvent* e )
 {
-	// Get the display containing the position.
+	// Get the display object containing the position.
 	CHtmlPoint pos;
 	pos.set(e->pos().x(), e->pos().y());
 	CHtmlDisp* disp = this->fFormatter->find_by_pos(pos, true);

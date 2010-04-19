@@ -915,14 +915,12 @@ CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, 
 
 	QBoxLayout* castLayout = static_cast<QBoxLayout*>(this->parentWidget()->layout());
 	if (castLayout->direction() == QBoxLayout::TopToBottom or castLayout->direction() == QBoxLayout::BottomToTop) {
-		//if (not use_height or (this->fBannerSize == height and this->fBannerSizeUnits == height_units)) {
 		if (not use_height) {
 			return;
 		}
 		this->fBannerSize = height;
 		this->fBannerSizeUnits = height_units;
 	} else {
-		//if (not use_width or (this->fBannerSize == width and this->fBannerSizeUnits == width_units)) {
 		if (not use_width) {
 			return;
 		}
@@ -931,10 +929,6 @@ CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, 
 	}
 
 	QSize parentSize(qWinGroup->centralWidget()->size());
-	//if (qFrame->gameWindow()->isHidden()) {
-	//	parentSize.setWidth(0);
-	//	parentSize.setHeight(0);
-	//}
 	qFrame->gameWindow()->calcChildBannerSizes(parentSize);
 	return;
 }

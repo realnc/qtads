@@ -16,6 +16,7 @@
  */
 
 #include <QLayout>
+#include <QLabel>
 #include <QStatusBar>
 
 #include "htmlqt.h"
@@ -485,9 +486,13 @@ CHtmlSysFrameQt::pause_for_more()
 {
 	qDebug() << Q_FUNC_INFO;
 
-	qWinGroup->statusBar()->showMessage(tr("*** MORE ***  [press a key to continue]"));
+	// Display a permanent QLabel instead of a temporary message.  This allows
+	// other status bar messages (like when hovering over hyperlinks) to
+	// temporary remove the MORE text instead of replacing it.
+	QLabel moreText("*** MORE ***  [press a key to continue]");
+	qWinGroup->statusBar()->addWidget(&moreText);
 	this->wait_for_keystroke(true);
-	qWinGroup->statusBar()->clearMessage();
+	qWinGroup->statusBar()->removeWidget(&moreText);
 }
 
 
