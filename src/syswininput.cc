@@ -57,6 +57,14 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 		return;
 	}
 
+	// If we're not in APPEND mode, clear out the current command; otherwise,
+	// make sure we're at the end of the current text.
+	if (!append) {
+		this->fTadsBuffer->del_line();
+	} else {
+		this->fTadsBuffer->end_of_line(false);
+	}
+
 	// Add the command string.
 	this->fTadsBuffer->add_string(cmd, len, true);
 
