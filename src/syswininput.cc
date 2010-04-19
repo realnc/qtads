@@ -37,6 +37,29 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
 
 
 void
+CHtmlSysWinInputQt::startLineInput( CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput* tag )
+{
+	this->fInputReady = false;
+	this->fAcceptInput = true;
+	this->fSingleKeyInput = false;
+	this->fTag = tag;
+	this->fTadsBuffer = tadsBuffer;
+	tadsBuffer->setbuf(tadsBuffer->getbuf(), 1000, 0);
+	tadsBuffer->set_sel_range(0, 0, 0);
+}
+
+
+void
+CHtmlSysWinInputQt::startKeypressInput()
+{
+	this->fInputReady = false;
+	this->fAcceptInput = true;
+	this->fSingleKeyInput = true;
+	this->fHrefEvent.clear();
+}
+
+
+void
 CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int append, int enter, int os_cmd_id )
 {
 	// If the command starts with "http:", "ftp:", "news:" "mailto:", or
@@ -51,9 +74,15 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 		return;
 	}
 
-	// If we're waiting for a single-key input or are't currently reading a
-	// command, ignore this.
-	if (this->fSingleKeyInput or not this->fAcceptInput) {
+	// If we're not currently accepting input, ignore this.
+	if (not this->fAcceptInput) {
+		return;
+	}
+
+	// If we're waiting for a single key-press event and the command isn't some
+	// sort of special OS_CMD command, it's an HREF event.
+	if (this->fAcceptInput and this->fSingleKeyInput and os_cmd_id == OS_CMD_NONE) {
+		this->fHrefEvent = QString::fromUtf8(cmd);
 		return;
 	}
 
@@ -243,7 +272,7 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 	this->fDispWidget->setCursorVisible(true);
 	this->fDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
 	this->startLineInput(tadsBuffer, tag);
-	while (qFrame->gameRunning() and not this->inputReady()) {
+	while (qFrame->gameRunning() and not this->fInputReady) {
 		qApp->sendPostedEvents();
 		qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 		qApp->sendPostedEvents();
@@ -299,19 +328,24 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 			QTime t;
 			t.start();
 			while (static_cast<unsigned long>(t.elapsed()) < timeout and qFrame->gameRunning()
-				   and not this->inputReady()) {
+				   and not this->fInputReady) {
 				qApp->sendPostedEvents();
 				qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents, timeout - t.elapsed());
 				qApp->sendPostedEvents();
 			}
-		} else while (qFrame->gameRunning() and not this->inputReady()) {
+		} else while (not this->fInputReady and this->fHrefEvent.isEmpty() and qFrame->gameRunning()) {
 			qApp->sendPostedEvents();
 			qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 			qApp->sendPostedEvents();
 		}
 
+		// If there was an HREF event, tell the caller.
+		if (not this->fHrefEvent.isEmpty()) {
+			return -1;
+		}
+
 		// If we're using a timeout and it expired, tell the caller.
-		if (useTimeout and qFrame->gameRunning() and not this->inputReady()) {
+		if (useTimeout and qFrame->gameRunning() and not this->fInputReady) {
 			Q_ASSERT(timedOut != 0);
 			*timedOut = true;
 			return -1;
@@ -366,26 +400,4 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 	// normal read on our next call and return the pending result.
 	done = true;
 	return extKey;
-}
-
-
-void
-CHtmlSysWinInputQt::startLineInput( CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput* tag )
-{
-	this->fInputReady = false;
-	this->fAcceptInput = true;
-	this->fSingleKeyInput = false;
-	this->fTag = tag;
-	this->fTadsBuffer = tadsBuffer;
-	tadsBuffer->setbuf(tadsBuffer->getbuf(), 1000, 0);
-	tadsBuffer->set_sel_range(0, 0, 0);
-}
-
-
-void
-CHtmlSysWinInputQt::startKeypressInput()
-{
-	this->fInputReady = false;
-	this->fAcceptInput = true;
-	this->fSingleKeyInput = true;
 }

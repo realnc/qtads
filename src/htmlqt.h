@@ -615,11 +615,20 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	Qt::Key fLastKeyEvent;
 	QChar fLastKeyText;
 
+	// Pending HREF event, if any.
+	QString fHrefEvent;
+
 	// The input tag we use to communicate with the base code.
 	class CHtmlTagTextInput* fTag;
 
 	// The externally managed input buffer.
 	class CHtmlInputBuf* fTadsBuffer;
+
+	void
+	startLineInput( class CHtmlInputBuf* tadsBuffer, class CHtmlTagTextInput* tag );
+
+	void
+	startKeypressInput();
 
   protected:
 	virtual void
@@ -651,20 +660,22 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	 * is pressed before the timeout is reached, we return the same as
 	 * os_getc_raw() and set 'timedOut' to false.
 	 *
-	 * TODO: Timeouts are not handled yet.
+	 * If an HREF events happens while we're waiting for input, -1 is returned.
+	 * The caller should use the pendingHrefEvent() method to get the HREF
+	 * event in this case.
 	 */
 	int
 	getKeypress( unsigned long timeout = 0, bool useTimeout = false, bool* timedOut = 0 );
 
-	bool
-	inputReady()
-	{ return this->fInputReady; }
-
-	void
-	startLineInput( class CHtmlInputBuf* tadsBuffer, class CHtmlTagTextInput* tag );
-
-	void
-	startKeypressInput();
+	// Return the currently pending HREF event (is there is one.)  This method
+	// will clear the event, so subsequent calls will return an empty string.
+	QString
+	pendingHrefEvent()
+	{
+		QString ret(this->fHrefEvent);
+		this->fHrefEvent.clear();
+		return ret;
+	}
 };
 
 

@@ -445,7 +445,13 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
 		return OS_EVT_TIMEOUT;
 	}
 
-	if (res == 0) {
+	if (res == -1) {
+		// It was an HREF event (user clicked a hyperlink).  Get the last
+		// pending HREF event.
+		qstrncpy(info->href, this->fGameWin->pendingHrefEvent().toUtf8().constData(), sizeof(info->href) - 1);
+		info->href[sizeof(info->href) - 1] = '\0';
+		return OS_EVT_HREF;
+	} else if (res == 0) {
 		// It was an extended character; call again to get the
 		// extended code.
 		info->key[0] = 0;
@@ -455,7 +461,7 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
 		info->key[0] = res;
 		info->key[1] = 0;
 	}
-	// Tell the caller it was an key-event.
+	// Tell the caller it was a key-event.
 	return OS_EVT_KEY;
 }
 
