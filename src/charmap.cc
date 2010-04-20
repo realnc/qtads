@@ -795,7 +795,7 @@ void CCharmapToLocal::load_table(osfildef *fp)
     /* read the first entry, which gives the offset of the to-local table */
     if (osfrb(fp, buf, 4))
         return;
-    ofs = osrp4(buf);
+	ofs = t3rp4u(buf);
 
     /* seek to the to-local table */
     osfseek(fp, startpos + ofs, OSFSK_SET);
@@ -804,7 +804,7 @@ void CCharmapToLocal::load_table(osfildef *fp)
     if (osfrb(fp, buf, 6))
         return;
     cnt = osrp2(buf);
-    xbytes = osrp4(buf + 2);
+	xbytes = t3rp4u(buf + 2);
 
     /*
      *   Allocate space for the translation table.  Note that we cannot
@@ -822,8 +822,8 @@ void CCharmapToLocal::load_table(osfildef *fp)
      */
     for (next_ofs = 0 ; cnt > 0 ; --cnt)
     {
-        uint  codept;
-        uint  xlen;
+		wchar_t codept;
+		uint xlen;
 
         /* read the code point and translation length */
         if (osfrb(fp, buf, 3))
@@ -860,7 +860,7 @@ void CCharmapToLocal::load_table(osfildef *fp)
 
     /* decode the expansion entry count and aggregate length */
     cnt = osrp2(buf);
-    xchars = osrp4(buf + 2);
+	xchars = t3rp4u(buf + 2);
 
     /*
      *   add one entry so that we can leave index zero unused, to indicate
@@ -882,7 +882,7 @@ void CCharmapToLocal::load_table(osfildef *fp)
      */
     for (next_ofs = 1 ; cnt > 0 ; --cnt)
     {
-        uint codept;
+		wchar_t codept;
         uint xlen;
         size_t i;
 
