@@ -805,7 +805,7 @@ class QTadsMediaObject: public QObject {
 	static void callback( int channel );
 
 	void
-	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat );
+	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol );
 
 	void
 	cancelPlaying( bool sync );

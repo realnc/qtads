@@ -82,10 +82,26 @@ QTadsMediaObject::callback( int channel )
 
 
 void
-QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat )
+QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+								int vol )
 {
 	Q_ASSERT(not this->fPlaying);
 	Q_ASSERT(not QTadsMediaObject::fObjList.contains(this));
+
+	// Adjust volume if it exceeds min/max levels.
+	if (vol < 0) {
+		vol = 0;
+	} else if (vol > 100) {
+		vol = 100;
+	}
+
+	// Convert the TADS volume level semantics [0..100] to SDL volume
+	// semantics [0..MIX_MAX_VOLUME].
+	vol = (vol * MIX_MAX_VOLUME) / 100;
+
+	// Set the volume level.
+	Mix_VolumeChunk(this->fChunk, vol);
+
 	this->fRepeatsWanted = repeat;
 	this->fChannel = Mix_PlayChannel(-1, this->fChunk, 0);
 	if (this->fChannel == -1) {
@@ -211,7 +227,7 @@ CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								int crossfade )
 {
 	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	this->startPlaying(done_func, done_func_ctx, repeat);
+	this->startPlaying(done_func, done_func_ctx, repeat, vol);
 	return 0;
 }
 
@@ -248,7 +264,7 @@ CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								int crossfade )
 {
 	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	this->startPlaying(done_func, done_func_ctx, repeat);
+	this->startPlaying(done_func, done_func_ctx, repeat, vol);
 	return 0;
 }
 
@@ -285,7 +301,7 @@ CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 								 int crossfade )
 {
 	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	this->startPlaying(done_func, done_func_ctx, repeat);
+	this->startPlaying(done_func, done_func_ctx, repeat, vol);
 	return 0;
 }
 
