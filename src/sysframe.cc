@@ -560,7 +560,7 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 	}
 
 	if (parent == 0) {
-		parent = this->fGameWin;
+		parent = castParent = this->fGameWin;
 	}
 
 	castParent->addBanner(banner, where, castOther, pos, style);
