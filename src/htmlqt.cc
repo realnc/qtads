@@ -176,21 +176,26 @@ QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, 
 		chunk = Mix_LoadWAV_RW(rw, 1);
 	}
 
+	// We have all the data we need; create the sound object.  It is
+	// *important* not to pass the CHtmlSysWin object as the parent in the
+	// constructor; doing so would result in Qt deleting the sound object when
+	// the parent object gets destroyed.  Therefore, we simply pass 0 to make
+	// sound object parentless.
 	CHtmlSysSound* sound;
 	switch (type) {
 	  case WAV:
 		qDebug() << "Sound type: WAV";
-		sound = new CHtmlSysSoundWavQt(static_cast<CHtmlSysWinQt*>(win), chunk, WAV);
+		sound = new CHtmlSysSoundWavQt(0, chunk, WAV);
 		break;
 
 	  case OGG:
 		qDebug() << "Sound type: OGG";
-		sound = new CHtmlSysSoundOggQt(static_cast<CHtmlSysWinQt*>(win), chunk, OGG);
+		sound = new CHtmlSysSoundWavQt(0, chunk, OGG);
 		break;
 
 	  case MPEG:
 		qDebug() << "Sound type: MPEG";
-		sound = new CHtmlSysSoundMpegQt(static_cast<CHtmlSysWinQt*>(win), chunk, MPEG);
+		sound = new CHtmlSysSoundWavQt(0, chunk, MPEG);
 		break;
 	}
 	return sound;
