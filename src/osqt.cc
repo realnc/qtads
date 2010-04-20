@@ -790,6 +790,7 @@ os_gen_charmap_filename( char* filename, char* internal_id, char* /*argv0*/ )
 void
 os_advise_load_charmap( char* /*id*/, char* /*ldesc*/, char* /*sysinfo*/ )
 {
+	qDebug() << Q_FUNC_INFO;
 	//QTextCodec::setCodecForCStrings(QTextCodec::codecForName(sysinfo));
 }
 
@@ -807,54 +808,47 @@ os_get_sysinfo( int code, void* /*param*/, long* result )
 	switch(code)
 	{
 	  case SYSINFO_HTML:
-		// We do HTML.
-		*result = 1;
-		break;
-
-	  case SYSINFO_TEXT_COLORS:
-		// We fully support RGB text colors.
-		*result = SYSINFO_TXC_RGB;
-		break;
-
-	  case SYSINFO_TEXT_HILITE:
-		// We do text highlighting.
-		*result = 1;
-		break;
-
-	  case SYSINFO_INTERP_CLASS:
-		// We're an HTML interpreter.
-		*result = SYSINFO_ICLASS_HTML;
-		break;
-
 	  case SYSINFO_JPEG:
+	  case SYSINFO_PNG:
 	  case SYSINFO_WAV:
-	  case SYSINFO_MPEG:
-	  case SYSINFO_MPEG1:
-	  case SYSINFO_MPEG2:
-	  case SYSINFO_MPEG3:
-	  case SYSINFO_OGG:
+	  case SYSINFO_MIDI:
+	  case SYSINFO_WAV_MIDI_OVL:
+	  case SYSINFO_WAV_OVL:
 	  case SYSINFO_PREF_IMAGES:
 	  case SYSINFO_PREF_SOUNDS:
 	  case SYSINFO_PREF_MUSIC:
 	  case SYSINFO_PREF_LINKS:
-	  case SYSINFO_WAV_OVL:
-	  case SYSINFO_PNG:
-	  case SYSINFO_PNG_TRANS:
-	  case SYSINFO_PNG_ALPHA:
-	  case SYSINFO_MNG:
-	  case SYSINFO_MNG_TRANS:
-	  case SYSINFO_MNG_ALPHA:
-	  case SYSINFO_BANNERS:
-	  case SYSINFO_MIDI:
-	  case SYSINFO_WAV_MIDI_OVL:
-		*result = 1;
-		break;
-
+	  case SYSINFO_MPEG:
+	  case SYSINFO_MPEG1:
+	  case SYSINFO_MPEG2:
+	  case SYSINFO_MPEG3:
 	  case SYSINFO_LINKS_HTTP:
 	  case SYSINFO_LINKS_FTP:
 	  case SYSINFO_LINKS_NEWS:
 	  case SYSINFO_LINKS_MAILTO:
 	  case SYSINFO_LINKS_TELNET:
+	  case SYSINFO_PNG_TRANS:
+	  case SYSINFO_PNG_ALPHA:
+	  case SYSINFO_OGG:
+	  case SYSINFO_MNG:
+	  case SYSINFO_MNG_TRANS:
+	  case SYSINFO_MNG_ALPHA:
+	  case SYSINFO_TEXT_HILITE:
+		*result = 1;
+		break;
+
+	  case SYSINFO_TEXT_COLORS:
+		*result = SYSINFO_TXC_RGB;
+		break;
+
+	  case SYSINFO_BANNERS:
+		*result = 1;
+		break;
+
+	  case SYSINFO_INTERP_CLASS:
+		*result = SYSINFO_ICLASS_HTML;
+		break;
+
 	  case SYSINFO_AUDIO_FADE:
 	  case SYSINFO_AUDIO_CROSSFADE:
 		// For now, we don't support any of this.
