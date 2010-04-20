@@ -217,6 +217,10 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	const QList<CHtmlSysWinQt*>&
 	childBannersOf( const CHtmlSysWinQt* parent );
 
+	// Recalculate and adjust the sizes of all HTML banners.
+	void
+	adjustBannerSizes();
+
 	//
 	// CHtmlSysFrame interface implementation.
 	//

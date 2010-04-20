@@ -314,6 +314,14 @@ CHtmlSysFrameQt::runT3Game( const QString& fname )
 
 
 void
+CHtmlSysFrameQt::adjustBannerSizes()
+{
+	QSize siz(qWinGroup->centralWidget()->size());
+	this->fGameWin->calcChildBannerSizes(siz);
+}
+
+
+void
 CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 {
 	this->fParser->parse(&this->fBuffer, qWinGroup);
@@ -351,7 +359,7 @@ CHtmlSysFrameQt::start_new_page()
 	this->fParser->clear_page();
 	this->fFormatter->remove_all_banners(false);
 	this->fGameWin->notify_clear_contents();
-	//this->fGameWin->calcChildBannerSizes();
+	this->adjustBannerSizes();
 	this->fFormatter->start_at_top(true);
 
 	this->fGameWin->do_formatting(false, true, false);
