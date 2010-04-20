@@ -58,7 +58,7 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 	this->fClientifc = new CVmMainClientConsole;
 
 	this->fMainWin = new CHtmlSysWinGroupQt;
-	this->fMainWin->setWindowTitle("QTads");
+	this->fMainWin->setWindowTitle(appName);
 	connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 
 	this->fMainWin->resize(800, 600);
@@ -289,6 +289,8 @@ CHtmlSysFrameQt::runT2Game( const QString& fname )
 	char* argv[2] = {argv0, argv1};
 	char savExt[] = "sav";
 
+	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
+
 	this->fGameRunning = true;
 	int ret = trdmain(2, argv, &this->fAppctx, savExt);
 	this->fGameRunning = false;
@@ -305,6 +307,8 @@ CHtmlSysFrameQt::runT3Game( const QString& fname )
 	this->fGameWin->setFocus();
 	this->fFormatter->set_t3_mode(true);
 	this->fTads3 = true;
+
+	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
 
 	this->fGameRunning = true;
 	return vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0,
