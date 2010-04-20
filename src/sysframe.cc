@@ -546,13 +546,14 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 		banner->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	}
 
+	CHtmlSysWinQt* castParent = static_cast<CHtmlSysWinQt*>(parent);
+	CHtmlSysWinQt* castOther = static_cast<CHtmlSysWinQt*>(other);
+
 	// If BEFORE or AFTER is requested but 'other' isn't a child of the
 	// parent, we must behave as if OS_BANNER_LAST were specified.
 	if (where == OS_BANNER_BEFORE or where == OS_BANNER_AFTER) {
 		Q_ASSERT(other != 0);
-		Q_ASSERT(parent != 0);
-		if (static_cast<CHtmlSysWinQt*>(parent)->parentWidget()->layout()
-			->indexOf(static_cast<CHtmlSysWinQt*>(other)) == -1) {
+		if ((parent == 0) or castParent->parentWidget()->layout()->indexOf(castOther) == -1) {
 			// 'other' is not a child banner of 'parent'.
 			where = OS_BANNER_LAST;
 		}
@@ -562,7 +563,7 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 		parent = this->fGameWin;
 	}
 
-	static_cast<CHtmlSysWinQt*>(parent)->addBanner(banner, where, static_cast<CHtmlSysWinQt*>(other), pos, style);
+	castParent->addBanner(banner, where, castOther, pos, style);
 	this->fBannerList.append(banner);
 	banner->setFocus();
 	return banner;
