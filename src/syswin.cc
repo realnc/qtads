@@ -57,9 +57,6 @@ CHtmlSysWinQt::~CHtmlSysWinQt()
 		this->fBgImage->remove_ref();
 	}
 
-	this->formatter_->cancel_playback();
-	this->formatter_->cancel_sound(HTML_Attrib_invalid, 0.0, false, true);
-
 	// Don't allow the formatter to reference us anymore, since
 	// we're about to be deleted.
 	this->formatter_->unset_win();
