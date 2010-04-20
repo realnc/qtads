@@ -414,7 +414,6 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	//
 	// CHtmlSysWin interface implementation.
 	//
-  public:
 	virtual class CHtmlSysWinGroup*
 	get_win_group()
 	{ return qWinGroup; }

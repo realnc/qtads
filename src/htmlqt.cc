@@ -180,7 +180,7 @@ QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, 
 	// *important* not to pass the CHtmlSysWin object as the parent in the
 	// constructor; doing so would result in Qt deleting the sound object when
 	// the parent object gets destroyed.  Therefore, we simply pass 0 to make
-	// sound object parentless.
+	// the sound object parentless.
 	CHtmlSysSound* sound;
 	switch (type) {
 	  case WAV:
