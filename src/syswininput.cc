@@ -352,6 +352,11 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 		qApp->sendPostedEvents();
 	}
 
+	if (not qFrame->gameRunning()) {
+		// Game is quitting.
+		return -3;
+	}
+
 	// If there was an HREF event, tell the caller.
 	if (not this->fHrefEvent.isEmpty()) {
 		return -2;
