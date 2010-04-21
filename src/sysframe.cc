@@ -78,10 +78,7 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 	delete this->fParser;
 	delete[] this->fInputBuffer;
 	delete this->fTadsBuffer;
-
-	// Normally we would delete the formatter too, but for some reason this
-	// will crash the application.  So for now, don't delete it.
-	//delete this->fFormatter;
+	delete this->fFormatter;
 
 	// Delete cached fonts.
 	while (not this->fFontList.isEmpty()) {
