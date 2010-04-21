@@ -315,89 +315,96 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 	static bool done = true;
 	static int extKey;
 
-	if (done) {
-		CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(this->formatter_);
-		formatter->prepare_for_input();
-		while (formatter->more_to_do()) {
-			formatter->do_formatting();
-		}
-		this->verticalScrollBar()->setValue(this->verticalScrollBar()->maximum());
-		extKey = 0;
-		this->startKeypressInput();
-		if (useTimeout) {
-			QTime t;
-			t.start();
-			while (static_cast<unsigned long>(t.elapsed()) < timeout and qFrame->gameRunning()
-				   and not this->fInputReady) {
-				qApp->sendPostedEvents();
-				qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents, timeout - t.elapsed());
-				qApp->sendPostedEvents();
-			}
-		} else while (not this->fInputReady and this->fHrefEvent.isEmpty() and qFrame->gameRunning()) {
-			qApp->sendPostedEvents();
-			qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
-			qApp->sendPostedEvents();
-		}
-
-		// If there was an HREF event, tell the caller.
-		if (not this->fHrefEvent.isEmpty()) {
-			return -1;
-		}
-
-		// If we're using a timeout and it expired, tell the caller.
-		if (useTimeout and qFrame->gameRunning() and not this->fInputReady) {
-			Q_ASSERT(timedOut != 0);
-			*timedOut = true;
-			return -1;
-		}
-
-		if (this->fLastKeyEvent != 0) {
-			switch (this->fLastKeyEvent) {
-			  case Qt::Key_Escape:   return 27;
-			  // A Tab is not an extended character, but Tads requires that
-			  // it is handled as one.
-			  case Qt::Key_Tab:      extKey = CMD_TAB; break;
-			  case Qt::Key_Return:
-			  case Qt::Key_Enter:    return 13;
-			  case Qt::Key_Down:     extKey = CMD_DOWN; break;
-			  case Qt::Key_Up:       extKey = CMD_UP; break;
-			  case Qt::Key_Left:     extKey = CMD_LEFT; break;
-			  case Qt::Key_Right:    extKey = CMD_RIGHT; break;
-			  case Qt::Key_Home:     extKey = CMD_HOME; break;
-			  case Qt::Key_Backspace: return 8;
-			  case Qt::Key_F1:       extKey = CMD_F1; break;
-			  case Qt::Key_F2:       extKey = CMD_F2; break;
-			  case Qt::Key_F3:       extKey = CMD_F3; break;
-			  case Qt::Key_F4:       extKey = CMD_F4; break;
-			  case Qt::Key_F5:       extKey = CMD_F5; break;
-			  case Qt::Key_F6:       extKey = CMD_F6; break;
-			  case Qt::Key_F7:       extKey = CMD_F7; break;
-			  case Qt::Key_F8:       extKey = CMD_F8; break;
-			  case Qt::Key_F9:       extKey = CMD_F9; break;
-			  case Qt::Key_F10:      extKey = CMD_F10; break;
-			  case Qt::Key_Delete:   extKey = CMD_DEL; break;
-			  case Qt::Key_PageDown: extKey = CMD_PGDN; break;
-			  case Qt::Key_PageUp:   extKey = CMD_PGUP; break;
-			  case Qt::Key_End:      extKey = CMD_END; break;
-			  default:
-				  // If we got here, something went wrong.  Just report a
-				  // space.
-				  qWarning() << Q_FUNC_INFO << "unrecognized key event in switch";
-				  return ' ';
-			}
-		} else {
-			// It's a textual key press.
-			return this->fLastKeyText.unicode();
-		}
-
-		// Prepare to return the extended key-code on
-		// our next call.
-		done = false;
-		return 0;
+	if (not done) {
+		// We have a pending return from our last call.  Prepare to do a
+		// normal read on our next call and return the pending result.
+		done = true;
+		return extKey;
 	}
 
-	// We have a pending return from our last call.  Prepare to do a
-	// normal read on our next call and return the pending result.
-	done = true;
-	return extKey;
+	// Prepare the formatter for input and format all remaining lines.
+	CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(this->formatter_);
+	formatter->prepare_for_input();
+	while (formatter->more_to_do()) {
+		formatter->do_formatting();
+	}
+
+	// Scroll to bottom.
+	this->verticalScrollBar()->setValue(this->verticalScrollBar()->maximum());
+
+	// Clear any pending HREF event.
+	this->fHrefEvent.clear();
+
+	extKey = 0;
+	this->startKeypressInput();
+	if (useTimeout) {
+		QTime t;
+		t.start();
+		while (static_cast<unsigned long>(t.elapsed()) < timeout and qFrame->gameRunning()
+			   and not this->fInputReady) {
+			qApp->sendPostedEvents();
+			qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents, timeout - t.elapsed());
+			qApp->sendPostedEvents();
+		}
+	} else while (not this->fInputReady and this->fHrefEvent.isEmpty() and qFrame->gameRunning()) {
+		qApp->sendPostedEvents();
+		qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
+		qApp->sendPostedEvents();
+	}
+
+	// If there was an HREF event, tell the caller.
+	if (not this->fHrefEvent.isEmpty()) {
+		return -2;
+	}
+
+	// If we're using a timeout and it expired, tell the caller.
+	if (useTimeout and qFrame->gameRunning() and not this->fInputReady) {
+		Q_ASSERT(timedOut != 0);
+		*timedOut = true;
+		return -1;
+	}
+
+	if (this->fLastKeyEvent != 0) {
+		switch (this->fLastKeyEvent) {
+		  case Qt::Key_Escape:   return 27;
+		  // A Tab is not an extended character, but Tads requires that
+		  // it is handled as one.
+		  case Qt::Key_Tab:      extKey = CMD_TAB; break;
+		  case Qt::Key_Return:
+		  case Qt::Key_Enter:    return 13;
+		  case Qt::Key_Down:     extKey = CMD_DOWN; break;
+		  case Qt::Key_Up:       extKey = CMD_UP; break;
+		  case Qt::Key_Left:     extKey = CMD_LEFT; break;
+		  case Qt::Key_Right:    extKey = CMD_RIGHT; break;
+		  case Qt::Key_Home:     extKey = CMD_HOME; break;
+		  case Qt::Key_Backspace: return 8;
+		  case Qt::Key_F1:       extKey = CMD_F1; break;
+		  case Qt::Key_F2:       extKey = CMD_F2; break;
+		  case Qt::Key_F3:       extKey = CMD_F3; break;
+		  case Qt::Key_F4:       extKey = CMD_F4; break;
+		  case Qt::Key_F5:       extKey = CMD_F5; break;
+		  case Qt::Key_F6:       extKey = CMD_F6; break;
+		  case Qt::Key_F7:       extKey = CMD_F7; break;
+		  case Qt::Key_F8:       extKey = CMD_F8; break;
+		  case Qt::Key_F9:       extKey = CMD_F9; break;
+		  case Qt::Key_F10:      extKey = CMD_F10; break;
+		  case Qt::Key_Delete:   extKey = CMD_DEL; break;
+		  case Qt::Key_PageDown: extKey = CMD_PGDN; break;
+		  case Qt::Key_PageUp:   extKey = CMD_PGUP; break;
+		  case Qt::Key_End:      extKey = CMD_END; break;
+		  default:
+			  // If we got here, something went wrong.  Just report a
+			  // space.
+			  qWarning() << Q_FUNC_INFO << "unrecognized key event in switch:" << hex << this->fLastKeyEvent;
+			  return ' ';
+		}
+	} else {
+		// It's a textual key press.
+		return this->fLastKeyText.unicode();
+	}
+
+	// Prepare to return the extended key-code on
+	// our next call.
+	done = false;
+	return 0;
 }
