@@ -478,15 +478,40 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
 }
 
 
+// FIXME: OS_EVT_HREF isn't handled and shouldn't be allowed here.
 textchar_t
 CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
 {
 	qDebug() << Q_FUNC_INFO;
 
+	static int pendingCmd = 0;
+	int ret;
+
+	// Flush output.
+	flush_txtbuf(true, false);
+
+	// If we have a pending keystroke command from out last call, return it
+	// now.
+	if (pendingCmd != 0) {
+		ret = pendingCmd;
+		pendingCmd = 0;
+		qDebug() << ret;
+		return ret;
+	}
+
 	os_event_info_t info;
-	this->get_input_event(0, false, &info);
+	ret = this->get_input_event(0, false, &info);
+
+	if (ret == OS_EVT_EOF) {
+		pendingCmd = CMD_EOF;
+		return 0;
+	}
+
+	if (ret == OS_EVT_KEY and info.key[0] == 0) {
+		pendingCmd = info.key[1];
+		return 0;
+	}
 	return info.key[0];
-	//return '\n';
 }
 
 
