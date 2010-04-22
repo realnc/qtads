@@ -277,7 +277,6 @@ CHtmlSysFrameQt::runT2Game( const QString& fname )
 	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, 0);
 	this->fMainWin->setCentralWidget(this->fGameWin);
 	this->fGameWin->setFocus();
-	this->fFormatter->set_t3_mode(false);
 	this->fTads3 = false;
 
 	char argv0[] = "qtads";
@@ -302,7 +301,6 @@ CHtmlSysFrameQt::runT3Game( const QString& fname )
 	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, 0);
 	this->fMainWin->setCentralWidget(this->fGameWin);
 	this->fGameWin->setFocus();
-	this->fFormatter->set_t3_mode(true);
 	this->fTads3 = true;
 
 	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
