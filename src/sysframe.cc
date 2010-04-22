@@ -85,8 +85,8 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 		delete this->fFontList.takeLast();
 	}
 
-	delete this->fHostifc;
 	delete this->fClientifc;
+	delete this->fHostifc;
 	delete this->fSettings;
 
 	//delete this->fGameWin;
