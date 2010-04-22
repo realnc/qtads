@@ -1314,11 +1314,15 @@ size_t CCharmapToUniUTF8::map2(char **outp, size_t *outlen,
         *outlen -= copy_len;
     }
 
-    /* copy the data */
-    memcpy(*outp, inp, copy_len);
+    /* Copy the data, if appropriate.  If 'outp' is 0, the caller is just
+     * trying to figure out the total length needed.
+     */
+    if (outp != 0) {
+        memcpy(*outp, inp, copy_len);
 
-    /* advance the output pointer past the copied data */
-    *outp += copy_len;
+        /* advance the output pointer past the copied data */
+        *outp += copy_len;
+    }
 
     /*
      *   return the total input length -- the total output length is
