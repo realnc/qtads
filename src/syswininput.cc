@@ -166,6 +166,14 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 		this->fTadsBuffer->start_of_line(true);
 	} else if (e->matches(QKeySequence::SelectEndOfLine) or e->matches(QKeySequence::SelectEndOfBlock)) {
 		this->fTadsBuffer->end_of_line(true);
+	} else if (e->matches(QKeySequence::SelectAll)) {
+		this->fTadsBuffer->start_of_line(false);
+		this->fTadsBuffer->end_of_line(true);
+	} else if (e->matches(QKeySequence::Undo)) {
+		this->fTadsBuffer->undo();
+	} else if (e->matches(QKeySequence::Paste)) {
+		const QString& clipStr = QApplication::clipboard()->text();
+		this->fTadsBuffer->add_string(clipStr.toUtf8().constData(), clipStr.toUtf8().size(), true);
 	} else if (e->key() == Qt::Key_Backspace) {
 		this->fTadsBuffer->backspace();
 	} else {
