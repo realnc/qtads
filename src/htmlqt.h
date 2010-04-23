@@ -635,7 +635,7 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 
   protected:
 	virtual void
-	keyPressEvent( QKeyEvent* event );
+	keyPressEvent( QKeyEvent* e );
 
 	void
 	singleKeyPressEvent( QKeyEvent* event );

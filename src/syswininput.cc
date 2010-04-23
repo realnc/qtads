@@ -19,6 +19,7 @@
 #include <QScrollBar>
 #include <QTime>
 #include <QDesktopServices>
+#include <QClipboard>
 #include <QUrl>
 
 #include "htmlqt.h"
@@ -108,79 +109,70 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 
 
 void
-CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* event )
+CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 {
 	//qDebug() << Q_FUNC_INFO;
 
 	//qDebug() << "Key pressed:" << hex << event->key();
 
 	if (not this->fAcceptInput) {
-		QScrollArea::keyPressEvent(event);
+		QScrollArea::keyPressEvent(e);
 		return;
 	}
 
 	if (this->fSingleKeyInput) {
-		this->singleKeyPressEvent(event);
+		this->singleKeyPressEvent(e);
 		return;
 	}
 
-	switch (event->key()) {
-	  case Qt::Key_Enter:
-	  case Qt::Key_Return:
+	if (e->matches(QKeySequence::MoveToStartOfLine)) {
+		this->fTadsBuffer->start_of_line(false);
+	} else if (e->matches(QKeySequence::MoveToEndOfLine)) {
+		this->fTadsBuffer->end_of_line(false);
+	} else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
 		this->fInputReady = true;
 		this->fAcceptInput = false;
 		this->fTadsBuffer->add_hist();
 		return;
-
-	  case Qt::Key_Backspace:
-		if (event->modifiers().testFlag(Qt::ControlModifier)) {
-			this->fTadsBuffer->move_left(true, true);
-			this->fTadsBuffer->del_selection();
-		} else {
-			this->fTadsBuffer->backspace();
-		}
-		break;
-
-	  case Qt::Key_Delete:
-		if (event->modifiers().testFlag(Qt::ControlModifier)) {
-			this->fTadsBuffer->move_right(true, true);
-			this->fTadsBuffer->del_selection();
-		} else {
-			this->fTadsBuffer->del_right();
-		}
-		break;
-
-	  case Qt::Key_Home:
-		this->fTadsBuffer->start_of_line(event->modifiers().testFlag(Qt::ShiftModifier));
-		break;
-
-	  case Qt::Key_End:
-		this->fTadsBuffer->end_of_line(event->modifiers().testFlag(Qt::ShiftModifier));
-		break;
-
-	  case Qt::Key_Left:
-		this->fTadsBuffer->move_left(event->modifiers().testFlag(Qt::ShiftModifier),
-									 event->modifiers().testFlag(Qt::ControlModifier));
-		break;
-
-	  case Qt::Key_Right:
-		this->fTadsBuffer->move_right(event->modifiers().testFlag(Qt::ShiftModifier),
-									  event->modifiers().testFlag(Qt::ControlModifier));
-		break;
-
-	  case Qt::Key_Up:
+	} else if (e->matches(QKeySequence::Delete)) {
+		this->fTadsBuffer->del_right();
+	} else if (e->matches(QKeySequence::DeleteEndOfWord)) {
+		this->fTadsBuffer->move_right(true, true);
+		this->fTadsBuffer->del_selection();
+	} else if (e->matches(QKeySequence::DeleteStartOfWord)) {
+		this->fTadsBuffer->move_left(true, true);
+		this->fTadsBuffer->del_selection();
+	} else if (e->matches(QKeySequence::MoveToPreviousChar)) {
+		this->fTadsBuffer->move_left(false, false);
+	} else if (e->matches(QKeySequence::MoveToNextChar)) {
+		this->fTadsBuffer->move_right(false, false);
+	} else if (e->matches(QKeySequence::MoveToPreviousWord)) {
+		this->fTadsBuffer->move_left(false, true);
+	} else if (e->matches(QKeySequence::MoveToNextWord)) {
+		this->fTadsBuffer->move_right(false, true);
+	} else if (e->matches(QKeySequence::MoveToPreviousLine)) {
 		this->fTadsBuffer->select_prev_hist();
-		break;
-
-	  case Qt::Key_Down:
+	} else if (e->matches(QKeySequence::MoveToNextLine)) {
 		this->fTadsBuffer->select_next_hist();
-		break;
-
-	  default:
-		if (event->text().isEmpty()) {
+	} else if (e->matches(QKeySequence::SelectPreviousChar)) {
+		this->fTadsBuffer->move_left(true, false);
+	} else if (e->matches(QKeySequence::SelectNextChar)) {
+		this->fTadsBuffer->move_right(true, false);
+	} else if (e->matches(QKeySequence::SelectPreviousWord)) {
+		this->fTadsBuffer->move_left(true, true);
+	} else if (e->matches(QKeySequence::SelectNextWord)) {
+		this->fTadsBuffer->move_right(true, true);
+	} else if (e->matches(QKeySequence::SelectStartOfLine) or e->matches(QKeySequence::SelectStartOfBlock)) {
+		this->fTadsBuffer->start_of_line(true);
+	} else if (e->matches(QKeySequence::SelectEndOfLine) or e->matches(QKeySequence::SelectEndOfBlock)) {
+		this->fTadsBuffer->end_of_line(true);
+	} else if (e->key() == Qt::Key_Backspace) {
+		this->fTadsBuffer->backspace();
+	} else {
+		if (e->text().isEmpty()) {
 			return;
 		}
-		this->fTadsBuffer->add_string(event->text().toUtf8().constData(), event->text().toUtf8().length(), true);
+		this->fTadsBuffer->add_string(e->text().toUtf8().constData(), e->text().toUtf8().length(), true);
 	}
 
 	this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
