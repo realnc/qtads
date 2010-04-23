@@ -129,7 +129,11 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 		this->fTadsBuffer->start_of_line(false);
 	} else if (e->matches(QKeySequence::MoveToEndOfLine)) {
 		this->fTadsBuffer->end_of_line(false);
+#if QT_VERSION >= 0x040500
 	} else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
+#else
+	} else if (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return) {
+#endif
 		this->fInputReady = true;
 		this->fAcceptInput = false;
 		this->fTadsBuffer->add_hist();
