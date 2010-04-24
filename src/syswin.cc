@@ -227,7 +227,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QSize& parentSize )
 			this->setMaximumWidth(newSize.width());
 		//}
 	}
-	qFrame->gameWindow()->verticalScrollBar()->setValue(qFrame->gameWindow()->verticalScrollBar()->maximum());
+	qFrame->gameWindow()->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 	--this->fDontReformat;
 }
 
@@ -552,7 +552,7 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 		this->formatter_->freeze_display(false);
 	}
 
-	this->verticalScrollBar()->setValue(this->verticalScrollBar()->maximum());
+	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 	if (update_win) {
 		this->fDispWidget->repaint();
 	}
