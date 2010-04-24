@@ -137,7 +137,7 @@ QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, 
 	// Check if the file exists and is readable.
 	QFileInfo inf(filename);
 	if (not inf.exists() or not inf.isReadable()) {
-		qDebug() << "ERROR:" << filename << "doesn't exist or is unreadable";
+		qWarning() << "ERROR:" << filename << "doesn't exist or is unreadable";
 		return 0;
 	}
 
@@ -356,7 +356,7 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 	// Check if the file exists and is readable.
 	QFileInfo inf(filename);
 	if (not inf.exists() or not inf.isReadable()) {
-		qDebug() << "ERROR:" << filename << "doesn't exist or is unreadable";
+		qWarning() << "ERROR:" << filename << "doesn't exist or is unreadable";
 		return 0;
 	}
 
