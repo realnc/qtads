@@ -297,14 +297,14 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 		qFrame->display_output("\n", 1);
 	}
 
-	// Flush the newline, and update the window immediately, in case the
-	// operation takes a while to complete.
-	qFrame->flush_txtbuf(true, true);
-
 	// Tell the formatter to add an extra line's worth of spacing, to ensure
 	// that we have some immediate visual feedback (in the form of scrolling
 	// the window up a line) when the user presses the Enter key.
 	this->formatter_->add_line_to_disp_height();
+
+	// Flush the newline, and update the window immediately, in case the
+	// operation takes a while to complete.
+	qFrame->flush_txtbuf(true, true);
 	return true;
 }
 
