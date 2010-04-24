@@ -134,6 +134,13 @@ QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, 
 	qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
 			<< "url:" << url->get_url();
 
+	// Check if the file exists and is readable.
+	QFileInfo inf(filename);
+	if (not inf.exists() or not inf.isReadable()) {
+		qDebug() << "ERROR:" << filename << "doesn't exist or is unreadable";
+		return 0;
+	}
+
 	// Load the sound data into a buffer.
 	QFile file(filename);
 	file.open(QIODevice::ReadOnly);
@@ -345,6 +352,13 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 {
 	qDebug() << "Loading" << imageType << "image from" << filename << "at offset" << seekpos
 			<< "with size" << filesize << "url:" << url->get_url();
+
+	// Check if the file exists and is readable.
+	QFileInfo inf(filename);
+	if (not inf.exists() or not inf.isReadable()) {
+		qDebug() << "ERROR:" << filename << "doesn't exist or is unreadable";
+		return 0;
+	}
 
 	CHtmlSysResource* image;
 
