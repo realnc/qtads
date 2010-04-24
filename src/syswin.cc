@@ -18,7 +18,6 @@
 #include <QBoxLayout>
 #include <QPainter>
 #include <QScrollBar>
-#include <QResizeEvent>
 
 #include "htmlqt.h"
 #include "qtadsdispwidget.h"
@@ -86,9 +85,6 @@ CHtmlSysWinQt::keyPressEvent( QKeyEvent* event )
 void
 CHtmlSysWinQt::resizeEvent( QResizeEvent* event )
 {
-	if (event->oldSize().width() == event->size().width()) {
-		return;
-	}
 	if (this->fDontReformat == 0) {
 		this->formatter_->start_at_top(false);
 		this->do_formatting(true, false, true);
