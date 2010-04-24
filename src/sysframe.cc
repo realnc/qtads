@@ -330,7 +330,7 @@ CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 	}
 	// Also flush all banner windows.
 	for (int i = 0; i < this->fBannerList.size(); ++i) {
-		//this->fBannerList.at(i)->get_formatter()->flush_txtbuf(fmt);
+		this->fBannerList.at(i)->get_formatter()->flush_txtbuf(fmt);
 	}
 }
 
