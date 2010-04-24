@@ -141,12 +141,23 @@ QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, 
 		return 0;
 	}
 
-	// Load the sound data into a buffer.
+	// Open the file and seek to the specified position.
 	QFile file(filename);
-	file.open(QIODevice::ReadOnly);
-	file.seek(seekpos);
+	if (not file.open(QIODevice::ReadOnly)) {
+		qWarning() << "ERROR: Can't open file" << filename;
+		return 0;
+	}
+	if (not file.seek(seekpos)) {
+		qWarning() << "ERROR: Can't seek in file" << filename;
+		file.close();
+		return 0;
+	}
 	QByteArray data(file.read(filesize));
 	file.close();
+	if (data.isEmpty() or data.size() < filesize) {
+		qWarning() << "ERROR: Could not read" << filesize << "bytes from file" << filename;
+		return 0;
+	}
 
 	Mix_Chunk* chunk;
 	if (type == MPEG) {
@@ -360,14 +371,19 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 		return 0;
 	}
 
-	CHtmlSysResource* image;
-
 	// Open the file and seek to the specified position.
 	QFile file(filename);
-	// TODO: Check for errors.
-	file.open(QIODevice::ReadOnly);
-	file.seek(seekpos);
+	if (not file.open(QIODevice::ReadOnly)) {
+		qWarning() << "ERROR: Can't open file" << filename;
+		return 0;
+	}
+	if (not file.seek(seekpos)) {
+		qWarning() << "ERROR: Can't seek in file" << filename;
+		file.close();
+		return 0;
+	}
 
+	CHtmlSysResource* image;
 	// Better get an error at compile-time using static_cast rather than an
 	// abort at runtime using dynamic_cast.
 	QTadsPixmap* cast;
@@ -389,8 +405,18 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 	}
 
 	// Load the image data.
-	// TODO: Check for errors.
-	cast->loadFromData(file.read(filesize), imageType.toAscii());
+	const QByteArray& data(file.read(filesize));
+	file.close();
+	if (data.isEmpty() or data.size() < filesize) {
+		qWarning() << "ERROR: Could not read" << filesize << "bytes from file" << filename;
+		delete image;
+		return 0;
+	}
+	if (not cast->loadFromData(data, imageType.toAscii())) {
+		qWarning() << "ERROR: Could not create pixmap from image data";
+		delete image;
+		return 0;
+	}
 	return image;
 }
 
