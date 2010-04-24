@@ -528,6 +528,13 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	// Format all remaining lines.
 	while (this->formatter_->more_to_do()) {
 		this->formatter_->do_formatting();
+		this->fDispWidget->resize(this->fDispWidget->width(), this->formatter_->get_max_y_pos());
+		if (update_win) {
+			this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+			qApp->sendPostedEvents();
+			qApp->processEvents();
+			qApp->sendPostedEvents();
+		}
 	}
 
 	// We make the view a bit higher (5 pixels) than required by the real
