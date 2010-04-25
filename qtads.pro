@@ -1,6 +1,10 @@
 TEMPLATE = app
 CONFIG += qt silent warn_off
-LIBS += -lSDL_mixer -lSDL -lsmpeg
+macx {
+	LIBS += -framework SDL_mixer -framework SDL
+} else {
+	LIBS += -lSDL_mixer -lSDL -lsmpeg
+}
 
 # mingw32 static build
 # LIBS += -lmikmod -lsmpeg -lvorbisfile -lvorbis -logg -ldxguid -lpthread
