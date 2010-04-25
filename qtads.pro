@@ -26,10 +26,12 @@ QMAKE_CFLAGS_WARN_OFF =
 	QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter
 }
 
-QMAKE_CFLAGS += $$system(sdl-config --cflags)
-QMAKE_CXXFLAGS += $$system(sdl-config --cflags)
-QMAKE_CFLAGS += $$system(smpeg-config --cflags)
-QMAKE_CXXFLAGS += $$system(smpeg-config --cflags)
+!macx {
+	QMAKE_CFLAGS += $$system(sdl-config --cflags)
+	QMAKE_CXXFLAGS += $$system(sdl-config --cflags)
+	QMAKE_CFLAGS += $$system(smpeg-config --cflags)
+	QMAKE_CXXFLAGS += $$system(smpeg-config --cflags)
+}
 
 # This is just a hack to make code completion work OK in Qt Creator.
 INCLUDEPATH += /usr/include/SDL /usr/include/smpeg
