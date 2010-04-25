@@ -91,6 +91,8 @@ QTadsConfDialog::applySettings()
 	sett->writerFont.setPointSize(ui->writerFontSizeComboBox->currentText().toInt());
 	sett->inputFont.setPointSize(ui->inputFontSizeComboBox->currentText().toInt());
 
+	qFrame->reformatBanners();
+
 	sett->saveToDisk();
 }
 

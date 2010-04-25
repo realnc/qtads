@@ -221,6 +221,10 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	void
 	adjustBannerSizes();
 
+	// Reformat all HTML banners.
+	void
+	reformatBanners();
+
 	//
 	// CHtmlSysFrame interface implementation.
 	//

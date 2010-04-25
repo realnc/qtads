@@ -321,6 +321,18 @@ CHtmlSysFrameQt::adjustBannerSizes()
 
 
 void
+CHtmlSysFrameQt::reformatBanners()
+{
+	this->fGameWin->get_formatter()->start_at_top(false);
+	this->fGameWin->do_formatting(false, false, false);
+	for (int i = 0; i < this->fBannerList.size(); ++i) {
+		this->fBannerList.at(i)->get_formatter()->start_at_top(false);
+		this->fBannerList.at(i)->do_formatting(false, false, false);
+	}
+}
+
+
+void
 CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 {
 	this->fParser->parse(&this->fBuffer, qWinGroup);
