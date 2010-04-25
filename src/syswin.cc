@@ -537,11 +537,15 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	// document height so that we get a bit of extra space under the input
 	// prompt because it looks nicer.  This is only done if we're the main game
 	// window.
+	//
+	// FIXME: Disable it for now until we fix the "jumping text" problem.
+	/*
 	unsigned long height = this->formatter_->get_max_y_pos();
 	if (this == qFrame->gameWindow()) {
 		height += 5;
 	}
 	this->fDispWidget->resize(this->formatter_->get_outer_max_line_width(), height);
+	*/
 
 	// Unfreeze the display if we froze it before.
 	if (freeze_display) {
