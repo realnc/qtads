@@ -540,6 +540,9 @@ CHtmlSysFrameQt::pause_for_more()
 	// other status bar messages (like when hovering over hyperlinks) to
 	// temporary remove the MORE text instead of replacing it.
 	QLabel moreText("*** MORE ***  [press a key to continue]");
+	moreText.setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+	moreText.setLineWidth(0);
+	moreText.setContentsMargins(0, 0, 0, 0);
 	qWinGroup->statusBar()->addWidget(&moreText);
 	this->wait_for_keystroke(true);
 	qWinGroup->statusBar()->removeWidget(&moreText);
