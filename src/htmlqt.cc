@@ -17,6 +17,7 @@
 
 #include <QDir>
 #include <QBuffer>
+#include <QPainter>
 #include <smpeg.h>
 
 #include "htmlqt.h"
@@ -348,6 +349,39 @@ CHtmlSysSoundMpegQt::resume()
 
 
 /* --------------------------------------------------------------------
+ * CHtmlSysImageMngQt
+ */
+void
+CHtmlSysImageMngQt::draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
+{
+	QPainter painter(static_cast<CHtmlSysWinQt*>(win)->widget());
+	QPixmap pix(this->currentPixmap());
+	const QRect& pixRect = this->frameRect();
+	if (mode == HTMLIMG_DRAW_CLIP) {
+		// Clip mode.  Only draw the part of the image that would fit.  If the
+		// image is smaller than pos, adjust the drawing area to avoid scaling.
+		int targetWidth;
+		int targetHeight;
+		if (pixRect.width() > pos->right - pos->left) {
+			targetWidth = pos->right - pos->left;
+		} else {
+			targetWidth = pixRect.width();
+		}
+		if (pixRect.height() > pos->bottom - pos->top) {
+			targetHeight = pos->bottom - pos->top;
+		} else {
+			targetHeight = pixRect.height();
+		}
+		//painter.drawPixmap(pos->left, pos->top, targetWidth, targetHeight, *this);
+		painter.drawPixmap(pos->left, pos->top, pix, 0, 0, targetWidth, targetHeight);
+	} else {
+		// QPainter will scale it by default.
+		painter.drawPixmap(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top, pix);
+	}
+}
+
+
+/* --------------------------------------------------------------------
  * Non-portable static methods
  */
 
@@ -387,6 +421,7 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 	// Better get an error at compile-time using static_cast rather than an
 	// abort at runtime using dynamic_cast.
 	QTadsPixmap* cast;
+	CHtmlSysImageMngQt* mngCast;
 
 	// Create an object of the appropriate class for the specified image type.
 	// Also cast the object to a QTadsPixmap so we can loadFromData() later on.
@@ -398,7 +433,7 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 		cast = static_cast<QTadsPixmap*>(static_cast<CHtmlSysImagePngQt*>(image));
 	} else if (imageType == "MNG") {
 		image = new CHtmlSysImageMngQt;
-		cast = static_cast<QTadsPixmap*>(static_cast<CHtmlSysImageMngQt*>(image));
+		mngCast = static_cast<CHtmlSysImageMngQt*>(image);
 	} else {
 		// TODO: Don't just abort but be graceful.
 		qFatal(Q_FUNC_INFO, "unknown image type.");
@@ -412,7 +447,15 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 		delete image;
 		return 0;
 	}
-	if (not cast->loadFromData(data, imageType.toAscii())) {
+
+	if (imageType == "MNG") {
+		QBuffer* buf = new QBuffer(mngCast);
+		buf->setData(data);
+		buf->open(QBuffer::ReadOnly);
+		mngCast->setFormat("MNG");
+		mngCast->setDevice(buf);
+		mngCast->start();
+	} else if (not cast->loadFromData(data, imageType.toAscii())) {
 		qWarning() << "ERROR: Could not create pixmap from image data";
 		delete image;
 		return 0;

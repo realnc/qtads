@@ -886,8 +886,9 @@ CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
 		castImg = static_cast<CHtmlSysImagePngQt*>(image->get_image());
 		break;
 	  case HTML_res_type_MNG:
-		castImg = static_cast<CHtmlSysImageMngQt*>(image->get_image());
-		break;
+		// FIXME: Handle MNG backgrounds.
+		//castImg = static_cast<CHtmlSysImageMngQt*>(image->get_image());
+		return;
 	  default:
 		qWarning() << Q_FUNC_INFO << "Unknown resource type";
 		castImg = dynamic_cast<QTadsPixmap*>(image->get_image());

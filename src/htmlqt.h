@@ -31,6 +31,7 @@
 #include <QMainWindow>
 #include <QScrollArea>
 #include <QTemporaryFile>
+#include <QMovie>
 #include <SDL.h>
 #include <SDL_mixer.h>
 
@@ -732,22 +733,65 @@ class CHtmlSysImagePngQt: public QTadsPixmap, public CHtmlSysImagePng {
 };
 
 
-class CHtmlSysImageMngQt: public QTadsPixmap, public CHtmlSysImageMng {
+class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
+	Q_OBJECT
+
+  private:
+	CHtmlSysImageDisplaySite* fDispSite;
+
+  private slots:
+	void
+	updateDisplay( const QRect& rect )
+	{
+		if (this->fDispSite != 0) {
+			this->fDispSite->dispsite_inval(rect.x(), rect.y(), rect.width(), rect.height());
+		}
+	}
+
   public:
+	CHtmlSysImageMngQt()
+	: fDispSite(0)
+	{
+		connect(this, SIGNAL(updated(QRect)), this, SLOT(updateDisplay(QRect)));
+	}
+
 	//
 	// CHtmlSysImageMng interface implementation.
-	//
+	//	
 	virtual void
-	draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
-	{ QTadsPixmap::drawFromPaintEvent(win, pos, mode); }
+	set_display_site ( CHtmlSysImageDisplaySite* dispSite )
+	{
+		this->fDispSite = dispSite;
+	}
+
+	virtual void
+	cancel_playback()
+	{ this->stop(); }
+
+	virtual void
+	pause_playback()
+	{ this->setPaused(true); }
+
+	virtual void
+	resume_playback()
+	{
+		this->setPaused(false);
+	}
+
+	virtual void
+	draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode );
 
 	virtual unsigned long
 	get_width() const
-	{ return QTadsPixmap::width(); }
+	{
+		return this->frameRect().width();
+	}
 
 	virtual unsigned long
 	get_height() const
-	{ return QTadsPixmap::height(); }
+	{
+		return this->frameRect().height();
+	}
 
 	virtual int
 	map_palette( CHtmlSysWin* win, int foreground )
