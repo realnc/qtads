@@ -84,6 +84,7 @@ int main( int argc, char** argv )
 	}
 	Mix_AllocateChannels(16);
 	Mix_ChannelFinished(QTadsSound::callback);
+	Mix_HookMusicFinished(CHtmlSysSoundMidiQt::callback);
 
 	/*
 	int numtimesopened, frequency, channels;
@@ -141,6 +142,7 @@ int main( int argc, char** argv )
 	}
 
 	Mix_ChannelFinished(0);
+	Mix_HookMusicFinished(0);
 	CHtmlSysFrame::set_frame_obj(0);
 	delete app;
 	Mix_CloseAudio();

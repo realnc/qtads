@@ -30,7 +30,147 @@ CHtmlSysWinGroupQt* qWinGroup = 0;
 
 
 /* --------------------------------------------------------------------
- * QTadsMediaObject
+ * CHtmlSysSoundMidiQt
+ */
+CHtmlSysSoundMidiQt* CHtmlSysSoundMidiQt::fActiveMidi = 0;
+
+CHtmlSysSoundMidiQt::CHtmlSysSoundMidiQt( SDL_RWops* music )
+: fRWops(music), fPlaying(false), fDone_func(0), fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
+{
+	this->fMusic = Mix_LoadMUS_RW(this->fRWops);
+}
+
+
+CHtmlSysSoundMidiQt::~CHtmlSysSoundMidiQt()
+{
+	this->fRepeatsWanted = -1;
+	if (this->fPlaying) {
+		Mix_HaltMusic();
+		CHtmlSysSoundMidiQt::callback();
+		CHtmlSysSoundMidiQt::fActiveMidi = 0;
+	}
+	Mix_FreeMusic(this->fMusic);
+	SDL_FreeRW(this->fRWops);
+}
+
+
+void
+CHtmlSysSoundMidiQt::callback()
+{
+	Q_ASSERT(fActiveMidi != 0);
+
+	// If it's an infinite loop sound, or it has not reached the wanted repeat
+	// count yet..  Play again on the same channel.
+	if ((fActiveMidi->fRepeatsWanted == 0) or (fActiveMidi->fRepeats < fActiveMidi->fRepeatsWanted)) {
+		Mix_PlayMusic(fActiveMidi->fMusic, 0);
+		++fActiveMidi->fRepeats;
+		return;
+	}
+
+	// Sound has repeated enough times, or it has been halted.  In either case,
+	// we need to invoke the TADS callback, if there is one.
+	fActiveMidi->fPlaying = false;
+	if (fActiveMidi->fDone_func) {
+		qDebug() << "Invoking callback - repeats:" << fActiveMidi->fRepeats;
+		fActiveMidi->fDone_func(fActiveMidi->fDone_func_ctx, fActiveMidi->fRepeats);
+	}
+	fActiveMidi->fPlaying = false;
+	fActiveMidi = 0;
+}
+
+
+int
+CHtmlSysSoundMidiQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count),
+								 void* done_func_ctx, int repeat, const textchar_t* url, int vol,
+								 long fade_in, long fade_out, int crossfade )
+{
+	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
+
+	// Adjust volume if it exceeds min/max levels.
+	if (vol < 0) {
+		vol = 0;
+	} else if (vol > 100) {
+		vol = 100;
+	}
+
+	// Convert the TADS volume level semantics [0..100] to SDL volume
+	// semantics [0..MIX_MAX_VOLUME].
+	vol = (vol * MIX_MAX_VOLUME) / 100;
+
+	// Set the volume level.
+	Mix_VolumeMusic(vol);
+
+	this->fRepeatsWanted = repeat;
+	if (CHtmlSysSoundMidiQt::fActiveMidi != 0 and CHtmlSysSoundMidiQt::fActiveMidi->fPlaying) {
+		// Another MIDI sound is playing.  Halt it before we play a new one.
+		Mix_HaltMusic();
+		CHtmlSysSoundMidiQt::callback();
+	}
+	if (Mix_PlayMusic(this->fMusic, 0) == -1) {
+		qWarning() << "ERROR: Can't play MIDI:" << Mix_GetError();
+		return 1;
+	}
+	this->fPlaying = true;
+	this->fRepeats = 1;
+	CHtmlSysSoundMidiQt::fActiveMidi = this;
+	this->fDone_func = done_func;
+	this->fDone_func_ctx = done_func_ctx;
+	return 0;
+}
+
+
+void
+CHtmlSysSoundMidiQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
+{
+	qDebug() << Q_FUNC_INFO;
+
+	if (this->fPlaying) {
+		this->fRepeatsWanted = -1;
+		Mix_HaltMusic();
+		CHtmlSysSoundMidiQt::callback();
+		CHtmlSysSoundMidiQt::fActiveMidi = 0;
+		this->fPlaying = false;
+	}
+}
+
+
+CHtmlSysResource*
+CHtmlSysSoundMidi::create_midi( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
+								unsigned long filesize, CHtmlSysWin* win )
+{
+	qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
+			<< "url:" << url->get_url();
+
+	// Check if the file exists and is readable.
+	QFileInfo inf(filename);
+	if (not inf.exists() or not inf.isReadable()) {
+		qWarning() << "ERROR:" << filename << "doesn't exist or is unreadable";
+		return 0;
+	}
+
+	// Open the file and seek to the specified position.
+	QFile file(filename);
+	if (not file.open(QIODevice::ReadOnly)) {
+		qWarning() << "ERROR: Can't open file" << filename;
+		return 0;
+	}
+	if (not file.seek(seekpos)) {
+		qWarning() << "ERROR: Can't seek in file" << filename;
+		file.close();
+		return 0;
+	}
+	QByteArray data(file.read(filesize));
+	file.close();
+	if (data.isEmpty() or data.size() < filesize) {
+		qWarning() << "ERROR: Could not read" << filesize << "bytes from file" << filename;
+		return 0;
+	}
+	return new CHtmlSysSoundMidiQt(SDL_RWFromConstMem(data.constData(), data.size()));
+}
+
+
+/* --------------------------------------------------------------------
+ * QTadsSound
  */
 QList<QTadsSound*> QTadsSound::fObjList;
 
@@ -495,15 +635,6 @@ CHtmlSysImageMng::create_mng( const CHtmlUrl* url, const textchar_t* filename, u
 							  unsigned long filesize, CHtmlSysWin* win )
 {
 	return ::createImageFromFile(url, filename, seekpos, filesize, win, "MNG");
-}
-
-
-CHtmlSysResource*
-CHtmlSysSoundMidi::create_midi( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-								unsigned long filesize, CHtmlSysWin* win )
-{
-	qDebug() << Q_FUNC_INFO << "called";
-	return 0;
 }
 
 
