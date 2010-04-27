@@ -699,7 +699,7 @@ CHtmlSysWinQt::set_window_title( const textchar_t* title )
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	qWinGroup->setWindowTitle(QString::fromUtf8(title) + " - " + qApp->applicationName());
+	qWinGroup->setWindowTitle(QString::fromUtf8(title));
 }
 
 
