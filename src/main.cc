@@ -71,9 +71,9 @@ int main( int argc, char** argv )
 #if (MIX_MAJOR_VERSION > 1) \
 	|| ((MIX_MAJOR_VERSION == 1) && (MIX_MINOR_VERSION > 2)) \
 	|| ((MIX_MAJOR_VERSION == 1) && (MIX_MINOR_VERSION == 2) && (MIX_PATCHLEVEL > 9))
-	int sdlFormats = MIX_INIT_OGG | MIX_INIT_MP3;
+	int sdlFormats = MIX_INIT_OGG;
 	if (Mix_Init((sdlFormats & sdlFormats) != sdlFormats)) {
-		qFatal("Unable to load Ogg Vorbis and MP3 support: %s", Mix_GetError());
+		qFatal("Unable to load Ogg Vorbis support: %s", Mix_GetError());
 		return 1;
 	}
 #endif
