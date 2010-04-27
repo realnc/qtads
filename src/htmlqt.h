@@ -32,6 +32,7 @@
 #include <QScrollArea>
 #include <QTemporaryFile>
 #include <QMovie>
+#include <QTime>
 #include <SDL.h>
 #include <SDL_mixer.h>
 
@@ -832,6 +833,12 @@ class QTadsMediaObject: public QObject {
 	// 0 means repeat forever.
 	int fRepeatsWanted;
 
+	// How long has the sound been playing.
+	QTime fTime;
+
+	// Total length of the sound in milliseconds.
+	unsigned fLength;
+
 	// All QTadsMediaObjects that currently exist.  We need this in order to
 	// implement the SDL_Mixer callback (which in turn needs to call the TADS
 	// callback) that is invoked after a channel has stopped playing.  That
@@ -840,17 +847,15 @@ class QTadsMediaObject: public QObject {
 	// to invoke the TADS callback based on the channel number.
 	static QList<QTadsMediaObject*> fObjList;
 
-	//void
-	//fFinish();
-
   public:
 	QTadsMediaObject( QObject* parent, Mix_Chunk* chunk, SoundType type );
 
 	virtual
 	~QTadsMediaObject();
 
-	// The SDL_Mixer callback.
+	// The SDL_Mixer callbacks.
 	static void callback( int channel );
+	static void effectCallback( int chan, void* stream, int len, void* udata );
 
 	void
 	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol );

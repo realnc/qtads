@@ -35,9 +35,11 @@ CHtmlSysWinGroupQt* qWinGroup = 0;
 QList<QTadsMediaObject*> QTadsMediaObject::fObjList;
 
 QTadsMediaObject::QTadsMediaObject( QObject* parent, Mix_Chunk* chunk, SoundType type )
-  : QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fPlaying(false), fDone_func(0),
-	fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
+: QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fPlaying(false), fDone_func(0),
+  fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
 {
+	this->fLength = (this->fChunk->alen * 8) / (2 * 16 * 44.1);
+	qDebug() << "Sound length:" << this->fLength;
 }
 
 
@@ -83,6 +85,12 @@ QTadsMediaObject::callback( int channel )
 
 
 void
+QTadsMediaObject::effectCallback( int chan, void* stream, int len, void* udata )
+{
+}
+
+
+void
 QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
 								int vol )
 {
@@ -108,6 +116,9 @@ QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void
 	if (this->fChannel == -1) {
 		qWarning() << "Error: Can't play sound:" << Mix_GetError();
 	} else {
+		this->fTime.start();
+		//Mix_UnregisterAllEffects(this->fChannel);
+		//Mix_RegisterEffect(this->fChannel, effectCallback, 0, this);
 		this->fPlaying = true;
 		this->fRepeats = 1;
 		QTadsMediaObject::fObjList.append(this);
