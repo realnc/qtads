@@ -355,7 +355,7 @@ void
 CHtmlSysImageMngQt::draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
 {
 	QPainter painter(static_cast<CHtmlSysWinQt*>(win)->widget());
-	QPixmap pix(this->currentPixmap());
+	const QPixmap& pix = this->currentPixmap();
 	const QRect& pixRect = this->frameRect();
 	if (mode == HTMLIMG_DRAW_CLIP) {
 		// Clip mode.  Only draw the part of the image that would fit.  If the
@@ -372,7 +372,6 @@ CHtmlSysImageMngQt::draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_m
 		} else {
 			targetHeight = pixRect.height();
 		}
-		//painter.drawPixmap(pos->left, pos->top, targetWidth, targetHeight, *this);
 		painter.drawPixmap(pos->left, pos->top, pix, 0, 0, targetWidth, targetHeight);
 	} else {
 		// QPainter will scale it by default.
