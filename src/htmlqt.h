@@ -808,7 +808,7 @@ class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
 };
 
 
-class QTadsMediaObject: public QObject {
+class QTadsSound: public QObject {
 	Q_OBJECT
 
   public:
@@ -845,13 +845,13 @@ class QTadsMediaObject: public QObject {
 	// callback has to be a static member (C++ methods can't be C callbacks),
 	// and since there's no 'this' pointer in static member functions, it needs
 	// to invoke the TADS callback based on the channel number.
-	static QList<QTadsMediaObject*> fObjList;
+	static QList<QTadsSound*> fObjList;
 
   public:
-	QTadsMediaObject( QObject* parent, Mix_Chunk* chunk, SoundType type );
+	QTadsSound( QObject* parent, Mix_Chunk* chunk, SoundType type );
 
 	virtual
-	~QTadsMediaObject();
+	~QTadsSound();
 
 	// The SDL_Mixer callbacks.
 	static void callback( int channel );
@@ -869,10 +869,10 @@ class QTadsMediaObject: public QObject {
 };
 
 
-class CHtmlSysSoundWavQt: public QTadsMediaObject, public CHtmlSysSoundWav {
+class CHtmlSysSoundWavQt: public QTadsSound, public CHtmlSysSoundWav {
   public:
 	CHtmlSysSoundWavQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
-	: QTadsMediaObject(parent, chunk, type)
+	: QTadsSound(parent, chunk, type)
 	{ }
 
 	//
@@ -899,10 +899,10 @@ class CHtmlSysSoundWavQt: public QTadsMediaObject, public CHtmlSysSoundWav {
 };
 
 
-class CHtmlSysSoundOggQt: public QTadsMediaObject, public CHtmlSysSoundOgg {
+class CHtmlSysSoundOggQt: public QTadsSound, public CHtmlSysSoundOgg {
   public:
 	CHtmlSysSoundOggQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
-	: QTadsMediaObject(parent, chunk, type)
+	: QTadsSound(parent, chunk, type)
 	{ }
 
 	//
@@ -929,10 +929,10 @@ class CHtmlSysSoundOggQt: public QTadsMediaObject, public CHtmlSysSoundOgg {
 };
 
 
-class CHtmlSysSoundMpegQt: public QTadsMediaObject, public CHtmlSysSoundMpeg {
+class CHtmlSysSoundMpegQt: public QTadsSound, public CHtmlSysSoundMpeg {
   public:
 	CHtmlSysSoundMpegQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
-	: QTadsMediaObject(parent, chunk, type)
+	: QTadsSound(parent, chunk, type)
 	{ }
 
 	//

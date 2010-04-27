@@ -32,9 +32,9 @@ CHtmlSysWinGroupQt* qWinGroup = 0;
 /* --------------------------------------------------------------------
  * QTadsMediaObject
  */
-QList<QTadsMediaObject*> QTadsMediaObject::fObjList;
+QList<QTadsSound*> QTadsSound::fObjList;
 
-QTadsMediaObject::QTadsMediaObject( QObject* parent, Mix_Chunk* chunk, SoundType type )
+QTadsSound::QTadsSound( QObject* parent, Mix_Chunk* chunk, SoundType type )
 : QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fPlaying(false), fDone_func(0),
   fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
 {
@@ -43,7 +43,7 @@ QTadsMediaObject::QTadsMediaObject( QObject* parent, Mix_Chunk* chunk, SoundType
 }
 
 
-QTadsMediaObject::~QTadsMediaObject()
+QTadsSound::~QTadsSound()
 {
 	//qDebug() << Q_FUNC_INFO;
 	this->fRepeatsWanted = -1;
@@ -55,9 +55,9 @@ QTadsMediaObject::~QTadsMediaObject()
 
 
 void
-QTadsMediaObject::callback( int channel )
+QTadsSound::callback( int channel )
 {
-	QTadsMediaObject* mObj = 0;
+	QTadsSound* mObj = 0;
 	// Find the object that uses the specified channel.
 	for (int i = 0; i < fObjList.size() and mObj == 0; ++i) {
 		if (fObjList.at(i)->fChannel == channel) {
@@ -85,17 +85,17 @@ QTadsMediaObject::callback( int channel )
 
 
 void
-QTadsMediaObject::effectCallback( int chan, void* stream, int len, void* udata )
+QTadsSound::effectCallback( int chan, void* stream, int len, void* udata )
 {
 }
 
 
 void
-QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
 								int vol )
 {
 	Q_ASSERT(not this->fPlaying);
-	Q_ASSERT(not QTadsMediaObject::fObjList.contains(this));
+	Q_ASSERT(not QTadsSound::fObjList.contains(this));
 
 	// Adjust volume if it exceeds min/max levels.
 	if (vol < 0) {
@@ -121,7 +121,7 @@ QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void
 		//Mix_RegisterEffect(this->fChannel, effectCallback, 0, this);
 		this->fPlaying = true;
 		this->fRepeats = 1;
-		QTadsMediaObject::fObjList.append(this);
+		QTadsSound::fObjList.append(this);
 		this->fDone_func = done_func;
 		this->fDone_func_ctx = done_func_ctx;
 	}
@@ -129,7 +129,7 @@ QTadsMediaObject::startPlaying( void (*done_func)(void*, int repeat_count), void
 
 
 void
-QTadsMediaObject::cancelPlaying( bool sync )
+QTadsSound::cancelPlaying( bool sync )
 {
 	if (this->fPlaying) {
 		this->fRepeatsWanted = -1;
@@ -140,7 +140,7 @@ QTadsMediaObject::cancelPlaying( bool sync )
 
 // TODO: Check for I/O errors.
 CHtmlSysSound*
-QTadsMediaObject::createSound( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
+QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
 							   unsigned long filesize, CHtmlSysWin* win, SoundType type )
 {
 	qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
@@ -511,7 +511,7 @@ CHtmlSysResource*
 CHtmlSysSoundWav::create_wav( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
 							  unsigned long filesize, CHtmlSysWin* win )
 {
-	return QTadsMediaObject::createSound(url, filename, seekpos, filesize, win, QTadsMediaObject::WAV);
+	return QTadsSound::createSound(url, filename, seekpos, filesize, win, QTadsSound::WAV);
 }
 
 
@@ -519,7 +519,7 @@ CHtmlSysResource*
 CHtmlSysSoundMpeg::create_mpeg( const CHtmlUrl* url, const textchar_t* filename,
 								unsigned long seekpos, unsigned long filesize, CHtmlSysWin* win )
 {
-	return QTadsMediaObject::createSound(url, filename, seekpos, filesize, win, QTadsMediaObject::MPEG);
+	return QTadsSound::createSound(url, filename, seekpos, filesize, win, QTadsSound::MPEG);
 }
 
 
@@ -527,5 +527,5 @@ CHtmlSysResource*
 CHtmlSysSoundOgg::create_ogg( const CHtmlUrl* url, const textchar_t* filename,
 							  unsigned long seekpos, unsigned long filesize, CHtmlSysWin* win )
 {
-	return QTadsMediaObject::createSound(url, filename, seekpos, filesize, win, QTadsMediaObject::OGG);
+	return QTadsSound::createSound(url, filename, seekpos, filesize, win, QTadsSound::OGG);
 }

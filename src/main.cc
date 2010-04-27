@@ -83,7 +83,7 @@ int main( int argc, char** argv )
 		return 1;
 	}
 	Mix_AllocateChannels(16);
-	Mix_ChannelFinished(QTadsMediaObject::callback);
+	Mix_ChannelFinished(QTadsSound::callback);
 
 	/*
 	int numtimesopened, frequency, channels;
