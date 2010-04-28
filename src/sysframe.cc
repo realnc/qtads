@@ -18,6 +18,7 @@
 #include <QLayout>
 #include <QLabel>
 #include <QStatusBar>
+#include <QFileDialog>
 
 #include "htmlqt.h"
 #include "qtadshostifc.h"
@@ -91,6 +92,50 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 
 	//delete this->fGameWin;
 	//delete this->fMainWin;
+}
+
+
+int
+CHtmlSysFrameQt::main( int argc, char** argv )
+{
+	// Filename of the game to run.
+	QString gameFileName;
+
+	if (argc == 2) {
+		if (QFile::exists(QString::fromLocal8Bit(argv[1]))) {
+			gameFileName = QString::fromLocal8Bit(argv[1]);
+		} else if (QFile::exists(QString::fromLocal8Bit(argv[1]) + ".gam")) {
+			gameFileName = QString::fromLocal8Bit(argv[1]) + ".gam";
+		} else if (QFile::exists(QString::fromLocal8Bit(argv[1]) + ".t3")) {
+			gameFileName = QString::fromLocal8Bit(argv[1]) + ".t3";
+		} else {
+			qWarning().nospace() << "File '" << argv[1] << "'' not found.";
+		}
+	}
+
+	if (gameFileName.isEmpty()) {
+		gameFileName = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run", "",
+													"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
+		if (gameFileName.isNull()) {
+			return 0;
+		}
+	}
+
+	CHtmlSysFrame::set_frame_obj(this);
+
+	QDir::setCurrent(QFileInfo(gameFileName).path());
+	int ret;
+	if (vm_get_game_type(QFileInfo(gameFileName).fileName().toLocal8Bit(), 0, 0, 0, 0) == VM_GGT_TADS2) {
+		ret = this->runT2Game(QFileInfo(gameFileName).fileName());
+	} else if (vm_get_game_type(QFileInfo(gameFileName).fileName().toLocal8Bit(), 0, 0, 0, 0) == VM_GGT_TADS3) {
+		ret = this->runT3Game(QFileInfo(gameFileName).fileName());
+	} else {
+		qWarning() << gameFileName.toLocal8Bit().constData() << "is not a TADS game file.";
+		ret = 1;
+	}
+
+	CHtmlSysFrame::set_frame_obj(0);
+	this->exit(ret);
 }
 
 
@@ -306,9 +351,10 @@ CHtmlSysFrameQt::runT3Game( const QString& fname )
 	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
 
 	this->fGameRunning = true;
-	return vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0,
-						0, false, 0, 0, false, false, 0, 0, 0, 0);
+	int ret = vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0, 0, false, 0, 0,
+						   false, false, 0, 0, 0, 0);
 	this->fGameRunning = false;
+	return ret;
 }
 
 
