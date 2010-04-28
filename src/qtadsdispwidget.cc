@@ -61,10 +61,10 @@ QTadsDisplayWidget::paintEvent( QPaintEvent* e )
 	if (this->fCursorVisible) {
 		if (this->fBlinkVisible) {
 			// Blink out.
-		} else {
-			// Blink in.
 			painter.drawLine(this->fCursorPos.x(), this->fCursorPos.y()+2,
 							 this->fCursorPos.x(), this->fCursorPos.y()+18);
+		} else {
+			// Blink in.
 		}
 	}
 }
@@ -163,5 +163,13 @@ QTadsDisplayWidget::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* t
 	tadsBuffer->get_sel_range(&start, &end, &caret);
 	formatter->set_sel_range(start + inp_txt_ofs, end + inp_txt_ofs);
 
-	this->update();
+	// Reset the blink timer and blink-in (if needed).
+	this->fBlinkTimer->stop();
+	this->fBlinkTimer->start();
+	if (not this->fBlinkVisible) {
+		this->fBlinkCursor();
+	}
+
+	const CHtmlRect& itemRect = formatter->find_by_pos(cursorPos, false)->get_pos();
+	this->update(0, itemRect.top, this->width(), itemRect.bottom - itemRect.top);
 }
