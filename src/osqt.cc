@@ -749,6 +749,8 @@ os_set_save_ext( const char* )
 void
 os_get_charmap( char* mapname, int charmap_id )
 {
+	qDebug() << Q_FUNC_INFO;
+
 #ifndef HTMLQT
 	Q_ASSERT(QTadsIO::t3Mode());
 #endif
@@ -777,6 +779,8 @@ os_get_charmap( char* mapname, int charmap_id )
 void
 os_gen_charmap_filename( char* filename, char* internal_id, char* /*argv0*/ )
 {
+	qDebug() << Q_FUNC_INFO;
+
 #ifndef HTMLQT
 	Q_ASSERT(filename != 0);
 

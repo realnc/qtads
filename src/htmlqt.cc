@@ -60,7 +60,7 @@ CHtmlSysSoundMidiQt::callback()
 	Q_ASSERT(fActiveMidi != 0);
 
 	// If it's an infinite loop sound, or it has not reached the wanted repeat
-	// count yet..  Play again on the same channel.
+	// count yet, play again.
 	if ((fActiveMidi->fRepeatsWanted == 0) or (fActiveMidi->fRepeats < fActiveMidi->fRepeatsWanted)) {
 		Mix_PlayMusic(fActiveMidi->fMusic, 0);
 		++fActiveMidi->fRepeats;
@@ -71,7 +71,7 @@ CHtmlSysSoundMidiQt::callback()
 	// we need to invoke the TADS callback, if there is one.
 	fActiveMidi->fPlaying = false;
 	if (fActiveMidi->fDone_func) {
-		qDebug() << "Invoking callback - repeats:" << fActiveMidi->fRepeats;
+		//qDebug() << "Invoking callback - repeats:" << fActiveMidi->fRepeats;
 		fActiveMidi->fDone_func(fActiveMidi->fDone_func_ctx, fActiveMidi->fRepeats);
 	}
 	fActiveMidi->fPlaying = false;
@@ -84,7 +84,7 @@ CHtmlSysSoundMidiQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 								 void* done_func_ctx, int repeat, const textchar_t* url, int vol,
 								 long fade_in, long fade_out, int crossfade )
 {
-	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
+	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 
 	// Adjust volume if it exceeds min/max levels.
 	if (vol < 0) {
@@ -138,8 +138,8 @@ CHtmlSysResource*
 CHtmlSysSoundMidi::create_midi( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
 								unsigned long filesize, CHtmlSysWin* win )
 {
-	qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
-			<< "url:" << url->get_url();
+	//qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
+	//		<< "url:" << url->get_url();
 
 	// Check if the file exists and is readable.
 	QFileInfo inf(filename);
@@ -179,7 +179,7 @@ QTadsSound::QTadsSound( QObject* parent, Mix_Chunk* chunk, SoundType type )
   fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
 {
 	this->fLength = (this->fChunk->alen * 8) / (2 * 16 * 44.1);
-	qDebug() << "Sound length:" << this->fLength;
+	//qDebug() << "Sound length:" << this->fLength;
 }
 
 
@@ -206,7 +206,7 @@ QTadsSound::callback( int channel )
 	}
 
 	// If it's an infinite loop sound, or it has not reached the wanted repeat
-	// count yet..  Play again on the same channel.
+	// count yet, play again on the same channel.
 	if ((mObj->fRepeatsWanted == 0) or (mObj->fRepeats < mObj->fRepeatsWanted)) {
 		Mix_PlayChannel(channel, mObj->fChunk, 0);
 		++mObj->fRepeats;
@@ -217,7 +217,7 @@ QTadsSound::callback( int channel )
 	// we need to invoke the TADS callback, if there is one.
 	mObj->fPlaying = false;
 	if (mObj->fDone_func) {
-		qDebug() << "Invoking callback - repeats:" << mObj->fRepeats;
+		//qDebug() << "Invoking callback - repeats:" << mObj->fRepeats;
 		mObj->fDone_func(mObj->fDone_func_ctx, mObj->fRepeats);
 	}
 	fObjList.removeAll(mObj);
@@ -283,8 +283,8 @@ CHtmlSysSound*
 QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
 							   unsigned long filesize, CHtmlSysWin* win, SoundType type )
 {
-	qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
-			<< "url:" << url->get_url();
+	//qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
+	//		<< "url:" << url->get_url();
 
 	// Check if the file exists and is readable.
 	QFileInfo inf(filename);
@@ -370,17 +370,17 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
 	CHtmlSysSound* sound;
 	switch (type) {
 	  case WAV:
-		qDebug() << "Sound type: WAV";
+		//qDebug() << "Sound type: WAV";
 		sound = new CHtmlSysSoundWavQt(0, chunk, WAV);
 		break;
 
 	  case OGG:
-		qDebug() << "Sound type: OGG";
+		//qDebug() << "Sound type: OGG";
 		sound = new CHtmlSysSoundWavQt(0, chunk, OGG);
 		break;
 
 	  case MPEG:
-		qDebug() << "Sound type: MPEG";
+		//qDebug() << "Sound type: MPEG";
 		sound = new CHtmlSysSoundWavQt(0, chunk, MPEG);
 		break;
 	}
@@ -396,7 +396,7 @@ CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								int repeat, const textchar_t* url, int vol, long fade_in, long fade_out,
 								int crossfade )
 {
-	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
+	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 	this->startPlaying(done_func, done_func_ctx, repeat, vol);
 	return 0;
 }
@@ -405,14 +405,14 @@ CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 void
 CHtmlSysSoundWavQt::add_crossfade( CHtmlSysWin* win, long ms )
 {
-	qDebug() << Q_FUNC_INFO;
+	qDebug() << Q_FUNC_INFO << "\n Crossfades not implemented yet.";
 }
 
 
 void
 CHtmlSysSoundWavQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	this->cancelPlaying(sync);
 }
@@ -421,7 +421,7 @@ CHtmlSysSoundWavQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, 
 void
 CHtmlSysSoundWavQt::resume()
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 }
 
 
@@ -433,7 +433,7 @@ CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								int repeat, const textchar_t* url, int vol, long fade_in, long fade_out,
 								int crossfade )
 {
-	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
+	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 	this->startPlaying(done_func, done_func_ctx, repeat, vol);
 	return 0;
 }
@@ -442,14 +442,14 @@ CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 void
 CHtmlSysSoundOggQt::add_crossfade( CHtmlSysWin* win, long ms )
 {
-	qDebug() << Q_FUNC_INFO;
+	qDebug() << Q_FUNC_INFO << "\n Crossfades not implemented yet.";
 }
 
 
 void
 CHtmlSysSoundOggQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	this->cancelPlaying(sync);
 }
@@ -458,7 +458,7 @@ CHtmlSysSoundOggQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, 
 void
 CHtmlSysSoundOggQt::resume()
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 }
 
 
@@ -470,7 +470,7 @@ CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 								 int repeat, const textchar_t* url, int vol, long fade_in, long fade_out,
 								 int crossfade )
 {
-	qDebug() << "play_sound url:" << url << "repeat:" << repeat;
+	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 	this->startPlaying(done_func, done_func_ctx, repeat, vol);
 	return 0;
 }
@@ -479,14 +479,14 @@ CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 void
 CHtmlSysSoundMpegQt::add_crossfade( CHtmlSysWin* win, long ms )
 {
-	qDebug() << Q_FUNC_INFO;
+	qDebug() << Q_FUNC_INFO << "\n Crossfades not implemented yet.";
 }
 
 
 void
 CHtmlSysSoundMpegQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	this->cancelPlaying(sync);
 }
@@ -495,7 +495,7 @@ CHtmlSysSoundMpegQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms,
 void
 CHtmlSysSoundMpegQt::resume()
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 }
 
 
@@ -545,8 +545,8 @@ static CHtmlSysResource*
 createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
 					 unsigned long filesize, CHtmlSysWin* win, const QString& imageType )
 {
-	qDebug() << "Loading" << imageType << "image from" << filename << "at offset" << seekpos
-			<< "with size" << filesize << "url:" << url->get_url();
+	//qDebug() << "Loading" << imageType << "image from" << filename << "at offset" << seekpos
+	//		<< "with size" << filesize << "url:" << url->get_url();
 
 	// Check if the file exists and is readable.
 	QFileInfo inf(filename);
