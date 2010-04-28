@@ -43,6 +43,13 @@
 #include "qtadshostifc.h"
 
 
+// On OS X, SDL does weird stuff with main() and redefines it to SDLMain().
+// We don't like that.
+#ifdef Q_WS_MAC
+#  ifdef main
+#    undef main
+#  endif
+#endif
 int main( int argc, char** argv )
 {
 	// Filename of the game to run.
