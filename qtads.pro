@@ -107,6 +107,7 @@ HEADERS += \
 	src/qtadscharmap.h \
 	src/qtadspixmap.h \
 	src/qtadsdispwidget.h \
+	src/qtadsdispwidgetinput.h \
 	src/qtadshostifc.h \
 	src/qtadstimer.h \
 	src/vmuni.h \
@@ -129,6 +130,7 @@ SOURCES += \
 	src/qtadspixmap.cc \
 	src/main.cc \
 	src/qtadsdispwidget.cc \
+	src/qtadsdispwidgetinput.cc \
 	src/qtadsconfdialog.cpp \
 	src/qtadssettings.cc
 

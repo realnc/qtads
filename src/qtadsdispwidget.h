@@ -24,35 +24,19 @@
 #include <QWidget>
 
 
-/* A QScrollArea with custom event handlers for player input.
+/* The widget where CHtmlSysWin* performs actual paint operations.  It also
+ * handles mouse events.
  */
 class QTadsDisplayWidget: public QWidget {
 	Q_OBJECT
 
-  private:
+  protected:
 	// The window we're embeded in.
 	class CHtmlSysWinQt* fParentSysWin;
 
 	// Our parent's formatter, for easy access.
 	class CHtmlFormatter* fFormatter;
 
-	// Position of the text cursor.
-	QPoint fCursorPos;
-
-	// Last position of the text cursor.
-	QPoint fLastCursorPos;
-
-	// Is the text cursor visible?
-	bool fCursorVisible;
-
-	// Text cursor blink visibility.  Changed by a timer to show/hide the
-	// cursor at specific intervals if fCursorVisible is true.
-	bool fBlinkVisible;
-
-	// Text cursor blink timer.
-	class QTimer* fBlinkTimer;
-
-  protected:
 	virtual void
 	paintEvent( QPaintEvent* e );
 
@@ -62,26 +46,8 @@ class QTadsDisplayWidget: public QWidget {
 	virtual void
 	mousePressEvent( QMouseEvent* e );
 
-private slots:
-	// Called by the timer to blink the text cursor.
-	void
-	fBlinkCursor();
-
   public:
 	QTadsDisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
-
-	// Change the text cursor position.
-	void
-	moveCursorPos( const QPoint& pos )
-	{ this->fCursorPos = pos; }
-
-	// Show/hide the text cursor.
-	void
-	setCursorVisible( bool visible )
-	{ this->fCursorVisible = visible; }
-
-	void
-	updateCursorPos( class CHtmlFormatter* formatter, class CHtmlInputBuf* tadsBuffer, class CHtmlTagTextInput* tag );
 };
 
 

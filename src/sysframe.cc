@@ -567,7 +567,7 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 	qDebug() << "Creating new banner. parent:" << parent << "type:" << window_type << "where:" << where
 			<< "other:" << other << "pos:" << pos << "style:" << style;
 
-	CHtmlSysWinQt* banner = new CHtmlSysWinQt(formatter, 0);
+	CHtmlSysWinQt* banner = new CHtmlSysWinQt(formatter, 0, 0);
 
 	if (style & OS_BANNER_STYLE_VSCROLL) {
 		banner->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);

@@ -23,7 +23,7 @@
 #include <QUrl>
 
 #include "htmlqt.h"
-#include "qtadsdispwidget.h"
+#include "qtadsdispwidgetinput.h"
 
 #include "htmlfmt.h"
 #include "htmlinp.h"
@@ -32,9 +32,13 @@
 
 
 CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* parent )
-: CHtmlSysWinQt(formatter, parent), fInputReady(false), fAcceptInput(false), fSingleKeyInput(false),
-  fLastKeyEvent(Qt::Key_Any)
-{ }
+: CHtmlSysWinQt(formatter, 0, parent), fInputReady(false),
+  fAcceptInput(false), fSingleKeyInput(false), fLastKeyEvent(Qt::Key_Any)
+{
+	this->fDispWidget = new QTadsDisplayWidgetInput(this, formatter);
+	this->fCastDispWidget = static_cast<QTadsDisplayWidgetInput*>(this->fDispWidget);
+	this->setWidget(this->fDispWidget);
+}
 
 
 void
@@ -191,7 +195,7 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 	if (this->fTag->ready_to_format()) {
 		this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
 	}
-	this->fDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
+	this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
 	//static_cast<CHtmlSysWinQt*>(this->widget())->do_formatting(false, true, false);
 }
 
@@ -273,8 +277,8 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 		tag->format(this, this->formatter_);
 	}
 	tadsBuffer->show_caret();
-	this->fDispWidget->setCursorVisible(true);
-	this->fDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
+	this->fCastDispWidget->setCursorVisible(true);
+	this->fCastDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
 	this->startLineInput(tadsBuffer, tag);
 	while (qFrame->gameRunning() and not this->fInputReady) {
 		qApp->sendPostedEvents();
@@ -285,7 +289,7 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 		return false;
 	}
 	tadsBuffer->hide_caret();
-	this->fDispWidget->setCursorVisible(false);
+	this->fCastDispWidget->setCursorVisible(false);
 	formatter->end_input();
 
 	// Add the line-break after the command.

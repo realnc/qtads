@@ -28,15 +28,18 @@
 #include "htmlrc.h"
 
 
-CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QWidget* parent )
+CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QTadsDisplayWidget* dispWidget, QWidget* parent )
 : QScrollArea(parent), CHtmlSysWin(formatter), fBannerSize(0), fBannerSizeUnits(HTML_BANNERWIN_UNITS_PIX),
   fDontReformat(0), fVFrame(0), fHFrame(0), fVLine(0), fHLine(0), fVLayout(0), fHLayout(0), fParentBanner(0),
-  fMargins(8, 2, 8, 2), fBgImage(0), fDispWidget(new QTadsDisplayWidget(this, formatter))
+  fMargins(8, 2, 8, 2), fBgImage(0)
 {
+	if (dispWidget == 0) {
+		this->fDispWidget = new QTadsDisplayWidget(this, formatter);
+		this->setWidget(this->fDispWidget);
+	}
 	this->formatter_->set_win(this, &fMargins);
 	this->setForegroundRole(QPalette::Text);
 	this->setBackgroundRole(QPalette::Base);
-	this->setWidget(this->fDispWidget);
 	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	this->setFrameStyle(QFrame::NoFrame | QFrame::Plain);

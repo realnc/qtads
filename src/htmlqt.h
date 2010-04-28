@@ -392,7 +392,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	resizeEvent( QResizeEvent* event );
 
   public:
-	CHtmlSysWinQt( class CHtmlFormatter* formatter, QWidget* parent );
+	CHtmlSysWinQt( class CHtmlFormatter* formatter, class QTadsDisplayWidget* dispWidget, QWidget* parent );
 
 	virtual
 	~CHtmlSysWinQt();
@@ -600,6 +600,9 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	friend class CHtmlSysWinQt;
 
   private:
+	// Our display widget casted for easier access.
+	class QTadsDisplayWidgetInput* fCastDispWidget;
+
 	// We have a finished user input.
 	bool fInputReady;
 
