@@ -15,16 +15,16 @@
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef QTADSPIXMAP_H
-#define QTADSPIXMAP_H
+#ifndef QTADSIMAGE_H
+#define QTADSIMAGE_H
 
-#include <QPixmap>
+#include <QImage>
 
 
 /* We handle all types of images the same way, so we implement that handling
  * in this class and derive the various CHtmlSysImage* classes from this one.
  */
-class QTadsPixmap: public QPixmap {
+class QTadsImage: public QImage {
   public:
 	// A call to this method is only allowed to happen from inside
 	// QTadsDisplayWidget::paintEvent().  This always happens indirectly

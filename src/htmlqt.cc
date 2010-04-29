@@ -506,7 +506,7 @@ void
 CHtmlSysImageMngQt::draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
 {
 	QPainter painter(static_cast<CHtmlSysWinQt*>(win)->widget());
-	const QPixmap& pix = this->currentPixmap();
+	const QImage& img = this->currentImage();
 	const QRect& pixRect = this->frameRect();
 	if (mode == HTMLIMG_DRAW_CLIP) {
 		// Clip mode.  Only draw the part of the image that would fit.  If the
@@ -523,10 +523,10 @@ CHtmlSysImageMngQt::draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_m
 		} else {
 			targetHeight = pixRect.height();
 		}
-		painter.drawPixmap(pos->left, pos->top, pix, 0, 0, targetWidth, targetHeight);
+		painter.drawImage(pos->left, pos->top, img, 0, 0, targetWidth, targetHeight);
 	} else {
 		// QPainter will scale it by default.
-		painter.drawPixmap(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top, pix);
+		painter.drawImage(QRect(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top), img);
 	}
 }
 
@@ -570,17 +570,17 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 	CHtmlSysResource* image;
 	// Better get an error at compile-time using static_cast rather than an
 	// abort at runtime using dynamic_cast.
-	QTadsPixmap* cast;
+	QTadsImage* cast;
 	CHtmlSysImageMngQt* mngCast;
 
 	// Create an object of the appropriate class for the specified image type.
-	// Also cast the object to a QTadsPixmap so we can loadFromData() later on.
+	// Also cast the object to a QTadsImage so we can loadFromData() later on.
 	if (imageType == "JPG" or imageType == "JPEG") {
 		image = new CHtmlSysImageJpegQt;
-		cast = static_cast<QTadsPixmap*>(static_cast<CHtmlSysImageJpegQt*>(image));
+		cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImageJpegQt*>(image));
 	} else if (imageType == "PNG") {
 		image = new CHtmlSysImagePngQt;
-		cast = static_cast<QTadsPixmap*>(static_cast<CHtmlSysImagePngQt*>(image));
+		cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImagePngQt*>(image));
 	} else if (imageType == "MNG") {
 		image = new CHtmlSysImageMngQt;
 		mngCast = static_cast<CHtmlSysImageMngQt*>(image);
@@ -606,7 +606,7 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 		mngCast->setDevice(buf);
 		mngCast->start();
 	} else if (not cast->loadFromData(data, imageType.toAscii())) {
-		qWarning() << "ERROR: Could not create pixmap from image data";
+		qWarning() << "ERROR: Could not parse image data";
 		delete image;
 		return 0;
 	}

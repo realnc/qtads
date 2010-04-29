@@ -940,7 +940,7 @@ CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
 		return;
 	}
 
-	QTadsPixmap* castImg;
+	QTadsImage* castImg;
 	switch (image->get_image()->get_res_type()) {
 	  case HTML_res_type_JPEG:
 		castImg = static_cast<CHtmlSysImageJpegQt*>(image->get_image());
@@ -954,7 +954,7 @@ CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
 		return;
 	  default:
 		qWarning() << Q_FUNC_INFO << "Unknown resource type";
-		castImg = dynamic_cast<QTadsPixmap*>(image->get_image());
+		castImg = dynamic_cast<QTadsImage*>(image->get_image());
 	}
 
 	QPalette p(this->palette());

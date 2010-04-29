@@ -103,7 +103,7 @@ HEADERS += \
 	src/htmlqt.h \
 	src/missing.h \
 	src/qtadscharmap.h \
-	src/qtadspixmap.h \
+	src/qtadsimage.h \
 	src/qtadsdispwidget.h \
 	src/qtadsdispwidgetinput.h \
 	src/qtadshostifc.h \
@@ -125,7 +125,7 @@ SOURCES += \
 	src/missing.cc \
 	src/charmap.cc \
 	src/qtadscharmap.cc \
-	src/qtadspixmap.cc \
+	src/qtadsimage.cc \
 	src/main.cc \
 	src/qtadsdispwidget.cc \
 	src/qtadsdispwidgetinput.cc \

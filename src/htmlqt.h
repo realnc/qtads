@@ -38,7 +38,7 @@
 #include "hos_qt.h"
 #include "htmlsys.h"
 
-#include "qtadspixmap.h"
+#include "qtadsimage.h"
 
 
 /* Works like qApp, but contains the global CHtmlSysFrameQt object instead.  If
@@ -728,22 +728,22 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 };
 
 
-class CHtmlSysImageJpegQt: public QTadsPixmap, public CHtmlSysImageJpeg {
+class CHtmlSysImageJpegQt: public QTadsImage, public CHtmlSysImageJpeg {
   public:
 	//
 	// CHtmlSysImageJpeg interface implementation.
 	//
 	virtual void
 	draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
-	{ QTadsPixmap::drawFromPaintEvent(win, pos, mode); }
+	{ QTadsImage::drawFromPaintEvent(win, pos, mode); }
 
 	virtual unsigned long
 	get_width() const
-	{ return QTadsPixmap::width(); }
+	{ return QTadsImage::width(); }
 
 	virtual unsigned long
 	get_height() const
-	{ return QTadsPixmap::height(); }
+	{ return QTadsImage::height(); }
 
 	virtual int
 	map_palette( CHtmlSysWin* win, int foreground )
@@ -751,22 +751,22 @@ class CHtmlSysImageJpegQt: public QTadsPixmap, public CHtmlSysImageJpeg {
 };
 
 
-class CHtmlSysImagePngQt: public QTadsPixmap, public CHtmlSysImagePng {
+class CHtmlSysImagePngQt: public QTadsImage, public CHtmlSysImagePng {
   public:
 	//
 	// CHtmlSysImagePng interface implementation.
 	//
 	virtual void
 	draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
-	{ QTadsPixmap::drawFromPaintEvent(win, pos, mode); }
+	{ QTadsImage::drawFromPaintEvent(win, pos, mode); }
 
 	virtual unsigned long
 	get_width() const
-	{ return QTadsPixmap::width(); }
+	{ return QTadsImage::width(); }
 
 	virtual unsigned long
 	get_height() const
-	{ return QTadsPixmap::height(); }
+	{ return QTadsImage::height(); }
 
 	virtual int
 	map_palette( CHtmlSysWin* win, int foreground )

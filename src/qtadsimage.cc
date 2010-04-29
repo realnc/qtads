@@ -18,11 +18,10 @@
 #include <QPainter>
 
 #include "htmlqt.h"
-#include "qtadspixmap.h"
+#include "qtadsimage.h"
 
-// TODO: Implement draw mode.
 void
-QTadsPixmap::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, htmlimg_draw_mode_t mode )
+QTadsImage::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, htmlimg_draw_mode_t mode )
 {
 	QPainter painter(static_cast<CHtmlSysWinQt*>(win)->widget());
 	if (mode == HTMLIMG_DRAW_CLIP) {
@@ -40,10 +39,9 @@ QTadsPixmap::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, h
 		} else {
 			targetHeight = this->height();
 		}
-		//painter.drawPixmap(pos->left, pos->top, targetWidth, targetHeight, *this);
-		painter.drawPixmap(pos->left, pos->top, *this, 0, 0, targetWidth, targetHeight);
+		painter.drawImage(pos->left, pos->top, *this, 0, 0, targetWidth, targetHeight);
 	} else {
 		// QPainter will scale it by default.
-		painter.drawPixmap(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top, *this);
+		painter.drawImage(QRect(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top), *this);
 	}
 }
