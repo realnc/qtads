@@ -30,7 +30,6 @@
 #include <QFont>
 #include <QMainWindow>
 #include <QScrollArea>
-#include <QTemporaryFile>
 #include <QMovie>
 #include <QTime>
 #include <SDL.h>
