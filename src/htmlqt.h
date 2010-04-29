@@ -231,6 +231,14 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	void
 	reformatBanners();
 
+	// Prune the main window's parse tree, if we're using too much memory.
+	// This should be called before getting user input; we'll check to see how
+	// much memory the parse tree is taking up, and cut it down a bit if it's
+	// too big.
+	// TODO: Implement configurable max memory size.
+	void
+	pruneParseTree();
+
 	// Advance the event loop.
 	void
 	advanceEventLoop( QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents )

@@ -28,6 +28,7 @@
 #include "htmlinp.h"
 #include "htmlfmt.h"
 #include "htmlrf.h"
+#include "htmltxar.h"
 #include "vmmaincn.h"
 
 
@@ -380,6 +381,30 @@ CHtmlSysFrameQt::reformatBanners()
 }
 
 
+void CHtmlSysFrameQt::pruneParseTree()
+{
+	static int checkCount = 0;
+
+	// Skip this entirely most of the time; only check every so often, so that
+	// we don't waste a lot of time doing this too frequently.
+	++checkCount;
+	if (checkCount < 10) {
+		return;
+	}
+
+	checkCount = 0;
+	// Check to see if we're consuming too much memory - if not, there's
+	// nothing we need to do here.
+	if (this->fParser->get_text_array()->get_mem_in_use() < 65536) {
+		return;
+	}
+
+	this->fParser->prune_tree(65536 / 2);
+	this->reformatBanners();
+	this->adjustBannerSizes();
+}
+
+
 void
 CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 {
@@ -460,6 +485,8 @@ CHtmlSysFrameQt::get_input( textchar_t* buf, size_t bufsiz )
 	//qDebug() << Q_FUNC_INFO;
 
 	this->flush_txtbuf(true, false);
+	this->pruneParseTree();
+
 	int ret = this->fGameWin->getInput(this->fTadsBuffer);
 	int len = this->fTadsBuffer->getlen() > bufsiz ? bufsiz : this->fTadsBuffer->getlen();
 	strncpy(buf, this->fTadsBuffer->getbuf(), len);
@@ -498,6 +525,9 @@ int
 CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_event_info_t* info )
 {
 	//qDebug() << Q_FUNC_INFO << "use_timeout:" << use_timeout;
+
+	this->flush_txtbuf(true, false);
+	this->pruneParseTree();
 
 	bool timedOut = false;
 	int res = this->fGameWin->getKeypress(timeout, use_timeout, &timedOut);
@@ -541,9 +571,6 @@ CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
 
 	static int pendingCmd = 0;
 	int ret;
-
-	// Flush output.
-	flush_txtbuf(true, false);
 
 	// If we have a pending keystroke command from out last call, return it
 	// now.
