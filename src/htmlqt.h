@@ -670,6 +670,9 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 
   protected:
 	virtual void
+	resizeEvent( QResizeEvent* event );
+
+	virtual void
 	keyPressEvent( QKeyEvent* e );
 
 	void

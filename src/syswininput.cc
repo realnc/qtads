@@ -113,6 +113,16 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 
 
 void
+CHtmlSysWinInputQt::resizeEvent( QResizeEvent* event )
+{
+	CHtmlSysWinQt::resizeEvent(event);
+	if (this->fCastDispWidget->isCursorVisible()) {
+		this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
+	}
+}
+
+
+void
 CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 {
 	//qDebug() << Q_FUNC_INFO;

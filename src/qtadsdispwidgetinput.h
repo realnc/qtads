@@ -65,8 +65,13 @@ class QTadsDisplayWidgetInput: public QTadsDisplayWidget {
 	setCursorVisible( bool visible )
 	{ this->fCursorVisible = visible; }
 
+	bool
+	isCursorVisible()
+	{ return this->fCursorVisible; }
+
 	void
-	updateCursorPos( class CHtmlFormatter* formatter, class CHtmlInputBuf* tadsBuffer, class CHtmlTagTextInput* tag );
+	updateCursorPos( class CHtmlFormatter* formatter, class CHtmlInputBuf* tadsBuffer,
+					 class CHtmlTagTextInput* tag );
 };
 
 
