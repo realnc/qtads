@@ -592,9 +592,7 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 		this->fDispWidget->resize(this->fDispWidget->width(), this->formatter_->get_max_y_pos());
 		if (update_win) {
 			this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
-			qApp->sendPostedEvents();
-			qApp->processEvents();
-			qApp->sendPostedEvents();
+			qFrame->advanceEventLoop();
 		}
 	}
 
@@ -748,7 +746,7 @@ CHtmlSysWinQt::scroll_to_doc_coords( const CHtmlRect* pos )
 {
 	qDebug() << Q_FUNC_INFO;
 
-	qApp->processEvents();
+	qFrame->advanceEventLoop();
 }
 
 

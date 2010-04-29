@@ -281,9 +281,7 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 	this->fCastDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
 	this->startLineInput(tadsBuffer, tag);
 	while (qFrame->gameRunning() and not this->fInputReady) {
-		qApp->sendPostedEvents();
-		qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
-		qApp->sendPostedEvents();
+		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 	}
 	if (not qFrame->gameRunning()) {
 		return false;
@@ -357,14 +355,10 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 		t.start();
 		while (static_cast<unsigned long>(t.elapsed()) < timeout and qFrame->gameRunning()
 			   and not this->fInputReady) {
-			qApp->sendPostedEvents();
-			qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents, timeout - t.elapsed());
-			qApp->sendPostedEvents();
+			qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents, timeout - t.elapsed());
 		}
 	} else while (not this->fInputReady and this->fHrefEvent.isEmpty() and qFrame->gameRunning()) {
-		qApp->sendPostedEvents();
-		qApp->processEvents(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
-		qApp->sendPostedEvents();
+		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 	}
 
 	if (not qFrame->gameRunning()) {

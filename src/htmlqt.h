@@ -231,6 +231,28 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	void
 	reformatBanners();
 
+	// Advance the event loop.
+	void
+	advanceEventLoop( QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents )
+	{
+		// DeferredDelete events need to be dispatched manually, since we don't
+		// return to the main event loop while a game is running.
+		this->sendPostedEvents(0, QEvent::DeferredDelete);
+		this->sendPostedEvents();
+		this->processEvents(flags);
+		this->sendPostedEvents();
+	}
+
+	// Advance the event loop with a timeout.
+	void
+	advanceEventLoop( QEventLoop::ProcessEventsFlags flags, int maxtime )
+	{
+		this->sendPostedEvents(0, QEvent::DeferredDelete);
+		this->sendPostedEvents();
+		this->processEvents(flags, maxtime);
+		this->sendPostedEvents();
+	}
+
 	//
 	// CHtmlSysFrame interface implementation.
 	//
