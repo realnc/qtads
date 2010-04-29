@@ -820,7 +820,8 @@ class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
 	}
 
 	virtual void
-	draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode );
+	draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
+	{ QTadsImage(this->currentImage()).drawFromPaintEvent(win, pos, mode); }
 
 	virtual unsigned long
 	get_width() const

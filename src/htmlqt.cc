@@ -500,38 +500,6 @@ CHtmlSysSoundMpegQt::resume()
 
 
 /* --------------------------------------------------------------------
- * CHtmlSysImageMngQt
- */
-void
-CHtmlSysImageMngQt::draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
-{
-	QPainter painter(static_cast<CHtmlSysWinQt*>(win)->widget());
-	const QImage& img = this->currentImage();
-	const QRect& pixRect = this->frameRect();
-	if (mode == HTMLIMG_DRAW_CLIP) {
-		// Clip mode.  Only draw the part of the image that would fit.  If the
-		// image is smaller than pos, adjust the drawing area to avoid scaling.
-		int targetWidth;
-		int targetHeight;
-		if (pixRect.width() > pos->right - pos->left) {
-			targetWidth = pos->right - pos->left;
-		} else {
-			targetWidth = pixRect.width();
-		}
-		if (pixRect.height() > pos->bottom - pos->top) {
-			targetHeight = pos->bottom - pos->top;
-		} else {
-			targetHeight = pixRect.height();
-		}
-		painter.drawImage(pos->left, pos->top, img, 0, 0, targetWidth, targetHeight);
-	} else {
-		// QPainter will scale it by default.
-		painter.drawImage(QRect(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top), img);
-	}
-}
-
-
-/* --------------------------------------------------------------------
  * Non-portable static methods
  */
 
