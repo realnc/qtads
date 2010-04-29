@@ -117,6 +117,7 @@ CHtmlSysFrameQt::main( int argc, char** argv )
 		gameFileName = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run", "",
 													"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
 		if (gameFileName.isNull()) {
+			this->exit(0);
 			return 0;
 		}
 	}
@@ -136,6 +137,7 @@ CHtmlSysFrameQt::main( int argc, char** argv )
 
 	CHtmlSysFrame::set_frame_obj(0);
 	this->exit(ret);
+	return ret;
 }
 
 
