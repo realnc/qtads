@@ -57,25 +57,31 @@ CHtmlSysSoundMidiQt::~CHtmlSysSoundMidiQt()
 void
 CHtmlSysSoundMidiQt::callback()
 {
-	Q_ASSERT(fActiveMidi != 0);
+	//qDebug() << Q_FUNC_INFO;
+
+	if (CHtmlSysSoundMidiQt::fActiveMidi == 0) {
+		// No music is playing.  Nothing to do.
+		return;
+	}
 
 	// If it's an infinite loop sound, or it has not reached the wanted repeat
 	// count yet, play again.
-	if ((fActiveMidi->fRepeatsWanted == 0) or (fActiveMidi->fRepeats < fActiveMidi->fRepeatsWanted)) {
-		Mix_PlayMusic(fActiveMidi->fMusic, 0);
-		++fActiveMidi->fRepeats;
+	if ((CHtmlSysSoundMidiQt::fActiveMidi->fRepeatsWanted == 0)
+		or (CHtmlSysSoundMidiQt::fActiveMidi->fRepeats < CHtmlSysSoundMidiQt::fActiveMidi->fRepeatsWanted)) {
+		Mix_PlayMusic(CHtmlSysSoundMidiQt::fActiveMidi->fMusic, 0);
+		++CHtmlSysSoundMidiQt::fActiveMidi->fRepeats;
 		return;
 	}
 
 	// Sound has repeated enough times, or it has been halted.  In either case,
 	// we need to invoke the TADS callback, if there is one.
-	fActiveMidi->fPlaying = false;
-	if (fActiveMidi->fDone_func) {
-		//qDebug() << "Invoking callback - repeats:" << fActiveMidi->fRepeats;
-		fActiveMidi->fDone_func(fActiveMidi->fDone_func_ctx, fActiveMidi->fRepeats);
+	if (CHtmlSysSoundMidiQt::fActiveMidi->fDone_func) {
+		//qDebug() << "Invoking callback - repeats:" << CHtmlSysSoundMidiQt::fActiveMidi->fRepeats;
+		CHtmlSysSoundMidiQt::fActiveMidi->fDone_func(CHtmlSysSoundMidiQt::fActiveMidi->fDone_func_ctx,
+													 CHtmlSysSoundMidiQt::fActiveMidi->fRepeats);
 	}
-	fActiveMidi->fPlaying = false;
-	fActiveMidi = 0;
+	CHtmlSysSoundMidiQt::fActiveMidi->fPlaying = false;
+	CHtmlSysSoundMidiQt::fActiveMidi = 0;
 }
 
 
@@ -85,6 +91,11 @@ CHtmlSysSoundMidiQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 								 long fade_in, long fade_out, int crossfade )
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
+
+	if (CHtmlSysSoundMidiQt::fActiveMidi != 0) {
+		// Only one MIDI sound can be active at a time.
+		return 1;
+	}
 
 	// Adjust volume if it exceeds min/max levels.
 	if (vol < 0) {
@@ -101,20 +112,15 @@ CHtmlSysSoundMidiQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 	Mix_VolumeMusic(vol);
 
 	this->fRepeatsWanted = repeat;
-	if (CHtmlSysSoundMidiQt::fActiveMidi != 0 and CHtmlSysSoundMidiQt::fActiveMidi->fPlaying) {
-		// Another MIDI sound is playing.  Halt it before we play a new one.
-		Mix_HaltMusic();
-		CHtmlSysSoundMidiQt::callback();
-	}
 	if (Mix_PlayMusic(this->fMusic, 0) == -1) {
 		qWarning() << "ERROR: Can't play MIDI:" << Mix_GetError();
 		return 1;
 	}
 	this->fPlaying = true;
 	this->fRepeats = 1;
-	CHtmlSysSoundMidiQt::fActiveMidi = this;
 	this->fDone_func = done_func;
 	this->fDone_func_ctx = done_func_ctx;
+	CHtmlSysSoundMidiQt::fActiveMidi = this;
 	return 0;
 }
 

@@ -888,7 +888,7 @@ class CHtmlSysSoundMidiQt: public CHtmlSysSoundMidi {
 
 	virtual void
 	add_crossfade( CHtmlSysWin* win, long ms )
-	{ }
+	{ qDebug() << Q_FUNC_INFO; }
 
 	virtual void
 	cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg );
