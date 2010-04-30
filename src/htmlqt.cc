@@ -44,7 +44,7 @@ CHtmlSysSoundMidiQt::CHtmlSysSoundMidiQt( SDL_RWops* music )
 CHtmlSysSoundMidiQt::~CHtmlSysSoundMidiQt()
 {
 	this->fRepeatsWanted = -1;
-	if (this->fPlaying) {
+	if (CHtmlSysSoundMidiQt::fActiveMidi == this) {
 		Mix_HaltMusic();
 		CHtmlSysSoundMidiQt::callback();
 		CHtmlSysSoundMidiQt::fActiveMidi = 0;
@@ -64,24 +64,24 @@ CHtmlSysSoundMidiQt::callback()
 		return;
 	}
 
+	CHtmlSysSoundMidiQt* curMidi = CHtmlSysSoundMidiQt::fActiveMidi;
+
 	// If it's an infinite loop sound, or it has not reached the wanted repeat
 	// count yet, play again.
-	if ((CHtmlSysSoundMidiQt::fActiveMidi->fRepeatsWanted == 0)
-		or (CHtmlSysSoundMidiQt::fActiveMidi->fRepeats < CHtmlSysSoundMidiQt::fActiveMidi->fRepeatsWanted)) {
-		Mix_PlayMusic(CHtmlSysSoundMidiQt::fActiveMidi->fMusic, 0);
-		++CHtmlSysSoundMidiQt::fActiveMidi->fRepeats;
+	if ((curMidi->fRepeatsWanted == 0) or (curMidi->fRepeats < curMidi->fRepeatsWanted)) {
+		Mix_PlayMusic(curMidi->fMusic, 0);
+		++curMidi->fRepeats;
 		return;
 	}
 
+	CHtmlSysSoundMidiQt::fActiveMidi = 0;
 	// Sound has repeated enough times, or it has been halted.  In either case,
 	// we need to invoke the TADS callback, if there is one.
-	if (CHtmlSysSoundMidiQt::fActiveMidi->fDone_func) {
-		//qDebug() << "Invoking callback - repeats:" << CHtmlSysSoundMidiQt::fActiveMidi->fRepeats;
-		CHtmlSysSoundMidiQt::fActiveMidi->fDone_func(CHtmlSysSoundMidiQt::fActiveMidi->fDone_func_ctx,
-													 CHtmlSysSoundMidiQt::fActiveMidi->fRepeats);
+	if (curMidi->fDone_func) {
+		//qDebug() << "Invoking callback - repeats:" << curMidi->fRepeats;
+		curMidi->fDone_func(curMidi->fDone_func_ctx, curMidi->fRepeats);
 	}
-	CHtmlSysSoundMidiQt::fActiveMidi->fPlaying = false;
-	CHtmlSysSoundMidiQt::fActiveMidi = 0;
+	curMidi->fPlaying = false;
 }
 
 
@@ -128,9 +128,9 @@ CHtmlSysSoundMidiQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 void
 CHtmlSysSoundMidiQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
-	if (this->fPlaying) {
+	if (fActiveMidi == this) {
 		this->fRepeatsWanted = -1;
 		Mix_HaltMusic();
 		CHtmlSysSoundMidiQt::callback();
