@@ -91,8 +91,7 @@ CHtmlSysWinQt::resizeEvent( QResizeEvent* event )
 	if (this->fDontReformat == 0) {
 		this->formatter_->start_at_top(false);
 		this->do_formatting(true, false, true);
-		QSize siz(qWinGroup->centralWidget()->size());
-		qFrame->gameWindow()->calcChildBannerSizes(siz);
+		qFrame->adjustBannerSizes();
 	}
 	QScrollArea::resizeEvent(event);
 }
@@ -999,9 +998,7 @@ CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, 
 		this->fBannerSize = width;
 		this->fBannerSizeUnits = width_units;
 	}
-
-	QSize parentSize(qWinGroup->centralWidget()->size());
-	qFrame->gameWindow()->calcChildBannerSizes(parentSize);
+	qFrame->adjustBannerSizes();
 	return;
 }
 

@@ -706,8 +706,7 @@ CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
 	static_cast<CHtmlSysWinQt*>(win)->parentBanner()->setFocus();
 	delete win;
 	// Recalculate the banner layout.
-	QSize siz(qWinGroup->centralWidget()->size());
-	qFrame->gameWindow()->calcChildBannerSizes(siz);
+	this->adjustBannerSizes();
 }
 
 
