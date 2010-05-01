@@ -110,7 +110,7 @@ CHtmlSysFrameQt::main( int argc, char** argv )
 		} else if (QFile::exists(QString::fromLocal8Bit(argv[1]) + ".t3")) {
 			gameFileName = QString::fromLocal8Bit(argv[1]) + ".t3";
 		} else {
-			qWarning().nospace() << "File '" << argv[1] << "'' not found.";
+			qWarning().nospace() << "File '" << argv[1] << "' not found.";
 		}
 	}
 
