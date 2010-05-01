@@ -34,7 +34,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	QMenu* editMenu = menuBar->addMenu(tr("&Edit"));
 	QAction* settingsAct = new QAction(tr("&Settings"), menuBar);
 	editMenu->addAction(settingsAct);
-	connect(settingsAct, SIGNAL(triggered()), this, SLOT(showConfDialog()));
+	connect(settingsAct, SIGNAL(triggered()), this, SLOT(fShowConfDialog()));
 	this->setMenuBar(menuBar);
 
 	// Create a default status bar.
@@ -56,7 +56,7 @@ CHtmlSysWinGroupQt::~CHtmlSysWinGroupQt()
 
 
 void
-CHtmlSysWinGroupQt::showConfDialog()
+CHtmlSysWinGroupQt::fShowConfDialog()
 {
 	// If the dialog is already open, simply activate and raise it.
 	if (this->fConfDialog != 0) {
@@ -66,13 +66,13 @@ CHtmlSysWinGroupQt::showConfDialog()
 	}
 	this->fConfDialog = new QTadsConfDialog(this);
 	this->fConfDialog->setWindowTitle(tr("QTads Preferences"));
-	connect(this->fConfDialog, SIGNAL(finished(int)), this, SLOT(hideConfDialog()));
+	connect(this->fConfDialog, SIGNAL(finished(int)), this, SLOT(fHideConfDialog()));
 	this->fConfDialog->show();
 }
 
 
 void
-CHtmlSysWinGroupQt::hideConfDialog()
+CHtmlSysWinGroupQt::fHideConfDialog()
 {
 	if (this->fConfDialog != 0) {
 		this->fConfDialog->deleteLater();

@@ -34,8 +34,8 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QTadsDisplayWidget* dis
   fMargins(8, 2, 8, 2), fBgImage(0)
 {
 	if (dispWidget == 0) {
-		this->fDispWidget = new QTadsDisplayWidget(this, formatter);
-		this->setWidget(this->fDispWidget);
+		this->dispWidget = new QTadsDisplayWidget(this, formatter);
+		this->setWidget(this->dispWidget);
 	}
 	this->formatter_->set_win(this, &fMargins);
 	this->setForegroundRole(QPalette::Text);
@@ -418,7 +418,7 @@ CHtmlSysWinQt::get_max_chars_in_width( CHtmlSysFont* font, const textchar_t* str
 void
 CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str, size_t len )
 {
-	QPainter painter(this->fDispWidget);
+	QPainter painter(this->dispWidget);
 	const CHtmlSysFontQt& fontCast = *static_cast<CHtmlSysFontQt*>(font);
 	painter.setFont(fontCast);
 
@@ -476,7 +476,7 @@ CHtmlSysWinQt::draw_hrule( const CHtmlRect* pos, int shade )
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	QPainter(this->fDispWidget).drawRect(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top);
+	QPainter(this->dispWidget).drawRect(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top);
 }
 
 
@@ -507,7 +507,7 @@ CHtmlSysWinQt::draw_table_border( const CHtmlRect* pos, int width, int cell )
 	QPen pen;
 	pen.setWidth(width);
 	pen.setColor(tlColor);
-	QPainter painter(this->fDispWidget);
+	QPainter painter(this->dispWidget);
 	painter.setPen(pen);
 
 	// Draw the top and left lines in highlight color.
@@ -556,7 +556,7 @@ CHtmlSysWinQt::draw_table_bkg( const CHtmlRect* pos, HTML_color_t bgcolor )
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	QPainter painter(this->fDispWidget);
+	QPainter painter(this->dispWidget);
 	int red = HTML_color_red(bgcolor);
 	int green = HTML_color_green(bgcolor);
 	int blue = HTML_color_blue(bgcolor);
@@ -588,7 +588,7 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	// Format all remaining lines.
 	while (this->formatter_->more_to_do()) {
 		this->formatter_->do_formatting();
-		this->fDispWidget->resize(this->fDispWidget->width(), this->formatter_->get_max_y_pos());
+		this->dispWidget->resize(this->dispWidget->width(), this->formatter_->get_max_y_pos());
 		if (update_win) {
 			this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 			qFrame->advanceEventLoop();
@@ -616,7 +616,7 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 
 	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 	if (update_win) {
-		this->fDispWidget->repaint();
+		this->dispWidget->repaint();
 	}
 	return false;
 }
@@ -698,8 +698,8 @@ CHtmlSysWinQt::fmt_adjust_hscroll()
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	if (this->formatter_->get_outer_max_line_width() > this->fDispWidget->width()) {
-		this->fDispWidget->resize(this->formatter_->get_outer_max_line_width(), this->fDispWidget->height());
+	if (this->formatter_->get_outer_max_line_width() > this->dispWidget->width()) {
+		this->dispWidget->resize(this->formatter_->get_outer_max_line_width(), this->dispWidget->height());
 	}
 }
 
@@ -709,8 +709,8 @@ CHtmlSysWinQt::fmt_adjust_vscroll()
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	if (this->formatter_->get_max_y_pos() > static_cast<unsigned long>(this->fDispWidget->height())) {
-		this->fDispWidget->resize(this->fDispWidget->width(), this->formatter_->get_max_y_pos());
+	if (this->formatter_->get_max_y_pos() > static_cast<unsigned long>(this->dispWidget->height())) {
+		this->dispWidget->resize(this->dispWidget->width(), this->formatter_->get_max_y_pos());
 	}
 }
 
@@ -723,13 +723,13 @@ CHtmlSysWinQt::inval_doc_coords( const CHtmlRect* area )
 	//qDebug() << "Invalidating area" << area->left << area->top << area->right << area->bottom;
 
 	long width = area->right == HTMLSYSWIN_MAX_RIGHT ?
-				 this->fDispWidget->width() - area->left
+				 this->dispWidget->width() - area->left
 				 : area->right - area->left;
 	long height = area->bottom == HTMLSYSWIN_MAX_BOTTOM ?
-				  this->fDispWidget->height() - area->top
+				  this->dispWidget->height() - area->top
 				  : area->bottom - area->top;
 
-	this->fDispWidget->update(QRect(area->left, area->top, width, height));
+	this->dispWidget->update(QRect(area->left, area->top, width, height));
 }
 
 

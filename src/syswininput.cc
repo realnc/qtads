@@ -35,14 +35,14 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
 : CHtmlSysWinQt(formatter, 0, parent), fInputReady(false),
   fAcceptInput(false), fSingleKeyInput(false), fLastKeyEvent(Qt::Key_Any)
 {
-	this->fDispWidget = new QTadsDisplayWidgetInput(this, formatter);
-	this->fCastDispWidget = static_cast<QTadsDisplayWidgetInput*>(this->fDispWidget);
-	this->setWidget(this->fDispWidget);
+	this->dispWidget = new QTadsDisplayWidgetInput(this, formatter);
+	this->fCastDispWidget = static_cast<QTadsDisplayWidgetInput*>(this->dispWidget);
+	this->setWidget(this->dispWidget);
 }
 
 
 void
-CHtmlSysWinInputQt::startLineInput( CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput* tag )
+CHtmlSysWinInputQt::fStartLineInput( CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput* tag )
 {
 	this->fInputReady = false;
 	this->fAcceptInput = true;
@@ -55,7 +55,7 @@ CHtmlSysWinInputQt::startLineInput( CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput
 
 
 void
-CHtmlSysWinInputQt::startKeypressInput()
+CHtmlSysWinInputQt::fStartKeypressInput()
 {
 	this->fInputReady = false;
 	this->fAcceptInput = true;
@@ -289,7 +289,7 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 	tadsBuffer->show_caret();
 	this->fCastDispWidget->setCursorVisible(true);
 	this->fCastDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
-	this->startLineInput(tadsBuffer, tag);
+	this->fStartLineInput(tadsBuffer, tag);
 	while (qFrame->gameRunning() and not this->fInputReady) {
 		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 	}
@@ -359,7 +359,7 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 	}
 
 	extKey = 0;
-	this->startKeypressInput();
+	this->fStartKeypressInput();
 	if (useTimeout) {
 		QTime t;
 		t.start();

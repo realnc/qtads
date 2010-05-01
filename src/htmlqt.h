@@ -69,7 +69,7 @@ class CHtmlSysFontQt: public QFont, public CHtmlSysFont {
 	{ return this->fColor; }
 
 	HTML_color_t
-	htmlColor()
+	htmlColor() const
 	{ return HTML_make_color(this->fColor.red(), this->fColor.green(), this->fColor.blue()); }
 
 	void
@@ -83,7 +83,7 @@ class CHtmlSysFontQt: public QFont, public CHtmlSysFont {
 	{ return this->fBgColor; }
 
 	HTML_color_t
-	htmlBgColor()
+	htmlBgColor() const
 	{ return HTML_make_color(this->fBgColor.red(), this->fBgColor.green(), this->fBgColor.blue()); }
 
 	void
@@ -176,7 +176,8 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
   public slots:
 	// Replacement for main().  We need this so that we can start the Tads VM
 	// after the QApplication main event loop has started.
-	int main( int argc, char** argv );
+	void
+	main( int argc, char** argv );
 
   public:
 	CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
@@ -334,13 +335,13 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
   private slots:
 	void
-	showConfDialog();
+	fShowConfDialog();
 
 	void
-	hideConfDialog();
+	fHideConfDialog();
 
   protected:
-	void
+	virtual void
 	closeEvent( QCloseEvent* event );
 
   public:
@@ -414,10 +415,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 
   protected:
 	// Our display widget.
-	class QTadsDisplayWidget* fDispWidget;
-
-	// The formatter we're associated with.
-	//class CHtmlFormatter* fFormatter;
+	class QTadsDisplayWidget* dispWidget;
 
 	virtual void
 	keyPressEvent( QKeyEvent* event );
@@ -432,8 +430,9 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	~CHtmlSysWinQt();
 
 	// Returns our display widget.
-	class QTadsDisplayWidget* displayWidget()
-	{ return this->fDispWidget; }
+	class QTadsDisplayWidget*
+	displayWidget() const
+	{ return this->dispWidget; }
 
 	// Calculate and adjust the sizes of our child banners.  On entry,
 	// 'parentSize' contains the size of the full parent window area; on
@@ -448,7 +447,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 
 	// Our parent banner, if there is one.
 	CHtmlSysWinQt*
-	parentBanner()
+	parentBanner() const
 	{ return this->fParentBanner; }
 
 	//
@@ -612,8 +611,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	set_html_bg_image( class CHtmlResCacheObject* image );
 
 	virtual void
-	inval_html_bg_image( unsigned int x, unsigned int y, unsigned int wid,
-			     unsigned int ht );
+	inval_html_bg_image( unsigned int x, unsigned int y, unsigned int wid, unsigned int ht );
 
 	virtual void
 	set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width, long height,
@@ -671,10 +669,10 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	class CHtmlInputBuf* fTadsBuffer;
 
 	void
-	startLineInput( class CHtmlInputBuf* tadsBuffer, class CHtmlTagTextInput* tag );
+	fStartLineInput( class CHtmlInputBuf* tadsBuffer, class CHtmlTagTextInput* tag );
 
 	void
-	startKeypressInput();
+	fStartKeypressInput();
 
   protected:
 	virtual void
@@ -700,19 +698,18 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	bool
 	getInput( class CHtmlInputBuf* tadsBuffer );
 
-	/* Uses os_getc_raw() semantics, but with a timeout.
-	 *
-	 * If 'timeout' is 0 or negative, then the routine behaves exactly like
-	 * os_getc_raw().  If 'timeout' is positive, then we only wait for a key
-	 * for 'timeout' milliseconds.  If the operation times out before a key
-	 * has been pressed, we return 0 and set 'timedOut' to true.  If a key
-	 * is pressed before the timeout is reached, we return the same as
-	 * os_getc_raw() and set 'timedOut' to false.
-	 *
-	 * If an HREF events happens while we're waiting for input, -1 is returned.
-	 * The caller should use the pendingHrefEvent() method to get the HREF
-	 * event in this case.
-	 */
+	// Uses os_getc_raw() semantics, but with a timeout.
+	//
+	// If 'timeout' is 0 or negative, then the routine behaves exactly like
+	// os_getc_raw().  If 'timeout' is positive, then we only wait for a key
+	// for 'timeout' milliseconds.  If the operation times out before a key has
+	// been pressed, we return 0 and set 'timedOut' to true.  If a key is
+	// pressed before the timeout is reached, we return the same as
+	// os_getc_raw() and set 'timedOut' to false.
+	//
+	// If an HREF events happens while we're waiting for input, -1 is returned.
+	// The caller should use the pendingHrefEvent() method to get the HREF
+	// event in this case.
 	int
 	getKeypress( unsigned long timeout = 0, bool useTimeout = false, bool* timedOut = 0 );
 
@@ -792,18 +789,14 @@ class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
   public:
 	CHtmlSysImageMngQt()
 	: fDispSite(0)
-	{
-		connect(this, SIGNAL(updated(QRect)), this, SLOT(updateDisplay(QRect)));
-	}
+	{ connect(this, SIGNAL(updated(QRect)), this, SLOT(updateDisplay(QRect))); }
 
 	//
 	// CHtmlSysImageMng interface implementation.
 	//	
 	virtual void
 	set_display_site ( CHtmlSysImageDisplaySite* dispSite )
-	{
-		this->fDispSite = dispSite;
-	}
+	{ this->fDispSite = dispSite; }
 
 	virtual void
 	cancel_playback()
@@ -815,9 +808,7 @@ class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
 
 	virtual void
 	resume_playback()
-	{
-		this->setPaused(false);
-	}
+	{ this->setPaused(false); }
 
 	virtual void
 	draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
@@ -825,15 +816,11 @@ class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
 
 	virtual unsigned long
 	get_width() const
-	{
-		return this->frameRect().width();
-	}
+	{ return this->frameRect().width(); }
 
 	virtual unsigned long
 	get_height() const
-	{
-		return this->frameRect().height();
-	}
+	{ return this->frameRect().height(); }
 
 	virtual int
 	map_palette( CHtmlSysWin* win, int foreground )
@@ -895,28 +882,24 @@ class CHtmlSysSoundMidiQt: public CHtmlSysSoundMidi {
 
 	virtual int
 	maybe_suspend( CHtmlSysSound* )
-	{
-		// MIDI is exclusive - we can only play one MIDI sound at a time.  However,
-		// the current HTML TADS model only allows MIDI to play in one layer (the
-		// background layer) anyway, so we should never find ourselves wanting to
-		// play a MIDI sound while another MIDI sound is already active.  So, we'll
-		// just ignore this request entirely; the result will be that the new
-		// foreground sound will be unable to play.
-		//
-		// If at some point in the future the HTML TADS model changes to allow
-		// multiple layers of MIDI sounds, this part of this routine will have to
-		// have a real implementation.
-		return false;
-	}
+	// MIDI is exclusive - we can only play one MIDI sound at a time.  However,
+	// the current HTML TADS model only allows MIDI to play in one layer (the
+	// background layer) anyway, so we should never find ourselves wanting to
+	// play a MIDI sound while another MIDI sound is already active.  So, we'll
+	// just ignore this request entirely; the result will be that the new
+	// foreground sound will be unable to play.
+	//
+	// If at some point in the future the HTML TADS model changes to allow
+	// multiple layers of MIDI sounds, this part of this routine will have to
+	// have a real implementation.
+	{ return false; }
 
 	virtual void
 	resume()
-	{
-		// We never suspend MIDI, so there's nothing to do.  (See the notes
-		// in maybe_suspend() - if the model changes to require that MIDI
-		// suspension be implemented, we would have to provide a real
-		// implementation here.)
-	}
+	// We never suspend MIDI, so there's nothing to do.  (See the notes in
+	// maybe_suspend() - if the model changes to require that MIDI suspension
+	// be implemented, we would have to provide a real implementation here.)
+	{ }
 };
 
 

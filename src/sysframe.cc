@@ -96,7 +96,7 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 }
 
 
-int
+void
 CHtmlSysFrameQt::main( int argc, char** argv )
 {
 	// Filename of the game to run.
@@ -119,7 +119,7 @@ CHtmlSysFrameQt::main( int argc, char** argv )
 													"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
 		if (gameFileName.isNull()) {
 			this->exit(0);
-			return 0;
+			return;
 		}
 	}
 
@@ -138,7 +138,6 @@ CHtmlSysFrameQt::main( int argc, char** argv )
 
 	CHtmlSysFrame::set_frame_obj(0);
 	this->exit(ret);
-	return ret;
 }
 
 
