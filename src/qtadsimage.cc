@@ -40,8 +40,16 @@ QTadsImage::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, ht
 			targetHeight = this->height();
 		}
 		painter.drawImage(pos->left, pos->top, *this, 0, 0, targetWidth, targetHeight);
-	} else {
+		return;
+	}
+
+	if (mode == HTMLIMG_DRAW_STRETCH) {
 		// QPainter will scale it by default.
 		painter.drawImage(QRect(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top), *this);
+		return;
 	}
+
+	Q_ASSERT(mode == HTMLIMG_DRAW_TILE);
+	QPixmap pix(QPixmap::fromImage(*this));
+	painter.drawTiledPixmap(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top, pix);
 }
