@@ -22,6 +22,16 @@
 #include "qtadsconfdialog.h"
 
 
+void
+CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
+{
+	if (qFrame->gameWindow() != 0) {
+		qFrame->reformatBanners();
+		qFrame->adjustBannerSizes();
+	}
+}
+
+
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 : fConfDialog(0)
 {
@@ -40,13 +50,29 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	// Create a default status bar.
 	this->statusBar();
 
+	// Set up our central widget.
+	this->fScrollArea = new QScrollArea(this);
+	this->fScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	this->fScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	this->fScrollArea->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+	this->fScrollArea->setLineWidth(0);
+	this->fScrollArea->setContentsMargins(0, 0, 0, 0);
+	this->fScrollArea->setWidgetResizable(true);
+	this->fFrame = new QTadsFrame(this->fScrollArea);
+	this->fFrame->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+	this->fFrame->setLineWidth(0);
+	this->fFrame->setContentsMargins(0,0,0,0);
+	this->fScrollArea->setWidget(this->fFrame);
+	this->setCentralWidget(this->fScrollArea);
+	this->fScrollArea->show();
+
 	qWinGroup = this;
 }
 
 
 CHtmlSysWinGroupQt::~CHtmlSysWinGroupQt()
 {
-	qDebug() << Q_FUNC_INFO << "called";
+	qDebug() << Q_FUNC_INFO;
 
 	Q_ASSERT(qWinGroup != 0);
 
@@ -82,10 +108,10 @@ CHtmlSysWinGroupQt::fHideConfDialog()
 
 
 void
-CHtmlSysWinGroupQt::closeEvent( QCloseEvent* event )
+CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
 {
 	qFrame->setGameRunning(false);
-	event->accept();
+	e->accept();
 }
 
 

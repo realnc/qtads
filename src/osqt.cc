@@ -222,7 +222,7 @@ os_get_special_path( char* buf, size_t /*buflen*/, const char* /*argv0*/, int id
 int
 os_locate( const char* fname, int /*flen*/, const char* /*arg0*/, char* buf, size_t bufsiz )
 {
-	qDebug() << Q_FUNC_INFO << "\n Looking for:" << fname;
+	//qDebug() << Q_FUNC_INFO << "\n Looking for:" << fname;
 	Q_ASSERT(fname != 0);
 	Q_ASSERT(buf != 0);
 

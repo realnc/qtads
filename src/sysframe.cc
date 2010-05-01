@@ -63,9 +63,6 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 	this->fMainWin->setWindowTitle(appName);
 	connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 
-	this->fMainWin->resize(800, 600);
-	this->fMainWin->show();
-
 	qFrame = this;
 }
 
@@ -124,6 +121,8 @@ CHtmlSysFrameQt::main( int argc, char** argv )
 	}
 
 	CHtmlSysFrame::set_frame_obj(this);
+	this->fMainWin->resize(800, 600);
+	this->fMainWin->show();
 
 	QDir::setCurrent(QFileInfo(gameFileName).path());
 	int ret;
@@ -321,8 +320,9 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 int
 CHtmlSysFrameQt::runT2Game( const QString& fname )
 {
-	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, 0);
-	this->fMainWin->setCentralWidget(this->fGameWin);
+	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralFrame());
+	this->fGameWin->resize(qWinGroup->centralFrame()->size());
+	this->fGameWin->show();
 	this->fGameWin->setFocus();
 	this->fTads3 = false;
 
@@ -345,8 +345,9 @@ CHtmlSysFrameQt::runT2Game( const QString& fname )
 int
 CHtmlSysFrameQt::runT3Game( const QString& fname )
 {
-	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, 0);
-	this->fMainWin->setCentralWidget(this->fGameWin);
+	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralFrame());
+	this->fGameWin->resize(qWinGroup->centralFrame()->size());
+	this->fGameWin->show();
 	this->fGameWin->setFocus();
 	this->fTads3 = true;
 
@@ -363,7 +364,10 @@ CHtmlSysFrameQt::runT3Game( const QString& fname )
 void
 CHtmlSysFrameQt::adjustBannerSizes()
 {
-	QSize siz(qWinGroup->centralWidget()->size());
+	if (this->fGameWin == 0) {
+		return;
+	}
+	QRect siz(qWinGroup->centralFrame()->geometry());
 	this->fGameWin->calcChildBannerSizes(siz);
 }
 
@@ -371,6 +375,9 @@ CHtmlSysFrameQt::adjustBannerSizes()
 void
 CHtmlSysFrameQt::reformatBanners()
 {
+	if (this->fGameWin == 0) {
+		return;
+	}
 	this->fGameWin->get_formatter()->start_at_top(false);
 	this->fGameWin->do_formatting(false, false, false);
 	for (int i = 0; i < this->fBannerList.size(); ++i) {
@@ -390,8 +397,8 @@ void CHtmlSysFrameQt::pruneParseTree()
 	if (checkCount < 10) {
 		return;
 	}
-
 	checkCount = 0;
+
 	// Check to see if we're consuming too much memory - if not, there's
 	// nothing we need to do here.
 	if (this->fParser->get_text_array()->get_mem_in_use() < 65536) {
@@ -429,27 +436,25 @@ CHtmlSysFrameQt::get_parser()
 void
 CHtmlSysFrameQt::start_new_page()
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	// Don't bother if the game is quitting.
 	if (not this->fGameRunning) {
 		return;
 	}
 
-	//this->fFormatter->cancel_sound(HTML_Attrib_invalid, 0.0, false, true);
 	this->flush_txtbuf(true, false);
 	this->fFormatter->cancel_playback();
 	this->fParser->clear_page();
 	this->fFormatter->remove_all_banners(false);
 	this->fGameWin->notify_clear_contents();
-	this->adjustBannerSizes();
 	this->fFormatter->start_at_top(true);
-
 	this->fGameWin->do_formatting(false, true, false);
 	for (int i = 0; i < this->fBannerList.size(); ++i) {
 		this->fBannerList.at(i)->get_formatter()->start_at_top(true);
 		this->fBannerList.at(i)->do_formatting(false, true, false);
 	}
+	this->adjustBannerSizes();
 }
 
 
@@ -566,7 +571,7 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
 textchar_t
 CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	static int pendingCmd = 0;
 	int ret;
@@ -576,7 +581,7 @@ CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
 	if (pendingCmd != 0) {
 		ret = pendingCmd;
 		pendingCmd = 0;
-		qDebug() << ret;
+		//qDebug() << ret;
 		return ret;
 	}
 
@@ -608,7 +613,7 @@ CHtmlSysFrameQt::pause_for_exit()
 void
 CHtmlSysFrameQt::pause_for_more()
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	// Display a permanent QLabel instead of a temporary message.  This allows
 	// other status bar messages (like when hovering over hyperlinks) to
@@ -638,10 +643,10 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 	//qDebug() << Q_FUNC_INFO;
 	//return 0;
 
-	qDebug() << "Creating new banner. parent:" << parent << "type:" << window_type << "where:" << where
-			<< "other:" << other << "pos:" << pos << "style:" << style;
+	//qDebug() << "Creating new banner. parent:" << parent << "type:" << window_type << "where:" << where
+	//		<< "other:" << other << "pos:" << pos << "style:" << style;
 
-	CHtmlSysWinQt* banner = new CHtmlSysWinQt(formatter, 0, 0);
+	CHtmlSysWinQt* banner = new CHtmlSysWinQt(formatter, 0, qWinGroup->centralFrame());
 
 	if (style & OS_BANNER_STYLE_VSCROLL) {
 		banner->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -662,8 +667,7 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 	// parent, we must behave as if OS_BANNER_LAST were specified.
 	if (where == OS_BANNER_BEFORE or where == OS_BANNER_AFTER) {
 		Q_ASSERT(other != 0);
-		if ((parent == 0) or castParent->parentWidget()->layout()->indexOf(castOther) == -1) {
-			// 'other' is not a child banner of 'parent'.
+		if ((parent == 0) or castOther->parentBanner() != parent) {
 			where = OS_BANNER_LAST;
 		}
 	}
@@ -674,7 +678,6 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 
 	castParent->addBanner(banner, where, castOther, pos, style);
 	this->fBannerList.append(banner);
-	banner->setFocus();
 	return banner;
 }
 
@@ -682,7 +685,7 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 void
 CHtmlSysFrameQt::orphan_banner_window( CHtmlFormatterBannerExt* banner )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 
 	os_banner_delete(banner);
 }
@@ -699,7 +702,7 @@ CHtmlSysFrameQt::create_aboutbox_window( CHtmlFormatter* formatter )
 void
 CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(static_cast<CHtmlSysWinQt*>(win)->parentBanner() != 0);
 	this->fBannerList.removeAll(static_cast<CHtmlSysWinQt*>(win));
 	static_cast<CHtmlSysWinQt*>(win)->parentBanner()->setFocus();

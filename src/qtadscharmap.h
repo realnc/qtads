@@ -34,6 +34,7 @@
 #include <QTextCodec>
 #include <QByteArray>
 #include <QString>
+#include <QDebug>
 
 #include "charmap.h"
 
@@ -227,7 +228,7 @@ inline size_t
 QTadsCharmapToUni::map2( char** output_ptr, size_t* output_buf_len, const char* input_ptr,
                          size_t input_len, size_t* partial_len ) const
 {
-	qDebug("QTadsCharmapToUni::map2() called");
+	qDebug() << Q_FUNC_INFO;
 	// No idea how to implement that one.
 	*partial_len = 0;
 	return this->map(output_ptr, output_buf_len, input_ptr, input_len);

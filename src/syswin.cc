@@ -18,6 +18,7 @@
 #include <QBoxLayout>
 #include <QPainter>
 #include <QScrollBar>
+#include <QResizeEvent>
 
 #include "htmlqt.h"
 #include "qtadsdispwidget.h"
@@ -30,8 +31,7 @@
 
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QTadsDisplayWidget* dispWidget, QWidget* parent )
 : QScrollArea(parent), CHtmlSysWin(formatter), fBannerSize(0), fBannerSizeUnits(HTML_BANNERWIN_UNITS_PIX),
-  fDontReformat(0), fVFrame(0), fHFrame(0), fVLine(0), fHLine(0), fVLayout(0), fHLayout(0), fParentBanner(0),
-  fMargins(8, 2, 8, 2), fBgImage(0)
+  fDontReformat(0), fParentBanner(0), fMargins(8, 2, 8, 2), fBgImage(0)
 {
 	if (dispWidget == 0) {
 		this->dispWidget = new QTadsDisplayWidget(this, formatter);
@@ -68,13 +68,6 @@ CHtmlSysWinQt::~CHtmlSysWinQt()
 	if (this->fParentBanner != 0) {
 		this->fParentBanner->fChildBanners.removeAll(this);
 	}
-
-	//if (this->fVFrame != 0) delete this->fVFrame;
-	//if (this->fVLayout != 0) delete this->fVLayout;
-	//if (this->fVLine != 0) delete this->fVLine;
-	//if (this->fHFrame != 0) delete this->fHFrame;
-	//if (this->fHLayout != 0) delete this->fHLayout;
-	//if (this->fHLine != 0) delete this->fHLine;
 }
 
 
@@ -91,23 +84,23 @@ CHtmlSysWinQt::resizeEvent( QResizeEvent* event )
 	if (this->fDontReformat == 0) {
 		this->formatter_->start_at_top(false);
 		this->do_formatting(true, false, true);
-		qFrame->adjustBannerSizes();
+		this->displayWidget()->resize(this->formatter_->get_outer_max_line_width(), this->displayWidget()->height());
 	}
 	QScrollArea::resizeEvent(event);
 }
 
 
 void
-CHtmlSysWinQt::calcChildBannerSizes( QSize& parentSize )
+CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 {
 	//qDebug() << Q_FUNC_INFO;
 	++this->fDontReformat;
 
-	QSize newSize;
-	QSize oldSize;
+	QRect newSize;
+	QRect oldSize;
 
 	// Get our current size.
-	oldSize = this->size();
+	oldSize = this->geometry();
 
 	// Start off assuming we'll take the entire parent area.  If we're a
 	// top-level window, we'll leave it exactly like that.  If we're a banner,
@@ -172,18 +165,38 @@ CHtmlSysWinQt::calcChildBannerSizes( QSize& parentSize )
 			ht = parentSize.height();
 		}
 
-		// Resize our and the parent area according to our alignment type.
-		switch (this->fBannerPos) {
-		  case HTML_BANNERWIN_POS_TOP:
-		  case HTML_BANNERWIN_POS_BOTTOM:
-			newSize.setHeight(ht);
-			parentSize.setHeight(parentSize.height() - ht);
+		// Position the banner according to our alignment type.
+		switch(this->fBannerPos) {
+		case HTML_BANNERWIN_POS_TOP:
+			// Align the banner at the top of the window.
+			newSize.setBottom(newSize.top() + ht);
+
+			// Take the space out of the top of the parent window.
+			parentSize.setTop(parentSize.top() + ht);
 			break;
 
-		  case HTML_BANNERWIN_POS_LEFT:
-		  case HTML_BANNERWIN_POS_RIGHT:
-			newSize.setWidth(wid);
-			parentSize.setWidth(parentSize.width() - wid);
+		case HTML_BANNERWIN_POS_BOTTOM:
+			// Align the banner at the bottom of the window.
+			newSize.setTop((newSize.top() + newSize.height()) - ht);
+
+			// Take the space out of the bottom of the parent area.
+			parentSize.setBottom((parentSize.top() + parentSize.height()) - ht);
+			break;
+
+		case HTML_BANNERWIN_POS_LEFT:
+			// Align the banner at the left of the window.
+			newSize.setRight(newSize.left() + wid);
+
+			// Take the space from the left of the parent window.
+			parentSize.setLeft(parentSize.left() + wid);
+			break;
+
+		case HTML_BANNERWIN_POS_RIGHT:
+			// Align the banner at the right of the window.
+			newSize.setLeft(newSize.left() + newSize.width() - wid);
+
+			// Take the space from the right of the parent window.
+			parentSize.setRight(parentSize.left() + parentSize.width() - wid);
 			break;
 		}
 	}
@@ -195,36 +208,11 @@ CHtmlSysWinQt::calcChildBannerSizes( QSize& parentSize )
 		this->fChildBanners.at(i)->calcChildBannerSizes(newSize);
 	}
 
-	// If we're the main game window and our new size is 0 or less in any
-	// dimension, then we should hide completely.
-	//qDebug() << newSize;
-	if (this == qFrame->gameWindow()) {
-		// We're the main game window.
-		if (newSize.height() > 0 and newSize.width() > 0) {
-			if (this->isHidden()) {
-				this->show();
-				this->setFocus();
-			}
-		} else if (not this->isHidden()) {
-			this->hide();
-			// Switch focus to our first child, otherwise it's not possible
-			// for the user to input anything.
-			Q_ASSERT(this->fChildBanners.at(0) != 0);
-			this->fChildBanners.at(0)->setFocus();
-		}
-	} else if (this->fBannerPos == HTML_BANNERWIN_POS_TOP or this->fBannerPos == HTML_BANNERWIN_POS_BOTTOM) {
-		// We're a horizontal banner.
-		//if (newSize.height() != this->minimumHeight()) {
-			this->setMinimumHeight(newSize.height());
-			this->setMaximumHeight(newSize.height());
-		//}
-	} else {
-		// We're a vertical banner.
-		//if (newSize.width() != this->minimumWidth()) {
-			this->setMinimumWidth(newSize.width());
-			this->setMaximumWidth(newSize.width());
-		//}
+	// Set our new window position if it differs from the old one.
+	if (newSize != oldSize) {
+		this->setGeometry(newSize);
 	}
+
 	qFrame->gameWindow()->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 	--this->fDontReformat;
 }
@@ -235,122 +223,15 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other
 						  unsigned long style )
 {
 	Q_ASSERT(banner->fParentBanner == 0);
+
 	banner->fParentBanner = this;
-
-	// Don't try to reformat while we're in here or we'll crash and burn.
-	++this->fDontReformat;
-
-	QWidget* frame;
-	QBoxLayout* layout;
-	QWidget* oldCentralWidget = qWinGroup->centralWidget();
-
 	banner->fBannerPos = pos;
-	banner->fStyle = style;
-
-	if (qWinGroup->centralWidget() == this) {
-		// No banners exist yet.  Set up a new frame and layout and use the
-		// new frame as the main window's central widget.
-		frame = new QWidget;
-		if (pos == HTML_BANNERWIN_POS_TOP or pos == HTML_BANNERWIN_POS_BOTTOM) {
-			layout = new QVBoxLayout(frame);
-		} else {
-			layout = new QHBoxLayout(frame);
-		}
-		switch (pos) {
-		  case HTML_BANNERWIN_POS_TOP:
-		  case HTML_BANNERWIN_POS_BOTTOM:
-			this->fVLayout = static_cast<QVBoxLayout*>(layout);
-			this->fVFrame = frame;
-			break;
-
-		  case HTML_BANNERWIN_POS_LEFT:
-		  case HTML_BANNERWIN_POS_RIGHT:
-			this->fHLayout = static_cast<QHBoxLayout*>(layout);
-			this->fHFrame = frame;
-			break;
-
-		  default:
-			// TODO: Be graceful.
-			qFatal("Unknonwn HTML_BannerWin_Pos_t.");
-		}
-		layout->addWidget(this);
-	} else {
-		switch (pos) {
-		  case HTML_BANNERWIN_POS_TOP:
-		  case HTML_BANNERWIN_POS_BOTTOM:
-			if (this->fVFrame == 0) {
-				this->fVFrame = new QWidget;
-				this->fVLayout = new QVBoxLayout(this->fVFrame);
-				this->fVLayout->addWidget(oldCentralWidget);
-			}
-			frame = this->fVFrame;
-			layout = this->fVLayout;
-			break;
-
-		  case HTML_BANNERWIN_POS_LEFT:
-		  case HTML_BANNERWIN_POS_RIGHT:
-			if (this->fHFrame == 0) {
-				this->fHFrame = new QWidget;
-				this->fHLayout = new QHBoxLayout(this->fHFrame);
-				this->fHLayout->addWidget(oldCentralWidget);
-			}
-			layout = this->fHLayout;
-			frame = this->fHFrame;
-			break;
-
-		  default:
-			// TODO: Be graceful.
-			qFatal("Unknonwn HTML_BannerWin_Pos_t.");
-		}
-	}
-
-	layout->setSpacing(0);
-	layout->setContentsMargins(0, 0, 0, 0);
-
-	//qDebug() << "INDEX INSIDE LAYOUT:" << layout->indexOf(this);
-
-	switch (where) {
-	  case OS_BANNER_FIRST:
-		//qDebug() << "OS_BANNER_FIRST";
-		if (pos == HTML_BANNERWIN_POS_TOP or pos == HTML_BANNERWIN_POS_LEFT) {
-			layout->insertWidget(layout->indexOf(this), banner);
-		} else {
-			layout->insertWidget(layout->indexOf(this) + 1, banner);
-		}
-		break;
-
-	  case OS_BANNER_LAST:
-		//qDebug() << "OS_BANNER_LAST";
-		if (pos == HTML_BANNERWIN_POS_TOP or pos == HTML_BANNERWIN_POS_LEFT) {
-			//qDebug() << "TOP or LEFT";
-			layout->insertWidget(layout->indexOf(this), banner);
-		} else {
-			//qDebug() << "BOTTOM or RIGHT";
-			layout->insertWidget(layout->indexOf(this) + 2, banner);
-		}
-		break;
-
-	  case OS_BANNER_BEFORE:
-		Q_ASSERT(other != 0);
-		abort();
-		layout->insertWidget(layout->indexOf(other), banner);
-		break;
-
-	  case OS_BANNER_AFTER:
-		Q_ASSERT(other != 0);
-		abort();
-		layout->insertWidget(layout->indexOf(other) - 1, banner);
-		break;
-
-	  default:
-		qFatal("Unknown value for 'where' in addBanner()");
-	}
-
-	qWinGroup->setCentralWidget(frame);
-	qWinGroup->centralWidget()->show();
+	banner->fBannerStyle = style;
+	banner->fBannerWhere = where;
+	banner->setGeometry(this->geometry());
+	banner->viewport()->setGeometry(this->geometry());
 	Q_ASSERT(not this->fChildBanners.contains(banner));
 	this->fChildBanners.append(banner);
-	--this->fDontReformat;
 }
 
 
@@ -613,6 +494,8 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	if (freeze_display) {
 		this->formatter_->freeze_display(false);
 	}
+
+	//this->displayWidget()->resize(this->formatter_->get_outer_max_line_width(), this->displayWidget()->height());
 
 	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 	if (update_win) {
@@ -983,22 +866,23 @@ CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, 
 	}
 
 	Q_ASSERT(this->fParentBanner != 0);
-
-	QBoxLayout* castLayout = static_cast<QBoxLayout*>(this->parentWidget()->layout());
-	if (castLayout->direction() == QBoxLayout::TopToBottom or castLayout->direction() == QBoxLayout::BottomToTop) {
+	if (this->fBannerPos == HTML_BANNERWIN_POS_TOP or this->fBannerPos == HTML_BANNERWIN_POS_BOTTOM) {
 		if (not use_height) {
 			return;
 		}
 		this->fBannerSize = height;
 		this->fBannerSizeUnits = height_units;
 	} else {
+		Q_ASSERT(this->fBannerPos == HTML_BANNERWIN_POS_LEFT or this->fBannerPos == HTML_BANNERWIN_POS_RIGHT);
 		if (not use_width) {
 			return;
 		}
 		this->fBannerSize = width;
 		this->fBannerSizeUnits = width_units;
 	}
+	//this->show();
 	qFrame->adjustBannerSizes();
+	this->show();
 	return;
 }
 
@@ -1009,7 +893,7 @@ CHtmlSysWinQt::set_banner_info( HTML_BannerWin_Pos_t pos, unsigned long style )
 	//qDebug() << Q_FUNC_INFO;
 
 	this->fBannerPos = pos;
-	this->fStyle = style;
+	this->fBannerStyle = style;
 }
 
 
@@ -1018,5 +902,5 @@ CHtmlSysWinQt::get_banner_info( HTML_BannerWin_Pos_t* pos, unsigned long* style 
 {
 	//qDebug() << Q_FUNC_INFO;
 	*pos = this->fBannerPos;
-	*style = this->fStyle;
+	*style = this->fBannerStyle;
 }

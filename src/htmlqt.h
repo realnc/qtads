@@ -331,7 +331,20 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	Q_OBJECT
 
   private:
+	class QTadsFrame: public QFrame {
+	  protected:
+		virtual void
+		resizeEvent( QResizeEvent* e );
+
+	  public:
+		QTadsFrame( QWidget* parent )
+		: QFrame(parent)
+		{ }
+	};
+
 	class QTadsConfDialog* fConfDialog;
+	QScrollArea* fScrollArea;
+	QTadsFrame* fFrame;
 
   private slots:
 	void
@@ -342,13 +355,18 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
   protected:
 	virtual void
-	closeEvent( QCloseEvent* event );
+	closeEvent( QCloseEvent* e );
 
   public:
 	CHtmlSysWinGroupQt();
 
 	virtual
 	~CHtmlSysWinGroupQt();
+
+	QFrame*
+	centralFrame() const
+	{ return this->fFrame; }
+
 
 	//
 	// CHtmlSysWinGroup interface implementation.
@@ -366,13 +384,15 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	Q_OBJECT
 
   private:
-	// If we're a banner, what is our HTML_BannerWin_Pos_t and style?
+	// If we're a banner, what is our HTML_BannerWin_Pos_t, style and
+	// placement.
 	//
 	// Note: To determine whether we're a banner, we don't use a flag but
 	// simply check whether "this == qFrame->gameWindow()"; if we're the game
 	// window, we can't be a banner.
 	HTML_BannerWin_Pos_t fBannerPos;
-	unsigned long fStyle;
+	unsigned long fBannerStyle;
+	int fBannerWhere;
 
 	// Banner size information, if we are a banner.  This is either our width
 	// or height, according to our alignment type (vertical or horizontal).
@@ -384,19 +404,6 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	// process, the formatter will call the banner-creating routine again and
 	// we will crash due to the re-entrancy.
 	int fDontReformat;
-
-	// Frames and layouts for our adjacent banners, if there are any.  We can
-	// have rows and columns of banners attached to us in vertical and
-	// horizontal directions.  We keep child banners inside a frame and assign
-	// it its own layout.  This allows for an infinite number of banners being
-	// added recursively.  We also need a frame that does nothing except draw a
-	// line; this is needed for banners that have a border.
-	QWidget* fVFrame;
-	QWidget* fHFrame;
-	QFrame* fVLine;
-	QFrame* fHLine;
-	class QVBoxLayout* fVLayout;
-	class QHBoxLayout* fHLayout;
 
 	// Our parent banner, if any.  This is 0 if we don't have one.
 	CHtmlSysWinQt* fParentBanner;
@@ -439,7 +446,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	// return, it is updated to indicate the final size of the parent banner's
 	// area after deducting the space carved out for children.
 	void
-	calcChildBannerSizes( QSize& parentSize );
+	calcChildBannerSizes( QRect& parentSize );
 
 	void
 	addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other, HTML_BannerWin_Pos_t pos,
@@ -828,11 +835,11 @@ class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
 
 	virtual void
 	notify_timer()
-	{ qDebug() << Q_FUNC_INFO << "called"; }
+	{ qDebug() << Q_FUNC_INFO; }
 
 	virtual void
 	notify_image_change( int x, int y, int wid, int ht )
-	{ qDebug() << Q_FUNC_INFO << "called"; }
+	{ qDebug() << Q_FUNC_INFO; }
 };
 
 
