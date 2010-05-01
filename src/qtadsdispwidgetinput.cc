@@ -45,14 +45,9 @@ QTadsDisplayWidgetInput::paintEvent( QPaintEvent* e )
 
 	QTadsDisplayWidget::paintEvent(e);
 	QPainter painter(this);
-	if (this->fCursorVisible) {
-		if (this->fBlinkVisible) {
-			// Blink out.
-			painter.drawLine(this->fCursorPos.x(), this->fCursorPos.y()+2,
-							 this->fCursorPos.x(), this->fCursorPos.y()+18);
-		} else {
-			// Blink in.
-		}
+	if (this->fCursorVisible and this->fBlinkVisible) {
+		painter.drawLine(this->fCursorPos.x(), this->fCursorPos.y()+2,
+						 this->fCursorPos.x(), this->fCursorPos.y()+18);
 	}
 }
 
@@ -69,9 +64,8 @@ void
 QTadsDisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* tadsBuffer,
 										  CHtmlTagTextInput* tag )
 {
-	CHtmlPoint cursorPos;
 	this->fParentSysWin->do_formatting(false, false, false);
-	cursorPos = formatter->get_text_pos(tag->get_text_ofs() + tadsBuffer->get_caret());
+	CHtmlPoint cursorPos = formatter->get_text_pos(tag->get_text_ofs() + tadsBuffer->get_caret());
 	//qDebug() << "Moving cursor to x:" << cursorPos.x << "y:" << cursorPos.y;
 	//qDebug() << "caret position:" << tadsBuffer->get_caret();
 	this->moveCursorPos(QPoint(cursorPos.x, cursorPos.y));
@@ -89,6 +83,9 @@ QTadsDisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputB
 		this->fBlinkCursor();
 	}
 
-	const CHtmlRect& itemRect = formatter->find_by_pos(cursorPos, false)->get_pos();
-	this->update(0, itemRect.top, this->width(), itemRect.bottom - itemRect.top);
+	CHtmlDisp* disp = formatter->find_by_pos(cursorPos, false);
+	if (disp != 0) {
+		const CHtmlRect& itemRect = disp->get_pos();
+		this->update(0, itemRect.top, this->width(), itemRect.bottom - itemRect.top);
+	}
 }
