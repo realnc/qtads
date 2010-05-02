@@ -524,7 +524,7 @@ CHtmlSysWinQt::register_timer_func( void (*timer_func)(void*), void* func_ctx )
 	timer->setSingleShot(false);
 	timer->set_repeating(true);
 	timer->set_active(true);
-	timer->start(1200);
+	timer->start(1000);
 	this->fTimerList.append(timer);
 }
 
