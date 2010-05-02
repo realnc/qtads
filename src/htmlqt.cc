@@ -204,10 +204,12 @@ void
 QTadsSound::callback( int channel )
 {
 	QTadsSound* mObj = 0;
+	int index;
 	// Find the object that uses the specified channel.
 	for (int i = 0; i < fObjList.size() and mObj == 0; ++i) {
 		if (fObjList.at(i)->fChannel == channel) {
 			mObj = fObjList.at(i);
+			index = i;
 		}
 	}
 
@@ -226,7 +228,9 @@ QTadsSound::callback( int channel )
 		//qDebug() << "Invoking callback - repeats:" << mObj->fRepeats;
 		mObj->fDone_func(mObj->fDone_func_ctx, mObj->fRepeats);
 	}
-	fObjList.removeAll(mObj);
+	// Remove the object from the list.  Since it can be included several
+	// times, remove only the instance with the correct channel.
+	fObjList.removeAt(index);
 }
 
 
@@ -241,7 +245,6 @@ QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done
 								int vol )
 {
 	Q_ASSERT(not this->fPlaying);
-	Q_ASSERT(not QTadsSound::fObjList.contains(this));
 
 	// Adjust volume if it exceeds min/max levels.
 	if (vol < 0) {
