@@ -125,7 +125,7 @@ os_prev_char( oshtml_charset_id_t id, const textchar_t* p, const textchar_t* pst
  */
 
 /* system timer datatype */
-typedef unsigned long os_timer_t;
+typedef long os_timer_t;
 
 /* get the current system time value */
 os_timer_t os_get_time();

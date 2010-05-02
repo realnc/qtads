@@ -60,5 +60,5 @@ os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t*
 os_timer_t
 os_get_time()
 {
-	return QTime::currentTime().elapsed();
+	return os_get_sys_clock_ms();
 }

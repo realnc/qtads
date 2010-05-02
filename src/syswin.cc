@@ -522,7 +522,9 @@ CHtmlSysWinQt::register_timer_func( void (*timer_func)(void*), void* func_ctx )
 {
 	QTadsTimer* timer = new QTadsTimer(timer_func, func_ctx, this);
 	timer->setSingleShot(false);
-	timer->start(1000);
+	timer->set_repeating(true);
+	timer->set_active(true);
+	timer->start(1200);
 	this->fTimerList.append(timer);
 }
 
@@ -533,6 +535,7 @@ CHtmlSysWinQt::unregister_timer_func( void (*timer_func)( void * ), void* func_c
 	for (int i = 0; i < this->fTimerList.size(); ++i) {
 		if (this->fTimerList.at(i)->func_ == timer_func) {
 			delete this->fTimerList.takeAt(i);
+			return;
 		}
 	}
 }

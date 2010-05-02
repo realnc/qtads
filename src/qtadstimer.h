@@ -25,27 +25,20 @@
 class QTadsTimer: public QTimer, public CHtmlSysTimer {
 	Q_OBJECT
 
-  private:
-	// Callback routine, if any.
-	void (*fCallback)(void*);
-
-	// Context data to pass as argument to the callback.
-	void* fContext;
-
   public slots:
 	// We connect the timeout() signal to this slot.
 	void
 	trigger()
 	{
 		// If we have a callback, call it.
-		if (this->fCallback != 0) {
-			this->fCallback(this->fContext);
+		if (this->func_ != 0) {
+			this->invoke_callback();
 		}
 	}
 
   public:
 	QTadsTimer( void (*func)(void*), void* ctx, QObject* parent = 0 )
-	: QTimer(parent), CHtmlSysTimer(func, ctx), fCallback(func), fContext(ctx)
+	: QTimer(parent), CHtmlSysTimer(func, ctx)
 	{
 		connect(this, SIGNAL(timeout()), this, SLOT(trigger()));
 	}
