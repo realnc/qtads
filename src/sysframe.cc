@@ -34,7 +34,7 @@
 
 CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion,
 								  const char* orgName, const char* orgDomain )
-: QApplication(argc, argv), fGameRunning(false)
+: QApplication(argc, argv), fGameWin(0), fGameRunning(false)
 {
 
 	//qDebug() << Q_FUNC_INFO;

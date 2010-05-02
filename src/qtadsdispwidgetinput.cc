@@ -66,8 +66,6 @@ QTadsDisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputB
 {
 	this->fParentSysWin->do_formatting(false, false, false);
 	CHtmlPoint cursorPos = formatter->get_text_pos(tag->get_text_ofs() + tadsBuffer->get_caret());
-	//qDebug() << "Moving cursor to x:" << cursorPos.x << "y:" << cursorPos.y;
-	//qDebug() << "caret position:" << tadsBuffer->get_caret();
 	this->moveCursorPos(QPoint(cursorPos.x, cursorPos.y));
 
 	// Update the selection range in the formatter.
