@@ -17,6 +17,8 @@
 
 #include <QTimer>
 #include <QMetaType>
+#include <QFile>
+#include <QFileDialog>
 
 #include "os.h"
 #include "tadshtml.h"
@@ -33,6 +35,33 @@
 #endif
 int main( int argc, char** argv )
 {
+	CHtmlResType::add_basic_types();
+	CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", "2.0", "Nikos Chantziaras",
+											   "qtads.sourceforge.net");
+
+	// Filename of the game to run.
+	QString gameFileName;
+
+	if (argc == 2) {
+		if (QFile::exists(QString::fromLocal8Bit(argv[1]))) {
+			gameFileName = QString::fromLocal8Bit(argv[1]);
+		} else if (QFile::exists(QString::fromLocal8Bit(argv[1]) + ".gam")) {
+			gameFileName = QString::fromLocal8Bit(argv[1]) + ".gam";
+		} else if (QFile::exists(QString::fromLocal8Bit(argv[1]) + ".t3")) {
+			gameFileName = QString::fromLocal8Bit(argv[1]) + ".t3";
+		} else {
+			qWarning().nospace() << "File '" << argv[1] << "' not found.";
+		}
+	}
+
+	if (gameFileName.isEmpty()) {
+		gameFileName = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run", "",
+													"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
+		if (gameFileName.isNull()) {
+			return 0;
+		}
+	}
+
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
 		qWarning("Unable to initialize sound system: %s", SDL_GetError());
 		return 1;
@@ -91,11 +120,7 @@ int main( int argc, char** argv )
 	}
 	*/
 
-	CHtmlResType::add_basic_types();
-	CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", "2.0", "Nikos Chantziaras",
-											   "qtads.sourceforge.net");
-	qRegisterMetaType<char**>("char**");
-	QMetaObject::invokeMethod(app, "main", Qt::QueuedConnection, Q_ARG(int, argc), Q_ARG(char**, argv));
+	QMetaObject::invokeMethod(app, "main", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
 	int ret = app->exec();
 
 	delete app;

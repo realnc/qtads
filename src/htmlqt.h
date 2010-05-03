@@ -177,7 +177,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// Replacement for main().  We need this so that we can start the Tads VM
 	// after the QApplication main event loop has started.
 	void
-	main( int argc, char** argv );
+	main( QString gameFileName );
 
   public:
 	CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,

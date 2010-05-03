@@ -18,7 +18,7 @@
 #include <QLayout>
 #include <QLabel>
 #include <QStatusBar>
-#include <QFileDialog>
+#include <QDir>
 
 #include "htmlqt.h"
 #include "qtadshostifc.h"
@@ -94,32 +94,8 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 
 
 void
-CHtmlSysFrameQt::main( int argc, char** argv )
+CHtmlSysFrameQt::main( QString gameFileName )
 {
-	// Filename of the game to run.
-	QString gameFileName;
-
-	if (argc == 2) {
-		if (QFile::exists(QString::fromLocal8Bit(argv[1]))) {
-			gameFileName = QString::fromLocal8Bit(argv[1]);
-		} else if (QFile::exists(QString::fromLocal8Bit(argv[1]) + ".gam")) {
-			gameFileName = QString::fromLocal8Bit(argv[1]) + ".gam";
-		} else if (QFile::exists(QString::fromLocal8Bit(argv[1]) + ".t3")) {
-			gameFileName = QString::fromLocal8Bit(argv[1]) + ".t3";
-		} else {
-			qWarning().nospace() << "File '" << argv[1] << "' not found.";
-		}
-	}
-
-	if (gameFileName.isEmpty()) {
-		gameFileName = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run", "",
-													"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
-		if (gameFileName.isNull()) {
-			this->exit(0);
-			return;
-		}
-	}
-
 	CHtmlSysFrame::set_frame_obj(this);
 	this->fMainWin->resize(800, 600);
 	this->fMainWin->show();
