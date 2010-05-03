@@ -246,7 +246,12 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	{
 		// DeferredDelete events need to be dispatched manually, since we don't
 		// return to the main event loop while a game is running.
+#ifndef Q_WS_MAC
+		// On OS X, this causes CPU utilization to go through the roof.  Not
+		// sure why.  Disable this for now on OS X until further information
+		// is available on this.
 		this->sendPostedEvents(0, QEvent::DeferredDelete);
+#endif
 		this->sendPostedEvents();
 		this->processEvents(flags);
 		this->sendPostedEvents();
@@ -256,7 +261,9 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	void
 	advanceEventLoop( QEventLoop::ProcessEventsFlags flags, int maxtime )
 	{
+#ifndef Q_WS_MAC
 		this->sendPostedEvents(0, QEvent::DeferredDelete);
+#endif
 		this->sendPostedEvents();
 		this->processEvents(flags, maxtime);
 		this->sendPostedEvents();
