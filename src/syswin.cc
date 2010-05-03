@@ -229,6 +229,8 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other
 	banner->fBannerStyle = style;
 	banner->fBannerWhere = where;
 	banner->setGeometry(this->geometry());
+	// Qt will not update the viewport() geometry unless the widget is shown
+	// first.
 	banner->show();
 	banner->hide();
 	Q_ASSERT(not this->fChildBanners.contains(banner));
