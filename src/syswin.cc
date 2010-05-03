@@ -229,7 +229,8 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other
 	banner->fBannerStyle = style;
 	banner->fBannerWhere = where;
 	banner->setGeometry(this->geometry());
-	banner->viewport()->setGeometry(this->geometry());
+	banner->show();
+	banner->hide();
 	Q_ASSERT(not this->fChildBanners.contains(banner));
 	this->fChildBanners.append(banner);
 }
