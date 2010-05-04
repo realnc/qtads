@@ -635,7 +635,7 @@ os_get_sys_clock_ms( void )
 void
 os_sleep_ms( long ms )
 {
-	if (not qFrame->gameRunning()) {
+	if (not qFrame->gameRunning() or ms < 1) {
 		return;
 	}
 
