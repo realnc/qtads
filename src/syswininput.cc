@@ -351,13 +351,6 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 	// Clear any pending HREF event.
 	this->fHrefEvent.clear();
 
-	// Windows HTML TADS seems to always wait for about 50ms minimum.  In order
-	// to provide the same behavior, we artificially bump the minimum allowed
-	// value to 48.
-	if (useTimeout and timeout < 48) {
-		timeout = 48;
-	}
-
 	extKey = 0;
 	this->fStartKeypressInput();
 	if (useTimeout) {

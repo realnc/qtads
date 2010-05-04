@@ -635,15 +635,8 @@ os_get_sys_clock_ms( void )
 void
 os_sleep_ms( long ms )
 {
-	if (not qFrame->gameRunning() or ms < 1) {
+	if (not qFrame->gameRunning()) {
 		return;
-	}
-
-	// Windows HTML TADS seems to always wait for about 50ms minimum.  In order
-	// to provide the same behavior, we artificially bump the minimum allowed
-	// value to 48.
-	if (ms < 48) {
-		ms = 48;
 	}
 
 	QEventLoop idleLoop;
