@@ -10,6 +10,17 @@ rewritten.  For now, build QTads with:
 
 Do not try "make install".  Just run the qtads binary from the build directory.
 
+For it to build correctly, you will need to have the needed libraries along
+with their development headers/tools installed.  At this time, this would be:
+
+  Qt4 GUI module
+  Qt4 development tools (qmake, uic, etc.)
+  SDL
+  SDL_mixer
+  SMPEG
+
+Most Linux distributions provide the development versions in packages that have
+"-dev" appended to the package name.
 
 
 
