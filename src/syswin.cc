@@ -172,7 +172,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 			newSize.setBottom(newSize.top() + ht);
 
 			// Take the space out of the top of the parent window.
-			parentSize.setTop(parentSize.top() + ht);
+			parentSize.setTop(parentSize.top() + ht + 1);
 			break;
 
 		case HTML_BANNERWIN_POS_BOTTOM:
@@ -180,7 +180,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 			newSize.setTop((newSize.top() + newSize.height()) - ht);
 
 			// Take the space out of the bottom of the parent area.
-			parentSize.setBottom((parentSize.top() + parentSize.height()) - ht);
+			parentSize.setBottom((parentSize.top() + parentSize.height()) - ht - 1);
 			break;
 
 		case HTML_BANNERWIN_POS_LEFT:
@@ -188,7 +188,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 			newSize.setRight(newSize.left() + wid);
 
 			// Take the space from the left of the parent window.
-			parentSize.setLeft(parentSize.left() + wid);
+			parentSize.setLeft(parentSize.left() + wid + 1);
 			break;
 
 		case HTML_BANNERWIN_POS_RIGHT:
@@ -196,7 +196,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 			newSize.setLeft(newSize.left() + newSize.width() - wid);
 
 			// Take the space from the right of the parent window.
-			parentSize.setRight(parentSize.left() + parentSize.width() - wid);
+			parentSize.setRight(parentSize.left() + parentSize.width() - wid - 1);
 			break;
 		}
 	}
