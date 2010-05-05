@@ -351,7 +351,24 @@ CHtmlSysWinQt::draw_text_space( int hilite, long x, long y, CHtmlSysFont* font, 
 void
 CHtmlSysWinQt::draw_bullet( int hilite, long x, long y, CHtmlSysFont* font, HTML_SysWin_Bullet_t style )
 {
-	qDebug() << Q_FUNC_INFO;
+	int unicode;
+	switch (style) {
+	  case HTML_SYSWIN_BULLET_SQUARE:
+		unicode = 0x25AA;
+		break;
+	  case HTML_SYSWIN_BULLET_CIRCLE:
+		unicode = 0x25CB;
+		break;
+	  case HTML_SYSWIN_BULLET_DISC:
+		unicode = 0x2022;
+		break;
+	  default:
+		Q_ASSERT(style == HTML_SYSWIN_BULLET_PLAIN);
+		// Nothing to draw.
+		return;
+	}
+	const QByteArray& utf8 = QString(QChar(unicode)).toUtf8();
+	this->draw_text(hilite, x, y, font, utf8.constData(), utf8.size());
 }
 
 
