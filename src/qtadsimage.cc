@@ -49,6 +49,7 @@ QTadsImage::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, ht
 		return;
 	}
 
+	// If we get here, 'mode' must have been HTMLIMG_DRAW_TILE.
 	Q_ASSERT(mode == HTMLIMG_DRAW_TILE);
 	QPixmap pix(QPixmap::fromImage(*this));
 	painter.drawTiledPixmap(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top, pix);
