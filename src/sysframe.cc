@@ -72,6 +72,8 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 	//qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(qFrame != 0);
 
+	this->fSettings->saveToDisk();
+
 	qFrame = 0;
 	this->fFormatter->release_parser();
 	delete this->fParser;
@@ -97,7 +99,7 @@ void
 CHtmlSysFrameQt::main( QString gameFileName )
 {
 	CHtmlSysFrame::set_frame_obj(this);
-	this->fMainWin->resize(800, 600);
+	this->fMainWin->resize(this->fSettings->appSize);
 	this->fMainWin->show();
 
 	QDir::setCurrent(QFileInfo(gameFileName).path());

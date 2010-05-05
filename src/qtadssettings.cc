@@ -32,21 +32,8 @@ QTadsSettings::loadFromDisk()
 	this->scriptFont.fromString(sett.value("script", "cursive").toString());
 	this->writerFont.fromString(sett.value("typewriter", "monospace").toString());
 	this->inputFont.fromString(sett.value("input", "serif").toString());
-	//this->inputFont.setBold(sett.value("inputbold", false).toBool());
-	//this->inputFont.setItalic(sett.value("inputitalic", false).toBool());
 	sett.endGroup();
-
-	/*
-	qDebug() << "mainFont: " << QFontInfo(this->mainFont).family()
-			<< "\nmainFont pt:" << QFontInfo(this->mainFont).pointSize()
-			<< "\nmainFont px:" << QFontInfo(this->mainFont).pixelSize()
-			<< "\nmainFont height:" << QFontMetrics(this->mainFont).height()
-			<< "\nscriptFont: " << QFontInfo(this->scriptFont).family()
-			<< "\nscriptFont pt:" << QFontInfo(this->scriptFont).pointSize()
-			<< "\nscriptFont px:" << QFontInfo(this->scriptFont).pixelSize()
-			<< "\nscriptFont height:" << QFontMetrics(this->scriptFont).height()
-			;
-	*/
+	this->appSize = sett.value("geometry/size", QSize(740, 540)).toSize();
 }
 
 
@@ -62,8 +49,7 @@ QTadsSettings::saveToDisk()
 	sett.setValue("script", this->scriptFont.toString());
 	sett.setValue("typewriter", this->writerFont.toString());
 	sett.setValue("input", this->inputFont.toString());
-	//sett.setValue("inputbold", this->inputFont.bold());
-	//sett.setValue("inputitalic", this->inputFont.italic());
 	sett.endGroup();
+	sett.setValue("geometry/size", qWinGroup->size());
 	sett.sync();
 }

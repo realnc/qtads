@@ -36,6 +36,7 @@ class QTadsSettings {
 	CHtmlSysFontQt scriptFont;
 	CHtmlSysFontQt writerFont;
 	CHtmlSysFontQt inputFont;
+	QSize appSize;
 };
 
 
