@@ -167,7 +167,7 @@ CHtmlSysSoundMidi::create_midi( const CHtmlUrl* url, const textchar_t* filename,
 	}
 	QByteArray data(file.read(filesize));
 	file.close();
-	if (data.isEmpty() or data.size() < filesize) {
+	if (data.isEmpty() or static_cast<unsigned long>(data.size()) < filesize) {
 		qWarning() << "ERROR: Could not read" << filesize << "bytes from file" << filename;
 		return 0;
 	}
@@ -315,7 +315,7 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
 	}
 	QByteArray data(file.read(filesize));
 	file.close();
-	if (data.isEmpty() or data.size() < filesize) {
+	if (data.isEmpty() or static_cast<unsigned long>(data.size()) < filesize) {
 		qWarning() << "ERROR: Could not read" << filesize << "bytes from file" << filename;
 		return 0;
 	}
@@ -569,7 +569,7 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 	// Load the image data.
 	const QByteArray& data(file.read(filesize));
 	file.close();
-	if (data.isEmpty() or data.size() < filesize) {
+	if (data.isEmpty() or static_cast<unsigned long>(data.size()) < filesize) {
 		qWarning() << "ERROR: Could not read" << filesize << "bytes from file" << filename;
 		delete image;
 		return 0;
