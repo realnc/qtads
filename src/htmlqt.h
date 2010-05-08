@@ -352,6 +352,8 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	class QTadsConfDialog* fConfDialog;
 	QScrollArea* fScrollArea;
 	QTadsFrame* fFrame;
+	class CHtmlSysWinAboutBoxQt* fAboutBox;
+	class QAction* fAboutGameAction;
 
   private slots:
 	void
@@ -359,6 +361,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
 	void
 	fHideConfDialog();
+
+	void
+	fShowAboutGame();
 
   protected:
 	virtual void
@@ -374,6 +379,15 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	centralFrame() const
 	{ return this->fFrame; }
 
+	CHtmlSysWinAboutBoxQt*
+	createAboutBox( class CHtmlFormatter* formatter );
+
+	void
+	deleteAboutBox();
+
+	CHtmlSysWinAboutBoxQt*
+	aboutBox()
+	{ return this->fAboutBox; }
 
 	//
 	// CHtmlSysWinGroup interface implementation.
@@ -401,11 +415,6 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	unsigned long fBannerStyle;
 	int fBannerWhere;
 
-	// Banner size information, if we are a banner.  This is either our width
-	// or height, according to our alignment type (vertical or horizontal).
-	long fBannerSize;
-	HTML_BannerWin_Units_t fBannerSizeUnits;
-
 	// Do not attempt to reformat during a resize event.  This is set when in
 	// the process of creating a new banner.  If we reformat during that
 	// process, the formatter will call the banner-creating routine again and
@@ -418,9 +427,6 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	// Our child banners, if any.
 	QList<CHtmlSysWinQt*> fChildBanners;
 
-	// Margins.
-	CHtmlRect fMargins;
-
 	// List of timers with registered callbacks.
 	QList<class QTadsTimer*> fTimerList;
 
@@ -428,6 +434,14 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	class CHtmlResCacheObject* fBgImage;
 
   protected:
+	// Margins.
+	CHtmlRect margins;
+
+	// Banner size information, if we are a banner.  This is either our width
+	// or height, according to our alignment type (vertical or horizontal).
+	long bannerSize;
+	HTML_BannerWin_Units_t bannerSizeUnits;
+
 	// Our display widget.
 	class QTadsDisplayWidget* dispWidget;
 
@@ -636,6 +650,31 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 
 	virtual void
 	get_banner_info( HTML_BannerWin_Pos_t* pos, unsigned long* style );
+};
+
+
+/* We need special handling for the "About this game" box.
+ */
+class CHtmlSysWinAboutBoxQt: public CHtmlSysWinQt {
+	Q_OBJECT
+
+protected:
+	virtual void
+	keyPressEvent( QKeyEvent* e )
+	{ QScrollArea::keyPressEvent(e); }
+
+	virtual void
+	resizeEvent( QResizeEvent* e );
+
+	virtual QSize
+	sizeHint() const;
+
+  public:
+	CHtmlSysWinAboutBoxQt( class CHtmlFormatter* formatter, QWidget* parent );
+
+	virtual void
+	set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,
+					 long height, HTML_BannerWin_Units_t height_units, int use_height );
 };
 
 

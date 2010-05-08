@@ -33,7 +33,7 @@ CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
 
 
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
-: fConfDialog(0)
+: fConfDialog(0), fAboutBox(0)
 {
 	//qDebug() << Q_FUNC_INFO << "called";
 	Q_ASSERT(qWinGroup == 0);
@@ -41,10 +41,20 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	// We make our menu bar parentless so it will be shared by all our windows
 	// in Mac OS X.
 	QMenuBar* menuBar = new QMenuBar(0);
+
+	// "Edit" menu.
 	QMenu* editMenu = menuBar->addMenu(tr("&Edit"));
 	QAction* settingsAct = new QAction(tr("&Settings"), menuBar);
 	editMenu->addAction(settingsAct);
 	connect(settingsAct, SIGNAL(triggered()), this, SLOT(fShowConfDialog()));
+
+	// "Help" menu.
+	QMenu* gameMenu = menuBar->addMenu(tr("&Help"));
+	this->fAboutGameAction = new QAction(tr("&About this game"), menuBar);
+	this->fAboutGameAction->setEnabled(false);
+	gameMenu->addAction(this->fAboutGameAction);
+	connect(this->fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
+
 	this->setMenuBar(menuBar);
 
 	// Create a default status bar.
@@ -108,10 +118,55 @@ CHtmlSysWinGroupQt::fHideConfDialog()
 
 
 void
+CHtmlSysWinGroupQt::fShowAboutGame()
+{
+	if (this->fAboutBox == 0) {
+		return;
+	}
+	if (this->fAboutBox->isVisible()) {
+		this->fAboutBox->activateWindow();
+		this->fAboutBox->raise();
+		return;
+	}
+	this->fAboutBox->show();
+	//this->fAboutBox->adjustSize();
+}
+
+
+void
 CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
 {
 	qFrame->setGameRunning(false);
 	e->accept();
+}
+
+
+CHtmlSysWinAboutBoxQt*
+CHtmlSysWinGroupQt::createAboutBox( class CHtmlFormatter* formatter )
+{
+	// If there's already an "about" box, destroy it first.
+	if (this->fAboutBox != 0) {
+		this->fAboutBox->hide();
+		delete this->fAboutBox;
+	} else {
+		this->fAboutGameAction->setEnabled(true);
+	}
+
+	this->fAboutBox = new CHtmlSysWinAboutBoxQt(formatter, this);
+	return this->fAboutBox;
+}
+
+
+void
+CHtmlSysWinGroupQt::deleteAboutBox()
+{
+	if (this->fAboutBox == 0) {
+		return;
+	}
+	this->fAboutBox->hide();
+	delete this->fAboutBox;
+	this->fAboutBox = 0;
+	this->fAboutGameAction->setEnabled(false);
 }
 
 

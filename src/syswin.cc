@@ -30,14 +30,14 @@
 
 
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QTadsDisplayWidget* dispWidget, QWidget* parent )
-: QScrollArea(parent), CHtmlSysWin(formatter), fBannerSize(0), fBannerSizeUnits(HTML_BANNERWIN_UNITS_PIX),
-  fDontReformat(0), fParentBanner(0), fMargins(8, 2, 8, 2), fBgImage(0)
+: QScrollArea(parent), CHtmlSysWin(formatter), fDontReformat(0), fParentBanner(0), fBgImage(0),
+  margins(8, 2, 8, 2), bannerSize(0), bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
 {
 	if (dispWidget == 0) {
 		this->dispWidget = new QTadsDisplayWidget(this, formatter);
 		this->setWidget(this->dispWidget);
 	}
-	this->formatter_->set_win(this, &fMargins);
+	this->formatter_->set_win(this, &margins);
 	this->setForegroundRole(QPalette::Text);
 	this->setBackgroundRole(QPalette::Base);
 	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -118,42 +118,42 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 		int ht = oldSize.height();
 
 		// Convert the width units to pixels.
-		switch (this->fBannerSizeUnits) {
+		switch (this->bannerSizeUnits) {
 		  case HTML_BANNERWIN_UNITS_PIX:
 			// Pixels - use the stored width directly.
-			wid = this->fBannerSize;
+			wid = this->bannerSize;
 			break;
 
 		  case HTML_BANNERWIN_UNITS_CHARS:
 			// Character cells - calculate the size in terms of the width of a
 			// "0" character in the window's default font.
-			wid = this->fBannerSize * measure_text(get_default_font(), "0", 1, 0).x;
+			wid = this->bannerSize * measure_text(get_default_font(), "0", 1, 0).x;
 			break;
 
 		  case HTML_BANNERWIN_UNITS_PCT:
 			// Percentage - calculate the width as a percentage of the parent
 			// size.
-			wid = (this->fBannerSize * parentSize.width()) / 100;
+			wid = (this->bannerSize * parentSize.width()) / 100;
 			break;
 		}
 
 		// Convert the height units to pixels.
-		switch (this->fBannerSizeUnits) {
+		switch (this->bannerSizeUnits) {
 		  case HTML_BANNERWIN_UNITS_PIX:
 			// Pixels - use the stored height directly.
-			ht = this->fBannerSize;
+			ht = this->bannerSize;
 			break;
 
 		  case HTML_BANNERWIN_UNITS_CHARS:
 			// Character cells - calculate the size in terms of the height of a
 			// "0" character in the window's default font.
-			ht = this->fBannerSize * measure_text(get_default_font(), "0", 1, 0).y;
+			ht = this->bannerSize * measure_text(get_default_font(), "0", 1, 0).y;
 			break;
 
 		  case HTML_BANNERWIN_UNITS_PCT:
 			// Percentage - calculate the size as a percentage of the parent
 			// size.
-			ht = (this->fBannerSize * parentSize.height()) / 100;
+			ht = (this->bannerSize * parentSize.height()) / 100;
 			break;
 		}
 
@@ -915,15 +915,15 @@ CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, 
 		if (not use_height) {
 			return;
 		}
-		this->fBannerSize = height;
-		this->fBannerSizeUnits = height_units;
+		this->bannerSize = height;
+		this->bannerSizeUnits = height_units;
 	} else {
 		Q_ASSERT(this->fBannerPos == HTML_BANNERWIN_POS_LEFT or this->fBannerPos == HTML_BANNERWIN_POS_RIGHT);
 		if (not use_width) {
 			return;
 		}
-		this->fBannerSize = width;
-		this->fBannerSizeUnits = width_units;
+		this->bannerSize = width;
+		this->bannerSizeUnits = width_units;
 	}
 	//this->show();
 	qFrame->adjustBannerSizes();

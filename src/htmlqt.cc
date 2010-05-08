@@ -20,13 +20,66 @@
 #include <QPainter>
 #include <smpeg.h>
 
-#include "htmlqt.h"
-
 #include "htmlurl.h"
+#include "htmlfmt.h"
+
+#include "htmlqt.h"
+#include "qtadsdispwidget.h"
 
 
 CHtmlSysFrameQt* qFrame = 0;
 CHtmlSysWinGroupQt* qWinGroup = 0;
+
+
+/* --------------------------------------------------------------------
+ * CHtmlSysWinAboutBoxQt
+ */
+CHtmlSysWinAboutBoxQt::CHtmlSysWinAboutBoxQt( class CHtmlFormatter* formatter, QWidget* parent )
+: CHtmlSysWinQt(formatter, 0, parent)
+{
+	this->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
+	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->setWindowTitle(tr("About This Game"));
+
+	// Only set the width to something comfortable.  The height will be
+	// calculated later when set_banner_size() is called.
+	this->resize(500, 0);
+	this->show();
+	this->hide();
+}
+
+
+void
+CHtmlSysWinAboutBoxQt::resizeEvent( QResizeEvent* e )
+{
+	this->formatter_->start_at_top(false);
+	this->do_formatting(true, false, true);
+	QScrollArea::resizeEvent(e);
+}
+
+
+QSize
+CHtmlSysWinAboutBoxQt::sizeHint() const
+{
+	// Ensure that we're always large enough to show the whole contents of the
+	// "about" content.
+	return this->displayWidget()->size();
+}
+
+
+void
+CHtmlSysWinAboutBoxQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,
+										long height, HTML_BannerWin_Units_t height_units, int use_height )
+{
+	this->bannerSize = height;
+	this->bannerSizeUnits = height_units;
+	this->dispWidget->resize(width + this->margins.left + this->margins.right,
+							 height + this->margins.top + this->margins.bottom);
+	QRect rec(this->geometry());
+	this->calcChildBannerSizes(rec);
+	this->adjustSize();
+}
 
 
 /* --------------------------------------------------------------------

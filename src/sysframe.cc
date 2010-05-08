@@ -673,7 +673,8 @@ CHtmlSysWin*
 CHtmlSysFrameQt::create_aboutbox_window( CHtmlFormatter* formatter )
 {
 	//qDebug() << Q_FUNC_INFO;
-	return 0;
+
+	return this->fMainWin->createAboutBox(formatter);
 }
 
 
@@ -681,6 +682,12 @@ void
 CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
 {
 	//qDebug() << Q_FUNC_INFO;
+
+	if (win == this->fMainWin->aboutBox()) {
+		this->fMainWin->deleteAboutBox();
+		return;
+	}
+
 	Q_ASSERT(static_cast<CHtmlSysWinQt*>(win)->parentBanner() != 0);
 	this->fBannerList.removeAll(static_cast<CHtmlSysWinQt*>(win));
 	static_cast<CHtmlSysWinQt*>(win)->parentBanner()->setFocus();
