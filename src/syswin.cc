@@ -911,7 +911,6 @@ CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, 
 		return;
 	}
 
-	Q_ASSERT(this->fParentBanner != 0);
 	if (this->fBannerPos == HTML_BANNERWIN_POS_TOP or this->fBannerPos == HTML_BANNERWIN_POS_BOTTOM) {
 		if (not use_height) {
 			return;
