@@ -38,8 +38,8 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QTadsDisplayWidget* dis
 		this->setWidget(this->dispWidget);
 	}
 	this->formatter_->set_win(this, &margins);
-	this->setForegroundRole(QPalette::Text);
-	this->setBackgroundRole(QPalette::Base);
+	this->viewport()->setForegroundRole(QPalette::Text);
+	this->viewport()->setBackgroundRole(QPalette::Base);
 	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	this->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
@@ -47,7 +47,7 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QTadsDisplayWidget* dis
 	this->setContentsMargins(0, 0, 0, 0);
 
 	// TEMP: Just to make the area of this widget visibly more apparent.
-	//this->setBackgroundRole(QPalette::ToolTipBase);
+	//this->viewport()->setBackgroundRole(QPalette::ToolTipBase);
 }
 
 
