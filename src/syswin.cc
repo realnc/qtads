@@ -526,12 +526,6 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 		this->formatter_->freeze_display(false);
 	}
 
-	//this->displayWidget()->resize(this->formatter_->get_outer_max_line_width(), this->displayWidget()->height());
-
-	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
-	if (update_win) {
-		this->dispWidget->repaint();
-	}
 	return false;
 }
 
