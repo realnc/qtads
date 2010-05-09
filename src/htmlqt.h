@@ -170,6 +170,9 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// game?
 	bool fTads3;
 
+	// Is there a reformat pending?
+	bool fReformatPending;
+
   signals:
 	void gameQuitting();
 
@@ -231,6 +234,11 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// Reformat all HTML banners.
 	void
 	reformatBanners();
+
+	// Schedule a reformat.
+	void
+	scheduleReformat()
+	{ this->fReformatPending = true; }
 
 	// Prune the main window's parse tree, if we're using too much memory.
 	// This should be called before getting user input; we'll check to see how

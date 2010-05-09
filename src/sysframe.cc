@@ -35,7 +35,7 @@
 
 CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion,
 								  const char* orgName, const char* orgDomain )
-: QApplication(argc, argv), fGameWin(0), fGameRunning(false)
+: QApplication(argc, argv), fGameWin(0), fGameRunning(false), fReformatPending(false)
 {
 
 	//qDebug() << Q_FUNC_INFO;
@@ -374,6 +374,12 @@ CHtmlSysFrameQt::reformatBanners()
 void CHtmlSysFrameQt::pruneParseTree()
 {
 	static int checkCount = 0;
+
+	// If there's a reformat pending, perform it.
+	if (this->fReformatPending) {
+		this->fReformatPending = false;
+		this->reformatBanners();
+	}
 
 	// Skip this entirely most of the time; only check every so often, so that
 	// we don't waste a lot of time doing this too frequently.
