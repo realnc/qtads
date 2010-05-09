@@ -448,9 +448,6 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	virtual void
 	keyPressEvent( QKeyEvent* event );
 
-	virtual void
-	resizeEvent( QResizeEvent* event );
-
   public:
 	CHtmlSysWinQt( class CHtmlFormatter* formatter, class QTadsDisplayWidget* dispWidget, QWidget* parent );
 

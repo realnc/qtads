@@ -23,6 +23,7 @@
 #include "htmlqt.h"
 #include "qtadshostifc.h"
 #include "qtadssettings.h"
+#include "qtadsdispwidget.h"
 
 #include "htmlprs.h"
 #include "htmlinp.h"
@@ -357,10 +358,15 @@ CHtmlSysFrameQt::reformatBanners()
 		return;
 	}
 	this->fGameWin->get_formatter()->start_at_top(false);
-	this->fGameWin->do_formatting(false, false, false);
+	this->fGameWin->do_formatting(false, false, true);
+	this->fGameWin->displayWidget()->resize(this->fGameWin->get_formatter()->get_outer_max_line_width(),
+											this->fGameWin->displayWidget()->height());
 	for (int i = 0; i < this->fBannerList.size(); ++i) {
-		this->fBannerList.at(i)->get_formatter()->start_at_top(false);
-		this->fBannerList.at(i)->do_formatting(false, false, false);
+		CHtmlSysWinQt* win = this->fBannerList.at(i);
+		win->get_formatter()->start_at_top(false);
+		win->do_formatting(false, false, false);
+		win->displayWidget()->resize(win->get_formatter()->get_outer_max_line_width(),
+									 win->displayWidget()->height());
 	}
 }
 

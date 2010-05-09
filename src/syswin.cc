@@ -79,18 +79,6 @@ CHtmlSysWinQt::keyPressEvent( QKeyEvent* event )
 
 
 void
-CHtmlSysWinQt::resizeEvent( QResizeEvent* event )
-{
-	if (this->fDontReformat == 0) {
-		this->formatter_->start_at_top(false);
-		this->do_formatting(true, false, true);
-		this->displayWidget()->resize(this->formatter_->get_outer_max_line_width(), this->displayWidget()->height());
-	}
-	QScrollArea::resizeEvent(event);
-}
-
-
-void
 CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 {
 	//qDebug() << Q_FUNC_INFO;
@@ -674,7 +662,7 @@ CHtmlSysWinQt::scroll_to_doc_coords( const CHtmlRect* pos )
 {
 	qDebug() << Q_FUNC_INFO;
 
-	qFrame->advanceEventLoop();
+	//qFrame->advanceEventLoop();
 }
 
 
