@@ -906,9 +906,10 @@ CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, 
 		this->bannerSize = width;
 		this->bannerSizeUnits = width_units;
 	}
-	//this->show();
 	qFrame->adjustBannerSizes();
-	this->show();
+	if (not this->isVisible()) {
+		this->show();
+	}
 	return;
 }
 
