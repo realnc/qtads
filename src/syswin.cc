@@ -157,34 +157,34 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 		switch(this->fBannerPos) {
 		case HTML_BANNERWIN_POS_TOP:
 			// Align the banner at the top of the window.
-			newSize.setBottom(newSize.top() + ht);
+			newSize.setBottom(newSize.top() + ht - 1);
 
 			// Take the space out of the top of the parent window.
-			parentSize.setTop(parentSize.top() + ht + 1);
+			parentSize.setTop(parentSize.top() + ht);
 			break;
 
 		case HTML_BANNERWIN_POS_BOTTOM:
 			// Align the banner at the bottom of the window.
-			newSize.setTop((newSize.top() + newSize.height()) - ht);
+			newSize.setTop((newSize.top() + newSize.height()) - ht + 1);
 
 			// Take the space out of the bottom of the parent area.
-			parentSize.setBottom((parentSize.top() + parentSize.height()) - ht - 1);
+			parentSize.setBottom((parentSize.top() + parentSize.height()) - ht);
 			break;
 
 		case HTML_BANNERWIN_POS_LEFT:
 			// Align the banner at the left of the window.
-			newSize.setRight(newSize.left() + wid);
+			newSize.setRight(newSize.left() + wid - 1);
 
 			// Take the space from the left of the parent window.
-			parentSize.setLeft(parentSize.left() + wid + 1);
+			parentSize.setLeft(parentSize.left() + wid);
 			break;
 
 		case HTML_BANNERWIN_POS_RIGHT:
 			// Align the banner at the right of the window.
-			newSize.setLeft(newSize.left() + newSize.width() - wid);
+			newSize.setLeft(newSize.left() + newSize.width() - wid + 1);
 
 			// Take the space from the right of the parent window.
-			parentSize.setRight(parentSize.left() + parentSize.width() - wid - 1);
+			parentSize.setRight(parentSize.left() + parentSize.width() - wid);
 			break;
 		}
 	}
