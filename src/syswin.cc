@@ -525,8 +525,7 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	if (freeze_display) {
 		this->formatter_->freeze_display(false);
 	}
-
-	return false;
+	return true;
 }
 
 
