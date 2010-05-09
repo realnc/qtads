@@ -658,6 +658,8 @@ class CHtmlSysWinAboutBoxQt: public CHtmlSysWinQt {
 protected:
 	virtual void
 	keyPressEvent( QKeyEvent* e )
+	// It shouldn't be possible to do game input from the about box, so we
+	// bypass the inherited input handling and revert to the default.
 	{ QScrollArea::keyPressEvent(e); }
 
 	virtual void
