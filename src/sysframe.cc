@@ -46,24 +46,34 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 	this->setOrganizationName(orgName);
 	this->setOrganizationDomain(orgDomain);
 
+	// Load our persistent settings.
 	this->fSettings = new QTadsSettings;
 	this->fSettings->loadFromDisk();
 
+	// Create our HTML parser, input buffer and main game window formatter.
 	this->fParser = new CHtmlParser(true);
 	this->fInputBuffer = new textchar_t[1024];
 	this->fTadsBuffer =new CHtmlInputBuf(fInputBuffer, 1024, 100);
 	this->fFormatter = new CHtmlFormatterInput(this->fParser);
 
+	// Clear the TADS appctx; all unused fields must be 0.
 	memset(&this->fAppctx, 0, sizeof(this->fAppctx));
+
+	// Tell the resource finder about our appctx.
 	this->fFormatter->get_res_finder()->init_appctx(&this->fAppctx);
 
+	// Create the TADS host and client application interfaces.
 	this->fHostifc = new QTadsHostIfc(&this->fAppctx);
 	this->fClientifc = new CVmMainClientConsole;
 
+	// Create our main application window.
 	this->fMainWin = new CHtmlSysWinGroupQt;
 	this->fMainWin->setWindowTitle(appName);
+
+	// Automatically quit the application when the last window has closed.
 	connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 
+	// Set our global pointer.
 	qFrame = this;
 }
 
@@ -73,9 +83,13 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 	//qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(qFrame != 0);
 
+	// Save our persistent settings.
 	this->fSettings->saveToDisk();
 
+	// We're being destroyed, so our global pointer is no longer valid.
 	qFrame = 0;
+
+	// Release the parser and delete our parser, buffers and formatter.
 	this->fFormatter->release_parser();
 	delete this->fParser;
 	delete[] this->fInputBuffer;
@@ -87,6 +101,7 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 		delete this->fFontList.takeLast();
 	}
 
+	// Delete our TADS application interfaces and settings.
 	delete this->fClientifc;
 	delete this->fHostifc;
 	delete this->fSettings;
@@ -99,11 +114,17 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 void
 CHtmlSysFrameQt::main( QString gameFileName )
 {
+	// Note that we're the main HTML TADS frame object.
 	CHtmlSysFrame::set_frame_obj(this);
+
+	// Restore the application's size.
 	this->fMainWin->resize(this->fSettings->appSize);
 	this->fMainWin->show();
 
+	// Change to the game file's directory.
 	QDir::setCurrent(QFileInfo(gameFileName).path());
+
+	// Run the appropriate TADS VM.
 	int ret;
 	if (vm_get_game_type(QFileInfo(gameFileName).fileName().toLocal8Bit(), 0, 0, 0, 0) == VM_GGT_TADS2) {
 		ret = this->runT2Game(QFileInfo(gameFileName).fileName());
@@ -114,6 +135,7 @@ CHtmlSysFrameQt::main( QString gameFileName )
 		ret = 1;
 	}
 
+	// The VM finished.  Note that we're no longer the main frame object.
 	CHtmlSysFrame::set_frame_obj(0);
 	this->exit(ret);
 }
@@ -289,6 +311,8 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 
 	//qDebug() << "Font not found in cache; creating new font. Fonts so far:" << this->fFontList.size() + 1;
 
+	// There was no match in our cache. Create a new font and store it in our
+	// cache.
 	CHtmlSysFontQt* font = new CHtmlSysFontQt(newFont);
 	font->set_font_desc(&newFontDesc);
 	this->fFontList.append(font);
@@ -299,20 +323,30 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 int
 CHtmlSysFrameQt::runT2Game( const QString& fname )
 {
+	// Create the main HTML game window.
 	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralFrame());
+	// Make it as big as the view area of the application window.
 	this->fGameWin->resize(qWinGroup->centralFrame()->size());
 	this->fGameWin->show();
 	this->fGameWin->setFocus();
+
+	// We'll be loading a T2 game.
 	this->fTads3 = false;
 
+	// T2 requires argc/argv style arguments.
 	char argv0[] = "qtads";
 	char* argv1 = new char[fname.toLocal8Bit().size() + 1];
 	strcpy(argv1, fname.toLocal8Bit());
 	char* argv[2] = {argv0, argv1};
+
+	// We always use .sav as the extension for T2 save files.
 	char savExt[] = "sav";
 
+	// Set the application's window title to contain the filename of the game
+	// we're running.  The game is free to change that later on.
 	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
 
+	// Start the T2 VM.
 	this->fGameRunning = true;
 	int ret = trdmain(2, argv, &this->fAppctx, savExt);
 	this->fGameRunning = false;
@@ -346,6 +380,9 @@ CHtmlSysFrameQt::adjustBannerSizes()
 	if (this->fGameWin == 0) {
 		return;
 	}
+
+	// Start with the main game window.  Its area can never exceed the
+	// application's central frame.
 	QRect siz(qWinGroup->centralFrame()->geometry());
 	this->fGameWin->calcChildBannerSizes(siz);
 }
@@ -357,10 +394,14 @@ CHtmlSysFrameQt::reformatBanners()
 	if (this->fGameWin == 0) {
 		return;
 	}
+
+	// First, reformat the main game window.
 	this->fGameWin->get_formatter()->start_at_top(false);
 	this->fGameWin->do_formatting(false, false, true);
 	this->fGameWin->displayWidget()->resize(this->fGameWin->get_formatter()->get_outer_max_line_width(),
 											this->fGameWin->displayWidget()->height());
+
+	// Now reformat all active banner windows.
 	for (int i = 0; i < this->fBannerList.size(); ++i) {
 		CHtmlSysWinQt* win = this->fBannerList.at(i);
 		win->get_formatter()->start_at_top(false);
@@ -395,6 +436,7 @@ void CHtmlSysFrameQt::pruneParseTree()
 		return;
 	}
 
+	// Perform the pruning, reformat and adjust all banners.
 	this->fParser->prune_tree(65536 / 2);
 	this->reformatBanners();
 	this->adjustBannerSizes();
@@ -406,9 +448,12 @@ CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 {
 	this->fParser->parse(&this->fBuffer, qWinGroup);
 	this->fBuffer.clear();
+
+	// Reformat the main game window, if requested.
 	if (fmt) {
 		this->fGameWin->do_formatting(false, true, not immediate_redraw);
 	}
+
 	// Also flush all banner windows.
 	for (int i = 0; i < this->fBannerList.size(); ++i) {
 		this->fBannerList.at(i)->get_formatter()->flush_txtbuf(fmt);
@@ -697,15 +742,20 @@ CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
 {
 	//qDebug() << Q_FUNC_INFO;
 
+	// If this is the "about this game" box, ask the main window to delete it.
 	if (win == this->fMainWin->aboutBox()) {
 		this->fMainWin->deleteAboutBox();
 		return;
 	}
 
 	Q_ASSERT(static_cast<CHtmlSysWinQt*>(win)->parentBanner() != 0);
+
+	// Before deleting it, remove it from our list and give keyboard focus to
+	// its parent.
 	this->fBannerList.removeAll(static_cast<CHtmlSysWinQt*>(win));
 	static_cast<CHtmlSysWinQt*>(win)->parentBanner()->setFocus();
 	delete win;
+
 	// Recalculate the banner layout.
 	this->adjustBannerSizes();
 }
