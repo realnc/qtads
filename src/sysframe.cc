@@ -575,23 +575,19 @@ CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
 		return ret;
 	}
 
-	QLabel moreText("*** MORE ***  [press a key to continue]");
-	if (pause_only) {
-		// Display a permanent QLabel instead of a temporary message.  This allows
-		// other status bar messages (like when hovering over hyperlinks) to
-		// temporary remove the MORE text instead of replacing it.		
-		moreText.setFrameStyle(QFrame::NoFrame | QFrame::Plain);
-		moreText.setLineWidth(0);
-		moreText.setContentsMargins(0, 0, 0, 0);
-		qWinGroup->statusBar()->addWidget(&moreText);
-	}
+	QLabel moreText(pause_only ? tr("*** MORE ***  [press a key to continue]") : tr("Please press a key"));
+	// Display a permanent QLabel instead of a temporary message.  This allows
+	// other status bar messages (like when hovering over hyperlinks) to
+	// temporary remove the MORE text instead of replacing it.
+	moreText.setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+	moreText.setLineWidth(0);
+	moreText.setContentsMargins(0, 0, 0, 0);
+	qWinGroup->statusBar()->addWidget(&moreText);
 
 	os_event_info_t info;
 	ret = this->get_input_event(0, false, &info);
 
-	if (pause_only) {
-		qWinGroup->statusBar()->removeWidget(&moreText);
-	}
+	qWinGroup->statusBar()->removeWidget(&moreText);
 
 	if (ret == OS_EVT_EOF) {
 		pendingCmd = CMD_EOF;
