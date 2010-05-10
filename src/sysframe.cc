@@ -446,6 +446,7 @@ void CHtmlSysFrameQt::pruneParseTree()
 void
 CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 {
+	// Flush and clear the buffer.
 	this->fParser->parse(&this->fBuffer, qWinGroup);
 	this->fBuffer.clear();
 
@@ -471,17 +472,33 @@ CHtmlSysFrameQt::start_new_page()
 		return;
 	}
 
+	// Flush any pending output.
 	this->flush_txtbuf(true, false);
+
+	// Cancel all animations.
 	this->fFormatter->cancel_playback();
+
+	// Tell the parser to clear the page.
 	this->fParser->clear_page();
+
+	// Remove all banners.  The formatter will do the right thing and only
+	// remove banners that have not been created programmatically (like those
+	// created with <BANNER> tags.)
 	this->fFormatter->remove_all_banners(false);
+
+	// Notify the main game window that we're clearing the page.
 	this->fGameWin->notify_clear_contents();
+
+	// Reformat main game window and all banners. All currently playing sounds
+	// should be reset.
 	this->fFormatter->start_at_top(true);
 	this->fGameWin->do_formatting(false, true, false);
 	for (int i = 0; i < this->fBannerList.size(); ++i) {
 		this->fBannerList.at(i)->get_formatter()->start_at_top(true);
 		this->fBannerList.at(i)->do_formatting(false, true, false);
 	}
+
+	// Re-adjust all banners.
 	this->adjustBannerSizes();
 }
 
@@ -498,6 +515,7 @@ CHtmlSysFrameQt::display_output( const textchar_t *buf, size_t len )
 {
 	//qDebug() << Q_FUNC_INFO;
 
+	// Just add the new text to our buffer.
 	this->fBuffer.append(buf, len);
 }
 
@@ -507,6 +525,7 @@ CHtmlSysFrameQt::check_break_key()
 {
 	//qDebug() << Q_FUNC_INFO;
 
+	// TODO: We don't check for any such shortcut yet.
 	return false;
 }
 
@@ -516,10 +535,13 @@ CHtmlSysFrameQt::get_input( textchar_t* buf, size_t bufsiz )
 {
 	//qDebug() << Q_FUNC_INFO;
 
+	// Flush and prune before input.
 	this->flush_txtbuf(true, false);
 	this->pruneParseTree();
 
 	int ret = this->fGameWin->getInput(this->fTadsBuffer);
+
+	// If input exceeds the buffer size, make sure we don't overflow.
 	int len = this->fTadsBuffer->getlen() > bufsiz ? bufsiz : this->fTadsBuffer->getlen();
 	strncpy(buf, this->fTadsBuffer->getbuf(), len);
 	buf[len] = '\0';
@@ -558,9 +580,11 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
 {
 	//qDebug() << Q_FUNC_INFO << "use_timeout:" << use_timeout;
 
+	// Flush and prune before input.
 	this->flush_txtbuf(true, false);
 	this->pruneParseTree();
 
+	// Get the input.
 	bool timedOut = false;
 	int res = this->fGameWin->getKeypress(timeout, use_timeout, &timedOut);
 
@@ -622,9 +646,11 @@ CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
 	moreText.setContentsMargins(0, 0, 0, 0);
 	qWinGroup->statusBar()->addWidget(&moreText);
 
+	// Get the input.
 	os_event_info_t info;
 	ret = this->get_input_event(0, false, &info);
 
+	// Remove the status message.
 	qWinGroup->statusBar()->removeWidget(&moreText);
 
 	if (ret == OS_EVT_EOF) {
@@ -633,6 +659,8 @@ CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
 	}
 
 	if (ret == OS_EVT_KEY and info.key[0] == 0) {
+		// It was an extended character.  Prepare to return it on our next
+		// call.
 		pendingCmd = info.key[1];
 		return 0;
 	}
@@ -645,6 +673,7 @@ CHtmlSysFrameQt::pause_for_exit()
 {
 	qDebug() << Q_FUNC_INFO;
 
+	// Just wait for a keystroke and discard it.
 	this->wait_for_keystroke(true);
 }
 
@@ -676,14 +705,15 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 	//qDebug() << "Creating new banner. parent:" << parent << "type:" << window_type << "where:" << where
 	//		<< "other:" << other << "pos:" << pos << "style:" << style;
 
+	// Create the banner window.
 	CHtmlSysWinQt* banner = new CHtmlSysWinQt(formatter, 0, qWinGroup->centralFrame());
 
+	// Enable/disable the scrollbars, according to what was requested.
 	if (style & OS_BANNER_STYLE_VSCROLL) {
 		banner->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	} else {
 		banner->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	}
-
 	if (style & OS_BANNER_STYLE_HSCROLL) {
 		banner->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	} else {
@@ -702,10 +732,12 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 		}
 	}
 
+	// If no parent was specified, make it a child of the main game window.
 	if (parent == 0) {
 		parent = castParent = this->fGameWin;
 	}
 
+	// Add the banner and store it in our list.
 	castParent->addBanner(banner, where, castOther, pos, style);
 	this->fBannerList.append(banner);
 	return banner;
@@ -717,6 +749,7 @@ CHtmlSysFrameQt::orphan_banner_window( CHtmlFormatterBannerExt* banner )
 {
 	//qDebug() << Q_FUNC_INFO;
 
+	// We don't keep orphaned banners around; just delete it right away.
 	os_banner_delete(banner);
 }
 
