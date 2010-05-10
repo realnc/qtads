@@ -461,13 +461,6 @@ CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 }
 
 
-CHtmlParser*
-CHtmlSysFrameQt::get_parser()
-{
-	return this->fParser;
-}
-
-
 void
 CHtmlSysFrameQt::start_new_page()
 {

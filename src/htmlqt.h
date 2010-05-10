@@ -284,7 +284,8 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	flush_txtbuf( int fmt, int immediate_redraw );
 
 	virtual class CHtmlParser*
-	get_parser();
+	get_parser()
+	{ return this->fParser; }
 
 	virtual void
 	start_new_page();
