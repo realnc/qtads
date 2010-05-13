@@ -89,6 +89,12 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 	// We're being destroyed, so our global pointer is no longer valid.
 	qFrame = 0;
 
+	// Delete HTML banners and main game window.
+	while (not this->fBannerList.isEmpty()) {
+		delete this->fBannerList.takeLast();
+	}
+	delete this->fGameWin;
+
 	// Release the parser and delete our parser, buffers and formatter.
 	this->fFormatter->release_parser();
 	delete this->fParser;
