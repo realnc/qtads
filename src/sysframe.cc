@@ -111,6 +111,61 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 }
 
 
+int
+CHtmlSysFrameQt::fRunT2Game( const QString& fname )
+{
+	// Create the main HTML game window.
+	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralFrame());
+	// Make it as big as the view area of the application window.
+	this->fGameWin->resize(qWinGroup->centralFrame()->size());
+	this->fGameWin->show();
+	this->fGameWin->setFocus();
+
+	// We'll be loading a T2 game.
+	this->fTads3 = false;
+
+	// T2 requires argc/argv style arguments.
+	char argv0[] = "qtads";
+	char* argv1 = new char[fname.toLocal8Bit().size() + 1];
+	strcpy(argv1, fname.toLocal8Bit());
+	char* argv[2] = {argv0, argv1};
+
+	// We always use .sav as the extension for T2 save files.
+	char savExt[] = "sav";
+
+	// Set the application's window title to contain the filename of the game
+	// we're running.  The game is free to change that later on.
+	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
+
+	// Start the T2 VM.
+	this->fGameRunning = true;
+	int ret = trdmain(2, argv, &this->fAppctx, savExt);
+	this->fGameRunning = false;
+
+	delete[] argv1;
+	return ret;
+}
+
+
+int
+CHtmlSysFrameQt::fRunT3Game( const QString& fname )
+{
+	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralFrame());
+	this->fGameWin->resize(qWinGroup->centralFrame()->size());
+	this->fGameWin->show();
+	this->fGameWin->setFocus();
+	this->fTads3 = true;
+
+	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
+
+	this->fGameRunning = true;
+	int ret = vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0, 0, false, 0, 0,
+						   false, false, 0, 0, 0, 0);
+	this->fGameRunning = false;
+	return ret;
+}
+
+
 void
 CHtmlSysFrameQt::main( QString gameFileName )
 {
@@ -127,9 +182,9 @@ CHtmlSysFrameQt::main( QString gameFileName )
 	// Run the appropriate TADS VM.
 	int ret;
 	if (vm_get_game_type(QFileInfo(gameFileName).fileName().toLocal8Bit(), 0, 0, 0, 0) == VM_GGT_TADS2) {
-		ret = this->runT2Game(QFileInfo(gameFileName).fileName());
+		ret = this->fRunT2Game(QFileInfo(gameFileName).fileName());
 	} else if (vm_get_game_type(QFileInfo(gameFileName).fileName().toLocal8Bit(), 0, 0, 0, 0) == VM_GGT_TADS3) {
-		ret = this->runT3Game(QFileInfo(gameFileName).fileName());
+		ret = this->fRunT3Game(QFileInfo(gameFileName).fileName());
 	} else {
 		qWarning() << gameFileName.toLocal8Bit().constData() << "is not a TADS game file.";
 		ret = 1;
@@ -317,60 +372,6 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 	font->set_font_desc(&newFontDesc);
 	this->fFontList.append(font);
 	return font;
-}
-
-
-int
-CHtmlSysFrameQt::runT2Game( const QString& fname )
-{
-	// Create the main HTML game window.
-	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralFrame());
-	// Make it as big as the view area of the application window.
-	this->fGameWin->resize(qWinGroup->centralFrame()->size());
-	this->fGameWin->show();
-	this->fGameWin->setFocus();
-
-	// We'll be loading a T2 game.
-	this->fTads3 = false;
-
-	// T2 requires argc/argv style arguments.
-	char argv0[] = "qtads";
-	char* argv1 = new char[fname.toLocal8Bit().size() + 1];
-	strcpy(argv1, fname.toLocal8Bit());
-	char* argv[2] = {argv0, argv1};
-
-	// We always use .sav as the extension for T2 save files.
-	char savExt[] = "sav";
-
-	// Set the application's window title to contain the filename of the game
-	// we're running.  The game is free to change that later on.
-	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
-
-	// Start the T2 VM.
-	this->fGameRunning = true;
-	int ret = trdmain(2, argv, &this->fAppctx, savExt);
-	this->fGameRunning = false;
-
-	delete[] argv1;
-	return ret;
-}
-
-int
-CHtmlSysFrameQt::runT3Game( const QString& fname )
-{
-	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralFrame());
-	this->fGameWin->resize(qWinGroup->centralFrame()->size());
-	this->fGameWin->show();
-	this->fGameWin->setFocus();
-	this->fTads3 = true;
-
-	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
-
-	this->fGameRunning = true;
-	int ret = vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0, 0, false, 0, 0,
-						   false, false, 0, 0, 0, 0);
-	this->fGameRunning = false;
-	return ret;
 }
 
 

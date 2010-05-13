@@ -173,6 +173,12 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// Is there a reformat pending?
 	bool fReformatPending;
 
+	int
+	fRunT2Game( const QString& fname );
+
+	int
+	fRunT3Game( const QString& fname );
+
   signals:
 	void gameQuitting();
 
@@ -199,12 +205,6 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 
 	CHtmlSysFontQt*
 	createFont( const CHtmlFontDesc* font_desc );
-
-	int
-	runT2Game( const QString& fname );
-
-	int
-	runT3Game( const QString& fname );
 
 	bool
 	gameRunning()
