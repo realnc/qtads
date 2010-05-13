@@ -150,6 +150,9 @@ CHtmlSysFrameQt::fRunGame( const QString& fname )
 
 	// The VM finished.  Note that we're no longer the main frame object.
 	CHtmlSysFrame::set_frame_obj(0);
+
+	// Reset application window title.
+	qWinGroup->setWindowTitle(qFrame->applicationName());
 }
 
 
