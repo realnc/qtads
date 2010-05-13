@@ -69,6 +69,16 @@ void
 QTadsDisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* tadsBuffer,
 										  CHtmlTagTextInput* tag )
 {
+	// Reset the blink timer.
+	this->fBlinkTimer->stop();
+	this->fBlinkTimer->start();
+
+	// Blink-out first to ensure the cursor won't stay visible at the previous
+	// position after we move it.
+	if (this->fBlinkVisible) {
+		this->fBlinkCursor();
+	}
+
 	this->fParentSysWin->do_formatting(false, false, false);
 	CHtmlPoint cursorPos = formatter->get_text_pos(tag->get_text_ofs() + tadsBuffer->get_caret());
 	this->moveCursorPos(QPoint(cursorPos.x, cursorPos.y));
@@ -79,9 +89,7 @@ QTadsDisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputB
 	tadsBuffer->get_sel_range(&start, &end, &caret);
 	formatter->set_sel_range(start + inp_txt_ofs, end + inp_txt_ofs);
 
-	// Reset the blink timer and blink-in (if needed).
-	this->fBlinkTimer->stop();
-	this->fBlinkTimer->start();
+	// Blink-in.
 	if (not this->fBlinkVisible) {
 		this->fBlinkCursor();
 	}
