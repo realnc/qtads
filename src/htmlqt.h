@@ -173,10 +173,13 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// Is there a reformat pending?
 	bool fReformatPending;
 
-	int
+	void
+	fRunGame( const QString& fname );
+
+	void
 	fRunT2Game( const QString& fname );
 
-	int
+	void
 	fRunT3Game( const QString& fname );
 
   signals:

@@ -106,21 +106,50 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 	delete this->fHostifc;
 	delete this->fSettings;
 
-	//delete this->fGameWin;
 	//delete this->fMainWin;
 }
 
 
-int
+void
+CHtmlSysFrameQt::fRunGame( const QString& fname )
+{
+	// Note that we're the main HTML TADS frame object.
+	CHtmlSysFrame::set_frame_obj(this);
+
+	// Change to the game file's directory.
+	QDir::setCurrent(QFileInfo(fname).path());
+
+	// Run the appropriate TADS VM.
+	int vmType = vm_get_game_type(QFileInfo(fname).fileName().toLocal8Bit(), 0, 0, 0, 0);
+	if (vmType == VM_GGT_TADS2 or vmType == VM_GGT_TADS3) {
+		// It's a valid TADS game. Create the main HTML game window.
+		if (this->fGameWin != 0) {
+			delete this->fGameWin;
+		}
+		this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralFrame());
+		// Make it as big as the view area of the application window.
+		this->fGameWin->resize(qWinGroup->centralFrame()->size());
+		this->fGameWin->show();
+		this->fGameWin->setFocus();
+
+		// Run the appropriate VM.
+		if (vmType == VM_GGT_TADS2) {
+			this->fRunT2Game(QFileInfo(fname).fileName());
+		} else {
+			this->fRunT3Game(QFileInfo(fname).fileName());
+		}
+	} else {
+		qWarning() << fname.toLocal8Bit().constData() << "is not a TADS game file.";
+	}
+
+	// The VM finished.  Note that we're no longer the main frame object.
+	CHtmlSysFrame::set_frame_obj(0);
+}
+
+
+void
 CHtmlSysFrameQt::fRunT2Game( const QString& fname )
 {
-	// Create the main HTML game window.
-	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralFrame());
-	// Make it as big as the view area of the application window.
-	this->fGameWin->resize(qWinGroup->centralFrame()->size());
-	this->fGameWin->show();
-	this->fGameWin->setFocus();
-
 	// We'll be loading a T2 game.
 	this->fTads3 = false;
 
@@ -139,60 +168,38 @@ CHtmlSysFrameQt::fRunT2Game( const QString& fname )
 
 	// Start the T2 VM.
 	this->fGameRunning = true;
-	int ret = trdmain(2, argv, &this->fAppctx, savExt);
+	trdmain(2, argv, &this->fAppctx, savExt);
 	this->fGameRunning = false;
 
 	delete[] argv1;
-	return ret;
 }
 
 
-int
+void
 CHtmlSysFrameQt::fRunT3Game( const QString& fname )
 {
-	this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralFrame());
-	this->fGameWin->resize(qWinGroup->centralFrame()->size());
-	this->fGameWin->show();
-	this->fGameWin->setFocus();
 	this->fTads3 = true;
 
 	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
 
 	this->fGameRunning = true;
-	int ret = vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0, 0, false, 0, 0,
-						   false, false, 0, 0, 0, 0);
+	vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0, 0, false, 0, 0, false,
+				 false, 0, 0, 0, 0);
 	this->fGameRunning = false;
-	return ret;
 }
 
 
 void
 CHtmlSysFrameQt::main( QString gameFileName )
 {
-	// Note that we're the main HTML TADS frame object.
-	CHtmlSysFrame::set_frame_obj(this);
-
 	// Restore the application's size.
 	this->fMainWin->resize(this->fSettings->appSize);
 	this->fMainWin->show();
 
-	// Change to the game file's directory.
-	QDir::setCurrent(QFileInfo(gameFileName).path());
-
-	// Run the appropriate TADS VM.
-	int ret;
-	if (vm_get_game_type(QFileInfo(gameFileName).fileName().toLocal8Bit(), 0, 0, 0, 0) == VM_GGT_TADS2) {
-		ret = this->fRunT2Game(QFileInfo(gameFileName).fileName());
-	} else if (vm_get_game_type(QFileInfo(gameFileName).fileName().toLocal8Bit(), 0, 0, 0, 0) == VM_GGT_TADS3) {
-		ret = this->fRunT3Game(QFileInfo(gameFileName).fileName());
-	} else {
-		qWarning() << gameFileName.toLocal8Bit().constData() << "is not a TADS game file.";
-		ret = 1;
+	// If a game file was specified, try to run it.
+	if (not gameFileName.isEmpty()) {
+		this->fRunGame(gameFileName);
 	}
-
-	// The VM finished.  Note that we're no longer the main frame object.
-	CHtmlSysFrame::set_frame_obj(0);
-	this->exit(ret);
 }
 
 
