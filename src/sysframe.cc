@@ -132,12 +132,18 @@ CHtmlSysFrameQt::fRunGame( const QString& fname )
 		this->fGameWin->show();
 		this->fGameWin->setFocus();
 
+		// Set the application's window title to contain the filename of the game
+		// we're running.  The game is free to change that later on.
+		qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
+
 		// Run the appropriate VM.
+		this->fGameRunning = true;
 		if (vmType == VM_GGT_TADS2) {
 			this->fRunT2Game(QFileInfo(fname).fileName());
 		} else {
 			this->fRunT3Game(QFileInfo(fname).fileName());
 		}
+		this->fGameRunning = false;
 	} else {
 		qWarning() << fname.toLocal8Bit().constData() << "is not a TADS game file.";
 	}
@@ -162,14 +168,8 @@ CHtmlSysFrameQt::fRunT2Game( const QString& fname )
 	// We always use .sav as the extension for T2 save files.
 	char savExt[] = "sav";
 
-	// Set the application's window title to contain the filename of the game
-	// we're running.  The game is free to change that later on.
-	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
-
 	// Start the T2 VM.
-	this->fGameRunning = true;
 	trdmain(2, argv, &this->fAppctx, savExt);
-	this->fGameRunning = false;
 
 	delete[] argv1;
 }
@@ -179,13 +179,8 @@ void
 CHtmlSysFrameQt::fRunT3Game( const QString& fname )
 {
 	this->fTads3 = true;
-
-	qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
-
-	this->fGameRunning = true;
 	vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0, 0, false, 0, 0, false,
 				 false, 0, 0, 0, 0);
-	this->fGameRunning = false;
 }
 
 
