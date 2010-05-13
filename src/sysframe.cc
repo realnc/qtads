@@ -179,7 +179,7 @@ CHtmlSysFrameQt::fRunGame()
 
 			// Set the application's window title to contain the filename of the game
 			// we're running.  The game is free to change that later on.
-			qWinGroup->setWindowTitle(fname + " - " + qFrame->applicationName());
+			qWinGroup->setWindowTitle(QFileInfo(fname).fileName() + " - " + qFrame->applicationName());
 
 			// Run the appropriate VM.
 			this->fGameRunning = true;
