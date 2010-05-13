@@ -30,6 +30,9 @@ class QTadsDisplayWidgetInput: public QTadsDisplayWidget {
 	// Position of the text cursor.
 	QPoint fCursorPos;
 
+	// Height of the text cursor in pixels.
+	unsigned fHeight;
+
 	// Last position of the text cursor.
 	QPoint fLastCursorPos;
 
@@ -59,6 +62,11 @@ class QTadsDisplayWidgetInput: public QTadsDisplayWidget {
 	void
 	moveCursorPos( const QPoint& pos )
 	{ this->fCursorPos = pos; }
+
+	// Set the height of the text cursor in pixels.
+	void
+	setCursorHeight( unsigned height )
+	{ this->fHeight = height; }
 
 	// Show/hide the text cursor.
 	void

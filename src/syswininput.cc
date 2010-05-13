@@ -65,6 +65,13 @@ CHtmlSysWinInputQt::fStartKeypressInput()
 
 
 void
+CHtmlSysWinInputQt::setCursorHeight( unsigned height )
+{
+	this->fCastDispWidget->setCursorHeight(height);
+}
+
+
+void
 CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int append, int enter, int os_cmd_id )
 {
 	// If the command starts with "http:", "ftp:", "news:" "mailto:", or

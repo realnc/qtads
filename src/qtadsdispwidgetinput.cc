@@ -26,6 +26,7 @@
 #include "htmldisp.h"
 
 #include "htmlqt.h"
+#include "qtadssettings.h"
 #include "qtadsdispwidgetinput.h"
 
 
@@ -35,6 +36,9 @@ QTadsDisplayWidgetInput::QTadsDisplayWidgetInput( CHtmlSysWinQt* parent, CHtmlFo
 {
 	connect(this->fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
 	this->fBlinkTimer->start(QApplication::cursorFlashTime() / 2);
+
+	// Our initial height is the height of the current input font.
+	this->fHeight = QFontMetrics(qFrame->settings()->inputFont).height();
 }
 
 
@@ -46,8 +50,8 @@ QTadsDisplayWidgetInput::paintEvent( QPaintEvent* e )
 	QTadsDisplayWidget::paintEvent(e);
 	QPainter painter(this);
 	if (this->fCursorVisible and this->fBlinkVisible) {
-		painter.drawLine(this->fCursorPos.x(), this->fCursorPos.y()+2,
-						 this->fCursorPos.x(), this->fCursorPos.y()+18);
+		painter.drawLine(this->fCursorPos.x(), this->fCursorPos.y(),
+						 this->fCursorPos.x(), this->fCursorPos.y() + this->fHeight);
 	}
 }
 
@@ -56,7 +60,8 @@ void
 QTadsDisplayWidgetInput::fBlinkCursor()
 {
 	this->fBlinkVisible = not this->fBlinkVisible;
-	this->update(this->fCursorPos.x(), this->fCursorPos.y(), this->fCursorPos.x()+1, this->fCursorPos.y()+15);
+	this->update(this->fCursorPos.x(), this->fCursorPos.y(),
+				 this->fCursorPos.x() + 1, this->fCursorPos.y() + this->fHeight);
 }
 
 

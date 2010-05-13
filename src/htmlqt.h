@@ -752,6 +752,10 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	~CHtmlSysWinInputQt()
 	{ }
 
+	// Change the height of the text cursor.
+	void
+	setCursorHeight( unsigned height );
+
 	void
 	processCommand( const textchar_t* cmd, size_t len, int append, int enter, int os_cmd_id );
 
