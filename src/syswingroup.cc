@@ -17,6 +17,7 @@
 
 #include <QMenuBar>
 #include <QCloseEvent>
+#include <QFileDialog>
 
 #include "htmlqt.h"
 #include "qtadsconfdialog.h"
@@ -41,6 +42,13 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	// We make our menu bar parentless so it will be shared by all our windows
 	// in Mac OS X.
 	QMenuBar* menuBar = new QMenuBar(0);
+
+	// "File" menu.
+	QMenu* fileMenu = menuBar->addMenu(tr("&File"));
+	QAction* openAct = new QAction(tr("&Open New Game"), menuBar);
+	openAct->setShortcuts(QKeySequence::Open);
+	fileMenu->addAction(openAct);
+	connect(openAct, SIGNAL(triggered()), this, SLOT(fOpenNewGame()));
 
 	// "Edit" menu.
 	QMenu* editMenu = menuBar->addMenu(tr("&Edit"));
@@ -130,6 +138,17 @@ CHtmlSysWinGroupQt::fShowAboutGame()
 	}
 	this->fAboutBox->show();
 	//this->fAboutBox->adjustSize();
+}
+
+
+void
+CHtmlSysWinGroupQt::fOpenNewGame()
+{
+	const QString& fname = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run", "",
+														"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
+	if (not fname.isEmpty()) {
+		qFrame->setNextGame(fname);
+	}
 }
 
 

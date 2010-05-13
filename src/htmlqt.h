@@ -170,11 +170,15 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// game?
 	bool fTads3;
 
+	// The game we should try to run after the current one ends.
+	QString fNextGame;
+
 	// Is there a reformat pending?
 	bool fReformatPending;
 
+	// Run the game file contained in fNextGame.
 	void
-	fRunGame( const QString& fname );
+	fRunGame();
 
 	void
 	fRunT2Game( const QString& fname );
@@ -219,6 +223,19 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 		this->fGameRunning = f;
 		if (f == false) {
 			emit gameQuitting();
+		}
+	}
+
+	void
+	setNextGame( const QString& fname )
+	{
+		this->fNextGame = fname;
+		// If no game is currently executing, run it now. Otherwise, end the
+		// current game.
+		if (not this->fGameRunning) {
+			this->fRunGame();
+		} else {
+			this->setGameRunning(false);
 		}
 	}
 
@@ -376,6 +393,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
 	void
 	fShowAboutGame();
+
+	void
+	fOpenNewGame();
 
   protected:
 	virtual void
