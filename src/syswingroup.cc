@@ -18,6 +18,7 @@
 #include <QMenuBar>
 #include <QCloseEvent>
 #include <QFileDialog>
+#include <QVBoxLayout>
 
 #include "htmlqt.h"
 #include "qtadsconfdialog.h"
@@ -34,7 +35,7 @@ CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
 
 
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
-: fConfDialog(0), fAboutBox(0)
+: fConfDialog(0), fAboutBoxDialog(0), fAboutBox(0)
 {
 	//qDebug() << Q_FUNC_INFO << "called";
 	Q_ASSERT(qWinGroup == 0);
@@ -129,16 +130,16 @@ CHtmlSysWinGroupQt::fHideConfDialog()
 void
 CHtmlSysWinGroupQt::fShowAboutGame()
 {
-	if (this->fAboutBox == 0) {
+	if (this->fAboutBoxDialog == 0) {
 		return;
 	}
-	if (this->fAboutBox->isVisible()) {
-		this->fAboutBox->activateWindow();
-		this->fAboutBox->raise();
+	if (this->fAboutBoxDialog->isVisible()) {
+		this->fAboutBoxDialog->activateWindow();
+		this->fAboutBoxDialog->raise();
 		return;
 	}
-	this->fAboutBox->show();
-	//this->fAboutBox->adjustSize();
+	this->fAboutBoxDialog->resize(this->fAboutBox->size());
+	this->fAboutBoxDialog->show();
 }
 
 
@@ -165,14 +166,25 @@ CHtmlSysWinAboutBoxQt*
 CHtmlSysWinGroupQt::createAboutBox( class CHtmlFormatter* formatter )
 {
 	// If there's already an "about" box, destroy it first.
-	if (this->fAboutBox != 0) {
-		this->fAboutBox->hide();
-		delete this->fAboutBox;
+	if (this->fAboutBoxDialog != 0) {
+		this->fAboutBoxDialog->hide();
+		delete this->fAboutBoxDialog;
 	} else {
 		this->fAboutGameAction->setEnabled(true);
 	}
 
-	this->fAboutBox = new CHtmlSysWinAboutBoxQt(formatter, this);
+	this->fAboutBoxDialog = new QDialog(this);
+	this->fAboutBoxDialog->setWindowTitle(tr("About This Game"));
+	this->fAboutBox = new CHtmlSysWinAboutBoxQt(formatter, this->fAboutBoxDialog);
+	QVBoxLayout* layout = new QVBoxLayout(this->fAboutBoxDialog);
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->addWidget(this->fAboutBox);
+
+	// Only set the width to something comfortable.  The height will be
+	// calculated later when set_banner_size() is called on the about box.
+	this->fAboutBoxDialog->resize(500, 0);
+	this->fAboutBoxDialog->show();
+	this->fAboutBoxDialog->hide();
 	return this->fAboutBox;
 }
 
@@ -180,11 +192,12 @@ CHtmlSysWinGroupQt::createAboutBox( class CHtmlFormatter* formatter )
 void
 CHtmlSysWinGroupQt::deleteAboutBox()
 {
-	if (this->fAboutBox == 0) {
+	if (this->fAboutBoxDialog == 0) {
 		return;
 	}
-	this->fAboutBox->hide();
-	delete this->fAboutBox;
+	this->fAboutBoxDialog->hide();
+	delete this->fAboutBoxDialog;
+	this->fAboutBoxDialog = 0;
 	this->fAboutBox = 0;
 	this->fAboutGameAction->setEnabled(false);
 }

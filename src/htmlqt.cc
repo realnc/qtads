@@ -35,18 +35,10 @@ CHtmlSysWinGroupQt* qWinGroup = 0;
  * CHtmlSysWinAboutBoxQt
  */
 CHtmlSysWinAboutBoxQt::CHtmlSysWinAboutBoxQt( class CHtmlFormatter* formatter, QWidget* parent )
-: CHtmlSysWinQt(formatter, 0, parent)
+  : CHtmlSysWinQt(formatter, 0, parent)
 {
-	this->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
 	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	this->setWindowTitle(tr("About This Game"));
-
-	// Only set the width to something comfortable.  The height will be
-	// calculated later when set_banner_size() is called.
-	this->resize(500, 0);
-	this->show();
-	this->hide();
 }
 
 

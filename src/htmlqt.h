@@ -381,6 +381,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	class QTadsConfDialog* fConfDialog;
 	QScrollArea* fScrollArea;
 	QTadsFrame* fFrame;
+	class QDialog* fAboutBoxDialog;
 	class CHtmlSysWinAboutBoxQt* fAboutBox;
 	class QAction* fAboutGameAction;
 
