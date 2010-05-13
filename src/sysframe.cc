@@ -123,12 +123,12 @@ CHtmlSysFrameQt::fRunGame()
 	// Note that we're the main HTML TADS frame object.
 	CHtmlSysFrame::set_frame_obj(this);
 
-	// Change to the game file's directory.
-	QDir::setCurrent(QFileInfo(this->fNextGame).path());
-
 	while (not this->fNextGame.isEmpty()) {
 		QString fname = this->fNextGame;
 		this->fNextGame.clear();
+
+		// Change to the game file's directory.
+		QDir::setCurrent(QFileInfo(fname).path());
 
 		// Run the appropriate TADS VM.
 		int vmType = vm_get_game_type(QFileInfo(fname).fileName().toLocal8Bit(), 0, 0, 0, 0);
