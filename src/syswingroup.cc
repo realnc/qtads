@@ -53,6 +53,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	// "Edit" menu.
 	QMenu* editMenu = menuBar->addMenu(tr("&Edit"));
 	QAction* settingsAct = new QAction(tr("&Settings"), menuBar);
+	settingsAct->setShortcuts(QKeySequence::Preferences);
 	editMenu->addAction(settingsAct);
 	connect(settingsAct, SIGNAL(triggered()), this, SLOT(fShowConfDialog()));
 
