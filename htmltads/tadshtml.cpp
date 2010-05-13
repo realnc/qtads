@@ -261,6 +261,9 @@ void th_free(void *ptr)
     static int check_heap = 0;
     mem_prefix_t *mem = ((mem_prefix_t *)ptr) - 1;
     static long ckblk[] = { 0xD9D9D9D9, 0xD9D9D9D9, 0xD9D9D9D9 };
+	
+	if (ptr == 0)
+		return;
 
     /* check the integrity of the entire heap if desired */
     if (check_heap)

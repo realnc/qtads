@@ -307,6 +307,7 @@ void t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args);
  */
 
 #ifdef T3_DEBUG
+#include <new>
 
 /* 
  *   Compiling in debug mode - use our diagnostic heap functions.
