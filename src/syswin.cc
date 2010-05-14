@@ -523,6 +523,10 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	this->fDispWidget->resize(this->formatter_->get_outer_max_line_width(), height);
 	*/
 
+	if (update_win) {
+		this->dispWidget->update();
+	}
+
 	// Unfreeze the display if we froze it before.
 	if (freeze_display) {
 		this->formatter_->freeze_display(false);
