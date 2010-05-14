@@ -175,7 +175,7 @@ CHtmlSysWinGroupQt::createAboutBox( class CHtmlFormatter* formatter )
 		this->fAboutGameAction->setEnabled(true);
 	}
 
-	this->fAboutBoxDialog = new QDialog(this);
+	this->fAboutBoxDialog = new QDialog(this, Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	this->fAboutBoxDialog->setWindowTitle(tr("About This Game"));
 	this->fAboutBox = new CHtmlSysWinAboutBoxQt(formatter, this->fAboutBoxDialog);
 	QVBoxLayout* layout = new QVBoxLayout(this->fAboutBoxDialog);

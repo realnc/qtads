@@ -22,7 +22,7 @@
 
 
 QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
-  : QDialog(parent), ui(new Ui::QTadsConfDialog)
+  : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::QTadsConfDialog)
 {
 	ui->setupUi(this);
 	QTadsSettings* sett = qFrame->settings();
