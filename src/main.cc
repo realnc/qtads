@@ -129,7 +129,6 @@ int main( int argc, char** argv )
 	// Close the audio device as many times as it was opened.
 	int opened = Mix_QuerySpec(0, 0, 0);
 	for (int i = 0; i < opened; ++i) {
-		qDebug() << "closing";
 		Mix_CloseAudio();
 	}
 	SDL_Quit();
