@@ -80,7 +80,7 @@ int main( int argc, char** argv )
 	}
 #endif
 
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) != 0) {
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
 		qWarning("Unable to initialize audio mixer: %s", Mix_GetError());
 		return 1;
 	}
