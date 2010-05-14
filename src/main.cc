@@ -126,7 +126,12 @@ int main( int argc, char** argv )
 	delete app;
 	Mix_ChannelFinished(0);
 	Mix_HookMusicFinished(0);
-	Mix_CloseAudio();
+	// Close the audio device as many times as it was opened.
+	int opened = Mix_QuerySpec(0, 0, 0);
+	for (int i = 0; i < opened; ++i) {
+		qDebug() << "closing";
+		Mix_CloseAudio();
+	}
 	SDL_Quit();
 	return ret;
 }
