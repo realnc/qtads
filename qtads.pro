@@ -50,7 +50,7 @@ HTDIR = htmltads
 DEFINES += \
 	HTMLQT \
 	TROLLTECH_QT \
-	_M_PPC \
+	_M_QT \
 	T3_COMPILING_FOR_HTML \
 	USE_HTML
 
@@ -103,6 +103,7 @@ HEADERS += \
 	src/config.h \
 	src/osqt.h \
 	src/hos_qt.h \
+	src/h_qt.h \
 	src/oswin.h \
 	src/hos_w32.h \
 	src/htmlqt.h \
