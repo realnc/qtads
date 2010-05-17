@@ -839,9 +839,9 @@ CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
 	if (castWin->parentBanner() != 0) {
 		castWin->parentBanner()->setFocus();
 	}
-	delete win;
 
-	// Recalculate the banner layout.
+	// Delete it and recalculate the banner layout.
+	delete win;
 	this->adjustBannerSizes();
 }
 
