@@ -249,7 +249,22 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other
 
 	// Add the banner to our child list.
 	Q_ASSERT(not this->fChildBanners.contains(banner));
-	this->fChildBanners.append(banner);
+	switch (where) {
+	  case OS_BANNER_FIRST:
+		this->fChildBanners.prepend(banner);
+		break;
+	  case OS_BANNER_LAST:
+		this->fChildBanners.append(banner);
+		break;
+	  case OS_BANNER_BEFORE:
+		Q_ASSERT(this->fChildBanners.contains(other));
+		this->fChildBanners.insert(this->fChildBanners.indexOf(other) - 1, banner);
+		break;
+	  default:
+		Q_ASSERT(where == OS_BANNER_AFTER);
+		Q_ASSERT(this->fChildBanners.contains(other));
+		this->fChildBanners.insert(this->fChildBanners.indexOf(other), banner);
+	}
 }
 
 
