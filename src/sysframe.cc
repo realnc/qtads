@@ -831,12 +831,14 @@ CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
 		return;
 	}
 
-	Q_ASSERT(static_cast<CHtmlSysWinQt*>(win)->parentBanner() != 0);
+	CHtmlSysWinQt* castWin = static_cast<CHtmlSysWinQt*>(win);
 
 	// Before deleting it, remove it from our list and give keyboard focus to
-	// its parent.
-	this->fBannerList.removeAll(static_cast<CHtmlSysWinQt*>(win));
-	static_cast<CHtmlSysWinQt*>(win)->parentBanner()->setFocus();
+	// its parent, if it has one.
+	this->fBannerList.removeAll(castWin);
+	if (castWin->parentBanner() != 0) {
+		castWin->parentBanner()->setFocus();
+	}
 	delete win;
 
 	// Recalculate the banner layout.

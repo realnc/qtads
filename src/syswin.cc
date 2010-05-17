@@ -68,6 +68,12 @@ CHtmlSysWinQt::~CHtmlSysWinQt()
 	if (this->fParentBanner != 0) {
 		this->fParentBanner->fChildBanners.removeAll(this);
 	}
+
+	// Remove all references to us from our child banners.
+	for (int i = 0; i < this->fChildBanners.size(); ++i) {
+		Q_ASSERT(this->fChildBanners.at(i)->fParentBanner == this);
+		this->fChildBanners.at(i)->fParentBanner = 0;
+	}
 }
 
 
