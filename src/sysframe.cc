@@ -764,34 +764,32 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 
 	// Create the banner window.
 	CHtmlSysWinQt* banner = new CHtmlSysWinQt(formatter, 0, qWinGroup->centralFrame());
-
-	// Enable/disable the scrollbars, according to what was requested.
-	if (style & OS_BANNER_STYLE_VSCROLL) {
-		banner->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	} else {
-		banner->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	}
-	if (style & OS_BANNER_STYLE_HSCROLL) {
-		banner->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	} else {
-		banner->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	}
-
 	CHtmlSysWinQt* castParent = static_cast<CHtmlSysWinQt*>(parent);
 	CHtmlSysWinQt* castOther = static_cast<CHtmlSysWinQt*>(other);
+
+	// Don't allow MORE mode in text grids.
+	if (window_type == HTML_BANNERWIN_TEXTGRID) {
+		style &= ~OS_BANNER_STYLE_MOREMODE;
+	}
+
+	// MORE mode implies auto vscroll.
+	if (style & OS_BANNER_STYLE_MOREMODE) {
+		style |= OS_BANNER_STYLE_AUTO_VSCROLL;
+	}
+
+	// If no parent was specified, it means that it's a child of the main
+	// game window.
+	if (parent == 0) {
+		parent = castParent = this->fGameWin;
+	}
 
 	// If BEFORE or AFTER is requested but 'other' isn't a child of the
 	// parent, we must behave as if OS_BANNER_LAST were specified.
 	if (where == OS_BANNER_BEFORE or where == OS_BANNER_AFTER) {
 		Q_ASSERT(other != 0);
-		if ((parent == 0) or castOther->parentBanner() != parent) {
+		if (castOther->parentBanner() != parent) {
 			where = OS_BANNER_LAST;
 		}
-	}
-
-	// If no parent was specified, make it a child of the main game window.
-	if (parent == 0) {
-		parent = castParent = this->fGameWin;
 	}
 
 	// Add the banner and store it in our list.

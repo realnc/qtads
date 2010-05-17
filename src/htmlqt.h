@@ -438,15 +438,17 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	Q_OBJECT
 
   private:
-	// If we're a banner, what is our HTML_BannerWin_Pos_t, style and
-	// placement.
+	// If we're a banner, what is our HTML_BannerWin_Pos_t, placement and
+	// style flags.
 	//
 	// Note: To determine whether we're a banner, we don't use a flag but
 	// simply check whether "this == qFrame->gameWindow()"; if we're the game
 	// window, we can't be a banner.
 	HTML_BannerWin_Pos_t fBannerPos;
-	unsigned long fBannerStyle;
 	int fBannerWhere;
+	bool fBannerStyleVScroll;
+	bool fBannerStyleAutoVScroll;
+	bool fBannerStyleHScroll;
 
 	// Do not attempt to reformat during a resize event.  This is set when in
 	// the process of creating a new banner.  If we reformat during that

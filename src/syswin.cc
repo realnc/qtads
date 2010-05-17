@@ -220,15 +220,34 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other
 {
 	Q_ASSERT(banner->fParentBanner == 0);
 
+	// Enable/disable the scrollbars, according to what was requested.
+	if (style & OS_BANNER_STYLE_VSCROLL) {
+		banner->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+		banner->fBannerStyleVScroll = true;
+	} else {
+		banner->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		banner->fBannerStyleVScroll = false;
+	}
+	if (style & OS_BANNER_STYLE_HSCROLL) {
+		banner->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+		banner->fBannerStyleHScroll = true;
+	} else {
+		banner->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		banner->fBannerStyleHScroll = true;
+	}
+
 	banner->fParentBanner = this;
 	banner->fBannerPos = pos;
-	banner->fBannerStyle = style;
 	banner->fBannerWhere = where;
+	banner->fBannerStyleAutoVScroll = style & OS_BANNER_STYLE_AUTO_VSCROLL;
+
 	banner->setGeometry(this->geometry());
 	// Qt will not update the viewport() geometry unless the widget is shown
 	// first.
 	banner->show();
 	banner->hide();
+
+	// Add the banner to our child list.
 	Q_ASSERT(not this->fChildBanners.contains(banner));
 	this->fChildBanners.append(banner);
 }
@@ -931,8 +950,13 @@ CHtmlSysWinQt::set_banner_info( HTML_BannerWin_Pos_t pos, unsigned long style )
 {
 	//qDebug() << Q_FUNC_INFO;
 
+	// Set the new auto-vscroll flag.
+	this->fBannerStyleAutoVScroll = style & OS_BANNER_STYLE_AUTO_VSCROLL;
+
+	// Set the new alignemnt.
 	this->fBannerPos = pos;
-	this->fBannerStyle = style;
+
+	// FIXME: ignore the scrollbar changes (for now, anyway)
 }
 
 
@@ -940,6 +964,17 @@ void
 CHtmlSysWinQt::get_banner_info( HTML_BannerWin_Pos_t* pos, unsigned long* style )
 {
 	//qDebug() << Q_FUNC_INFO;
+	Q_ASSERT(pos != 0);
+	Q_ASSERT(style != 0);
+
 	*pos = this->fBannerPos;
-	*style = this->fBannerStyle;
+
+	// Set the style flags.
+	*style = 0;
+	if (this->fBannerStyleAutoVScroll) {
+		*style |= OS_BANNER_STYLE_AUTO_VSCROLL;
+	}
+
+	// We provide full HTML interpretation, so we support <TAB>.
+	*style |= OS_BANNER_STYLE_TAB_ALIGN;
 }
