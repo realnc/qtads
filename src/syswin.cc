@@ -544,7 +544,9 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 		this->formatter_->do_formatting();
 		this->dispWidget->resize(this->dispWidget->width(), this->formatter_->get_max_y_pos());
 		if (update_win) {
-			this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+			if (this->fBannerStyleAutoVScroll) {
+				this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+			}
 			qFrame->advanceEventLoop();
 		}
 	}
@@ -562,6 +564,10 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	}
 	this->fDispWidget->resize(this->formatter_->get_outer_max_line_width(), height);
 	*/
+
+	if (this->fBannerStyleAutoVScroll) {
+		this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+	}
 
 	if (update_win) {
 		this->dispWidget->update();

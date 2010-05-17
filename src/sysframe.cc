@@ -848,8 +848,8 @@ int
 CHtmlSysFrameQt::get_exe_resource( const textchar_t* resname, size_t resnamelen, textchar_t* fname_buf,
 								   size_t fname_buf_len, unsigned long* seek_pos, unsigned long* siz )
 {
-	qDebug() << Q_FUNC_INFO;
-	qDebug() << "resname:" << resname << "fname_buf:" << fname_buf << "seek_pos:" << seek_pos;
+	//qDebug() << Q_FUNC_INFO;
+	//qDebug() << "resname:" << resname << "fname_buf:" << fname_buf << "seek_pos:" << seek_pos;
 
 	return false;
 }
