@@ -30,8 +30,8 @@
 
 
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QTadsDisplayWidget* dispWidget, QWidget* parent )
-: QScrollArea(parent), CHtmlSysWin(formatter), fDontReformat(0), fParentBanner(0), fBgImage(0),
-  margins(8, 2, 8, 2), bannerSize(0), bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
+  : QScrollArea(parent), CHtmlSysWin(formatter), fBannerStyleAutoVScroll(true), fDontReformat(0), fParentBanner(0),
+	fBgImage(0), margins(8, 2, 8, 2), bannerSize(0), bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
 {
 	if (dispWidget == 0) {
 		this->dispWidget = new QTadsDisplayWidget(this, formatter);
