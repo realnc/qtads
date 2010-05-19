@@ -63,6 +63,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	// "Help" menu.
 	QMenu* gameMenu = menuBar->addMenu(tr("&Help"));
 	this->fAboutGameAction = new QAction(tr("&About this game"), menuBar);
+	this->fAboutGameAction->setMenuRole(QAction::ApplicationSpecificRole);
 	this->fAboutGameAction->setEnabled(false);
 	gameMenu->addAction(this->fAboutGameAction);
 	connect(this->fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
