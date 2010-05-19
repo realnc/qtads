@@ -1,23 +1,18 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header$";
-#endif
-
 /* 
- *   Copyright (c) 1999, 2002 Michael J. Roberts.  All Rights Reserved.
+ *   Copyright (c) 2002 by Michael J. Roberts.  All Rights Reserved.
  *   
  *   Please see the accompanying license file, LICENSE.TXT, for information
  *   on using and copying this software.  
  */
 /*
 Name
-  vmcfgmem.cpp - T3 VM Configuration - in-memory (non-swapping) memory manager
+  vmcfgfl.cpp - "flat" constant pool configuration
 Function
   
 Notes
   
 Modified
-  10/08/99 MJRoberts  - Creation
+  09/19/02 MJRoberts  - Creation
 */
 
 #include "vminit.h"
@@ -28,6 +23,6 @@ Modified
  */
 void vm_initialize(struct vm_globals **vmg, const vm_init_options *opts)
 {
-    vm_init_in_mem(vmg, opts);
+    vm_init_flat(vmg, opts);
 }
 

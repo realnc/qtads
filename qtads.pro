@@ -1,6 +1,7 @@
 TEMPLATE = app
 CONFIG += qt silent warn_off
 macx {
+	#QMAKE_INFO_PLIST = Info.plist
 	LIBS += -framework SDL_mixer -framework SDL
 	INCLUDEPATH += \
 		/Library/Frameworks/SDL.framework/Headers \
@@ -52,6 +53,7 @@ DEFINES += \
 	TROLLTECH_QT \
 	_M_QT \
 	T3_COMPILING_FOR_HTML \
+	VM_FLAT_POOL \
 	USE_HTML
 
 CONFIG(release, debug|release) {
@@ -226,7 +228,7 @@ SOURCES += \
 	$$T3DIR/vmbignum.cpp \
 	$$T3DIR/vmbt3_nd.cpp \
 	$$T3DIR/vmbytarr.cpp \
-	$$T3DIR/vmcfgmem.cpp \
+	$$T3DIR/vmcfgfl.cpp \
 	$$T3DIR/vmcoll.cpp \
 	$$T3DIR/vmconhmp.cpp \
 	$$T3DIR/vmconhtm.cpp \
@@ -245,7 +247,7 @@ SOURCES += \
 	$$T3DIR/vmimage.cpp \
 	$$T3DIR/vmimg_nd.cpp \
 	$$T3DIR/vminit.cpp \
-	$$T3DIR/vminitim.cpp \
+	$$T3DIR/vminitfl.cpp \
 	$$T3DIR/vmini_nd.cpp \
 	$$T3DIR/vmintcls.cpp \
 	$$T3DIR/vmiter.cpp \
@@ -257,7 +259,7 @@ SOURCES += \
 	$$T3DIR/vmobj.cpp \
 	$$T3DIR/vmpat.cpp \
 	$$T3DIR/vmpool.cpp \
-	$$T3DIR/vmpoolim.cpp \
+	$$T3DIR/vmpoolfl.cpp \
 	$$T3DIR/vmregex.cpp \
 	$$T3DIR/vmrun.cpp \
 	$$T3DIR/vmrunsym.cpp \

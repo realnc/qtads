@@ -1,8 +1,3 @@
-#ifdef RCSID
-static char RCSid[] =
-"$Header$";
-#endif
-
 /* 
  *   Copyright (c) 1999, 2002 Michael J. Roberts.  All Rights Reserved.
  *   
@@ -11,23 +6,24 @@ static char RCSid[] =
  */
 /*
 Name
-  vminitim.cpp - VM initialization - in-memory pool implementation
+  vminitim.cpp - VM initialization - "flat" pool implementation
 Function
-  
+
 Notes
-  
+
 Modified
   07/21/99 MJRoberts  - Creation
 */
 
 #include "vminit.h"
 #include "vmpool.h"
+#include "vmglob.h"
 
 /* ------------------------------------------------------------------------ */
 /*
- *   Initialize the VM with in-memory page pools 
+ *   Initialize the VM with the "flat" pool manager
  */
-void vm_init_in_mem(vm_globals **vmg, const vm_init_options *opts)
+void vm_init_flat(vm_globals **vmg, const vm_init_options *opts)
 {
     vm_globals *vmg__;
 
@@ -40,9 +36,8 @@ void vm_init_in_mem(vm_globals **vmg, const vm_init_options *opts)
      */
     vmg__ = *vmg;
 
-    /* create the in-memory pools */
-    VM_IF_ALLOC_PRE_GLOBAL(G_code_pool = new CVmPoolInMem());
-    VM_IF_ALLOC_PRE_GLOBAL(G_const_pool = new CVmPoolInMem());
+    /* create the flat pools */
+    VM_IF_ALLOC_PRE_GLOBAL(G_code_pool = new CVmPoolFlat());
+    VM_IF_ALLOC_PRE_GLOBAL(G_const_pool = new CVmPoolFlat());
 }
-
 
