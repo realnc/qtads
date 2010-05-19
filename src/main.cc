@@ -42,15 +42,16 @@ int main( int argc, char** argv )
 	// Filename of the game to run.
 	QString gameFileName;
 
-	if (argc == 2) {
-		if (QFile::exists(QString::fromLocal8Bit(argv[1]))) {
-			gameFileName = QString::fromLocal8Bit(argv[1]);
-		} else if (QFile::exists(QString::fromLocal8Bit(argv[1]) + ".gam")) {
-			gameFileName = QString::fromLocal8Bit(argv[1]) + ".gam";
-		} else if (QFile::exists(QString::fromLocal8Bit(argv[1]) + ".t3")) {
-			gameFileName = QString::fromLocal8Bit(argv[1]) + ".t3";
+	const QStringList& args = app->arguments();
+	if (args.size() == 2) {
+		if (QFile::exists(args.at(1))) {
+			gameFileName = args.at(1);
+		} else if (QFile::exists(args.at(1) + ".gam")) {
+			gameFileName = args.at(1) + ".gam";
+		} else if (QFile::exists(args.at(1) + ".t3")) {
+			gameFileName = args.at(1) + ".t3";
 		} else {
-			qWarning().nospace() << "File '" << argv[1] << "' not found.";
+			qWarning() << "File" << args.at(1) << "not found.";
 		}
 	}
 
