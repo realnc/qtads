@@ -70,16 +70,19 @@ macx|win32 {
 }
 
 # These macros override some default buffer-sizes the T3VM uses for UNDO
-# operations.  QTads runs on systems with a lot of RAM (compared to
-# DOS), so we increase these buffers.  Normally, the player would only
-# be able to UNDO turns in a T3 game only 10 times or so.  With larger
-# UNDO-buffers, more turns are possible.  See tads3/vmparam.h for an
-# explanation.  Note that VM_UNDO_MAX_SAVEPTS can't be larger than 255.
-DEFINES += \
-	VM_STACK_SIZE=65536 \
-	VM_STACK_RESERVE=1024 \
-	VM_UNDO_MAX_RECORDS=65536 \
-	VM_UNDO_MAX_SAVEPTS=255
+# operations.  QTads runs on systems with a lot of RAM (compared to DOS), so we
+# could increase these buffers.  Normally, the player would only be able to
+# UNDO turns in a T3 game only 10 times or so.  With larger UNDO-buffers, more
+# turns are possible.  See tads3/vmparam.h for an explanation.  Note that
+# VM_UNDO_MAX_SAVEPTS can't be larger than 255.
+#
+# This, however, incurs quite a bit of overhead, slowing game response down
+# over time, which is why we disable this for now.
+#DEFINES += \
+#	VM_STACK_SIZE=65536 \
+#	VM_STACK_RESERVE=1024 \
+#	VM_UNDO_MAX_RECORDS=65536 \
+#	VM_UNDO_MAX_SAVEPTS=255
 
 INCLUDEPATH += src $$T2DIR $$T3DIR $$HTDIR
 DEPENDPATH += src $$T2DIR $$T3DIR $$HTDIR
