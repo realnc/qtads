@@ -863,7 +863,7 @@ CHtmlSysWinQt::get_html_link_underline() const
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	return true;
+	return false;
 }
 
 
@@ -872,7 +872,7 @@ CHtmlSysWinQt::get_html_show_links() const
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	return true;
+	return qFrame->settings()->enableLinks;
 }
 
 
@@ -881,7 +881,7 @@ CHtmlSysWinQt::get_html_show_graphics() const
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	return true;
+	return qFrame->settings()->enableGraphics;
 }
 
 

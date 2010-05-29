@@ -28,6 +28,11 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	QTadsSettings* sett = qFrame->settings();
 	sett->loadFromDisk();
 
+	ui->allowGraphicsCheckBox->setChecked(sett->enableGraphics);
+	ui->allowDigitalCheckBox->setChecked(sett->enableDigitalSound);
+	ui->allowMidiCheckBox->setChecked(sett->enableMidiSound);
+	ui->allowLinksCheckBox->setChecked(sett->enableLinks);
+
 	const QList<int>& sizeList = QFontDatabase::standardSizes();
 	for (int i = 0; i < sizeList.size(); ++i) {
 		const QString& item = QString::number(sizeList.at(i));
@@ -72,6 +77,11 @@ void
 QTadsConfDialog::applySettings()
 {
 	QTadsSettings* sett = qFrame->settings();
+
+	sett->enableGraphics = ui->allowGraphicsCheckBox->isChecked();
+	sett->enableDigitalSound = ui->allowDigitalCheckBox->isChecked();
+	sett->enableMidiSound = ui->allowMidiCheckBox->isChecked();
+	sett->enableLinks = ui->allowLinksCheckBox->isChecked();
 
 	sett->mainFont = ui->mainFontBox->currentFont();
 	sett->fixedFont = ui->fixedFontBox->currentFont();

@@ -29,6 +29,11 @@ class QTadsSettings {
 	void
 	saveToDisk();
 
+	bool enableGraphics;
+	bool enableDigitalSound;
+	bool enableMidiSound;
+	bool enableLinks;
+
 	CHtmlSysFontQt mainFont;
 	CHtmlSysFontQt fixedFont;
 	CHtmlSysFontQt serifFont;
@@ -36,6 +41,7 @@ class QTadsSettings {
 	CHtmlSysFontQt scriptFont;
 	CHtmlSysFontQt writerFont;
 	CHtmlSysFontQt inputFont;
+
 	QSize appSize;
 };
 

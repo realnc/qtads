@@ -25,6 +25,7 @@
 #include "htmldisp.h"
 
 #include "qtadsdispwidget.h"
+#include "qtadssettings.h"
 
 
 QTadsDisplayWidget::QTadsDisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
@@ -67,24 +68,26 @@ QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 	}
 
 	// It could be a link.
-	CHtmlDispLink* link = disp->get_link(this->fFormatter, pos.x, pos.y);
+	if (qFrame->settings()->enableLinks) {
+		CHtmlDispLink* link = disp->get_link(this->fFormatter, pos.x, pos.y);
 
-	// If we found something that has ALT text, show it in the status bar.
-	if (disp->get_alt_text() != 0 and qstrlen(disp->get_alt_text()) > 0) {
-		qWinGroup->statusBar()->showMessage(disp->get_alt_text());
-		// If it's a clickable link, also change the mouse cursor shape.
-		if (link != 0 and link->is_clickable_link()) {
-			this->setCursor(Qt::PointingHandCursor);
+		// If we found something that has ALT text, show it in the status bar.
+		if (disp->get_alt_text() != 0 and qstrlen(disp->get_alt_text()) > 0) {
+			qWinGroup->statusBar()->showMessage(disp->get_alt_text());
+			// If it's a clickable link, also change the mouse cursor shape.
+			if (link != 0 and link->is_clickable_link()) {
+				this->setCursor(Qt::PointingHandCursor);
+			}
+			return;
 		}
-		return;
-	}
 
-	// It could be a clickable link without any ALT text.  In that case, show
-	// its contents.
-	if (link != 0 and link->is_clickable_link()) {
-		qWinGroup->statusBar()->showMessage(link->href_.get_url());
-		this->setCursor(Qt::PointingHandCursor);
-		return;
+		// It could be a clickable link without any ALT text.  In that case, show
+		// its contents.
+		if (link != 0 and link->is_clickable_link()) {
+			qWinGroup->statusBar()->showMessage(link->href_.get_url());
+			this->setCursor(Qt::PointingHandCursor);
+			return;
+		}
 	}
 
 	// We don't know what it was.  Clear status bar message and reset cursor
@@ -110,7 +113,7 @@ QTadsDisplayWidget::mousePressEvent( QMouseEvent* e )
 
 	// If we found a link, process it.
 	// FIXME: We should track the link and process it at mouseReleaseEvent().
-	if (link != 0 and link->is_clickable_link()) {
+	if (link != 0 and link->is_clickable_link() and qFrame->settings()->enableLinks) {
 		// Draw all of the items involved in the link in the hilited state.
 		link->set_clicked(this->fParentSysWin, CHtmlDispLink_clicked);
 		const textchar_t* cmd = link->href_.get_url();

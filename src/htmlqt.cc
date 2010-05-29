@@ -24,6 +24,7 @@
 #include "htmlfmt.h"
 
 #include "htmlqt.h"
+#include "qtadssettings.h"
 #include "qtadsdispwidget.h"
 
 
@@ -136,6 +137,11 @@ CHtmlSysSoundMidiQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 								 long fade_in, long fade_out, int crossfade )
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
+
+	// Check if user disabled MIDI sound.
+	if (not qFrame->settings()->enableMidiSound) {
+		return 1;
+	}
 
 	if (CHtmlSysSoundMidiQt::fActiveMidi != 0) {
 		// Only one MIDI sound can be active at a time.
@@ -285,10 +291,15 @@ QTadsSound::effectCallback( int chan, void* stream, int len, void* udata )
 }
 
 
-void
+int
 QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
 								int vol )
 {
+	// Check if user disabled digital sound.
+	if (not qFrame->settings()->enableDigitalSound) {
+		return 1;
+	}
+
 	Q_ASSERT(not this->fPlaying);
 
 	// Adjust volume if it exceeds min/max levels.
@@ -319,6 +330,7 @@ QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done
 		this->fDone_func = done_func;
 		this->fDone_func_ctx = done_func_ctx;
 	}
+	return 0;
 }
 
 
@@ -451,8 +463,7 @@ CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								int crossfade )
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	this->startPlaying(done_func, done_func_ctx, repeat, vol);
-	return 0;
+	return this->startPlaying(done_func, done_func_ctx, repeat, vol);
 }
 
 
@@ -488,8 +499,7 @@ CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								int crossfade )
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	this->startPlaying(done_func, done_func_ctx, repeat, vol);
-	return 0;
+	return this->startPlaying(done_func, done_func_ctx, repeat, vol);
 }
 
 
@@ -525,8 +535,7 @@ CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 								 int crossfade )
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	this->startPlaying(done_func, done_func_ctx, repeat, vol);
-	return 0;
+	return this->startPlaying(done_func, done_func_ctx, repeat, vol);
 }
 
 

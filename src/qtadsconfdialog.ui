@@ -226,9 +226,6 @@
            </widget>
           </item>
          </layout>
-         <zorder>inputFontBox</zorder>
-         <zorder>inputFontSizeComboBox</zorder>
-         <zorder>inputFontItalicCheckBox</zorder>
          <zorder>inputFontBoldCheckBox</zorder>
          <zorder>inputFontItalicCheckBox</zorder>
         </widget>
@@ -249,6 +246,68 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Media</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>You can prevent games from displaying graphics or playing music and sound effects by clearing these checkboxes. If you turn off graphics and/or sounds, multimedia games will still work, but they'll be limited to displaying text.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QWidget" name="widget" native="true"/>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QCheckBox" name="allowGraphicsCheckBox">
+             <property name="text">
+              <string>Allow Graphics</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="allowDigitalCheckBox">
+             <property name="text">
+              <string>Allow Digital Sound</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="allowMidiCheckBox">
+             <property name="text">
+              <string>Allow MIDI Sound</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="allowLinksCheckBox">
+             <property name="text">
+              <string>Allow Hyperlinks</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget_2" native="true"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_3" native="true"/>
        </item>
       </layout>
      </widget>

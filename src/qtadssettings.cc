@@ -24,6 +24,14 @@ void
 QTadsSettings::loadFromDisk()
 {
 	QSettings sett;
+
+	sett.beginGroup("media");
+	this->enableGraphics = sett.value("graphics", true).toBool();
+	this->enableDigitalSound = sett.value("sounds", true).toBool();
+	this->enableMidiSound = sett.value("music", true).toBool();
+	this->enableLinks = sett.value("links", true).toBool();
+	sett.endGroup();
+
 	sett.beginGroup("fonts");
 	this->mainFont.fromString(sett.value("main", "serif").toString());
 	this->fixedFont.fromString(sett.value("fixed", "monospace").toString());
@@ -33,6 +41,7 @@ QTadsSettings::loadFromDisk()
 	this->writerFont.fromString(sett.value("typewriter", "monospace").toString());
 	this->inputFont.fromString(sett.value("input", "serif").toString());
 	sett.endGroup();
+
 	this->appSize = sett.value("geometry/size", QSize(740, 540)).toSize();
 }
 
@@ -41,6 +50,14 @@ void
 QTadsSettings::saveToDisk()
 {
 	QSettings sett;
+
+	sett.beginGroup("media");
+	sett.setValue("graphics", this->enableGraphics);
+	sett.setValue("sounds", this->enableDigitalSound);
+	sett.setValue("music", this->enableMidiSound);
+	sett.setValue("links", this->enableLinks);
+	sett.endGroup();
+
 	sett.beginGroup("fonts");
 	sett.setValue("main", this->mainFont.toString());
 	sett.setValue("fixed", this->fixedFont.toString());
@@ -50,6 +67,7 @@ QTadsSettings::saveToDisk()
 	sett.setValue("typewriter", this->writerFont.toString());
 	sett.setValue("input", this->inputFont.toString());
 	sett.endGroup();
+
 	sett.setValue("geometry/size", qWinGroup->size());
 	sett.sync();
 }

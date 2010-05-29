@@ -1046,7 +1046,7 @@ class QTadsSound: public QObject {
 	static void callback( int channel );
 	static void effectCallback( int chan, void* stream, int len, void* udata );
 
-	void
+	int
 	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol );
 
 	void
