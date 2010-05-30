@@ -83,9 +83,8 @@ QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 		}
 
 		// If we're tracking a hover and it's a new link, track this one and
-		// forget about the previous one, unless we're also tracking a clicked
-		// link.
-		if (this->fClickedLink == 0 and link != this->fHoverLink) {
+		// forget about the previous one.
+		if (link != this->fHoverLink) {
 			if (this->fHoverLink != 0) {
 				this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
 			}
@@ -96,7 +95,8 @@ QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 		// hovering color.
 		if (link != 0 and link->is_clickable_link()) {
 			this->setCursor(Qt::PointingHandCursor);
-			if (qFrame->settings()->highlightLinks) {
+			// Only change its color if we're not click-tracking another link.
+			if (qFrame->settings()->highlightLinks and this->fClickedLink == 0) {
 				link->set_clicked(this->parentSysWin, CHtmlDispLink_hover);
 			}
 		}
