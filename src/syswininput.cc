@@ -114,6 +114,11 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 
 	// Add the command string.
 	this->fTadsBuffer->add_string(cmd, len, true);
+	this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
+	if (this->fTag->ready_to_format()) {
+		this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
+	}
+	this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
 
 	// If 'enter' is true, indicate that we've finished reading the command, so
 	// that getInput() will return the new command as its result; otherwise,
