@@ -268,6 +268,10 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	void
 	pruneParseTree();
 
+	// Notify the application that preferences have changed.
+	void
+	notifyPreferencesChange( const class QTadsSettings* sett );
+
 	// Advance the event loop.
 	void
 	advanceEventLoop( QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents )

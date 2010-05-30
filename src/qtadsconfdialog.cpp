@@ -162,10 +162,8 @@ QTadsConfDialog::applySettings()
 	sett->writerFont.setPointSize(ui->writerFontSizeComboBox->currentText().toInt());
 	sett->inputFont.setPointSize(ui->inputFontSizeComboBox->currentText().toInt());
 
-	// Change the text cursor's height according to the new input font's height.
-	qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett->inputFont).height());
-
-	qFrame->reformatBanners();
+	// Notify the application that preferences have changed.
+	qFrame->notifyPreferencesChange(sett);
 
 	sett->saveToDisk();
 }

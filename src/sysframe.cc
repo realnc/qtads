@@ -501,6 +501,29 @@ void CHtmlSysFrameQt::pruneParseTree()
 
 
 void
+CHtmlSysFrameQt::notifyPreferencesChange( const QTadsSettings* sett )
+{
+	// If digital sounds are now turned off, cancel sound playback in the
+	// effects layers
+	if (not sett->enableDigitalSound) {
+		this->fFormatter->cancel_sound(HTML_Attrib_ambient, 0.0, false, false);
+		this->fFormatter->cancel_sound(HTML_Attrib_bgambient, 0.0, false, false);
+		this->fFormatter->cancel_sound(HTML_Attrib_foreground, 0.0, false, false);
+	}
+
+	// If MIDI is now turned off, cancel playback in the music layer.
+	if (not sett->enableMidiSound) {
+		this->fFormatter->cancel_sound(HTML_Attrib_background, 0.0, false, false);
+	}
+
+	// Change the text cursor's height according to the new input font's height.
+	qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett->inputFont).height());
+
+	qFrame->reformatBanners();
+}
+
+
+void
 CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 {
 	// Flush and clear the buffer.
