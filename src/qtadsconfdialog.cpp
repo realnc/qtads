@@ -46,6 +46,7 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	p.setColor(QPalette::Button, qFrame->settings()->bannerTextColor);
 	ui->bannerTextColorButton->setPalette(p);
 	ui->underlineLinksCheckBox->setChecked(sett->underlineLinks);
+	ui->highlightLinksCheckBox->setChecked(sett->highlightLinks);
 	p.setColor(QPalette::Button, qFrame->settings()->unvisitedLinkColor);
 	ui->linkUnvisitedColorButton->setPalette(p);
 	p.setColor(QPalette::Button, qFrame->settings()->hoveringLinkColor);
@@ -138,6 +139,7 @@ QTadsConfDialog::applySettings()
 	sett->bannerBgColor = ui->bannerBgColorButton->palette().color(QPalette::Button);
 	sett->bannerTextColor = ui->bannerTextColorButton->palette().color(QPalette::Button);
 	sett->underlineLinks = ui->underlineLinksCheckBox->isChecked();
+	sett->highlightLinks = ui->highlightLinksCheckBox->isChecked();
 	sett->unvisitedLinkColor = ui->linkUnvisitedColorButton->palette().color(QPalette::Button);
 	sett->hoveringLinkColor = ui->linkHoveringColorButton->palette().color(QPalette::Button);
 	sett->clickedLinkColor = ui->linkClickedColorButton->palette().color(QPalette::Button);

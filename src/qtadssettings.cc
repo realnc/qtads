@@ -38,6 +38,7 @@ QTadsSettings::loadFromDisk()
 	this->bannerBgColor = sett.value("bannerbg", QColor(Qt::lightGray)).value<QColor>();
 	this->bannerTextColor = sett.value("bannertext", QColor(Qt::black)).value<QColor>();
 	this->underlineLinks = sett.value("underlinelinks", false).toBool();
+	this->highlightLinks = sett.value("highlightlinks", true).toBool();
 	this->unvisitedLinkColor = sett.value("unvisitedlinks", QColor(Qt::blue)).value<QColor>();
 	this->hoveringLinkColor = sett.value("hoveringlinks", QColor(Qt::cyan)).value<QColor>();
 	this->clickedLinkColor = sett.value("clickedlinks", QColor(Qt::magenta)).value<QColor>();
@@ -75,6 +76,7 @@ QTadsSettings::saveToDisk()
 	sett.setValue("bannerbg", this->bannerBgColor);
 	sett.setValue("bannertext", this->bannerTextColor);
 	sett.setValue("underlinelinks", this->underlineLinks);
+	sett.setValue("highlightlinks", this->highlightLinks);
 	sett.setValue("unvisitedlinks", this->unvisitedLinkColor);
 	sett.setValue("hoveringlinks", this->hoveringLinkColor);
 	sett.setValue("clickedlinks", this->clickedLinkColor);

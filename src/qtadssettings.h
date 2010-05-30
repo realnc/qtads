@@ -40,6 +40,7 @@ class QTadsSettings {
 	QColor bannerBgColor;
 
 	bool underlineLinks;
+	bool highlightLinks;
 	QColor unvisitedLinkColor;
 	QColor hoveringLinkColor;
 	QColor clickedLinkColor;

@@ -96,7 +96,9 @@ QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 		// hovering color.
 		if (link != 0 and link->is_clickable_link()) {
 			this->setCursor(Qt::PointingHandCursor);
-			link->set_clicked(this->parentSysWin, CHtmlDispLink_hover);
+			if (qFrame->settings()->highlightLinks) {
+				link->set_clicked(this->parentSysWin, CHtmlDispLink_hover);
+			}
 		}
 
 		// If we found something that has ALT text, show it in the status bar.
