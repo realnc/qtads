@@ -40,8 +40,8 @@ QTadsSettings::loadFromDisk()
 	this->underlineLinks = sett.value("underlinelinks", false).toBool();
 	this->highlightLinks = sett.value("highlightlinks", true).toBool();
 	this->unvisitedLinkColor = sett.value("unvisitedlinks", QColor(Qt::blue)).value<QColor>();
-	this->hoveringLinkColor = sett.value("hoveringlinks", QColor(Qt::cyan)).value<QColor>();
-	this->clickedLinkColor = sett.value("clickedlinks", QColor(Qt::magenta)).value<QColor>();
+	this->hoveringLinkColor = sett.value("hoveringlinks", QColor(Qt::red)).value<QColor>();
+	this->clickedLinkColor = sett.value("clickedlinks", QColor(Qt::cyan)).value<QColor>();
 	sett.endGroup();
 
 	sett.beginGroup("fonts");
