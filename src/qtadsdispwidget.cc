@@ -127,6 +127,25 @@ QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 
 
 void
+QTadsDisplayWidget::leaveEvent( QEvent* e )
+{
+	// If we're tracking a link, forget it.
+	if (this->fHoverLink != 0 or this->fClickedLink != 0) {
+		if (this->fClickedLink != 0) {
+			this->fClickedLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+			this->fClickedLink = 0;
+		}
+		if (this->fHoverLink != 0) {
+			this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+			this->fHoverLink = 0;
+		}
+		this->unsetCursor();
+		qWinGroup->statusBar()->clearMessage();
+	}
+}
+
+
+void
 QTadsDisplayWidget::mousePressEvent( QMouseEvent* e )
 {
 	if (this->fHoverLink == 0) {

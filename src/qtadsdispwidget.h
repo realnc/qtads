@@ -48,6 +48,9 @@ class QTadsDisplayWidget: public QWidget {
 	mouseMoveEvent( QMouseEvent* e );
 
 	virtual void
+	leaveEvent( QEvent* e );
+
+	virtual void
 	mousePressEvent( QMouseEvent* e );
 
 	virtual void
