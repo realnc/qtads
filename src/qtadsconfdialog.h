@@ -42,6 +42,9 @@ class QTadsConfDialog: public QDialog {
   private slots:
 	void
 	applySettings();
+
+	void
+	selectColor( int i );
 };
 
 

@@ -34,6 +34,16 @@ class QTadsSettings {
 	bool enableMidiSound;
 	bool enableLinks;
 
+	QColor mainTextColor;
+	QColor mainBgColor;
+	QColor bannerTextColor;
+	QColor bannerBgColor;
+
+	bool underlineLinks;
+	QColor unvisitedLinkColor;
+	QColor hoveringLinkColor;
+	QColor clickedLinkColor;
+
 	CHtmlSysFontQt mainFont;
 	CHtmlSysFontQt fixedFont;
 	CHtmlSysFontQt serifFont;

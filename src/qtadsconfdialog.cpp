@@ -15,6 +15,9 @@
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <QColorDialog>
+#include <QSignalMapper>
+
 #include "qtadsconfdialog.h"
 #include "ui_qtadsconfdialog.h"
 #include "qtadssettings.h"
@@ -32,6 +35,23 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	ui->allowDigitalCheckBox->setChecked(sett->enableDigitalSound);
 	ui->allowMidiCheckBox->setChecked(sett->enableMidiSound);
 	ui->allowLinksCheckBox->setChecked(sett->enableLinks);
+
+	QPalette p(ui->mainBgColorButton->palette());
+	p.setColor(QPalette::Button, qFrame->settings()->mainBgColor);
+	ui->mainBgColorButton->setPalette(p);
+	p.setColor(QPalette::Button, qFrame->settings()->mainTextColor);
+	ui->mainTextColorButton->setPalette(p);
+	p.setColor(QPalette::Button, qFrame->settings()->bannerBgColor);
+	ui->bannerBgColorButton->setPalette(p);
+	p.setColor(QPalette::Button, qFrame->settings()->bannerTextColor);
+	ui->bannerTextColorButton->setPalette(p);
+	ui->underlineLinksCheckBox->setChecked(sett->underlineLinks);
+	p.setColor(QPalette::Button, qFrame->settings()->unvisitedLinkColor);
+	ui->linkUnvisitedColorButton->setPalette(p);
+	p.setColor(QPalette::Button, qFrame->settings()->hoveringLinkColor);
+	ui->linkHoveringColorButton->setPalette(p);
+	p.setColor(QPalette::Button, qFrame->settings()->clickedLinkColor);
+	ui->linkClickedColorButton->setPalette(p);
 
 	const QList<int>& sizeList = QFontDatabase::standardSizes();
 	for (int i = 0; i < sizeList.size(); ++i) {
@@ -63,6 +83,23 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	ui->inputFontItalicCheckBox->setChecked(sett->inputFont.italic());
 	ui->inputFontBoldCheckBox->setChecked(sett->inputFont.bold());
 
+	QSignalMapper* sigMapper = new QSignalMapper(this);
+	sigMapper->setMapping(ui->mainTextColorButton, 1);
+	sigMapper->setMapping(ui->mainBgColorButton, 2);
+	sigMapper->setMapping(ui->bannerTextColorButton, 3);
+	sigMapper->setMapping(ui->bannerBgColorButton, 4);
+	sigMapper->setMapping(ui->linkUnvisitedColorButton, 5);
+	sigMapper->setMapping(ui->linkHoveringColorButton, 6);
+	sigMapper->setMapping(ui->linkClickedColorButton, 7);
+	connect(ui->mainTextColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
+	connect(ui->mainBgColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
+	connect(ui->bannerTextColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
+	connect(ui->bannerBgColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
+	connect(ui->linkUnvisitedColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
+	connect(ui->linkHoveringColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
+	connect(ui->linkClickedColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
+	connect(sigMapper, SIGNAL(mapped(int)), this, SLOT(selectColor(int)));
+
 	connect(this, SIGNAL(accepted()), this, SLOT(applySettings()));
 }
 
@@ -70,6 +107,19 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 QTadsConfDialog::~QTadsConfDialog()
 {
 	delete ui;
+}
+
+
+void QTadsConfDialog::changeEvent(QEvent *e)
+{
+	QDialog::changeEvent(e);
+	switch (e->type()) {
+	case QEvent::LanguageChange:
+		ui->retranslateUi(this);
+		break;
+	default:
+		break;
+	}
 }
 
 
@@ -82,6 +132,15 @@ QTadsConfDialog::applySettings()
 	sett->enableDigitalSound = ui->allowDigitalCheckBox->isChecked();
 	sett->enableMidiSound = ui->allowMidiCheckBox->isChecked();
 	sett->enableLinks = ui->allowLinksCheckBox->isChecked();
+
+	sett->mainBgColor = ui->mainBgColorButton->palette().color(QPalette::Button);
+	sett->mainTextColor = ui->mainTextColorButton->palette().color(QPalette::Button);
+	sett->bannerBgColor = ui->bannerBgColorButton->palette().color(QPalette::Button);
+	sett->bannerTextColor = ui->bannerTextColorButton->palette().color(QPalette::Button);
+	sett->underlineLinks = ui->underlineLinksCheckBox->isChecked();
+	sett->unvisitedLinkColor = ui->linkUnvisitedColorButton->palette().color(QPalette::Button);
+	sett->hoveringLinkColor = ui->linkHoveringColorButton->palette().color(QPalette::Button);
+	sett->clickedLinkColor = ui->linkClickedColorButton->palette().color(QPalette::Button);
 
 	sett->mainFont = ui->mainFontBox->currentFont();
 	sett->fixedFont = ui->fixedFontBox->currentFont();
@@ -110,14 +169,43 @@ QTadsConfDialog::applySettings()
 }
 
 
-void QTadsConfDialog::changeEvent(QEvent *e)
+void
+QTadsConfDialog::selectColor( int i )
 {
-	QDialog::changeEvent(e);
-	switch (e->type()) {
-	case QEvent::LanguageChange:
-		ui->retranslateUi(this);
+	QColor res(QColorDialog::getColor());
+	if (not res.isValid()) {
+		// User canceled the dialog.
+		return;
+	}
+
+	QPalette p;
+	QToolButton* button;
+
+	switch (i) {
+	  case 1:
+		button = ui->mainTextColorButton;
 		break;
-	default:
+	  case 2:
+		button = ui->mainBgColorButton;
+		break;
+	  case 3:
+		button = ui->bannerTextColorButton;
+		break;
+	  case 4:
+		button = ui->bannerBgColorButton;
+		break;
+	  case 5:
+		button = ui->linkUnvisitedColorButton;
+		break;
+	  case 6:
+		button = ui->linkHoveringColorButton;
+		break;
+	  case 7:
+		button = ui->linkClickedColorButton;
 		break;
 	}
+
+	p = button->palette();
+	p.setColor(QPalette::Button, res);
+	button->setPalette(p);
 }

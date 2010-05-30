@@ -23,6 +23,7 @@
 #include <QUrl>
 
 #include "htmlqt.h"
+#include "qtadssettings.h"
 #include "qtadsdispwidgetinput.h"
 
 #include "htmlfmt.h"
@@ -38,6 +39,11 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
 	this->dispWidget = new QTadsDisplayWidgetInput(this, formatter);
 	this->fCastDispWidget = static_cast<QTadsDisplayWidgetInput*>(this->dispWidget);
 	this->setWidget(this->dispWidget);
+
+	QPalette p(this->palette());
+	p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
+	p.setColor(QPalette::Text, qFrame->settings()->mainTextColor);
+	this->setPalette(p);
 }
 
 

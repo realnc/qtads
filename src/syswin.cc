@@ -46,6 +46,11 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QTadsDisplayWidget* dis
 	this->setLineWidth(0);
 	this->setContentsMargins(0, 0, 0, 0);
 
+	QPalette p(this->palette());
+	p.setColor(QPalette::Base, qFrame->settings()->bannerBgColor);
+	p.setColor(QPalette::Text, qFrame->settings()->bannerTextColor);
+	this->setPalette(p);
+
 	// TEMP: Just to make the area of this widget visibly more apparent.
 	//this->viewport()->setBackgroundRole(QPalette::ToolTipBase);
 }
@@ -337,6 +342,7 @@ CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const 
 	painter.setFont(fontCast);
 
 	if (fontCast.use_font_color()) {
+		// The font has its own color; use it.
 		HTML_color_t color = fontCast.get_font_color();
 		painter.setPen(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
 	}
@@ -739,7 +745,11 @@ CHtmlSysWinQt::set_html_bg_color( HTML_color_t color, int use_default )
 
 	if (use_default) {
 		QPalette p(this->palette());
-		p.setColor(QPalette::Base, QScrollArea::palette().color(QPalette::Base));
+		if (this == qFrame->gameWindow()) {
+			p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
+		} else {
+			p.setColor(QPalette::Base, qFrame->settings()->bannerBgColor);
+		}
 		this->setPalette(p);
 		return;
 	}
@@ -760,7 +770,12 @@ CHtmlSysWinQt::set_html_text_color( HTML_color_t color, int use_default )
 
 	if (use_default) {
 		QPalette p(this->palette());
-		p.setColor(QPalette::Text, QScrollArea::palette().color(QPalette::Text));
+		if (this == qFrame->gameWindow()) {
+			p.setColor(QPalette::Text, qFrame->settings()->mainTextColor);
+		} else {
+			p.setColor(QPalette::Text, qFrame->settings()->bannerTextColor);
+		}
+		this->setPalette(p);
 		return;
 	}
 
@@ -806,19 +821,46 @@ CHtmlSysWinQt::map_system_color( HTML_color_t color )
 		return color;
 	}
 
+	QColor col;
+
 	switch (color) {
-	  case HTML_COLOR_STATUSBG:   return HTML_make_color(210, 200, 180);
-	  case HTML_COLOR_STATUSTEXT: return HTML_make_color(0, 0, 0);
-	  case HTML_COLOR_LINK:       return HTML_make_color(0, 0, 255);
-	  case HTML_COLOR_ALINK:      return HTML_make_color(0, 0, 255);
-	  case HTML_COLOR_TEXT:       return HTML_make_color(0, 0, 0);
-	  case HTML_COLOR_BGCOLOR:    return HTML_make_color(255, 255, 255);
-	  case HTML_COLOR_INPUT:      return HTML_make_color(0, 0, 0);
-	  case HTML_COLOR_HLINK:      return HTML_make_color(0, 0, 255);
+	  case HTML_COLOR_STATUSBG:
+		col = qFrame->settings()->bannerBgColor;
+		break;
+
+	  case HTML_COLOR_STATUSTEXT:
+		col = qFrame->settings()->bannerTextColor;
+		break;
+
+	  case HTML_COLOR_LINK:
+		col = qFrame->settings()->unvisitedLinkColor;
+		break;
+
+	  case HTML_COLOR_ALINK:
+		col = qFrame->settings()->clickedLinkColor;
+		break;
+
+	  case HTML_COLOR_TEXT:
+		col = qFrame->settings()->mainTextColor;
+		break;
+
+	  case HTML_COLOR_BGCOLOR:
+		col = qFrame->settings()->mainBgColor;
+		break;
+
+	  case HTML_COLOR_INPUT:
+		return HTML_make_color(0, 0, 0);
+
+	  case HTML_COLOR_HLINK:
+		col = qFrame->settings()->hoveringLinkColor;
+		break;
+
 	  default:
-		// Return black for anything else.
+		// Return black for everything else.
 		return 0;
 	}
+
+	return HTML_make_color(col.red(), col.green(), col.blue());
 }
 
 
@@ -827,7 +869,8 @@ CHtmlSysWinQt::get_html_link_color() const
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	return HTML_make_color(0, 0, 255);
+	const QColor& col = qFrame->settings()->unvisitedLinkColor;
+	return HTML_make_color(col.red(), col.green(), col.blue());
 }
 
 
@@ -854,7 +897,8 @@ CHtmlSysWinQt::get_html_hlink_color() const
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	return HTML_make_color(0, 0, 255);
+	const QColor& col = qFrame->settings()->hoveringLinkColor;
+	return HTML_make_color(col.red(), col.green(), col.blue());
 }
 
 
@@ -863,7 +907,7 @@ CHtmlSysWinQt::get_html_link_underline() const
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	return false;
+	return qFrame->settings()->underlineLinks;
 }
 
 

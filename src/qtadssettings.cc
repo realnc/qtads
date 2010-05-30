@@ -32,6 +32,17 @@ QTadsSettings::loadFromDisk()
 	this->enableLinks = sett.value("links", true).toBool();
 	sett.endGroup();
 
+	sett.beginGroup("colors");
+	this->mainBgColor = sett.value("mainbg", QColor(Qt::white)).value<QColor>();
+	this->mainTextColor = sett.value("maintext", QColor(Qt::black)).value<QColor>();
+	this->bannerBgColor = sett.value("bannerbg", QColor(Qt::lightGray)).value<QColor>();
+	this->bannerTextColor = sett.value("bannertext", QColor(Qt::black)).value<QColor>();
+	this->underlineLinks = sett.value("underlinelinks", false).toBool();
+	this->unvisitedLinkColor = sett.value("unvisitedlinks", QColor(Qt::blue)).value<QColor>();
+	this->hoveringLinkColor = sett.value("hoveringlinks", QColor(Qt::cyan)).value<QColor>();
+	this->clickedLinkColor = sett.value("clickedlinks", QColor(Qt::magenta)).value<QColor>();
+	sett.endGroup();
+
 	sett.beginGroup("fonts");
 	this->mainFont.fromString(sett.value("main", "serif").toString());
 	this->fixedFont.fromString(sett.value("fixed", "monospace").toString());
@@ -56,6 +67,17 @@ QTadsSettings::saveToDisk()
 	sett.setValue("sounds", this->enableDigitalSound);
 	sett.setValue("music", this->enableMidiSound);
 	sett.setValue("links", this->enableLinks);
+	sett.endGroup();
+
+	sett.beginGroup("colors");
+	sett.setValue("mainbg", this->mainBgColor);
+	sett.setValue("maintext", this->mainTextColor);
+	sett.setValue("bannerbg", this->bannerBgColor);
+	sett.setValue("bannertext", this->bannerTextColor);
+	sett.setValue("underlinelinks", this->underlineLinks);
+	sett.setValue("unvisitedlinks", this->unvisitedLinkColor);
+	sett.setValue("hoveringlinks", this->hoveringLinkColor);
+	sett.setValue("clickedlinks", this->clickedLinkColor);
 	sett.endGroup();
 
 	sett.beginGroup("fonts");
