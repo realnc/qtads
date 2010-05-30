@@ -28,14 +28,18 @@
  * handles mouse events.
  */
 class QTadsDisplayWidget: public QWidget {
-	Q_OBJECT
+  private:
+	// We track the current link the mouse is currently hovering over and the
+	// link over which the mouse button has been pressed but not released yet.
+	class CHtmlDispLink* fHoverLink;
+	class CHtmlDispLink* fClickedLink;
 
   protected:
 	// The window we're embeded in.
-	class CHtmlSysWinQt* fParentSysWin;
+	class CHtmlSysWinQt* parentSysWin;
 
 	// Our parent's formatter, for easy access.
-	class CHtmlFormatter* fFormatter;
+	class CHtmlFormatter* formatter;
 
 	virtual void
 	paintEvent( QPaintEvent* e );
@@ -45,6 +49,9 @@ class QTadsDisplayWidget: public QWidget {
 
 	virtual void
 	mousePressEvent( QMouseEvent* e );
+
+	virtual void
+	mouseReleaseEvent( QMouseEvent* e );
 
   public:
 	QTadsDisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );

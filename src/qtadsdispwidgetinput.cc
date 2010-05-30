@@ -79,7 +79,7 @@ QTadsDisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputB
 		this->fBlinkCursor();
 	}
 
-	this->fParentSysWin->do_formatting(false, false, false);
+	this->parentSysWin->do_formatting(false, false, false);
 	CHtmlPoint cursorPos = formatter->get_text_pos(tag->get_text_ofs() + tadsBuffer->get_caret());
 	this->moveCursorPos(QPoint(cursorPos.x, cursorPos.y));
 

@@ -29,7 +29,7 @@
 
 
 QTadsDisplayWidget::QTadsDisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
- : QWidget(parent), fParentSysWin(parent), fFormatter(formatter)
+  : QWidget(parent), fHoverLink(0), fClickedLink(0), parentSysWin(parent), formatter(formatter)
 {
 	this->setForegroundRole(QPalette::Text);
 	this->setBackgroundRole(QPalette::Base);
@@ -48,7 +48,7 @@ QTadsDisplayWidget::paintEvent( QPaintEvent* e )
 	//qDebug() << "repainting" << e->rect();
 	const QRect& qRect = e->region().boundingRect();
 	CHtmlRect cRect(qRect.left(), qRect.top(), qRect.left() + qRect.width(), qRect.top() + qRect.height());
-	this->fFormatter->draw(&cRect, false, 0);
+	this->formatter->draw(&cRect, false, 0);
 }
 
 
@@ -58,10 +58,15 @@ QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 	// Get the display object containing the position.
 	CHtmlPoint pos;
 	pos.set(e->pos().x(), e->pos().y());
-	CHtmlDisp* disp = this->fFormatter->find_by_pos(pos, true);
+	CHtmlDisp* disp = this->formatter->find_by_pos(pos, true);
 
 	// If there's nothing, no need to continue.
 	if (disp == 0) {
+		// If we were tracking anything, forget about it.
+		if (this->fHoverLink != 0) {
+			this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+			this->fHoverLink = 0;
+		}
 		this->unsetCursor();
 		qWinGroup->statusBar()->clearMessage();
 		return;
@@ -69,15 +74,34 @@ QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 
 	// It could be a link.
 	if (qFrame->settings()->enableLinks) {
-		CHtmlDispLink* link = disp->get_link(this->fFormatter, pos.x, pos.y);
+		CHtmlDispLink* link = disp->get_link(this->formatter, pos.x, pos.y);
+
+		// If we're already tracking a hover over this link, we don't need to
+		// do anything else.
+		if (link == this->fHoverLink) {
+			return;
+		}
+
+		// If we're tracking a hover and it's a new link, track this one and
+		// forget about the previous one, unless we're also tracking a clicked
+		// link.
+		if (this->fClickedLink == 0 and link != this->fHoverLink) {
+			if (this->fHoverLink != 0) {
+				this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+			}
+			this->fHoverLink = link;
+		}
+
+		// If it's a clickable link, also change the mouse cursor shape and
+		// hovering color.
+		if (link != 0 and link->is_clickable_link()) {
+			this->setCursor(Qt::PointingHandCursor);
+			link->set_clicked(this->parentSysWin, CHtmlDispLink_hover);
+		}
 
 		// If we found something that has ALT text, show it in the status bar.
 		if (disp->get_alt_text() != 0 and qstrlen(disp->get_alt_text()) > 0) {
 			qWinGroup->statusBar()->showMessage(disp->get_alt_text());
-			// If it's a clickable link, also change the mouse cursor shape.
-			if (link != 0 and link->is_clickable_link()) {
-				this->setCursor(Qt::PointingHandCursor);
-			}
 			return;
 		}
 
@@ -85,39 +109,56 @@ QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 		// its contents.
 		if (link != 0 and link->is_clickable_link()) {
 			qWinGroup->statusBar()->showMessage(link->href_.get_url());
-			this->setCursor(Qt::PointingHandCursor);
 			return;
 		}
 	}
 
-	// We don't know what it was.  Clear status bar message and reset cursor
-	// shape.
+	// We don't know what it was.  Clear status bar message, reset cursor shape
+	// and forget about any link we were tracking.
 	qWinGroup->statusBar()->clearMessage();
 	this->unsetCursor();
+	if (this->fHoverLink != 0) {
+		this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+		this->fHoverLink = 0;
+	}
 }
 
 
 void
 QTadsDisplayWidget::mousePressEvent( QMouseEvent* e )
 {
-	// Get the display object containing the position.
-	CHtmlPoint pos;
-	pos.set(e->pos().x(), e->pos().y());
-	CHtmlDisp* disp = this->fFormatter->find_by_pos(pos, true);
-
-	// Get the link from the display item, if there is one.
-	CHtmlDispLink* link = 0;
-	if (disp != 0) {
-		link = disp->get_link(this->fFormatter, pos.x, pos.y);
+	if (this->fHoverLink == 0) {
+		// We're not hover-tracking a link; there's nothing to do here.
+		return;
 	}
 
-	// If we found a link, process it.
-	// FIXME: We should track the link and process it at mouseReleaseEvent().
-	if (link != 0 and link->is_clickable_link() and qFrame->settings()->enableLinks) {
+	// If we're hover-tracking a clickable link here, also click-track it.
+	if (this->fHoverLink->is_clickable_link() and qFrame->settings()->enableLinks) {
 		// Draw all of the items involved in the link in the hilited state.
-		link->set_clicked(this->fParentSysWin, CHtmlDispLink_clicked);
-		const textchar_t* cmd = link->href_.get_url();
-		qFrame->gameWindow()->processCommand(cmd, qstrlen(cmd), link->get_append(),
-											 not link->get_noenter(), OS_CMD_NONE);
+		this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_clicked);
+		this->fClickedLink = this->fHoverLink;
 	}
+}
+
+
+void
+QTadsDisplayWidget::mouseReleaseEvent( QMouseEvent* e )
+{
+	if (this->fClickedLink == 0) {
+		// We're not click-tracking a link; there's nothing to do here.
+		return;
+	}
+
+	// If we're still hovering over the clicked link, process it.
+	if (this->fClickedLink == this->fHoverLink) {
+		const textchar_t* cmd = this->fClickedLink->href_.get_url();
+		qFrame->gameWindow()->processCommand(cmd, qstrlen(cmd), this->fClickedLink->get_append(),
+											 not this->fClickedLink->get_noenter(), OS_CMD_NONE);
+	}
+	// Stop tracking it.
+	this->fClickedLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+	this->fClickedLink = 0;
+	this->fHoverLink = 0;
+	this->unsetCursor();
+	qWinGroup->statusBar()->clearMessage();
 }
