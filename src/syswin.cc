@@ -745,11 +745,7 @@ CHtmlSysWinQt::set_html_bg_color( HTML_color_t color, int use_default )
 
 	if (use_default) {
 		QPalette p(this->palette());
-		if (this == qFrame->gameWindow()) {
-			p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
-		} else {
-			p.setColor(QPalette::Base, qFrame->settings()->bannerBgColor);
-		}
+		p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
 		this->setPalette(p);
 		return;
 	}
@@ -935,13 +931,15 @@ CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
 	//qDebug() << Q_FUNC_INFO;
 
 	if (image == 0 or image->get_image() == 0) {
+		// No image specified; forget the current image if we have one and
+		// restore the default background color.
 		if (this->fBgImage != 0) {
 			this->fBgImage->remove_ref();
 			this->fBgImage = 0;
-			QPalette p(this->palette());
-			p.setBrush(QPalette::Base, QBrush());
-			this->setPalette(p);
 		}
+		QPalette p(this->palette());
+		p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
+		this->setPalette(p);
 		return;
 	}
 
