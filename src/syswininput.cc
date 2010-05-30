@@ -88,7 +88,7 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 		|| strnicmp(cmd, "mailto:", 7) == 0
 		|| strnicmp(cmd, "telnet:", 7) == 0)
 	{
-		QDesktopServices::openUrl(QUrl::fromEncoded(cmd));
+		QDesktopServices::openUrl(QUrl::fromEncoded(cmd, QUrl::StrictMode));
 		return;
 	}
 
