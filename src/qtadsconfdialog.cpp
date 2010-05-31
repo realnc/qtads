@@ -173,46 +173,54 @@ QTadsConfDialog::applySettings()
 void
 QTadsConfDialog::selectColor( int i )
 {
-	QColor res(QColorDialog::getColor());
-	if (not res.isValid()) {
-		// User canceled the dialog.
-		return;
-	}
-
 	QToolButton* button;
 	QColor* tmpColor;
+	QColor newColor;
 
 	switch (i) {
 	  case 1:
 		button = ui->mainTextColorButton;
 		tmpColor = &this->fTmpMainTextColor;
+		newColor = this->fTmpMainTextColor;
 		break;
 	  case 2:
 		button = ui->mainBgColorButton;
 		tmpColor = &this->fTmpMainBgColor;
+		newColor = this->fTmpMainBgColor;
 		break;
 	  case 3:
 		button = ui->bannerTextColorButton;
 		tmpColor = &this->fTmpBannerTextColor;
+		newColor = this->fTmpBannerTextColor;
 		break;
 	  case 4:
 		button = ui->bannerBgColorButton;
 		tmpColor = &this->fTmpBannerBgColor;
+		newColor = this->fTmpBannerBgColor;
 		break;
 	  case 5:
 		button = ui->linkUnvisitedColorButton;
 		tmpColor = &this->fTmpUnvisitedLinkColor;
+		newColor = this->fTmpUnvisitedLinkColor;
 		break;
 	  case 6:
 		button = ui->linkHoveringColorButton;
 		tmpColor = &this->fTmpHoveringLinkColor;
+		newColor = this->fTmpHoveringLinkColor;
 		break;
 	  case 7:
 		button = ui->linkClickedColorButton;
 		tmpColor = &this->fTmpClickedLinkColor;
+		newColor = this->fTmpClickedLinkColor;
 		break;
 	}
 
-	*tmpColor = res;
-	button->setStyleSheet(QByteArray("*{background:") + res.name() + "}");
+	newColor = QColorDialog::getColor(newColor);
+	if (not newColor.isValid()) {
+		// User canceled the dialog.
+		return;
+	}
+
+	*tmpColor = newColor;
+	button->setStyleSheet(QByteArray("*{background:") + newColor.name() + "}");
 }
