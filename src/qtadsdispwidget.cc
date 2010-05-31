@@ -41,6 +41,25 @@ QTadsDisplayWidget::QTadsDisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* f
 
 
 void
+QTadsDisplayWidget::fInvalidateLinkTracking()
+{
+	// If we're tracking links (hover/click), forget about them.
+	if (this->fHoverLink != 0 or this->fClickedLink != 0) {
+		if (this->fClickedLink != 0) {
+			this->fClickedLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+			this->fClickedLink = 0;
+		}
+		if (this->fHoverLink != 0) {
+			this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+			this->fHoverLink = 0;
+		}
+		this->unsetCursor();
+		qWinGroup->statusBar()->clearMessage();
+	}
+}
+
+
+void
 QTadsDisplayWidget::paintEvent( QPaintEvent* e )
 {
 	//qDebug() << Q_FUNC_INFO << "called";
@@ -129,19 +148,7 @@ QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 void
 QTadsDisplayWidget::leaveEvent( QEvent* e )
 {
-	// If we're tracking a link, forget it.
-	if (this->fHoverLink != 0 or this->fClickedLink != 0) {
-		if (this->fClickedLink != 0) {
-			this->fClickedLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
-			this->fClickedLink = 0;
-		}
-		if (this->fHoverLink != 0) {
-			this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
-			this->fHoverLink = 0;
-		}
-		this->unsetCursor();
-		qWinGroup->statusBar()->clearMessage();
-	}
+	this->fInvalidateLinkTracking();
 }
 
 

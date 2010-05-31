@@ -34,6 +34,10 @@ class QTadsDisplayWidget: public QWidget {
 	class CHtmlDispLink* fHoverLink;
 	class CHtmlDispLink* fClickedLink;
 
+	// Stop tracking links.
+	void
+	fInvalidateLinkTracking();
+
   protected:
 	// The window we're embeded in.
 	class CHtmlSysWinQt* parentSysWin;
@@ -58,6 +62,12 @@ class QTadsDisplayWidget: public QWidget {
 
   public:
 	QTadsDisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
+
+	// When our parent's notify_clear_contents() is called, we need to know
+	// about it so we can perform link tracking invalidation.
+	void
+	notifyClearContents()
+	{ this->fInvalidateLinkTracking(); }
 };
 
 

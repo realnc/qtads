@@ -277,6 +277,9 @@ void
 CHtmlSysWinQt::notify_clear_contents()
 {
 	//qDebug() << Q_FUNC_INFO;
+
+	// Tell our display widget about it.
+	this->dispWidget->notifyClearContents();
 }
 
 
