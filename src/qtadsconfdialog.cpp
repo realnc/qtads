@@ -36,23 +36,24 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	ui->allowMidiCheckBox->setChecked(sett->enableMidiSound);
 	ui->allowLinksCheckBox->setChecked(sett->enableLinks);
 
-	QPalette p(ui->mainBgColorButton->palette());
-	p.setColor(QPalette::Button, qFrame->settings()->mainBgColor);
-	ui->mainBgColorButton->setPalette(p);
-	p.setColor(QPalette::Button, qFrame->settings()->mainTextColor);
-	ui->mainTextColorButton->setPalette(p);
-	p.setColor(QPalette::Button, qFrame->settings()->bannerBgColor);
-	ui->bannerBgColorButton->setPalette(p);
-	p.setColor(QPalette::Button, qFrame->settings()->bannerTextColor);
-	ui->bannerTextColorButton->setPalette(p);
+	const QByteArray buttonStyle("*{background:");
+	this->fTmpMainBgColor = qFrame->settings()->mainBgColor;
+	ui->mainBgColorButton->setStyleSheet(buttonStyle + this->fTmpMainBgColor.name() + "}");
+	this->fTmpMainTextColor = qFrame->settings()->mainTextColor;
+	ui->mainTextColorButton->setStyleSheet(buttonStyle + this->fTmpMainTextColor.name() + "}");
+	this->fTmpBannerBgColor = qFrame->settings()->bannerBgColor;
+	ui->bannerBgColorButton->setStyleSheet(buttonStyle + this->fTmpBannerBgColor.name() + "}");
+	this->fTmpBannerTextColor = qFrame->settings()->bannerTextColor;
+	ui->bannerTextColorButton->setStyleSheet(buttonStyle + this->fTmpBannerTextColor.name() + "}");
+	this->fTmpUnvisitedLinkColor = qFrame->settings()->unvisitedLinkColor;
+	ui->linkUnvisitedColorButton->setStyleSheet(buttonStyle + this->fTmpUnvisitedLinkColor.name() + "}");
+	this->fTmpHoveringLinkColor = qFrame->settings()->hoveringLinkColor;
+	ui->linkHoveringColorButton->setStyleSheet(buttonStyle + this->fTmpHoveringLinkColor.name() + "}");
+	this->fTmpClickedLinkColor = qFrame->settings()->clickedLinkColor;
+	ui->linkClickedColorButton->setStyleSheet(buttonStyle + this->fTmpClickedLinkColor.name() + "}");
+
 	ui->underlineLinksCheckBox->setChecked(sett->underlineLinks);
 	ui->highlightLinksCheckBox->setChecked(sett->highlightLinks);
-	p.setColor(QPalette::Button, qFrame->settings()->unvisitedLinkColor);
-	ui->linkUnvisitedColorButton->setPalette(p);
-	p.setColor(QPalette::Button, qFrame->settings()->hoveringLinkColor);
-	ui->linkHoveringColorButton->setPalette(p);
-	p.setColor(QPalette::Button, qFrame->settings()->clickedLinkColor);
-	ui->linkClickedColorButton->setPalette(p);
 
 	const QList<int>& sizeList = QFontDatabase::standardSizes();
 	for (int i = 0; i < sizeList.size(); ++i) {
@@ -134,15 +135,15 @@ QTadsConfDialog::applySettings()
 	sett->enableMidiSound = ui->allowMidiCheckBox->isChecked();
 	sett->enableLinks = ui->allowLinksCheckBox->isChecked();
 
-	sett->mainBgColor = ui->mainBgColorButton->palette().color(QPalette::Button);
-	sett->mainTextColor = ui->mainTextColorButton->palette().color(QPalette::Button);
-	sett->bannerBgColor = ui->bannerBgColorButton->palette().color(QPalette::Button);
-	sett->bannerTextColor = ui->bannerTextColorButton->palette().color(QPalette::Button);
+	sett->mainBgColor = this->fTmpMainBgColor;
+	sett->mainTextColor = this->fTmpMainTextColor;
+	sett->bannerBgColor = this->fTmpBannerBgColor;
+	sett->bannerTextColor = this->fTmpBannerTextColor;
+	sett->unvisitedLinkColor = this->fTmpUnvisitedLinkColor;
+	sett->hoveringLinkColor = this->fTmpHoveringLinkColor;
+	sett->clickedLinkColor = this->fTmpClickedLinkColor;
 	sett->underlineLinks = ui->underlineLinksCheckBox->isChecked();
 	sett->highlightLinks = ui->highlightLinksCheckBox->isChecked();
-	sett->unvisitedLinkColor = ui->linkUnvisitedColorButton->palette().color(QPalette::Button);
-	sett->hoveringLinkColor = ui->linkHoveringColorButton->palette().color(QPalette::Button);
-	sett->clickedLinkColor = ui->linkClickedColorButton->palette().color(QPalette::Button);
 
 	sett->mainFont = ui->mainFontBox->currentFont();
 	sett->fixedFont = ui->fixedFontBox->currentFont();
@@ -178,34 +179,40 @@ QTadsConfDialog::selectColor( int i )
 		return;
 	}
 
-	QPalette p;
 	QToolButton* button;
+	QColor* tmpColor;
 
 	switch (i) {
 	  case 1:
 		button = ui->mainTextColorButton;
+		tmpColor = &this->fTmpMainTextColor;
 		break;
 	  case 2:
 		button = ui->mainBgColorButton;
+		tmpColor = &this->fTmpMainBgColor;
 		break;
 	  case 3:
 		button = ui->bannerTextColorButton;
+		tmpColor = &this->fTmpBannerTextColor;
 		break;
 	  case 4:
 		button = ui->bannerBgColorButton;
+		tmpColor = &this->fTmpBannerBgColor;
 		break;
 	  case 5:
 		button = ui->linkUnvisitedColorButton;
+		tmpColor = &this->fTmpUnvisitedLinkColor;
 		break;
 	  case 6:
 		button = ui->linkHoveringColorButton;
+		tmpColor = &this->fTmpHoveringLinkColor;
 		break;
 	  case 7:
 		button = ui->linkClickedColorButton;
+		tmpColor = &this->fTmpClickedLinkColor;
 		break;
 	}
 
-	p = button->palette();
-	p.setColor(QPalette::Button, res);
-	button->setPalette(p);
+	*tmpColor = res;
+	button->setStyleSheet(QByteArray("*{background:") + res.name() + "}");
 }
