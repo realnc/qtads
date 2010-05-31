@@ -170,8 +170,8 @@ QTadsDisplayWidget::mouseReleaseEvent( QMouseEvent* e )
 		return;
 	}
 
+	// If we're still hovering over the clicked link, process it.
 	if (this->fClickedLink == this->fHoverLink) {
-		// We're still hovering over the clicked link; process it.
 		const textchar_t* cmd = this->fClickedLink->href_.get_url();
 		qFrame->gameWindow()->processCommand(cmd, qstrlen(cmd), this->fClickedLink->get_append(),
 											 not this->fClickedLink->get_noenter(), OS_CMD_NONE);
@@ -179,8 +179,8 @@ QTadsDisplayWidget::mouseReleaseEvent( QMouseEvent* e )
 		if (qFrame->settings()->highlightLinks) {
 			this->fClickedLink->set_clicked(this->parentSysWin, CHtmlDispLink_hover);
 		}
+	// Otherwise, if we're hovering over another link, put that one in hover mode.
 	} else if (this->fHoverLink != 0) {
-		// We're hovering over another link; put it in hover mode.
 		this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_hover);
 	}
 	// Stop click-tracking it.
