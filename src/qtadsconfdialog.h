@@ -48,12 +48,18 @@ class QTadsConfDialog: public QDialog {
 	QColor fTmpHoveringLinkColor;
 	QColor fTmpClickedLinkColor;
 
+	bool fInstantApply;
+
+	// Makes the dialog's controls apply instantly when they change.
+	void
+	fMakeInstantApply();
+
   private slots:
 	void
-	applySettings();
+	fApplySettings();
 
 	void
-	selectColor( int i );
+	fSelectColor( int i );
 };
 
 

@@ -17,6 +17,7 @@
 
 #include <QColorDialog>
 #include <QSignalMapper>
+#include <QPushButton>
 
 #include "qtadsconfdialog.h"
 #include "ui_qtadsconfdialog.h"
@@ -25,7 +26,8 @@
 
 
 QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
-  : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::QTadsConfDialog)
+  : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::QTadsConfDialog),
+	fInstantApply(false)
 {
 	ui->setupUi(this);
 	QTadsSettings* sett = qFrame->settings();
@@ -100,9 +102,30 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	connect(ui->linkUnvisitedColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
 	connect(ui->linkHoveringColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
 	connect(ui->linkClickedColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
-	connect(sigMapper, SIGNAL(mapped(int)), this, SLOT(selectColor(int)));
+	connect(sigMapper, SIGNAL(mapped(int)), this, SLOT(fSelectColor(int)));
 
-	connect(this, SIGNAL(accepted()), this, SLOT(applySettings()));
+	connect(this, SIGNAL(accepted()), this, SLOT(fApplySettings()));
+
+	// On Mac OS X, the dialog should not have any buttons, and settings
+	// changes should apply instantly.
+#ifdef Q_WS_MAC
+	this->fMakeInstantApply();
+	ui->buttonBox->setStandardButtons(QDialogButtonBox::NoButton);
+#else
+	// If we're using the Gtk style, we'll try to follow Gnome standards. We
+	// only provide a "Close" button and settings changes should apply
+	// instantly.
+	if (qstrcmp(QApplication::style()->metaObject()->className(), "QGtkStyle") == 0) {
+		this->fMakeInstantApply();
+		ui->buttonBox->setStandardButtons(QDialogButtonBox::Close);
+	} else {
+		// Assume KDE/MS Windows standards. No instant apply, and use OK/Apply/Cancel
+		// buttons.
+		ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
+		QPushButton* applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
+		connect(applyButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+	}
+#endif
 }
 
 
@@ -126,7 +149,37 @@ void QTadsConfDialog::changeEvent(QEvent *e)
 
 
 void
-QTadsConfDialog::applySettings()
+QTadsConfDialog::fMakeInstantApply()
+{
+	this->fInstantApply = true;
+
+	connect(ui->mainFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
+	connect(ui->fixedFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
+	connect(ui->serifFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
+	connect(ui->sansFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
+	connect(ui->scriptFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
+	connect(ui->writerFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
+	connect(ui->inputFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
+	connect(ui->mainFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
+	connect(ui->fixedFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
+	connect(ui->serifFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
+	connect(ui->sansFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
+	connect(ui->scriptFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
+	connect(ui->writerFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
+	connect(ui->inputFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
+	connect(ui->inputFontItalicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+	connect(ui->inputFontBoldCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+	connect(ui->underlineLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+	connect(ui->highlightLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+	connect(ui->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+	connect(ui->allowDigitalCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+	connect(ui->allowMidiCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+	connect(ui->allowLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+}
+
+
+void
+QTadsConfDialog::fApplySettings()
 {
 	QTadsSettings* sett = qFrame->settings();
 
@@ -171,7 +224,7 @@ QTadsConfDialog::applySettings()
 
 
 void
-QTadsConfDialog::selectColor( int i )
+QTadsConfDialog::fSelectColor( int i )
 {
 	QToolButton* button;
 	QColor* tmpColor;
@@ -223,4 +276,8 @@ QTadsConfDialog::selectColor( int i )
 
 	*tmpColor = newColor;
 	button->setStyleSheet(QByteArray("*{background:") + newColor.name() + "}");
+
+	if (this->fInstantApply) {
+		this->fApplySettings();
+	}
 }
