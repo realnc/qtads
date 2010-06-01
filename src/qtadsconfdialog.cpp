@@ -104,24 +104,25 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	connect(ui->linkClickedColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
 	connect(sigMapper, SIGNAL(mapped(int)), this, SLOT(fSelectColor(int)));
 
+#ifdef Q_WS_MAC
 	// On Mac OS X, the dialog should not have any buttons, and settings
 	// changes should apply instantly.
-#ifdef Q_WS_MAC
 	this->fMakeInstantApply();
 	ui->buttonBox->setStandardButtons(QDialogButtonBox::NoButton);
 #else
-	// If we're using the Gtk style, we'll try to follow Gnome standards. We
-	// only provide a "Close" button and settings changes should apply
-	// instantly.
-	if (qstrcmp(QApplication::style()->metaObject()->className(), "QGtkStyle") == 0) {
+	QDialogButtonBox::ButtonLayout layoutPolicy =
+			QDialogButtonBox::ButtonLayout(ui->buttonBox->style()->styleHint(QStyle::SH_DialogButtonLayout));
+	if (layoutPolicy == QDialogButtonBox::GnomeLayout) {
+		// On Gnome (and other Gtk-based environments, like XFCE), we follow
+		// Gnome standards. We only provide a "Close" button and settings
+		// changes should apply instantly.
 		this->fMakeInstantApply();
 		ui->buttonBox->setStandardButtons(QDialogButtonBox::Close);
 	} else {
 		// Assume KDE/MS Windows standards. No instant apply, and use OK/Apply/Cancel
 		// buttons.
 		ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
-		QPushButton* applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
-		connect(applyButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+		connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(fApplySettings()));
 		connect(this, SIGNAL(accepted()), this, SLOT(fApplySettings()));
 	}
 #endif
