@@ -104,8 +104,6 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	connect(ui->linkClickedColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
 	connect(sigMapper, SIGNAL(mapped(int)), this, SLOT(fSelectColor(int)));
 
-	connect(this, SIGNAL(accepted()), this, SLOT(fApplySettings()));
-
 	// On Mac OS X, the dialog should not have any buttons, and settings
 	// changes should apply instantly.
 #ifdef Q_WS_MAC
@@ -124,6 +122,7 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 		ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
 		QPushButton* applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 		connect(applyButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+		connect(this, SIGNAL(accepted()), this, SLOT(fApplySettings()));
 	}
 #endif
 }
