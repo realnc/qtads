@@ -116,6 +116,7 @@ CHtmlSysWinGroupQt::fShowConfDialog()
 	this->fConfDialog = new QTadsConfDialog(this);
 	this->fConfDialog->setWindowTitle(tr("QTads Preferences"));
 	connect(this->fConfDialog, SIGNAL(finished(int)), this, SLOT(fHideConfDialog()));
+	this->fConfDialog->show();
 #ifdef Q_WS_MAC
 	// There's a bug in Qt for OS X that results in a visual glitch with
 	// QFontComboBox widgets inside QFormLayouts.  Making the dialog 4 pixels
@@ -124,7 +125,6 @@ CHtmlSysWinGroupQt::fShowConfDialog()
 	// See: http://bugreports.qt.nokia.com/browse/QTBUG-10460
 	this->fConfDialog->setMinimumHeight(this->fConfDialog->height() + 4);
 #endif
-	this->fConfDialog->show();
 }
 
 
