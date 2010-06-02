@@ -83,12 +83,18 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 	// If the command starts with "http:", "ftp:", "news:" "mailto:", or
 	// "telnet:", try to open it in the external application that handles it.
 	if (strnicmp(cmd, "http:", 5) == 0
-		|| strnicmp(cmd, "ftp:", 4) == 0
-		|| strnicmp(cmd, "news:", 5) == 0
+		|| strnicmp(cmd, "ftp:", 4) == 0)
+	{
+		// Parse http and ftp URLs in strict mode.
+		QDesktopServices::openUrl(QUrl::fromEncoded(cmd, QUrl::StrictMode));
+		return;
+	}
+	if (strnicmp(cmd, "news:", 5) == 0
 		|| strnicmp(cmd, "mailto:", 7) == 0
 		|| strnicmp(cmd, "telnet:", 7) == 0)
 	{
-		QDesktopServices::openUrl(QUrl::fromEncoded(cmd, QUrl::StrictMode));
+		// Parse news, mailto and telnet URLs in tolerant mode.
+		QDesktopServices::openUrl(QUrl::fromEncoded(cmd, QUrl::TolerantMode));
 		return;
 	}
 
