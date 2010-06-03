@@ -172,8 +172,8 @@ CHtmlSysFrameQt::fRunGame()
 			this->fFormatter = new CHtmlFormatterInput(this->fParser);
 			// Tell the resource finder about our appctx.
 			this->fFormatter->get_res_finder()->init_appctx(&this->fAppctx);
-			this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralFrame());
-			this->fGameWin->resize(qWinGroup->centralFrame()->size());
+			this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralWidget());
+			this->fGameWin->resize(qWinGroup->centralWidget()->size());
 			this->fGameWin->show();
 			this->fGameWin->setFocus();
 
@@ -440,7 +440,7 @@ CHtmlSysFrameQt::adjustBannerSizes()
 
 	// Start with the main game window.  Its area can never exceed the
 	// application's central frame.
-	QRect siz(qWinGroup->centralFrame()->geometry());
+	QRect siz(qWinGroup->centralWidget()->rect());
 	this->fGameWin->calcChildBannerSizes(siz);
 }
 
@@ -786,7 +786,7 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 	//		<< "other:" << other << "pos:" << pos << "style:" << style;
 
 	// Create the banner window.
-	CHtmlSysWinQt* banner = new CHtmlSysWinQt(formatter, 0, qWinGroup->centralFrame());
+	CHtmlSysWinQt* banner = new CHtmlSysWinQt(formatter, 0, qWinGroup->centralWidget());
 	CHtmlSysWinQt* castParent = static_cast<CHtmlSysWinQt*>(parent);
 	CHtmlSysWinQt* castOther = static_cast<CHtmlSysWinQt*>(other);
 

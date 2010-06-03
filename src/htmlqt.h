@@ -412,10 +412,6 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	virtual
 	~CHtmlSysWinGroupQt();
 
-	QFrame*
-	centralFrame() const
-	{ return this->fFrame; }
-
 	CHtmlSysWinAboutBoxQt*
 	createAboutBox( class CHtmlFormatter* formatter );
 

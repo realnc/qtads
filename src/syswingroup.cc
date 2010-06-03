@@ -74,20 +74,11 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	this->statusBar();
 
 	// Set up our central widget.
-	this->fScrollArea = new QScrollArea(this);
-	this->fScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	this->fScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	this->fScrollArea->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
-	this->fScrollArea->setLineWidth(0);
-	this->fScrollArea->setContentsMargins(0, 0, 0, 0);
-	this->fScrollArea->setWidgetResizable(true);
-	this->fFrame = new QTadsFrame(this->fScrollArea);
+	this->fFrame = new QTadsFrame(this);
 	this->fFrame->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
 	this->fFrame->setLineWidth(0);
 	this->fFrame->setContentsMargins(0,0,0,0);
-	this->fScrollArea->setWidget(this->fFrame);
-	this->setCentralWidget(this->fScrollArea);
-	this->fScrollArea->show();
+	this->setCentralWidget(this->fFrame);
 
 	qWinGroup = this;
 }
