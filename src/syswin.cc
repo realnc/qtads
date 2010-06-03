@@ -708,6 +708,7 @@ void
 CHtmlSysWinQt::advise_clearing_disp_list()
 {
 	//qDebug() << Q_FUNC_INFO;
+	this->dispWidget->notifyClearContents();
 }
 
 
