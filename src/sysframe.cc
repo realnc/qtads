@@ -456,7 +456,7 @@ CHtmlSysFrameQt::reformatBanners()
 	this->fGameWin->get_formatter()->start_at_top(false);
 	this->fGameWin->do_formatting(false, false, true);
 	this->fGameWin->displayWidget()->resize(this->fGameWin->get_formatter()->get_outer_max_line_width(),
-											this->fGameWin->displayWidget()->height());
+											this->fGameWin->get_formatter()->get_max_y_pos());
 
 	// Now reformat all active banner windows.
 	for (int i = 0; i < this->fBannerList.size(); ++i) {
@@ -464,7 +464,7 @@ CHtmlSysFrameQt::reformatBanners()
 		win->get_formatter()->start_at_top(false);
 		win->do_formatting(false, false, false);
 		win->displayWidget()->resize(win->get_formatter()->get_outer_max_line_width(),
-									 win->displayWidget()->height());
+									 win->get_formatter()->get_max_y_pos());
 	}
 }
 
