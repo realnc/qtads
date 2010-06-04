@@ -295,29 +295,49 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 	// attributes.  For example, the "TADS-Input" font allows the player to
 	// specify color, bold, and italic styles in addition to the font name.
 	if (newFontDesc.face[0] != 0) {
-		QString facename(QString(newFontDesc.face).toLower());
-		if (facename == QString(HTMLFONT_TADS_SERIF).toLower()) {
-			strcpy(newFontDesc.face, this->fSettings->serifFont.family().toLatin1().constData());
-			base_point_size = this->fSettings->serifFont.pointSize();
-		} else if (facename == QString(HTMLFONT_TADS_SANS).toLower()) {
-			strcpy(newFontDesc.face, this->fSettings->sansFont.family().toLatin1().constData());
-			base_point_size = this->fSettings->sansFont.pointSize();
-		} else if (facename == QString(HTMLFONT_TADS_SCRIPT).toLower()) {
-			strcpy(newFontDesc.face, this->fSettings->scriptFont.family().toLatin1().constData());
-			base_point_size = this->fSettings->scriptFont.pointSize();
-		} else if (facename == QString(HTMLFONT_TADS_TYPEWRITER).toLower()) {
-			strcpy(newFontDesc.face, this->fSettings->writerFont.family().toLatin1().constData());
-			base_point_size = this->fSettings->writerFont.pointSize();
-		} else if (facename == QString(HTMLFONT_TADS_INPUT).toLower()) {
-			strcpy(newFontDesc.face, this->fSettings->inputFont.family().toLatin1().constData());
-			base_point_size = this->fSettings->inputFont.pointSize();
-			newFont.setBold(this->fSettings->inputFont.bold());
-			newFont.setItalic(this->fSettings->inputFont.italic());
-		} else {
-			// TODO: Parse the specified face name.
-			strcpy(newFontDesc.face, font_desc->face);
+		// The face name field can contain multiple face names separated by
+		// commas.  We split them into a list and try each one individualy.
+		bool matchFound = false;
+		const QStringList& strList = QString(newFontDesc.face).split(QChar(','), QString::SkipEmptyParts);
+		for (int i = 0; i < strList.size() and not matchFound; ++i) {
+			const QString& s = strList.at(i).simplified().toLower();
+			if (s == QString(HTMLFONT_TADS_SERIF).toLower()) {
+				strcpy(newFontDesc.face, this->fSettings->serifFont.family().toLatin1().constData());
+				base_point_size = this->fSettings->serifFont.pointSize();
+				matchFound = true;
+			} else if (s == QString(HTMLFONT_TADS_SANS).toLower()) {
+				strcpy(newFontDesc.face, this->fSettings->sansFont.family().toLatin1().constData());
+				base_point_size = this->fSettings->sansFont.pointSize();
+				matchFound = true;
+			} else if (s == QString(HTMLFONT_TADS_SCRIPT).toLower()) {
+				strcpy(newFontDesc.face, this->fSettings->scriptFont.family().toLatin1().constData());
+				base_point_size = this->fSettings->scriptFont.pointSize();
+				matchFound = true;
+			} else if (s == QString(HTMLFONT_TADS_TYPEWRITER).toLower()) {
+				strcpy(newFontDesc.face, this->fSettings->writerFont.family().toLatin1().constData());
+				base_point_size = this->fSettings->writerFont.pointSize();
+				matchFound = true;
+			} else if (s == QString(HTMLFONT_TADS_INPUT).toLower()) {
+				strcpy(newFontDesc.face, this->fSettings->inputFont.family().toLatin1().constData());
+				base_point_size = this->fSettings->inputFont.pointSize();
+				newFont.setBold(this->fSettings->inputFont.bold());
+				newFont.setItalic(this->fSettings->inputFont.italic());
+				matchFound = true;
+			} else {
+				newFont.setFamily(s.toLower());
+				if (newFont.exactMatch()) {
+					matchFound = true;
+					strcpy(newFontDesc.face, s.toLatin1().constData());
+				}
+			}
 		}
-	} else { // Apply characteristics only if the face wasn't specified.
+		// If we didn't find a match, use the main game font as set by
+		// the user.
+		if (not matchFound) {
+			strcpy(newFontDesc.face, this->fSettings->mainFont.family().toLatin1().constData());
+		}
+	// Apply characteristics only if the face wasn't specified.
+	} else {
 		// See if fixed-pitch is desired.
 		if (newFontDesc.fixed_pitch) {
 			// Use prefered monospaced font.
@@ -373,7 +393,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 		}
 	}
 
-	newFont.setFamily(newFontDesc.face);
+	newFont.setFamily(QString(newFontDesc.face).toLower());
 
 	// Note the HTML SIZE parameter requested - if this is zero, it indicates
 	// that we want to use a specific point size instead.
@@ -420,7 +440,8 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 		}
 	}
 
-	//qDebug() << "Font not found in cache; creating new font. Fonts so far:" << this->fFontList.size() + 1;
+	//qDebug() << "Font not found in cache; creating new font:" << newFont
+	//		<< "\nFonts so far:" << this->fFontList.size() + 1;
 
 	// There was no match in our cache. Create a new font and store it in our
 	// cache.
