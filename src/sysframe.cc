@@ -430,7 +430,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 		newFont.color(newFontDesc.color);
 	}
 	if (not newFontDesc.default_bgcolor) {
-		newFont.bgColor(newFontDesc.color);
+		newFont.bgColor(newFontDesc.bgcolor);
 	}
 
 	// Check whether a matching font is already in our cache.
