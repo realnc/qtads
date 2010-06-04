@@ -157,9 +157,9 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 		return;
 	}
 
-	if (e->matches(QKeySequence::MoveToStartOfLine)) {
+	if (e->matches(QKeySequence::MoveToStartOfLine) or e->matches(QKeySequence::MoveToStartOfBlock)) {
 		this->fTadsBuffer->start_of_line(false);
-	} else if (e->matches(QKeySequence::MoveToEndOfLine)) {
+	} else if (e->matches(QKeySequence::MoveToEndOfLine) or e->matches(QKeySequence::MoveToEndOfBlock)) {
 		this->fTadsBuffer->end_of_line(false);
 #if QT_VERSION >= 0x040500
 	} else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
