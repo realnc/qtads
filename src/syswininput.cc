@@ -213,7 +213,7 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 	} else if (e->key() == Qt::Key_Backspace) {
 		this->fTadsBuffer->backspace();
 	} else {
-		if (e->text().isEmpty()) {
+		if (e->text().isEmpty() or not e->text().at(0).isPrint()) {
 			return;
 		}
 		this->fTadsBuffer->add_string(e->text().toUtf8().constData(), e->text().toUtf8().length(), true);
