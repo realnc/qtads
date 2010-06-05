@@ -14,11 +14,12 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-
 #ifndef QTADSIMAGE_H
 #define QTADSIMAGE_H
 
 #include <QImage>
+
+#include "htmlsys.h"
 
 
 /* We handle all types of images the same way, so we implement that handling
@@ -38,7 +39,7 @@ class QTadsImage: public QImage {
 	// through CHtmlFormatter::draw(), which QTadsDisplayWidget::painEvent() is
 	// using to repaint the window.
 	void
-	drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, enum htmlimg_draw_mode_t mode );
+	drawFromPaintEvent( CHtmlSysWin* win, class CHtmlRect* pos, htmlimg_draw_mode_t mode );
 };
 
 

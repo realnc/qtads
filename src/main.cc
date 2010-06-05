@@ -14,16 +14,14 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-
-#include <QTimer>
 #include <QMetaType>
-#include <QFile>
 #include <QFileDialog>
+#include <SDL.h>
+#include <SDL_mixer.h>
 
-#include "os.h"
-#include "tadshtml.h"
-
-#include "htmlqt.h"
+#include "sysframe.h"
+#include "qtadssound.h"
+#include "syssoundmidi.h"
 
 
 // On OS X, SDL does weird stuff with main() and redefines it to SDLMain().

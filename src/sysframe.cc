@@ -20,10 +20,11 @@
 #include <QStatusBar>
 #include <QDir>
 
-#include "htmlqt.h"
 #include "qtadshostifc.h"
 #include "qtadssettings.h"
 #include "qtadsdispwidget.h"
+#include "syswinaboutbox.h"
+#include "syswininput.h"
 
 #include "htmlprs.h"
 #include "htmlinp.h"

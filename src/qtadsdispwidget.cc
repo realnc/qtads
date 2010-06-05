@@ -20,12 +20,12 @@
 #include <QStatusBar>
 
 #include "htmlattr.h"
-#include "htmlqt.h"
 #include "htmlfmt.h"
 #include "htmldisp.h"
 
 #include "qtadsdispwidget.h"
 #include "qtadssettings.h"
+#include "syswininput.h"
 
 
 QTadsDisplayWidget::QTadsDisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )

@@ -14,51 +14,36 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef QTADSCONFDIALOG_H
-#define QTADSCONFDIALOG_H
+#ifndef SYSWINABOUTBOX_H
+#define SYSWINABOUTBOX_H
 
-#include <QDialog>
+#include "syswin.h"
 
 
-namespace Ui {
-	class QTadsConfDialog;
-}
-
-class QTadsConfDialog: public QDialog {
+/* We need special handling for the "About this game" box.
+ */
+class CHtmlSysWinAboutBoxQt: public CHtmlSysWinQt {
 	Q_OBJECT
 
+protected:
+	virtual void
+	keyPressEvent( QKeyEvent* e )
+	// It shouldn't be possible to do game input from the about box, so we
+	// bypass the inherited input handling and revert to the default.
+	{ QScrollArea::keyPressEvent(e); }
+
+	virtual void
+	resizeEvent( QResizeEvent* e );
+
+	virtual QSize
+	sizeHint() const;
+
   public:
-	QTadsConfDialog( class CHtmlSysWinGroupQt* parent = 0 );
-	~QTadsConfDialog();
+	CHtmlSysWinAboutBoxQt( class CHtmlFormatter* formatter, QWidget* parent );
 
-  protected:
-	void
-	changeEvent( QEvent* e );
-
-  private:
-	Ui::QTadsConfDialog* ui;
-
-	// Temporary settings (before being applied.)
-	QColor fTmpMainBgColor;
-	QColor fTmpMainTextColor;
-	QColor fTmpBannerBgColor;
-	QColor fTmpBannerTextColor;
-	QColor fTmpUnvisitedLinkColor;
-	QColor fTmpHoveringLinkColor;
-	QColor fTmpClickedLinkColor;
-
-	bool fInstantApply;
-
-	// Makes the dialog's controls apply instantly when they change.
-	void
-	fMakeInstantApply();
-
-  private slots:
-	void
-	fApplySettings();
-
-	void
-	fSelectColor( int i );
+	virtual void
+	set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,
+					 long height, HTML_BannerWin_Units_t height_units, int use_height );
 };
 
 

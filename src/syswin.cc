@@ -20,10 +20,12 @@
 #include <QScrollBar>
 #include <QResizeEvent>
 
-#include "htmlqt.h"
 #include "qtadsdispwidget.h"
 #include "qtadstimer.h"
 #include "qtadssettings.h"
+#include "syswininput.h"
+#include "sysimagejpeg.h"
+#include "sysimagepng.h"
 
 #include "htmlfmt.h"
 #include "htmlrc.h"

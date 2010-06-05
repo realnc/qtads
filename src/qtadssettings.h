@@ -14,11 +14,10 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-
 #ifndef QTADSSETTINGS_H
 #define QTADSSETTINGS_H
 
-#include "htmlqt.h"
+#include "sysfont.h"
 
 
 class QTadsSettings {

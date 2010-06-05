@@ -14,13 +14,13 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-
+#include <QDebug>
 #include <QMenuBar>
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QVBoxLayout>
 
-#include "htmlqt.h"
+#include "syswinaboutbox.h"
 #include "qtadsconfdialog.h"
 
 

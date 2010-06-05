@@ -18,11 +18,8 @@
 /* This file provides some non-standard functions that are considered
  * standard by the portable Tads code and thus aren't in the OS-layer.
  */
-
 #ifndef MISSING_H
 #define MISSING_H
-
-#include "config.h"
 
 #include <stddef.h> /* For size_t. */
 

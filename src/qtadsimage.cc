@@ -17,7 +17,7 @@
 
 #include <QPainter>
 
-#include "htmlqt.h"
+#include "syswin.h"
 #include "qtadsimage.h"
 
 void

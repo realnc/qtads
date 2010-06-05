@@ -21,8 +21,10 @@
 
 #include "qtadsconfdialog.h"
 #include "ui_qtadsconfdialog.h"
+#include "globals.h"
 #include "qtadssettings.h"
-#include "htmlqt.h"
+#include "sysframe.h"
+#include "syswingroup.h"
 
 
 QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )

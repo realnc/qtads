@@ -20,11 +20,8 @@
  * This file *must not* contain C++ code, since it gets included from
  * the portable Tads C code.
  */
-
 #ifndef OSQT_H
 #define OSQT_H
-
-#include "config.h"
 
 /* Most systems have typedefs for ushort, uint and ulong.  If not, the
  * qtads.pro project file should be modified to define OS_NO_TYPES_DEFINED. */

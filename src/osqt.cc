@@ -23,9 +23,6 @@
  * prototypes in "osifc.h".  The only exception are static helper functions
  * that are clearly marked as such.
  */
-
-#include "config.h"
-
 #include <QApplication>
 #include <QDir>
 #include <QDateTime>
@@ -39,7 +36,9 @@
 #include <ctime>
 
 #include "os.h"
-#include "htmlqt.h"
+#include "globals.h"
+#include "sysframe.h"
+#include "syswininput.h"
 
 
 /* --------------------------------------------------------------------

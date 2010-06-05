@@ -14,12 +14,10 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef QTADSTIMER_H
-#define QTADSTIMER_H
+#ifndef SYSSOUNDMPEG_H
+#define SYSSOUNDMPEG_H
 
-#include <QTimer>
-
-#include "htmlsys.h"
+#include "qtadssound.h"
 
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -28,30 +26,33 @@
  * See htmltads/htmlsys.h and htmltads/notes/porting.htm for information
  * about this class.
  */
-class QTadsTimer: public QTimer, public CHtmlSysTimer {
-	Q_OBJECT
-
-  public slots:
-	// We connect the timeout() signal to this slot.
-	void
-	trigger()
-	{
-		// If we have a callback, call it.
-		if (this->func_ != 0) {
-			this->invoke_callback();
-		}
-	}
-
+class CHtmlSysSoundMpegQt: public QTadsSound, public CHtmlSysSoundMpeg {
   public:
-	QTadsTimer( void (*func)(void*), void* ctx, QObject* parent = 0 )
-	: QTimer(parent), CHtmlSysTimer(func, ctx)
-	{
-		connect(this, SIGNAL(timeout()), this, SLOT(trigger()));
-	}
+	CHtmlSysSoundMpegQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
+	: QTadsSound(parent, chunk, type)
+	{ }
 
-	// We bring this into public scope since we need to evaluate the callback
-	// pointer in order to unregister the timer.
-	using CHtmlSysTimer::func_;
+	//
+	// CHtmlSysSoundMpeg interface implementation.
+	//
+	virtual int
+	play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+				const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade );
+
+	virtual void
+	add_crossfade( CHtmlSysWin* win, long ms );
+
+	virtual void
+	cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg );
+
+	virtual int
+	maybe_suspend( CHtmlSysSound* )
+	// We always return false since we have no limitation regarding the amount
+	// of sounds we can play simultaneously.
+	{ return false; }
+
+	virtual void
+	resume();
 };
 
 

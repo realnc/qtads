@@ -25,8 +25,9 @@
 #include "htmlinp.h"
 #include "htmldisp.h"
 
-#include "htmlqt.h"
 #include "qtadssettings.h"
+#include "syswingroup.h"
+#include "syswin.h"
 #include "qtadsdispwidgetinput.h"
 
 

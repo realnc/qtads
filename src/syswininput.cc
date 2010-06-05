@@ -22,9 +22,9 @@
 #include <QClipboard>
 #include <QUrl>
 
-#include "htmlqt.h"
 #include "qtadssettings.h"
 #include "qtadsdispwidgetinput.h"
+#include "syswininput.h"
 
 #include "htmlfmt.h"
 #include "htmlinp.h"

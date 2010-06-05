@@ -18,6 +18,8 @@
 #include <QSettings>
 
 #include "qtadssettings.h"
+#include "syswingroup.h"
+#include "globals.h"
 
 
 void

@@ -19,12 +19,9 @@
  * switchboard for OS header inclusion.  Do not include this file directly from
  * from any other file.
  */
-
 #ifndef TADSHTML_H
 #include "tadshtml.h"
 #endif
-
-#include <QDebug>
 
 #ifndef HOS_QT_H
 #define HOS_QT_H

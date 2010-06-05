@@ -14,51 +14,38 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef QTADSCONFDIALOG_H
-#define QTADSCONFDIALOG_H
+#ifndef SYSIMAGEJPEG_H
+#define SYSIMAGEJPEG_H
 
-#include <QDialog>
+#include "qtadsimage.h"
 
 
-namespace Ui {
-	class QTadsConfDialog;
-}
-
-class QTadsConfDialog: public QDialog {
-	Q_OBJECT
-
+/* Tads HTML layer class whose interface needs to be implemented by the
+ * interpreter.
+ *
+ * See htmltads/htmlsys.h and htmltads/notes/porting.htm for information
+ * about this class.
+ */
+class CHtmlSysImageJpegQt: public QTadsImage, public CHtmlSysImageJpeg {
   public:
-	QTadsConfDialog( class CHtmlSysWinGroupQt* parent = 0 );
-	~QTadsConfDialog();
+	//
+	// CHtmlSysImageJpeg interface implementation.
+	//
+	virtual void
+	draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
+	{ QTadsImage::drawFromPaintEvent(win, pos, mode); }
 
-  protected:
-	void
-	changeEvent( QEvent* e );
+	virtual unsigned long
+	get_width() const
+	{ return QTadsImage::width(); }
 
-  private:
-	Ui::QTadsConfDialog* ui;
+	virtual unsigned long
+	get_height() const
+	{ return QTadsImage::height(); }
 
-	// Temporary settings (before being applied.)
-	QColor fTmpMainBgColor;
-	QColor fTmpMainTextColor;
-	QColor fTmpBannerBgColor;
-	QColor fTmpBannerTextColor;
-	QColor fTmpUnvisitedLinkColor;
-	QColor fTmpHoveringLinkColor;
-	QColor fTmpClickedLinkColor;
-
-	bool fInstantApply;
-
-	// Makes the dialog's controls apply instantly when they change.
-	void
-	fMakeInstantApply();
-
-  private slots:
-	void
-	fApplySettings();
-
-	void
-	fSelectColor( int i );
+	virtual int
+	map_palette( CHtmlSysWin* win, int foreground )
+	{ return false; }
 };
 
 

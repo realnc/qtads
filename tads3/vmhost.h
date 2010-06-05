@@ -25,6 +25,8 @@ Modified
 #ifndef VMHOST_H
 #define VMHOST_H
 
+#include "os.h"
+
 /* ------------------------------------------------------------------------ */
 /*
  *   I/O Safety Levels.  These are defined as integers, not an enum,

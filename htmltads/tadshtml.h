@@ -80,6 +80,7 @@ void oshtml_dbg_vprintf(const char *fmt, va_list argptr);
 #ifdef TADSHTML_DEBUG
 
 #include <stdarg.h>
+#include <new>
 
 void *th_malloc(size_t siz);
 void *th_realloc(void *oldptr, size_t siz);

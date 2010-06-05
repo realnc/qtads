@@ -23,11 +23,8 @@
  * This isn't true; a decent optimizer can sometimes inline even virtual
  * functions.
  */
-
 #ifndef QTADSCHARMAP_H
 #define QTADSCHARMAP_H
-
-#include "config.h"
 
 #include <cstring>
 

@@ -105,16 +105,29 @@ FORMS += src/qtadsconfdialog.ui
 
 # QTads headers
 HEADERS += \
-	src/config.h \
 	src/osqt.h \
 	src/hos_qt.h \
 	src/h_qt.h \
 	src/oswin.h \
 	src/hos_w32.h \
-	src/htmlqt.h \
 	src/missing.h \
+	src/globals.h \
+	src/sysfont.h \
+	src/sysframe.h \
+	src/syswinaboutbox.h \
+	src/syswingroup.h \
+	src/syswin.h \
+	src/syswininput.h \
+	src/sysimagejpeg.h \
+	src/sysimagepng.h \
+	src/sysimagemng.h \
+	src/syssoundogg.h \
+	src/syssoundwav.h \
+	src/syssoundmpeg.h \
+	src/syssoundmidi.h \
 	src/qtadscharmap.h \
 	src/qtadsimage.h \
+	src/qtadssound.h \
 	src/qtadsdispwidget.h \
 	src/qtadsdispwidgetinput.h \
 	src/qtadshostifc.h \
@@ -128,15 +141,19 @@ SOURCES += \
 	src/oemqt.c \
 	src/osqt.cc \
 	src/hos_qt.cc \
-	src/htmlqt.cc \
+	src/globals.cc \
 	src/sysframe.cc \
 	src/syswingroup.cc \
 	src/syswin.cc \
+	src/syswinaboutbox.cc \
 	src/syswininput.cc \
+	src/sysimage.cc \
+	src/syssound.cc \
 	src/missing.cc \
 	src/charmap.cc \
 	src/qtadscharmap.cc \
 	src/qtadsimage.cc \
+	src/qtadssound.cc \
 	src/main.cc \
 	src/qtadsdispwidget.cc \
 	src/qtadsdispwidgetinput.cc \

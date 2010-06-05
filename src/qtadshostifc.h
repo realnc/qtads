@@ -14,7 +14,6 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-
 #ifndef QTADSHOSTIFC_H
 #define QTADSHOSTIFC_H
 
@@ -23,8 +22,6 @@
 #include "vmhost.h"
 #include "resload.h"
 #include "appctx.h"
-
-#include "osqt.h"
 
 
 /* Host application interface.  This provides a bridge between the T3 VM host

@@ -25,9 +25,6 @@
  * mapping work to Qt.  No matter what the current charset looks like,
  * Qt will always get the mappings right.
  */
-
-#include "config.h"
-
 #include <cstdlib>
 #include <cstring>
 

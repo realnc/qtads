@@ -20,11 +20,8 @@
  * want to use them since Qt provides its own tables.  We simply provide
  * trivial replacements for the functions and let Qt do the work.
  */
-
 #ifndef VMUNI_H
 #define VMUNI_H
-
-#include "config.h"
 
 #include <QChar>
 
