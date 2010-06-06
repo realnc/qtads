@@ -363,7 +363,7 @@ void th_list_memory_blocks()
     /* display the list of undeleted memory blocks */
     for (mem = mem_head, cnt = 0 ; mem ; mem = mem->nxt, ++cnt)
     {
-        sprintf(buf, "  id = %ld, siz = %d\n", mem->id, mem->siz);
+        sprintf(buf, "  id = %ld, siz = %zu\n", mem->id, mem->siz);
         os_dbg_sys_msg(buf);
     }
 

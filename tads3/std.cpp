@@ -719,7 +719,7 @@ void t3_list_memory_blocks(void (*cb)(const char *))
     /* display the list of undeleted memory blocks */
     for (mem = mem_head, cnt = 0 ; mem ; mem = mem->nxt, ++cnt)
     {
-        sprintf(buf, "  id = %ld, siz = %d\n", mem->id, mem->siz);
+        sprintf(buf, "  id = %ld, siz = %zu\n", mem->id, mem->siz);
         (*cb)(buf);
     }
 
