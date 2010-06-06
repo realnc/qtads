@@ -186,8 +186,7 @@ CHtmlSysWinGroupQt::createAboutBox( class CHtmlFormatter* formatter )
 	// Only set the width to something comfortable.  The height will be
 	// calculated later when set_banner_size() is called on the about box.
 	this->fAboutBoxDialog->resize(500, 0);
-	this->fAboutBoxDialog->show();
-	this->fAboutBoxDialog->hide();
+	this->fAboutBoxDialog->layout()->activate();
 	return this->fAboutBox;
 }
 
