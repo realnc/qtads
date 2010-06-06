@@ -80,6 +80,10 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	this->fFrame->setContentsMargins(0,0,0,0);
 	this->setCentralWidget(this->fFrame);
 
+	// Use a sane minimum size; by default Qt would allow us to be resized
+	// to almost zero.
+	this->setMinimumSize(240, 180);
+
 	qWinGroup = this;
 }
 
