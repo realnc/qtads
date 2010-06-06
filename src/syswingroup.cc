@@ -110,7 +110,7 @@ CHtmlSysWinGroupQt::fShowConfDialog()
 #ifdef Q_WS_MAC
 	// There's a bug in Qt for OS X that results in a visual glitch with
 	// QFontComboBox widgets inside QFormLayouts.  Making the dialog 4 pixels
-	// heigher fixes it.
+	// higher fixes it.
 	//
 	// See: http://bugreports.qt.nokia.com/browse/QTBUG-10460
 	this->fConfDialog->layout()->activate();
