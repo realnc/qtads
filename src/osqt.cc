@@ -200,19 +200,18 @@ os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
 		return;
 
 	  case OS_GSP_T3_APP_DATA: {
-		const QString& dir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-		Q_ASSERT(dir.toLocal8Bit().size() < buflen);
-
+		const QString& dirStr = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+		QDir dir(dirStr);
 		// Create the directory if it doesn't exist.
-		if (not QDir().mkpath(dir)) {
+		if (not dir.exists() and not dir.mkpath(dirStr)) {
 			// TODO: Error dialog.
-			qWarning() << "Could not create directory path:" << dir;
+			qWarning() << "Could not create directory path:" << dirStr;
 			Q_ASSERT(QDir::tempPath().toLocal8Bit().size() < buflen);
 			strncpy(buf, QDir::tempPath().toLocal8Bit().constData(), buflen);
 			return;
 		}
-
-		strncpy(buf, dir.toLocal8Bit().constData(), buflen);
+		Q_ASSERT(dirStr.toLocal8Bit().size() < buflen);
+		strncpy(buf, dirStr.toLocal8Bit().constData(), buflen);
 		buf[buflen - 1] = '\0';
 		break;
 	  }
