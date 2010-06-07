@@ -24,6 +24,7 @@
  * that are clearly marked as such.
  */
 #include <QApplication>
+#include <QDesktopServices>
 #include <QDir>
 #include <QDateTime>
 #include <QTimer>
@@ -181,31 +182,41 @@ os_get_exe_filename( char* buf, size_t buflen, const char* argv0 )
 
 
 /* Get a special directory path.
- *
- * TODO: Implement it.
  */
 void
-os_get_special_path( char* buf, size_t /*buflen*/, const char* /*argv0*/, int id )
+os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
 {
-	qDebug() << "get_special_path. id:" << id;
 	switch (id) {
 	  case OS_GSP_T3_RES:
-		strcpy(buf, "/usr/share/games/frobtads/tads3/res");
-		break;
 	  case OS_GSP_T3_INC:
-		strcpy(buf, "/usr/share/games/frobtads/tads3/include");
-		break;
 	  case OS_GSP_T3_LIB:
-		strcpy(buf, "/usr/share/games/frobtads/tads3/lib");
-		break;
 	  case OS_GSP_T3_USER_LIBS:
-		strcpy(buf, "./");
+		// We can safely ignore those. They're needed only by the compiler.
+		// OS_GSP_T3_RES is only needed by the base code implementation of
+		// charmap.cc (tads3/charmap.cpp) which we don't use.
+		return;
+
+	  case OS_GSP_T3_APP_DATA: {
+		const QString& dir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+		Q_ASSERT(dir.toLocal8Bit().size() < buflen);
+
+		// Create the directory if it doesn't exist.
+		if (not QDir().mkpath(dir)) {
+			// TODO: Error dialog.
+			qWarning() << "Could not create directory path:" << dir;
+			strcpy(buf, "/tmp");
+			return;
+		}
+		strncpy(buf, dir.toLocal8Bit().constData(), buflen);
+		buf[buflen - 1] = '\0';
 		break;
-	  case OS_GSP_T3_APP_DATA:
-		strcpy(buf, "/tmp");
-		break;
+	  }
+
 	  default:
-		qFatal("Unknown id in os_get_special_path()");
+		// We didn't recognize the specified id. That means the base code
+		// added a new value for it that we don't know about.
+		// TODO: Error dialog.
+		qWarning("Unknown id in os_get_special_path()");
 	}
 }
 
