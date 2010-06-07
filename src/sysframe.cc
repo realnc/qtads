@@ -703,7 +703,7 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
 	if (res == -2) {
 		// It was an HREF event (user clicked a hyperlink).  Get the last
 		// pending HREF event.
-		qstrncpy(info->href, this->fGameWin->pendingHrefEvent().toUtf8().constData(), sizeof(info->href) - 1);
+		strncpy(info->href, this->fGameWin->pendingHrefEvent().toUtf8().constData(), sizeof(info->href) - 1);
 		info->href[sizeof(info->href) - 1] = '\0';
 		return OS_EVT_HREF;
 	} else if (res == 0) {

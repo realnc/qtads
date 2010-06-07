@@ -121,7 +121,7 @@ QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 		}
 
 		// If we found something that has ALT text, show it in the status bar.
-		if (disp->get_alt_text() != 0 and qstrlen(disp->get_alt_text()) > 0) {
+		if (disp->get_alt_text() != 0 and strlen(disp->get_alt_text()) > 0) {
 			qWinGroup->statusBar()->showMessage(disp->get_alt_text());
 			return;
 		}
@@ -180,7 +180,7 @@ QTadsDisplayWidget::mouseReleaseEvent( QMouseEvent* e )
 	// If we're still hovering over the clicked link, process it.
 	if (this->fClickedLink == this->fHoverLink) {
 		const textchar_t* cmd = this->fClickedLink->href_.get_url();
-		qFrame->gameWindow()->processCommand(cmd, qstrlen(cmd), this->fClickedLink->get_append(),
+		qFrame->gameWindow()->processCommand(cmd, strlen(cmd), this->fClickedLink->get_append(),
 											 not this->fClickedLink->get_noenter(), OS_CMD_NONE);
 		// Put it back in hovering mode.
 		if (qFrame->settings()->highlightLinks) {
