@@ -186,6 +186,9 @@ os_get_exe_filename( char* buf, size_t buflen, const char* argv0 )
 void
 os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
 {
+	Q_ASSERT(buf != 0);
+	Q_ASSERT(buflen > 0);
+
 	switch (id) {
 	  case OS_GSP_T3_RES:
 	  case OS_GSP_T3_INC:
@@ -204,9 +207,11 @@ os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
 		if (not QDir().mkpath(dir)) {
 			// TODO: Error dialog.
 			qWarning() << "Could not create directory path:" << dir;
-			strcpy(buf, "/tmp");
+			Q_ASSERT(QDir::tempPath().toLocal8Bit().size() < buflen);
+			strncpy(buf, QDir::tempPath().toLocal8Bit().constData(), buflen);
 			return;
 		}
+
 		strncpy(buf, dir.toLocal8Bit().constData(), buflen);
 		buf[buflen - 1] = '\0';
 		break;
