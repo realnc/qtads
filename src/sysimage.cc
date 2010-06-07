@@ -37,20 +37,20 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 	//		<< "with size" << filesize << "url:" << url->get_url();
 
 	// Check if the file exists and is readable.
-	QFileInfo inf(filename);
+	QFileInfo inf(QString::fromLocal8Bit(filename));
 	if (not inf.exists() or not inf.isReadable()) {
-		qWarning() << "ERROR:" << filename << "doesn't exist or is unreadable";
+		qWarning() << "ERROR:" << inf.filePath() << "doesn't exist or is unreadable";
 		return 0;
 	}
 
 	// Open the file and seek to the specified position.
-	QFile file(filename);
+	QFile file(inf.filePath());
 	if (not file.open(QIODevice::ReadOnly)) {
-		qWarning() << "ERROR: Can't open file" << filename;
+		qWarning() << "ERROR: Can't open file" << inf.filePath();
 		return 0;
 	}
 	if (not file.seek(seekpos)) {
-		qWarning() << "ERROR: Can't seek in file" << filename;
+		qWarning() << "ERROR: Can't seek in file" << inf.filePath();
 		file.close();
 		return 0;
 	}
@@ -81,7 +81,7 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 	const QByteArray& data(file.read(filesize));
 	file.close();
 	if (data.isEmpty() or static_cast<unsigned long>(data.size()) < filesize) {
-		qWarning() << "ERROR: Could not read" << filesize << "bytes from file" << filename;
+		qWarning() << "ERROR: Could not read" << filesize << "bytes from file" << inf.filePath();
 		delete image;
 		return 0;
 	}
