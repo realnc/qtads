@@ -417,30 +417,19 @@ void
 CHtmlSysWinQt::draw_hrule( const CHtmlRect* pos, int shade )
 {
 	//qDebug() << Q_FUNC_INFO;
+	Q_ASSERT(pos != 0);
 
 	QPainter painter(this->dispWidget);
-	QPen pen;
 	if (shade) {
-		pen.setWidth((pos->bottom - pos->top) / 2);
-
-		// Draw the top line with shadow color.
-		pen.setColor(QApplication::palette().color(QPalette::Dark));
-		painter.setPen(pen);
-		painter.drawLine(pos->left + pen.width() / 2, pos->top + pen.width() / 2,
-						 pos->right - pen.width() / 2, pos->top + pen.width() / 2);
-
-		// Draw the bottom line with hilite color.
-		pen.setColor(QApplication::palette().color(QPalette::Light));
-		painter.setPen(pen);
-		painter.drawLine(pos->left + pen.width() / 2, pos->top + pen.width() + pen.width() / 2,
-						 pos->right - pen.width() / 2, pos->top + pen.width() + pen.width() / 2);
-
+		if (pos->bottom - pos->top > 2) {
+			qDrawShadePanel(&painter, pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top,
+							this->palette(), true, 1, 0);
+		} else {
+			qDrawShadeLine(&painter, pos->left, pos->top, pos->right, pos->top, this->palette(), true, 1, 0);
+		}
 	} else {
-		pen.setWidth(pos->bottom - pos->top);
-		pen.setColor(QApplication::palette().color(QPalette::Dark));
-		painter.setPen(pen);
-		painter.drawLine(pos->left + pen.width() / 2, pos->top + pen.width() / 2,
-						 pos->right - pen.width() / 2, pos->top + pen.width() / 2);
+		qDrawPlainRect(&painter, pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top,
+					   QApplication::palette().color(QPalette::Dark), 1, 0);
 	}
 }
 
