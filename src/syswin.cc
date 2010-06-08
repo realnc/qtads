@@ -439,69 +439,11 @@ CHtmlSysWinQt::draw_table_border( const CHtmlRect* pos, int width, int cell )
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	QColor tlColor;
-	QColor brColor;
-
-	// Select the drawing scheme according to whether we're drawing a table
-	// or a cell.
-	if (cell) {
-		// Cell - make these look indented, so use the shadow color for the
-		// top and left edges, and the highlight color for the bottom and
-		// right edges.
-		tlColor = QApplication::palette().color(QPalette::Dark);
-		brColor = QApplication::palette().color(QPalette::Mid);
-	} else {
-		// Table - make the whole table look embossed, so use the highlight
-		// color for the top and left edges, and the shadow color for the
-		// bottom and right edges.
-		tlColor = QApplication::palette().color(QPalette::Mid);
-		brColor = QApplication::palette().color(QPalette::Dark);
-	}
-
-	QPen pen;
-	pen.setWidth(width);
-	pen.setColor(tlColor);
-	QPainter painter(this->dispWidget);
-	painter.setPen(pen);
-
-	// Draw the top and left lines in highlight color.
-	painter.drawLine(pos->left + width / 2, pos->top + width / 2,
-					 pos->right - width / 2, pos->top + width / 2);
-	painter.drawLine(pos->left + width / 2, pos->top + width / 2,
-					 pos->left + width / 2, pos->bottom - width / 2);
-
-	// Draw the right and bottom lines in shadow color.
-	pen.setColor(brColor);
-	painter.setPen(pen);
-	painter.drawLine(pos->right - width / 2, pos->top + width / 2,
-					 pos->right - width / 2, pos->bottom - width / 2);
-	painter.drawLine(pos->left + width / 2, pos->bottom - width / 2,
-					 pos->right - width / 2, pos->bottom - width / 2);
-
-	// If the width is greater than 1, fill in the corners to make the edges
-	// meet diagonally.  We've already drawn the bottom and right lines so they
-	// fully overlap the corners, so just add little triangles extending from
-	// the left and bottom edges.
-	if (not cell and width > 1) {
-		pen.setColor(tlColor);
-		pen.setWidth(1);
-		QBrush brush(tlColor);
-		painter.setPen(pen);
-		painter.setBrush(brush);
-		QPoint pts[3];
-
-		// Draw the top right corner.
-		pts[0].setX(pos->right - width - 1);  pts[0].setY(pos->top);
-		pts[1].setX(pos->right - 1);          pts[1].setY(pos->top);
-		pts[2].setX(pos->right - width);      pts[2].setY(pos->top + width - 1);
-		painter.drawPolygon(pts, 3);
-
-		// Draw the bottom left corner.
-		pts[0].setX(pos->left);               pts[0].setY(pos->bottom - width - 1);
-		pts[1].setX(pos->left);               pts[1].setY(pos->bottom - 1);
-		pts[2].setX(pos->left + width - 1);   pts[2].setY(pos->bottom - width);
-		painter.drawPolygon(pts, 3);
-	}
+	QPainter pnt(this->dispWidget);
+	QPalette pal;
+	// Use Midlight for Light to closer match Windows HTML TADS appearance.
+	pal.setColor(QPalette::Light, QApplication::palette().color(QPalette::Midlight));
+	qDrawShadePanel(&pnt, pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top, pal, cell, width);
 }
 
 
