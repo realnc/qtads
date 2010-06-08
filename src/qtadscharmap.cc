@@ -98,7 +98,7 @@ QTadsCharmapToUni::read_file( osfildef* fp, char* buf, size_t bufl, unsigned lon
 	}
 
 	// Copy the result to the output buffer, without the terminating '\0' byte
-	// (as this might overflow the the buffer, and we're not required to
+	// (as this might overflow the buffer, and we're not required to
 	// 0-terminate the result anyway).
 	const QByteArray& tmp = res.toUtf8();
 	std::strncpy(buf, tmp, tmp.length());
