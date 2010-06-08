@@ -35,11 +35,11 @@ QTadsCharmapToUni::read_file( osfildef* fp, char* buf, size_t bufl, unsigned lon
 	// We read only one byte at a time.
 	char c;
 
-	// We accumulate the bytes we read until we have a full
-	// character (the input file's charset might be multi-byte).  We
-	// assume that the biggest possible multi-byte character is 4
-	// bytes long.  I don't know of any charset in this world that
-	// uses more than 4 bytes to represent a single character.
+	// We accumulate the bytes we read until we have a full character (the
+	// input file's charset might be multi-byte).  We assume that the biggest
+	// possible multi-byte character is 4 bytes long.  I don't know of any
+	// charset in this world that uses more than 4 bytes to represent a single
+	// character.
 	QByteArray acc(4, '\0');
 
 	// Current index in acc (also number of bytes it contains).
@@ -60,9 +60,8 @@ QTadsCharmapToUni::read_file( osfildef* fp, char* buf, size_t bufl, unsigned lon
 	while (not eof and not done and count < read_limit) {
 		// Read one byte.
 		if (osfrb(fp, &c, 1) != 0) {
-			// Failed; must be EOF.  We don't care if it's
-			// really EOF or not; if we can't read, we can't
-			// read, no matter why.
+			// Failed; must be EOF.  We don't care if it's really EOF or not;
+			// if we can't read, we can't read, no matter why.
 			eof = true;
 		} else {
 			++count;
@@ -70,21 +69,16 @@ QTadsCharmapToUni::read_file( osfildef* fp, char* buf, size_t bufl, unsigned lon
 			Q_ASSERT(accInd < 4);
 			acc[accInd++] = c;
 			if (this->is_complete_char(acc, accInd)) {
-				// The accumulated sequence is a valid
-				// character; translate it and reset the
-				// accumulator, but make sure that we
-				// won't overflow the output buffer.
+				// The accumulated sequence is a valid character; translate it
+				// and reset the accumulator, but make sure that we won't
+				// overflow the output buffer.
 				const QString& tmp = this->fLocalCodec->toUnicode(acc, accInd);
 				if (static_cast<size_t>(res.toUtf8().length() + tmp.toUtf8().length()) > bufl) {
-					// It would overflow.  Set the
-					// file's seek location back, so
-					// that our caller won't lose
-					// the accumulated bytes; we'll
-					// read them again in our next
-					// call.
+					// It would overflow.  Set the file's seek location back,
+					// so that our caller won't lose the accumulated bytes;
+					// we'll read them again in our next call.
 					osfseek(fp, -accInd, OSFSK_CUR);
-					// We can't proceed, so we're
-					// done.
+					// We can't proceed, so we're done.
 					done = true;
 				} else {
 					// It fits.
@@ -96,17 +90,16 @@ QTadsCharmapToUni::read_file( osfildef* fp, char* buf, size_t bufl, unsigned lon
 	}
 
 	if (eof and res.isEmpty()) {
-		// Nothing was translated and we reached the end of the
-		// file.  Return 0 (EOF).  We don't care if there are
-		// still bytes in our accumulator; there's nothing left
-		// to read from the file, so the accumulator will never
-		// contain a valid sequence.
+		// Nothing was translated and we reached the end of the file.  Return 0
+		// (EOF).  We don't care if there are still bytes in our accumulator;
+		// there's nothing left to read from the file, so the accumulator will
+		// never contain a valid sequence.
 		return 0;
 	}
 
-	// Copy the result to the output buffer, without the terminating
-	// '\0' byte (as this might overflow the the buffer, and we're
-	// not required to 0-terminate the result anyway).
+	// Copy the result to the output buffer, without the terminating '\0' byte
+	// (as this might overflow the the buffer, and we're not required to
+	// 0-terminate the result anyway).
 	const QByteArray& tmp = res.toUtf8();
 	std::strncpy(buf, tmp, tmp.length());
 	return tmp.length();
