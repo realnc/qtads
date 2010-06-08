@@ -428,8 +428,8 @@ CHtmlSysWinQt::draw_hrule( const CHtmlRect* pos, int shade )
 			qDrawShadeLine(&painter, pos->left, pos->top, pos->right, pos->top, this->palette(), true, 1, 0);
 		}
 	} else {
-		qDrawPlainRect(&painter, pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top,
-					   QApplication::palette().color(QPalette::Dark), 1, 0);
+		painter.fillRect(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top,
+						 QApplication::palette().color(QPalette::Dark));
 	}
 }
 
