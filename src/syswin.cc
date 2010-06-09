@@ -690,11 +690,9 @@ CHtmlSysWinQt::set_html_bg_color( HTML_color_t color, int use_default )
 		return;
 	}
 
-	int red = HTML_color_red(color);
-	int green = HTML_color_green(color);
-	int blue = HTML_color_blue(color);
+	color = this->map_system_color(color);
 	QPalette p(this->palette());
-	p.setColor(QPalette::Base, QColor(red, green, blue));
+	p.setColor(QPalette::Base, QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
 	this->setPalette(p);
 }
 
@@ -715,11 +713,9 @@ CHtmlSysWinQt::set_html_text_color( HTML_color_t color, int use_default )
 		return;
 	}
 
-	int red = HTML_color_red(color);
-	int green = HTML_color_green(color);
-	int blue = HTML_color_blue(color);
+	color = this->map_system_color(color);
 	QPalette p(this->palette());
-	p.setColor(QPalette::Text, QColor(red, green, blue));
+	p.setColor(QPalette::Text, QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
 	this->setPalette(p);
 }
 
