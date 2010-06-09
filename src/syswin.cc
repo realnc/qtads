@@ -813,7 +813,8 @@ CHtmlSysWinQt::get_html_alink_color() const
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	return HTML_make_color(10, 10, 125);
+	const QColor& col = qFrame->settings()->clickedLinkColor;
+	return HTML_make_color(col.red(), col.green(), col.blue());
 }
 
 
@@ -822,7 +823,8 @@ CHtmlSysWinQt::get_html_vlink_color() const
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	return HTML_make_color(0, 0, 255);
+	// Visited links aren't really implemented by the HTML base code.
+	return this->get_html_link_color();
 }
 
 
