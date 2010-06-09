@@ -443,3 +443,17 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 	done = false;
 	return 0;
 }
+
+
+void
+CHtmlSysWinInputQt::set_html_input_color(HTML_color_t clr, int use_default)
+{
+	//qDebug() << Q_FUNC_INFO;
+
+	if (use_default) {
+		const QColor& def = qFrame->settings()->inputColor;
+		qFrame->inputColor(HTML_make_color(def.red(), def.green(), def.blue()));
+	} else {
+		qFrame->inputColor(this->map_system_color(clr));
+	}
+}

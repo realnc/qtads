@@ -235,7 +235,9 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	set_html_text_color( HTML_color_t color, int use_default );
 
 	virtual void
-	set_html_input_color( HTML_color_t clr, int use_default );
+	set_html_input_color( HTML_color_t, int )
+	// We don't provide input, so we don't deal with this.
+	{ }
 
 	virtual void
 	set_html_link_colors( HTML_color_t link_color, int link_use_default, HTML_color_t vlink_color,

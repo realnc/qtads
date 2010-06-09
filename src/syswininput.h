@@ -121,6 +121,12 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 		this->fHrefEvent.clear();
 		return ret;
 	}
+
+	//
+	// CHtmlSysWin interface implementation.
+	//
+	virtual void
+	set_html_input_color( HTML_color_t clr, int use_default );
 };
 
 

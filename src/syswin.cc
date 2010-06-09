@@ -721,20 +721,6 @@ CHtmlSysWinQt::set_html_text_color( HTML_color_t color, int use_default )
 
 
 void
-CHtmlSysWinQt::set_html_input_color(HTML_color_t clr, int use_default)
-{
-	//qDebug() << Q_FUNC_INFO;
-
-	if (use_default) {
-		const QColor& def = qFrame->settings()->inputColor;
-		qFrame->inputColor(HTML_make_color(def.red(), def.green(), def.blue()));
-	} else {
-		qFrame->inputColor(this->map_system_color(clr));
-	}
-}
-
-
-void
 CHtmlSysWinQt::set_html_link_colors( HTML_color_t link_color, int link_use_default,
 					 HTML_color_t vlink_color, int vlink_use_default,
 					 HTML_color_t alink_color, int alink_use_default,
