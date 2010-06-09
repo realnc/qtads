@@ -37,6 +37,7 @@ class QTadsSettings {
 	QColor mainBgColor;
 	QColor bannerTextColor;
 	QColor bannerBgColor;
+	QColor inputColor;
 
 	bool underlineLinks;
 	bool highlightLinks;

@@ -39,6 +39,7 @@ QTadsSettings::loadFromDisk()
 	this->mainTextColor = sett.value("maintext", QColor(Qt::black)).value<QColor>();
 	this->bannerBgColor = sett.value("bannerbg", QColor(Qt::lightGray)).value<QColor>();
 	this->bannerTextColor = sett.value("bannertext", QColor(Qt::black)).value<QColor>();
+	this->inputColor = sett.value("input", QColor(Qt::blue)).value<QColor>();
 	this->underlineLinks = sett.value("underlinelinks", false).toBool();
 	this->highlightLinks = sett.value("highlightlinks", true).toBool();
 	this->unvisitedLinkColor = sett.value("unvisitedlinks", QColor(Qt::blue)).value<QColor>();
@@ -77,6 +78,7 @@ QTadsSettings::saveToDisk()
 	sett.setValue("maintext", this->mainTextColor);
 	sett.setValue("bannerbg", this->bannerBgColor);
 	sett.setValue("bannertext", this->bannerTextColor);
+	sett.setValue("input", this->inputColor);
 	sett.setValue("underlinelinks", this->underlineLinks);
 	sett.setValue("highlightlinks", this->highlightLinks);
 	sett.setValue("unvisitedlinks", this->unvisitedLinkColor);

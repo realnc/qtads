@@ -51,6 +51,11 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 	this->fSettings = new QTadsSettings;
 	this->fSettings->loadFromDisk();
 
+	// Initialize the input color with the user-configured one.  The game is
+	// free to change the input color later on.
+	const QColor& tmpCol = this->fSettings->inputColor;
+	this->fInputColor = HTML_make_color(tmpCol.red(), tmpCol.green(), tmpCol.blue());
+
 	this->fParser = 0;
 	this->fInputBuffer = 0;
 	this->fTadsBuffer = 0;
@@ -323,6 +328,10 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 				base_point_size = this->fSettings->inputFont.pointSize();
 				newFont.setBold(this->fSettings->inputFont.bold());
 				newFont.setItalic(this->fSettings->inputFont.italic());
+				if (newFontDesc.default_color) {
+					newFontDesc.color = HTML_COLOR_INPUT;
+					newFont.color(HTML_COLOR_INPUT);
+				}
 				matchFound = true;
 			} else {
 				newFont.setFamily(s.toLower());

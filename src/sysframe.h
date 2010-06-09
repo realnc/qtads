@@ -78,6 +78,9 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// Is there a reformat pending?
 	bool fReformatPending;
 
+	// Current input font color.
+	HTML_color_t fInputColor;
+
 	// Run the game file contained in fNextGame.
 	void
 	fRunGame();
@@ -111,6 +114,14 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	class CHtmlSysWinInputQt*
 	gameWindow()
 	{ return this->fGameWin; }
+
+	HTML_color_t
+	inputColor()
+	{ return this->fInputColor; }
+
+	void
+	inputColor( HTML_color_t color )
+	{ this->fInputColor = color; }
 
 	CHtmlSysFontQt*
 	createFont( const CHtmlFontDesc* font_desc );

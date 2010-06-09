@@ -32,8 +32,8 @@
 
 
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QTadsDisplayWidget* dispWidget, QWidget* parent )
-  : QScrollArea(parent), CHtmlSysWin(formatter), fBannerStyleAutoVScroll(true), fDontReformat(0), fParentBanner(0),
-	fBgImage(0), margins(8, 2, 8, 2), bannerSize(0), bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
+  : QScrollArea(parent), CHtmlSysWin(formatter), fBannerStyleAutoVScroll(true), fDontReformat(0),
+	fParentBanner(0), fBgImage(0), margins(8, 2, 8, 2), bannerSize(0), bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
 {
 	if (dispWidget == 0) {
 		this->dispWidget = new QTadsDisplayWidget(this, formatter);
@@ -350,6 +350,8 @@ CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const 
 		// The font has its own color; use it.
 		HTML_color_t color = fontCast.get_font_color();
 		painter.setPen(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
+	} else if (font->get_font_color() == HTML_COLOR_INPUT) {
+		painter.setPen(qFrame->inputColor());
 	}
 
 	if (hilite) {
@@ -456,7 +458,8 @@ CHtmlSysWinQt::draw_table_bkg( const CHtmlRect* pos, HTML_color_t bgcolor )
 	int red = HTML_color_red(bgcolor);
 	int green = HTML_color_green(bgcolor);
 	int blue = HTML_color_blue(bgcolor);
-	painter.fillRect(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top, QColor(red, green, blue));
+	painter.fillRect(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top,
+					 QColor(red, green, blue));
 }
 
 
@@ -725,12 +728,13 @@ void
 CHtmlSysWinQt::set_html_input_color(HTML_color_t clr, int use_default)
 {
 	//qDebug() << Q_FUNC_INFO;
-	/*
-	int red = HTML_color_red(clr);
-	int green = HTML_color_green(clr);
-	int blue = HTML_color_blue(clr);
-	qFrame->settings()->inputFont.color(clr);
-	*/
+
+	if (use_default) {
+		const QColor& def = qFrame->settings()->inputColor;
+		qFrame->inputColor(HTML_make_color(def.red(), def.green(), def.blue()));
+	} else {
+		qFrame->inputColor(this->map_system_color(clr));
+	}
 }
 
 
@@ -782,7 +786,8 @@ CHtmlSysWinQt::map_system_color( HTML_color_t color )
 		break;
 
 	  case HTML_COLOR_INPUT:
-		return HTML_make_color(0, 0, 0);
+		col = qFrame->settings()->inputColor;
+		break;
 
 	  case HTML_COLOR_HLINK:
 		col = qFrame->settings()->hoveringLinkColor;
