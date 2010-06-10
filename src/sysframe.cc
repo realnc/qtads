@@ -75,6 +75,9 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 	// Automatically quit the application when the last window has closed.
 	connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 
+	// We're the main HTML TADS frame object.
+	CHtmlSysFrame::set_frame_obj(this);
+
 	// Set our global pointer.
 	qFrame = this;
 }
@@ -84,6 +87,9 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 {
 	//qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(qFrame != 0);
+
+	// We're no longer the main frame object.
+	CHtmlSysFrame::set_frame_obj(0);
 
 	// Save our persistent settings.
 	this->fSettings->saveToDisk();
@@ -125,9 +131,6 @@ CHtmlSysFrameQt::fRunGame()
 		// Nothing to run.
 		return;
 	}
-
-	// Note that we're the main HTML TADS frame object.
-	CHtmlSysFrame::set_frame_obj(this);
 
 	while (not this->fNextGame.isEmpty()) {
 		QString fname = this->fNextGame;
@@ -204,9 +207,6 @@ CHtmlSysFrameQt::fRunGame()
 			qWarning() << fname.toLocal8Bit().constData() << "is not a TADS game file.";
 		}
 	}
-
-	// The VM finished.  Note that we're no longer the main frame object.
-	CHtmlSysFrame::set_frame_obj(0);
 
 	// Reset application window title.
 	qWinGroup->setWindowTitle(qFrame->applicationName());
