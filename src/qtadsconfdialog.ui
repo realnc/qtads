@@ -334,7 +334,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_4">
+        <widget class="QGroupBox" name="linksGroupBox">
          <property name="title">
           <string>Hyperlinks</string>
          </property>
