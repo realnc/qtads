@@ -43,6 +43,7 @@ class QTadsConfDialog: public QDialog {
 	QColor fTmpMainTextColor;
 	QColor fTmpBannerBgColor;
 	QColor fTmpBannerTextColor;
+	QColor fTmpInputColor;
 	QColor fTmpUnvisitedLinkColor;
 	QColor fTmpHoveringLinkColor;
 	QColor fTmpClickedLinkColor;

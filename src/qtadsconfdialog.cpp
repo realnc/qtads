@@ -49,6 +49,8 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	ui->bannerBgColorButton->setStyleSheet(buttonStyle + this->fTmpBannerBgColor.name() + "}");
 	this->fTmpBannerTextColor = qFrame->settings()->bannerTextColor;
 	ui->bannerTextColorButton->setStyleSheet(buttonStyle + this->fTmpBannerTextColor.name() + "}");
+	this->fTmpInputColor = qFrame->settings()->inputColor;
+	ui->inputColorButton->setStyleSheet(buttonStyle + this->fTmpInputColor.name() + "}");
 	this->fTmpUnvisitedLinkColor = qFrame->settings()->unvisitedLinkColor;
 	ui->linkUnvisitedColorButton->setStyleSheet(buttonStyle + this->fTmpUnvisitedLinkColor.name() + "}");
 	this->fTmpHoveringLinkColor = qFrame->settings()->hoveringLinkColor;
@@ -97,10 +99,12 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	sigMapper->setMapping(ui->linkUnvisitedColorButton, 5);
 	sigMapper->setMapping(ui->linkHoveringColorButton, 6);
 	sigMapper->setMapping(ui->linkClickedColorButton, 7);
+	sigMapper->setMapping(ui->inputColorButton, 8);
 	connect(ui->mainTextColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
 	connect(ui->mainBgColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
 	connect(ui->bannerTextColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
 	connect(ui->bannerBgColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
+	connect(ui->inputColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
 	connect(ui->linkUnvisitedColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
 	connect(ui->linkHoveringColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
 	connect(ui->linkClickedColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
@@ -194,6 +198,7 @@ QTadsConfDialog::fApplySettings()
 	sett->mainTextColor = this->fTmpMainTextColor;
 	sett->bannerBgColor = this->fTmpBannerBgColor;
 	sett->bannerTextColor = this->fTmpBannerTextColor;
+	sett->inputColor = this->fTmpInputColor;
 	sett->unvisitedLinkColor = this->fTmpUnvisitedLinkColor;
 	sett->hoveringLinkColor = this->fTmpHoveringLinkColor;
 	sett->clickedLinkColor = this->fTmpClickedLinkColor;
@@ -267,6 +272,11 @@ QTadsConfDialog::fSelectColor( int i )
 		button = ui->linkClickedColorButton;
 		tmpColor = &this->fTmpClickedLinkColor;
 		newColor = this->fTmpClickedLinkColor;
+		break;
+	  case 8:
+		button = ui->inputColorButton;
+		tmpColor = &this->fTmpInputColor;
+		newColor = this->fTmpInputColor;
 		break;
 	}
 
