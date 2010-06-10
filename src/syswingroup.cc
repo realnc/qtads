@@ -48,11 +48,11 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
 	// "File" menu.
 	QMenu* fileMenu = menuBar->addMenu(tr("&File"));
-	QAction* openAct = new QAction(tr("&Open New Game"), menuBar);
+	QAction* openAct = new QAction(tr("&Open New Game"), this);
 	openAct->setShortcuts(QKeySequence::Open);
 	fileMenu->addAction(openAct);
 	connect(openAct, SIGNAL(triggered()), this, SLOT(fOpenNewGame()));
-	QAction* recentAct = new QAction(tr("&Recent Games"), menuBar);
+	QAction* recentAct = new QAction(tr("&Recent Games"), this);
 	this->fRecentGamesMenu = new QMenu("Recent Games", this);
 	recentAct->setMenu(this->fRecentGamesMenu);
 	fileMenu->addAction(recentAct);
@@ -60,7 +60,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
 	// "Edit" menu.
 	QMenu* editMenu = menuBar->addMenu(tr("&Edit"));
-	QAction* settingsAct = new QAction(tr("&Preferences"), menuBar);
+	QAction* settingsAct = new QAction(tr("&Preferences"), this);
 #if QT_VERSION >= 0x040600
 	settingsAct->setShortcuts(QKeySequence::Preferences);
 #endif
@@ -69,7 +69,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
 	// "Help" menu.
 	QMenu* gameMenu = menuBar->addMenu(tr("&Help"));
-	this->fAboutGameAction = new QAction(tr("&About This Game"), menuBar);
+	this->fAboutGameAction = new QAction(tr("&About This Game"), this);
 	this->fAboutGameAction->setMenuRole(QAction::ApplicationSpecificRole);
 	this->fAboutGameAction->setEnabled(false);
 	gameMenu->addAction(this->fAboutGameAction);
