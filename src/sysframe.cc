@@ -97,9 +97,12 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 	// We're being destroyed, so our global pointer is no longer valid.
 	qFrame = 0;
 
-	// Delete HTML banners and main game window.
+	// Delete HTML banners, orphaned banners and main game window.
 	while (not this->fBannerList.isEmpty()) {
 		delete this->fBannerList.takeLast();
+	}
+	while (not this->fOrhpanBannerList.isEmpty()) {
+		os_banner_delete(this->fOrhpanBannerList.takeLast());
 	}
 	delete this->fGameWin;
 
@@ -142,7 +145,10 @@ CHtmlSysFrameQt::fRunGame()
 		// Run the appropriate TADS VM.
 		int vmType = vm_get_game_type(QFileInfo(fname).fileName().toLocal8Bit(), 0, 0, 0, 0);
 		if (vmType == VM_GGT_TADS2 or vmType == VM_GGT_TADS3) {
-			// Delete all HTML banners.
+			// Delete all HTML and orphaned banners.
+			while (not this->fOrhpanBannerList.isEmpty()) {
+				os_banner_delete(this->fOrhpanBannerList.takeLast());
+			}
 			while (not this->fBannerList.isEmpty()) {
 				delete this->fBannerList.takeLast();
 			}
@@ -858,8 +864,7 @@ CHtmlSysFrameQt::orphan_banner_window( CHtmlFormatterBannerExt* banner )
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	// We don't keep orphaned banners around; just delete it right away.
-	os_banner_delete(banner);
+	this->fOrhpanBannerList.append(banner);
 }
 
 

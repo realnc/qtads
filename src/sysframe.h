@@ -61,6 +61,9 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// List of banners.
 	QList<class CHtmlSysWinQt*> fBannerList;
 
+	// List of orphaned banners.
+	QList<class CHtmlFormatterBannerExt*> fOrhpanBannerList;
+
 	// Fonts we created. We keep a list of every font we created since we're
 	// responsible for deleting them when they're no longer needed.
 	QList<class CHtmlSysFontQt*> fFontList;
