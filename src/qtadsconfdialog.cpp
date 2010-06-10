@@ -61,25 +61,13 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	ui->underlineLinksCheckBox->setChecked(sett->underlineLinks);
 	ui->highlightLinksCheckBox->setChecked(sett->highlightLinks);
 
-	const QList<int>& sizeList = QFontDatabase::standardSizes();
-	for (int i = 0; i < sizeList.size(); ++i) {
-		const QString& item = QString::number(sizeList.at(i));
-		ui->mainFontSizeComboBox->addItem(item);
-		ui->fixedFontSizeComboBox->addItem(item);
-		ui->serifFontSizeComboBox->addItem(item);
-		ui->sansFontSizeComboBox->addItem(item);
-		ui->scriptFontSizeComboBox->addItem(item);
-		ui->writerFontSizeComboBox->addItem(item);
-		ui->inputFontSizeComboBox->addItem(item);
-	}
-
-	ui->mainFontSizeComboBox->setCurrentIndex(sizeList.indexOf(sett->mainFont.pointSize()));
-	ui->fixedFontSizeComboBox->setCurrentIndex(sizeList.indexOf(sett->fixedFont.pointSize()));
-	ui->serifFontSizeComboBox->setCurrentIndex(sizeList.indexOf(sett->serifFont.pointSize()));
-	ui->sansFontSizeComboBox->setCurrentIndex(sizeList.indexOf(sett->sansFont.pointSize()));
-	ui->scriptFontSizeComboBox->setCurrentIndex(sizeList.indexOf(sett->scriptFont.pointSize()));
-	ui->writerFontSizeComboBox->setCurrentIndex(sizeList.indexOf(sett->writerFont.pointSize()));
-	ui->inputFontSizeComboBox->setCurrentIndex(sizeList.indexOf(sett->inputFont.pointSize()));
+	ui->mainFontSizeSpinBox->setValue(sett->mainFont.pointSize());
+	ui->fixedFontSizeSpinBox->setValue(sett->fixedFont.pointSize());
+	ui->serifFontSizeSpinBox->setValue(sett->serifFont.pointSize());
+	ui->sansFontSizeSpinBox->setValue(sett->sansFont.pointSize());
+	ui->scriptFontSizeSpinBox->setValue(sett->scriptFont.pointSize());
+	ui->writerFontSizeSpinBox->setValue(sett->writerFont.pointSize());
+	ui->inputFontSizeSpinBox->setValue(sett->inputFont.pointSize());
 
 	ui->mainFontBox->setCurrentFont(sett->mainFont);
 	ui->fixedFontBox->setCurrentFont(sett->fixedFont);
@@ -166,13 +154,13 @@ QTadsConfDialog::fMakeInstantApply()
 	connect(ui->scriptFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
 	connect(ui->writerFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
 	connect(ui->inputFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
-	connect(ui->mainFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
-	connect(ui->fixedFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
-	connect(ui->serifFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
-	connect(ui->sansFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
-	connect(ui->scriptFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
-	connect(ui->writerFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
-	connect(ui->inputFontSizeComboBox, SIGNAL(activated(int)), this, SLOT(fApplySettings()));
+	connect(ui->mainFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+	connect(ui->fixedFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+	connect(ui->serifFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+	connect(ui->sansFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+	connect(ui->scriptFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+	connect(ui->writerFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+	connect(ui->inputFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
 	connect(ui->inputFontItalicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 	connect(ui->inputFontBoldCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 	connect(ui->underlineLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -215,13 +203,13 @@ QTadsConfDialog::fApplySettings()
 	sett->inputFont.setBold(ui->inputFontBoldCheckBox->isChecked());
 	sett->inputFont.setItalic(ui->inputFontItalicCheckBox->isChecked());
 
-	sett->mainFont.setPointSize(ui->mainFontSizeComboBox->currentText().toInt());
-	sett->fixedFont.setPointSize(ui->fixedFontSizeComboBox->currentText().toInt());
-	sett->serifFont.setPointSize(ui->serifFontSizeComboBox->currentText().toInt());
-	sett->sansFont.setPointSize(ui->sansFontSizeComboBox->currentText().toInt());
-	sett->scriptFont.setPointSize(ui->scriptFontSizeComboBox->currentText().toInt());
-	sett->writerFont.setPointSize(ui->writerFontSizeComboBox->currentText().toInt());
-	sett->inputFont.setPointSize(ui->inputFontSizeComboBox->currentText().toInt());
+	sett->mainFont.setPointSize(ui->mainFontSizeSpinBox->value());
+	sett->fixedFont.setPointSize(ui->fixedFontSizeSpinBox->value());
+	sett->serifFont.setPointSize(ui->serifFontSizeSpinBox->value());
+	sett->sansFont.setPointSize(ui->sansFontSizeSpinBox->value());
+	sett->scriptFont.setPointSize(ui->scriptFontSizeSpinBox->value());
+	sett->writerFont.setPointSize(ui->writerFontSizeSpinBox->value());
+	sett->inputFont.setPointSize(ui->inputFontSizeSpinBox->value());
 
 	// Notify the application that preferences have changed.
 	qFrame->notifyPreferencesChange(sett);

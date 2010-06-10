@@ -44,7 +44,17 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="mainFontSizeComboBox"/>
+            <widget class="QSpinBox" name="mainFontSizeSpinBox">
+             <property name="suffix">
+              <string notr="true">pt</string>
+             </property>
+             <property name="minimum">
+              <number>6</number>
+             </property>
+             <property name="maximum">
+              <number>72</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -74,7 +84,17 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="fixedFontSizeComboBox"/>
+            <widget class="QSpinBox" name="fixedFontSizeSpinBox">
+             <property name="suffix">
+              <string notr="true">pt</string>
+             </property>
+             <property name="minimum">
+              <number>6</number>
+             </property>
+             <property name="maximum">
+              <number>72</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -101,7 +121,17 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="serifFontSizeComboBox"/>
+            <widget class="QSpinBox" name="serifFontSizeSpinBox">
+             <property name="suffix">
+              <string notr="true">pt</string>
+             </property>
+             <property name="minimum">
+              <number>6</number>
+             </property>
+             <property name="maximum">
+              <number>72</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -128,7 +158,17 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="sansFontSizeComboBox"/>
+            <widget class="QSpinBox" name="sansFontSizeSpinBox">
+             <property name="suffix">
+              <string notr="true">pt</string>
+             </property>
+             <property name="minimum">
+              <number>6</number>
+             </property>
+             <property name="maximum">
+              <number>72</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -155,7 +195,17 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="scriptFontSizeComboBox"/>
+            <widget class="QSpinBox" name="scriptFontSizeSpinBox">
+             <property name="suffix">
+              <string notr="true">pt</string>
+             </property>
+             <property name="minimum">
+              <number>6</number>
+             </property>
+             <property name="maximum">
+              <number>72</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -185,7 +235,17 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="writerFontSizeComboBox"/>
+            <widget class="QSpinBox" name="writerFontSizeSpinBox">
+             <property name="suffix">
+              <string notr="true">pt</string>
+             </property>
+             <property name="minimum">
+              <number>6</number>
+             </property>
+             <property name="maximum">
+              <number>72</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -210,7 +270,17 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="inputFontSizeComboBox"/>
+             <widget class="QSpinBox" name="inputFontSizeSpinBox">
+              <property name="suffix">
+               <string notr="true">pt</string>
+              </property>
+              <property name="minimum">
+               <number>6</number>
+              </property>
+              <property name="maximum">
+               <number>72</number>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -485,8 +555,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>252</x>
-     <y>329</y>
+     <x>256</x>
+     <y>304</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -501,8 +571,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>324</x>
-     <y>329</y>
+     <x>328</x>
+     <y>304</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
