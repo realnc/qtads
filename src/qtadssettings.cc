@@ -16,6 +16,8 @@
  */
 
 #include <QSettings>
+#include <QDebug>
+#include <QFileInfo>
 
 #include "qtadssettings.h"
 #include "syswingroup.h"
@@ -57,6 +59,19 @@ QTadsSettings::loadFromDisk()
 	this->inputFont.fromString(sett.value("input", "serif").toString());
 	sett.endGroup();
 
+	sett.beginGroup("recent");
+	this->recentGamesList = sett.value("games", QStringList()).toStringList();
+	Q_ASSERT(this->recentGamesList.size() <= this->recentGamesCapacity);
+	// Remove any files that don't exist or aren't readable.
+	for (int i = 0; i < this->recentGamesList.size(); ++i) {
+		QFileInfo file(this->recentGamesList.at(i));
+		if (not file.exists() or not (file.isFile() or file.isSymLink()) or not file.isReadable()) {
+			this->recentGamesList.removeAt(i);
+			--i;
+		}
+	}
+	sett.endGroup();
+
 	this->appSize = sett.value("geometry/size", QSize(740, 540)).toSize();
 }
 
@@ -94,6 +109,10 @@ QTadsSettings::saveToDisk()
 	sett.setValue("script", this->scriptFont.toString());
 	sett.setValue("typewriter", this->writerFont.toString());
 	sett.setValue("input", this->inputFont.toString());
+	sett.endGroup();
+
+	sett.beginGroup("recent");
+	sett.setValue("games", this->recentGamesList);
 	sett.endGroup();
 
 	sett.setValue("geometry/size", qWinGroup->size());

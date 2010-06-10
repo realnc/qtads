@@ -68,18 +68,19 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 	this->fHostifc = new QTadsHostIfc(&this->fAppctx);
 	this->fClientifc = new CVmMainClientConsole;
 
+	// Set our global pointer.
+	qFrame = this;
+
 	// Create our main application window.
 	this->fMainWin = new CHtmlSysWinGroupQt;
 	this->fMainWin->setWindowTitle(appName);
+	this->fMainWin->updateRecentGames();
 
 	// Automatically quit the application when the last window has closed.
 	connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
 
 	// We're the main HTML TADS frame object.
 	CHtmlSysFrame::set_frame_obj(this);
-
-	// Set our global pointer.
-	qFrame = this;
 }
 
 
@@ -136,14 +137,14 @@ CHtmlSysFrameQt::fRunGame()
 	}
 
 	while (not this->fNextGame.isEmpty()) {
-		QString fname = this->fNextGame;
+		QFileInfo finfo(QFileInfo(this->fNextGame).absoluteFilePath());
 		this->fNextGame.clear();
 
 		// Change to the game file's directory.
-		QDir::setCurrent(QFileInfo(fname).path());
+		QDir::setCurrent(finfo.absolutePath());
 
 		// Run the appropriate TADS VM.
-		int vmType = vm_get_game_type(QFileInfo(fname).fileName().toLocal8Bit(), 0, 0, 0, 0);
+		int vmType = vm_get_game_type(finfo.absoluteFilePath().toLocal8Bit().constData(), 0, 0, 0, 0);
 		if (vmType == VM_GGT_TADS2 or vmType == VM_GGT_TADS3) {
 			// Delete all HTML and orphaned banners.
 			while (not this->fOrhpanBannerList.isEmpty()) {
@@ -194,14 +195,30 @@ CHtmlSysFrameQt::fRunGame()
 
 			// Set the application's window title to contain the filename of the game
 			// we're running.  The game is free to change that later on.
-			qWinGroup->setWindowTitle(QFileInfo(fname).fileName() + " - " + qFrame->applicationName());
+			qWinGroup->setWindowTitle(finfo.fileName() + " - " + qFrame->applicationName());
+
+			// Add the game file to our "recent games" list.
+			int recentIdx = this->fSettings->recentGamesList.indexOf(finfo.absoluteFilePath());
+			if (recentIdx > 0) {
+				// It's already in the list and it's not the first item.  Make
+				// it the first item so that it becomes the most recent entry.
+				this->fSettings->recentGamesList.move(recentIdx, 0);
+			} else if (recentIdx < 0) {
+				// It's not in the list.  Prepend it as the most recent item
+				// and, if the list is full, delete the oldest one.
+				if (this->fSettings->recentGamesList.size() >= this->fSettings->recentGamesCapacity) {
+					this->fSettings->recentGamesList.removeLast();
+				}
+				this->fSettings->recentGamesList.prepend(finfo.absoluteFilePath());
+			}
+			this->fMainWin->updateRecentGames();
 
 			// Run the appropriate VM.
 			this->fGameRunning = true;
 			if (vmType == VM_GGT_TADS2) {
-				this->fRunT2Game(QFileInfo(fname).fileName());
+				this->fRunT2Game(finfo.absoluteFilePath());
 			} else {
-				this->fRunT3Game(QFileInfo(fname).fileName());
+				this->fRunT3Game(finfo.absoluteFilePath());
 			}
 			this->fGameRunning = false;
 
@@ -210,7 +227,7 @@ CHtmlSysFrameQt::fRunGame()
 			this->fFormatter->cancel_sound(HTML_Attrib_invalid, 0.0, false, false);
 			this->fFormatter->cancel_playback();
 		} else {
-			qWarning() << fname.toLocal8Bit().constData() << "is not a TADS game file.";
+			qWarning() << finfo.fileName() << "is not a TADS game file.";
 		}
 	}
 

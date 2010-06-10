@@ -49,6 +49,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	QTadsFrame* fFrame;
 	class QDialog* fAboutBoxDialog;
 	class CHtmlSysWinAboutBoxQt* fAboutBox;
+	class QMenu* fRecentGamesMenu;
 	class QAction* fAboutGameAction;
 
   private slots:
@@ -63,6 +64,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
 	void
 	fOpenNewGame();
+
+	void
+	fRecentGameTriggered( QAction* action );
 
   protected:
 	virtual void
@@ -83,6 +87,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	CHtmlSysWinAboutBoxQt*
 	aboutBox()
 	{ return this->fAboutBox; }
+
+	void
+	updateRecentGames();
 
 	//
 	// CHtmlSysWinGroup interface implementation.

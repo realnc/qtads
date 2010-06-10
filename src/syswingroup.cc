@@ -14,6 +14,7 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+#include <Qt>
 #include <QDebug>
 #include <QMenuBar>
 #include <QCloseEvent>
@@ -22,6 +23,7 @@
 
 #include "syswinaboutbox.h"
 #include "qtadsconfdialog.h"
+#include "qtadssettings.h"
 
 
 void
@@ -50,6 +52,11 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	openAct->setShortcuts(QKeySequence::Open);
 	fileMenu->addAction(openAct);
 	connect(openAct, SIGNAL(triggered()), this, SLOT(fOpenNewGame()));
+	QAction* recentAct = new QAction(tr("&Recent Games"), menuBar);
+	this->fRecentGamesMenu = new QMenu("Recent Games", this);
+	recentAct->setMenu(this->fRecentGamesMenu);
+	fileMenu->addAction(recentAct);
+	connect(this->fRecentGamesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fRecentGameTriggered(QAction*)));
 
 	// "Edit" menu.
 	QMenu* editMenu = menuBar->addMenu(tr("&Edit"));
@@ -162,6 +169,13 @@ CHtmlSysWinGroupQt::fOpenNewGame()
 
 
 void
+CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
+{
+	qFrame->setNextGame(action->text().replace("&&", "&"));
+}
+
+
+void
 CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
 {
 	qFrame->setGameRunning(false);
@@ -206,6 +220,30 @@ CHtmlSysWinGroupQt::deleteAboutBox()
 	this->fAboutBoxDialog = 0;
 	this->fAboutBox = 0;
 	this->fAboutGameAction->setEnabled(false);
+}
+
+
+void
+CHtmlSysWinGroupQt::updateRecentGames()
+{
+	// We simply clear the menu of all items and re-populate it.
+	this->fRecentGamesMenu->clear();
+
+	// If the list is empty, disable the menu.
+	if (qFrame->settings()->recentGamesList.isEmpty()) {
+		this->fRecentGamesMenu->setEnabled(false);
+		return;
+	}
+
+	// The list is not empty.  If the menu was disabled, enable it.
+	if (not this->fRecentGamesMenu->isEnabled()) {
+		this->fRecentGamesMenu->setEnabled(true);
+	}
+
+	// Populate it.
+	for (int i = 0; i < qFrame->settings()->recentGamesList.size(); ++i) {
+		this->fRecentGamesMenu->addAction(QString(qFrame->settings()->recentGamesList.at(i)).replace("&", "&&"));
+	}
 }
 
 

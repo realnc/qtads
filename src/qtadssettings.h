@@ -53,6 +53,9 @@ class QTadsSettings {
 	CHtmlSysFontQt writerFont;
 	CHtmlSysFontQt inputFont;
 
+	QStringList recentGamesList;
+	static const int recentGamesCapacity = 10;
+
 	QSize appSize;
 };
 
