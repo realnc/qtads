@@ -314,9 +314,6 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 	tadsBuffer->hide_caret();
 	this->fCastDispWidget->setCursorVisible(false);
 	formatter->end_input();
-	if (not qFrame->gameRunning()) {
-		return false;
-	}
 
 	// Add the line-break after the command.
 	if (qFrame->get_parser()->get_obey_markups()) {
@@ -335,6 +332,10 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 	// Flush the newline, and update the window immediately, in case the
 	// operation takes a while to complete.
 	qFrame->flush_txtbuf(true, true);
+
+	if (not qFrame->gameRunning()) {
+		return false;
+	}
 	return true;
 }
 
