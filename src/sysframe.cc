@@ -222,6 +222,7 @@ CHtmlSysFrameQt::fRunGame()
 				this->fRunT3Game(finfo.absoluteFilePath());
 			}
 			this->fGameRunning = false;
+			emit gameHasQuit();
 
 			// Flush any pending output and cancel all sounds and animations.
 			this->flush_txtbuf(true, false);
