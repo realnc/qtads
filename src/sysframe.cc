@@ -215,6 +215,7 @@ CHtmlSysFrameQt::fRunGame()
 
 			// Run the appropriate VM.
 			this->fGameRunning = true;
+			emit gameStarting();
 			if (vmType == VM_GGT_TADS2) {
 				this->fRunT2Game(finfo.absoluteFilePath());
 			} else {

@@ -96,6 +96,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 
   signals:
 	void gameQuitting();
+	void gameStarting();
 
   public slots:
 	// Replacement for main().  We need this so that we can start the Tads VM
