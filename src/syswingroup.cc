@@ -116,6 +116,21 @@ CHtmlSysWinGroupQt::~CHtmlSysWinGroupQt()
 }
 
 
+bool
+CHtmlSysWinGroupQt::fAskQuitGameDialog()
+{
+	if (QMessageBox::question(0, tr("End Current Game") + " - " + qFrame->applicationName(),
+							  tr("If you didn't save the current game, all progress will be lost. Do you wish"
+								 " to quit the game?"), QMessageBox::Yes | QMessageBox::Cancel,
+							  QMessageBox::Cancel)
+		== QMessageBox::Yes)
+	{
+		return true;
+	}
+	return false;
+}
+
+
 void
 CHtmlSysWinGroupQt::fShowConfDialog()
 {
@@ -181,23 +196,20 @@ CHtmlSysWinGroupQt::fOpenNewGame()
 void
 CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 {
-	qFrame->setNextGame(action->text().replace("&&", "&"));
+	if (this->fAskQuitGameDialog()) {
+		qFrame->setNextGame(action->text().replace("&&", "&"));
+	}
 }
 
 
-void
+bool
 CHtmlSysWinGroupQt::fEndCurrentGame()
 {
-	if (qFrame->gameRunning()) {
-		if (QMessageBox::question(0, tr("End Current Game") + " - " + qFrame->applicationName(),
-								  tr("If you didn't save the current game, all progress will be lost. Do you wish"
-									 " to quit the game?"), QMessageBox::Yes | QMessageBox::Cancel,
-								  QMessageBox::Cancel)
-			== QMessageBox::Yes)
-		{
-			qFrame->setGameRunning(false);
-		}
+	if (qFrame->gameRunning() and this->fAskQuitGameDialog()) {
+		qFrame->setGameRunning(false);
+		return true;
 	}
+	return false;
 }
 
 

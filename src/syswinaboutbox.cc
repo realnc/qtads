@@ -25,6 +25,7 @@ CHtmlSysWinAboutBoxQt::CHtmlSysWinAboutBoxQt( class CHtmlFormatter* formatter, Q
 {
 	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	this->setMinimumSize(200,140);
 }
 
 

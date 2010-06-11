@@ -52,6 +52,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	class QMenu* fRecentGamesMenu;
 	class QAction* fAboutGameAction;
 
+	bool
+	fAskQuitGameDialog();
+
   private slots:
 	void
 	fShowConfDialog();
@@ -68,7 +71,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	void
 	fRecentGameTriggered( QAction* action );
 
-	void
+	bool
 	fEndCurrentGame();
 
   protected:
