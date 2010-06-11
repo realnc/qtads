@@ -20,6 +20,7 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QVBoxLayout>
+#include <QMessageBox>
 
 #include "syswinaboutbox.h"
 #include "qtadsconfdialog.h"
@@ -178,8 +179,18 @@ CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 void
 CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
 {
-	qFrame->setGameRunning(false);
-	e->accept();
+	if (qFrame->gameRunning()) {
+		if (QMessageBox::question(0, tr("Quit Interpreter") + " - " + qFrame->applicationName(),
+								  tr("A game is currently running. Abandon the game and quit the interpreter?"),
+								  QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel)
+			== QMessageBox::Yes)
+		{
+			qFrame->setGameRunning(false);
+			e->accept();
+		} else {
+			e->ignore();
+		}
+	}
 }
 
 
