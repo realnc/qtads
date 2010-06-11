@@ -95,15 +95,15 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	fRunT3Game( const QString& fname );
 
   signals:
-	// Emmited just prior to starting a game.  The game has not started yet
+	// Emitted just prior to starting a game.  The game has not started yet
 	// when this is emitted.
 	void gameStarting();
 
-	// Emmited prior to quitting a game.  The game has not quit yet when this
+	// Emitted prior to quitting a game.  The game has not quit yet when this
 	// is emitted.
 	void gameQuitting();
 
-	// Emmited after quiting a game.  The game has already quit when this is
+	// Emitted after quiting a game.  The game has already quit when this is
 	// emitted.
 	void gameHasQuit();
 
