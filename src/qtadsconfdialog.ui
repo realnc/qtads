@@ -287,14 +287,14 @@
           <item>
            <widget class="QCheckBox" name="inputFontItalicCheckBox">
             <property name="text">
-             <string>Italic</string>
+             <string>&amp;Italic</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="inputFontBoldCheckBox">
             <property name="text">
-             <string>Bold</string>
+             <string>&amp;Bold</string>
             </property>
            </widget>
           </item>
@@ -324,7 +324,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="label_6">
               <property name="text">
-               <string>Text</string>
+               <string>&amp;Text</string>
               </property>
               <property name="buddy">
                <cstring>mainTextColorButton</cstring>
@@ -337,7 +337,7 @@
             <item row="1" column="0">
              <widget class="QLabel" name="label_9">
               <property name="text">
-               <string>Background</string>
+               <string>&amp;Background</string>
               </property>
               <property name="buddy">
                <cstring>mainBgColorButton</cstring>
@@ -350,7 +350,7 @@
             <item row="2" column="0">
              <widget class="QLabel" name="label_15">
               <property name="text">
-               <string>Input</string>
+               <string>&amp;Input</string>
               </property>
               <property name="buddy">
                <cstring>inputColorButton</cstring>
@@ -375,7 +375,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="label_10">
               <property name="text">
-               <string>Text</string>
+               <string>T&amp;ext</string>
               </property>
               <property name="buddy">
                <cstring>bannerTextColorButton</cstring>
@@ -388,7 +388,7 @@
             <item row="1" column="0">
              <widget class="QLabel" name="label_11">
               <property name="text">
-               <string>Background</string>
+               <string>B&amp;ackground</string>
               </property>
               <property name="buddy">
                <cstring>bannerBgColorButton</cstring>
@@ -412,14 +412,14 @@
           <item>
            <widget class="QCheckBox" name="underlineLinksCheckBox">
             <property name="text">
-             <string>Underline Links</string>
+             <string>&amp;Underline Links</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="highlightLinksCheckBox">
             <property name="text">
-             <string>Highlight when hovering</string>
+             <string>&amp;Highlight when hovering</string>
             </property>
            </widget>
           </item>
@@ -431,7 +431,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="label_12">
               <property name="text">
-               <string>Unvisited</string>
+               <string>U&amp;nvisited</string>
               </property>
               <property name="buddy">
                <cstring>linkUnvisitedColorButton</cstring>
@@ -444,7 +444,7 @@
             <item row="1" column="0">
              <widget class="QLabel" name="label_13">
               <property name="text">
-               <string>Hovering</string>
+               <string>H&amp;overing</string>
               </property>
               <property name="buddy">
                <cstring>linkHoveringColorButton</cstring>
@@ -457,7 +457,7 @@
             <item row="2" column="0">
              <widget class="QLabel" name="label_14">
               <property name="text">
-               <string>Clicked</string>
+               <string>&amp;Clicked</string>
               </property>
               <property name="buddy">
                <cstring>linkClickedColorButton</cstring>
@@ -502,28 +502,28 @@
            <item>
             <widget class="QCheckBox" name="allowGraphicsCheckBox">
              <property name="text">
-              <string>Allow Graphics</string>
+              <string>Allow &amp;Graphics</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QCheckBox" name="allowDigitalCheckBox">
              <property name="text">
-              <string>Allow Digital Sound</string>
+              <string>Allow &amp;Digital Sound</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QCheckBox" name="allowMidiCheckBox">
              <property name="text">
-              <string>Allow MIDI Sound</string>
+              <string>Allow &amp;MIDI Sound</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QCheckBox" name="allowLinksCheckBox">
              <property name="text">
-              <string>Allow Hyperlinks</string>
+              <string>Allow &amp;Hyperlinks</string>
              </property>
             </widget>
            </item>
