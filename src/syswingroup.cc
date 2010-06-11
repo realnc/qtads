@@ -196,9 +196,10 @@ CHtmlSysWinGroupQt::fOpenNewGame()
 void
 CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 {
-	if (this->fAskQuitGameDialog()) {
-		qFrame->setNextGame(action->text().replace("&&", "&"));
+	if (qFrame->gameRunning() and not this->fAskQuitGameDialog()) {
+		return;
 	}
+	qFrame->setNextGame(action->text().replace("&&", "&"));
 }
 
 
