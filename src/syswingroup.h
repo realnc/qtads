@@ -68,6 +68,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	void
 	fRecentGameTriggered( QAction* action );
 
+	void
+	fEndCurrentGame();
+
   protected:
 	virtual void
 	closeEvent( QCloseEvent* e );

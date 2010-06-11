@@ -58,6 +58,10 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	act->setMenu(this->fRecentGamesMenu);
 	menu->addAction(act);
 	connect(this->fRecentGamesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fRecentGameTriggered(QAction*)));
+	act = new QAction(tr("&End Current Game"), this);
+	act->setShortcuts(QKeySequence::Close);
+	menu->addAction(act);
+	connect(act, SIGNAL(triggered()), this, SLOT(fEndCurrentGame()));
 	menu->addSeparator();
 	act = new QAction(tr("&Quit"), this);
 	act->setShortcuts(QKeySequence::Quit);
@@ -178,6 +182,22 @@ void
 CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 {
 	qFrame->setNextGame(action->text().replace("&&", "&"));
+}
+
+
+void
+CHtmlSysWinGroupQt::fEndCurrentGame()
+{
+	if (qFrame->gameRunning()) {
+		if (QMessageBox::question(0, tr("End Current Game") + " - " + qFrame->applicationName(),
+								  tr("If you didn't save the current game, all progress will be lost. Do you wish"
+									 " to quit the game?"), QMessageBox::Yes | QMessageBox::Cancel,
+								  QMessageBox::Cancel)
+			== QMessageBox::Yes)
+		{
+			qFrame->setGameRunning(false);
+		}
+	}
 }
 
 

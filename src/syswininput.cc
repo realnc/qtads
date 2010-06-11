@@ -311,12 +311,12 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 	while (qFrame->gameRunning() and not this->fInputReady) {
 		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 	}
-	if (not qFrame->gameRunning()) {
-		return false;
-	}
 	tadsBuffer->hide_caret();
 	this->fCastDispWidget->setCursorVisible(false);
 	formatter->end_input();
+	if (not qFrame->gameRunning()) {
+		return false;
+	}
 
 	// Add the line-break after the command.
 	if (qFrame->get_parser()->get_obey_markups()) {
