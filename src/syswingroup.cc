@@ -58,6 +58,11 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	act->setMenu(this->fRecentGamesMenu);
 	menu->addAction(act);
 	connect(this->fRecentGamesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fRecentGameTriggered(QAction*)));
+	menu->addSeparator();
+	act = new QAction(tr("&Quit"), this);
+	act->setShortcuts(QKeySequence::Quit);
+	menu->addAction(act);
+	connect(act, SIGNAL(triggered()), this, SLOT(close()));
 
 	// "Edit" menu.
 	menu = menuBar->addMenu(tr("&Edit"));
