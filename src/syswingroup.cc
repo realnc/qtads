@@ -48,32 +48,32 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	QMenuBar* menuBar = new QMenuBar(0);
 
 	// "File" menu.
-	QMenu* fileMenu = menuBar->addMenu(tr("&File"));
-	QAction* openAct = new QAction(tr("&Open New Game"), this);
-	openAct->setShortcuts(QKeySequence::Open);
-	fileMenu->addAction(openAct);
-	connect(openAct, SIGNAL(triggered()), this, SLOT(fOpenNewGame()));
-	QAction* recentAct = new QAction(tr("&Recent Games"), this);
+	QMenu* menu = menuBar->addMenu(tr("&File"));
+	QAction* act = new QAction(tr("&Open New Game"), this);
+	act->setShortcuts(QKeySequence::Open);
+	menu->addAction(act);
+	connect(act, SIGNAL(triggered()), this, SLOT(fOpenNewGame()));
+	act = new QAction(tr("&Recent Games"), this);
 	this->fRecentGamesMenu = new QMenu("Recent Games", this);
-	recentAct->setMenu(this->fRecentGamesMenu);
-	fileMenu->addAction(recentAct);
+	act->setMenu(this->fRecentGamesMenu);
+	menu->addAction(act);
 	connect(this->fRecentGamesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fRecentGameTriggered(QAction*)));
 
 	// "Edit" menu.
-	QMenu* editMenu = menuBar->addMenu(tr("&Edit"));
-	QAction* settingsAct = new QAction(tr("&Preferences"), this);
+	menu = menuBar->addMenu(tr("&Edit"));
+	act = new QAction(tr("&Preferences"), this);
 #if QT_VERSION >= 0x040600
-	settingsAct->setShortcuts(QKeySequence::Preferences);
+	act->setShortcuts(QKeySequence::Preferences);
 #endif
-	editMenu->addAction(settingsAct);
-	connect(settingsAct, SIGNAL(triggered()), this, SLOT(fShowConfDialog()));
+	menu->addAction(act);
+	connect(act, SIGNAL(triggered()), this, SLOT(fShowConfDialog()));
 
 	// "Help" menu.
-	QMenu* gameMenu = menuBar->addMenu(tr("&Help"));
+	menu = menuBar->addMenu(tr("&Help"));
 	this->fAboutGameAction = new QAction(tr("&About This Game"), this);
 	this->fAboutGameAction->setMenuRole(QAction::ApplicationSpecificRole);
 	this->fAboutGameAction->setEnabled(false);
-	gameMenu->addAction(this->fAboutGameAction);
+	menu->addAction(this->fAboutGameAction);
 	connect(this->fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
 
 	this->setMenuBar(menuBar);
