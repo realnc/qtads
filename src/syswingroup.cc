@@ -58,10 +58,11 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	act->setMenu(this->fRecentGamesMenu);
 	menu->addAction(act);
 	connect(this->fRecentGamesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fRecentGameTriggered(QAction*)));
-	act = new QAction(tr("&End Current Game"), this);
-	act->setShortcuts(QKeySequence::Close);
-	menu->addAction(act);
-	connect(act, SIGNAL(triggered()), this, SLOT(fEndCurrentGame()));
+	this->fEndCurrentGameAction = new QAction(tr("&End Current Game"), this);
+	this->fEndCurrentGameAction->setShortcuts(QKeySequence::Close);
+	menu->addAction(this->fEndCurrentGameAction);
+	this->fEndCurrentGameAction->setEnabled(false);
+	connect(this->fEndCurrentGameAction, SIGNAL(triggered()), this, SLOT(fEndCurrentGame()));
 	menu->addSeparator();
 	act = new QAction(tr("&Quit"), this);
 	act->setShortcuts(QKeySequence::Quit);
@@ -100,6 +101,12 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	// Use a sane minimum size; by default Qt would allow us to be resized
 	// to almost zero.
 	this->setMinimumSize(240, 180);
+
+	// Receive notification when a game is about to quit/start so we can
+	// enable/disable related actions.
+	connect(qFrame, SIGNAL(gameQuitting()), this, SLOT(fNotifyGameQuitting()));
+	connect(qFrame, SIGNAL(gameHasQuit()), this, SLOT(fNotifyGameQuitting()));
+	connect(qFrame, SIGNAL(gameStarting()), this, SLOT(fNotifyGameStarting()));
 
 	qWinGroup = this;
 }
@@ -207,6 +214,20 @@ CHtmlSysWinGroupQt::fEndCurrentGame()
 		return true;
 	}
 	return false;
+}
+
+
+void
+CHtmlSysWinGroupQt::fNotifyGameQuitting()
+{
+	this->fEndCurrentGameAction->setEnabled(false);
+}
+
+
+void
+CHtmlSysWinGroupQt::fNotifyGameStarting()
+{
+	this->fEndCurrentGameAction->setEnabled(true);
 }
 
 

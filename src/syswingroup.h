@@ -51,6 +51,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	class CHtmlSysWinAboutBoxQt* fAboutBox;
 	class QMenu* fRecentGamesMenu;
 	class QAction* fAboutGameAction;
+	class QAction* fEndCurrentGameAction;
 
 	bool
 	fAskQuitGameDialog();
@@ -73,6 +74,12 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
 	bool
 	fEndCurrentGame();
+
+	void
+	fNotifyGameQuitting();
+
+	void
+	fNotifyGameStarting();
 
   protected:
 	virtual void
