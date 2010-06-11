@@ -107,12 +107,8 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
 CHtmlSysWinGroupQt::~CHtmlSysWinGroupQt()
 {
-	qDebug() << Q_FUNC_INFO;
-
 	Q_ASSERT(qWinGroup != 0);
-
 	qWinGroup = 0;
-	delete this->menuBar();
 }
 
 

@@ -124,7 +124,7 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 	delete this->fHostifc;
 	delete this->fSettings;
 
-	//delete this->fMainWin;
+	delete this->fMainWin;
 }
 
 
