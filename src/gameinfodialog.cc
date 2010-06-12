@@ -83,14 +83,12 @@ GameInfoDialog::GameInfoDialog( const QByteArray& fname, QWidget* parent )
     ui->setupUi(this);
 
 	CTadsGameInfo info;
-	if (not info.read_from_file(fname.constData())) {
-		QMessageBox::information(this, tr("Game Information") + " - " + qApp->applicationName(),
-								 "The game does not contain any meta information.");
-		return;
-	}
-
 	QTadsGameInfoEnum cb;
+
+	info.read_from_file(fname.constData());
 	info.enum_values(&cb);
+
+	// Fill out the description.
 	QString tmp(cb.gameName + "<p>" + (cb.htmlByLine.isEmpty() ? cb.byLine : cb.htmlByLine) + "<p>");
 	tmp += cb.htmlDesc.isEmpty() ? cb.desc : cb.htmlDesc;
 	ui->description->setHtml(tmp);
@@ -134,7 +132,16 @@ GameInfoDialog::GameInfoDialog( const QByteArray& fname, QWidget* parent )
 	ui->table->setShowGrid(false);
 }
 
+
 GameInfoDialog::~GameInfoDialog()
 {
     delete ui;
+}
+
+
+bool
+GameInfoDialog::gameHasMetaInfo( const QByteArray& fname )
+{
+	CTadsGameInfo info;
+	return info.read_from_file(fname.constData());
 }

@@ -15,6 +15,10 @@ public:
 	explicit GameInfoDialog( const QByteArray& fname, QWidget* parent = 0 );
     ~GameInfoDialog();
 
+	// Checks whether a game file contains any embedded meta information.
+	static bool
+	gameHasMetaInfo( const QByteArray& fname );
+
 private:
     Ui::GameInfoDialog *ui;
 };
