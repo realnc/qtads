@@ -89,6 +89,9 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 	//qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(qFrame != 0);
 
+	// Delete the "about this game" box.
+	this->fMainWin->deleteAboutBox();
+
 	// We're no longer the main frame object.
 	CHtmlSysFrame::set_frame_obj(0);
 
