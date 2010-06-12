@@ -259,6 +259,7 @@ CHtmlSysWinGroupQt::fNotifyGameQuitting()
 void
 CHtmlSysWinGroupQt::fNotifyGameStarting()
 {
+	this->fHideGameInfoDialog();
 	this->fGameInfoAction->setEnabled(GameInfoDialog::gameHasMetaInfo(qFrame->gameFile()));
 	this->fEndCurrentGameAction->setEnabled(true);
 }
