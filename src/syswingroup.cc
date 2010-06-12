@@ -25,6 +25,7 @@
 #include "syswinaboutbox.h"
 #include "qtadsconfdialog.h"
 #include "qtadssettings.h"
+#include "gameinfodialog.h"
 
 
 void
@@ -38,7 +39,7 @@ CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
 
 
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
-: fConfDialog(0), fAboutBoxDialog(0), fAboutBox(0)
+: fConfDialog(0), fAboutBoxDialog(0), fAboutBox(0), fGameInfoDialog(0)
 {
 	//qDebug() << Q_FUNC_INFO << "called";
 	Q_ASSERT(qWinGroup == 0);
@@ -58,6 +59,10 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	act->setMenu(this->fRecentGamesMenu);
 	menu->addAction(act);
 	connect(this->fRecentGamesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fRecentGameTriggered(QAction*)));
+	this->fGameInfoAction = new QAction(tr("Game &Information"), this);
+	menu->addAction(this->fGameInfoAction);
+	this->fGameInfoAction->setEnabled(false);
+	connect(this->fGameInfoAction, SIGNAL(triggered()), this, SLOT(fShowGameInfoDialog()));
 	this->fEndCurrentGameAction = new QAction(tr("&End Current Game"), this);
 	this->fEndCurrentGameAction->setShortcuts(QKeySequence::Close);
 	menu->addAction(this->fEndCurrentGameAction);
@@ -131,6 +136,32 @@ CHtmlSysWinGroupQt::fAskQuitGameDialog()
 		return true;
 	}
 	return false;
+}
+
+
+void
+CHtmlSysWinGroupQt::fShowGameInfoDialog()
+{
+	// If the dialog is already open, simply activate and raise it.
+	if (this->fGameInfoDialog != 0) {
+		this->fGameInfoDialog->activateWindow();
+		this->fGameInfoDialog->raise();
+		return;
+	}
+	this->fGameInfoDialog = new GameInfoDialog(qFrame->gameFile(), this);
+	this->fGameInfoDialog->setWindowTitle(tr("Game Information"));
+	connect(this->fGameInfoDialog, SIGNAL(finished(int)), this, SLOT(fHideGameInfoDialog()));
+	this->fGameInfoDialog->show();
+}
+
+
+void
+CHtmlSysWinGroupQt::fHideGameInfoDialog()
+{
+	if (this->fGameInfoDialog != 0) {
+		this->fGameInfoDialog->deleteLater();
+		this->fGameInfoDialog = 0;
+	}
 }
 
 
@@ -220,6 +251,7 @@ CHtmlSysWinGroupQt::fEndCurrentGame()
 void
 CHtmlSysWinGroupQt::fNotifyGameQuitting()
 {
+	this->fGameInfoAction->setEnabled(false);
 	this->fEndCurrentGameAction->setEnabled(false);
 }
 
@@ -227,6 +259,7 @@ CHtmlSysWinGroupQt::fNotifyGameQuitting()
 void
 CHtmlSysWinGroupQt::fNotifyGameStarting()
 {
+	this->fGameInfoAction->setEnabled(true);
 	this->fEndCurrentGameAction->setEnabled(true);
 }
 

@@ -215,6 +215,7 @@ CHtmlSysFrameQt::fRunGame()
 
 			// Run the appropriate VM.
 			this->fGameRunning = true;
+			this->fGameFile = finfo.absoluteFilePath().toLocal8Bit();
 			emit gameStarting();
 			if (vmType == VM_GGT_TADS2) {
 				this->fRunT2Game(finfo.absoluteFilePath());
@@ -222,6 +223,7 @@ CHtmlSysFrameQt::fRunGame()
 				this->fRunT3Game(finfo.absoluteFilePath());
 			}
 			this->fGameRunning = false;
+			this->fGameFile.clear();
 			emit gameHasQuit();
 
 			// Flush any pending output and cancel all sounds and animations.

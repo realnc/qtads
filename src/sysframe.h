@@ -71,6 +71,9 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// Are we currently executing a game?
 	bool fGameRunning;
 
+	// Filename of the game we're currently executing.
+	QByteArray fGameFile;
+
 	// Is the game we're currently running (if we're running one) a Tads 3
 	// game?
 	bool fTads3;
@@ -142,6 +145,10 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	bool
 	gameRunning()
 	{ return this->fGameRunning; }
+
+	const QByteArray&
+	gameFile()
+	{ return this->fGameFile; }
 
 	void
 	setGameRunning( bool f )

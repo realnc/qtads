@@ -45,6 +45,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	};
 
 	class QTadsConfDialog* fConfDialog;
+	class GameInfoDialog* fGameInfoDialog;
 	QScrollArea* fScrollArea;
 	QTadsFrame* fFrame;
 	class QDialog* fAboutBoxDialog;
@@ -52,11 +53,18 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	class QMenu* fRecentGamesMenu;
 	class QAction* fAboutGameAction;
 	class QAction* fEndCurrentGameAction;
+	class QAction* fGameInfoAction;
 
 	bool
 	fAskQuitGameDialog();
 
   private slots:
+	void
+	fShowGameInfoDialog();
+
+	void
+	fHideGameInfoDialog();
+
 	void
 	fShowConfDialog();
 

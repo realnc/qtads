@@ -101,7 +101,9 @@ UI_DIR = tmp
 # $$HTDIR/LICENSE.TXT \
 # $$HTDIR/notes/porting.htm
 
-FORMS += src/qtadsconfdialog.ui
+FORMS += \
+	src/qtadsconfdialog.ui \
+	src/gameinfodialog.ui
 
 # QTads headers
 HEADERS += \
@@ -134,7 +136,8 @@ HEADERS += \
 	src/qtadstimer.h \
 	src/vmuni.h \
 	src/qtadsconfdialog.h \
-	src/qtadssettings.h
+	src/qtadssettings.h \
+	src/gameinfodialog.h
 
 # QTads sources.
 SOURCES += \
@@ -158,7 +161,8 @@ SOURCES += \
 	src/qtadsdispwidget.cc \
 	src/qtadsdispwidgetinput.cc \
 	src/qtadsconfdialog.cpp \
-	src/qtadssettings.cc
+	src/qtadssettings.cc \
+	src/gameinfodialog.cc
 
 # Portable Tads headers.  We simply include every header from the Tads
 # directories.  It's sub-optimal, but the safest solution.
