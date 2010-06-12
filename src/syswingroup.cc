@@ -32,8 +32,8 @@ void
 CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
 {
 	if (qFrame->gameWindow() != 0) {
-		qFrame->reformatBanners();
 		qFrame->adjustBannerSizes();
+		qFrame->reformatBanners();
 	}
 }
 
