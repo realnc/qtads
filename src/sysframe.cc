@@ -554,7 +554,6 @@ void CHtmlSysFrameQt::pruneParseTree()
 	// Perform the pruning, reformat and adjust all banners.
 	this->fParser->prune_tree(65536 / 2);
 	this->reformatBanners();
-	this->adjustBannerSizes();
 }
 
 
