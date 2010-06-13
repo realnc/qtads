@@ -80,6 +80,10 @@ CHtmlSysWinInputQt::setCursorHeight( unsigned height )
 void
 CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int append, int enter, int os_cmd_id )
 {
+	if (not qFrame->gameRunning()) {
+		return;
+	}
+
 	// If the command starts with "http:", "ftp:", "news:" "mailto:", or
 	// "telnet:", try to open it in the external application that handles it.
 	if (strnicmp(cmd, "http:", 5) == 0 || strnicmp(cmd, "ftp:", 4) == 0) {
@@ -147,7 +151,7 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 
 	//qDebug() << "Key pressed:" << hex << event->key();
 
-	if (not this->fAcceptInput) {
+	if (not this->fAcceptInput or not qFrame->gameRunning()) {
 		QScrollArea::keyPressEvent(e);
 		return;
 	}
