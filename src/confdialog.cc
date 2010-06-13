@@ -19,19 +19,19 @@
 #include <QSignalMapper>
 #include <QPushButton>
 
-#include "qtadsconfdialog.h"
-#include "ui_qtadsconfdialog.h"
+#include "confdialog.h"
+#include "ui_confdialog.h"
 #include "globals.h"
-#include "qtadssettings.h"
+#include "settings.h"
 #include "sysframe.h"
 #include "syswingroup.h"
 
 
-QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
-  : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::QTadsConfDialog)
+ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
+  : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::ConfDialog)
 {
 	ui->setupUi(this);
-	QTadsSettings* sett = qFrame->settings();
+	Settings* sett = qFrame->settings();
 	sett->loadFromDisk();
 
 #ifdef Q_WS_MAC
@@ -108,13 +108,13 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 }
 
 
-QTadsConfDialog::~QTadsConfDialog()
+ConfDialog::~ConfDialog()
 {
 	delete ui;
 }
 
 
-void QTadsConfDialog::changeEvent(QEvent *e)
+void ConfDialog::changeEvent(QEvent *e)
 {
 	QDialog::changeEvent(e);
 	switch (e->type()) {
@@ -128,7 +128,7 @@ void QTadsConfDialog::changeEvent(QEvent *e)
 
 
 void
-QTadsConfDialog::fMakeInstantApply()
+ConfDialog::fMakeInstantApply()
 {
 	connect(ui->mainFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
 	connect(ui->fixedFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
@@ -167,9 +167,9 @@ QTadsConfDialog::fMakeInstantApply()
 
 
 void
-QTadsConfDialog::fApplySettings()
+ConfDialog::fApplySettings()
 {
-	QTadsSettings* sett = qFrame->settings();
+	Settings* sett = qFrame->settings();
 
 	sett->enableGraphics = ui->allowGraphicsCheckBox->isChecked();
 	sett->enableDigitalSound = ui->allowDigitalCheckBox->isChecked();

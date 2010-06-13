@@ -20,9 +20,9 @@
 #include <QScrollBar>
 #include <QResizeEvent>
 
-#include "qtadsdispwidget.h"
+#include "dispwidget.h"
 #include "qtadstimer.h"
-#include "qtadssettings.h"
+#include "settings.h"
 #include "syswininput.h"
 #include "sysimagejpeg.h"
 #include "sysimagepng.h"
@@ -31,12 +31,12 @@
 #include "htmlrc.h"
 
 
-CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QTadsDisplayWidget* dispWidget, QWidget* parent )
+CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidget, QWidget* parent )
   : QScrollArea(parent), CHtmlSysWin(formatter), fBannerStyleAutoVScroll(true), fDontReformat(0),
 	fParentBanner(0), fBgImage(0), margins(8, 2, 8, 2), bannerSize(0), bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
 {
 	if (dispWidget == 0) {
-		this->dispWidget = new QTadsDisplayWidget(this, formatter);
+		this->dispWidget = new DisplayWidget(this, formatter);
 		this->setWidget(this->dispWidget);
 	}
 	this->formatter_->set_win(this, &margins);

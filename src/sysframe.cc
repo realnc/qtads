@@ -21,8 +21,8 @@
 #include <QDir>
 
 #include "qtadshostifc.h"
-#include "qtadssettings.h"
-#include "qtadsdispwidget.h"
+#include "settings.h"
+#include "dispwidget.h"
 #include "syswinaboutbox.h"
 #include "syswininput.h"
 
@@ -48,7 +48,7 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 	this->setOrganizationDomain(orgDomain);
 
 	// Load our persistent settings.
-	this->fSettings = new QTadsSettings;
+	this->fSettings = new Settings;
 	this->fSettings->loadFromDisk();
 
 	// Initialize the input color with the user-configured one.  The game is
@@ -561,7 +561,7 @@ void CHtmlSysFrameQt::pruneParseTree()
 
 
 void
-CHtmlSysFrameQt::notifyPreferencesChange( const QTadsSettings* sett )
+CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
 {
 	// If digital sounds are now turned off, cancel sound playback in the
 	// effects layers

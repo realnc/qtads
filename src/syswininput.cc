@@ -22,8 +22,8 @@
 #include <QClipboard>
 #include <QUrl>
 
-#include "qtadssettings.h"
-#include "qtadsdispwidgetinput.h"
+#include "settings.h"
+#include "dispwidgetinput.h"
 #include "syswininput.h"
 
 #include "htmlfmt.h"
@@ -36,8 +36,8 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
 : CHtmlSysWinQt(formatter, 0, parent), fInputReady(false),
   fAcceptInput(false), fSingleKeyInput(false), fLastKeyEvent(Qt::Key_Any)
 {
-	this->dispWidget = new QTadsDisplayWidgetInput(this, formatter);
-	this->fCastDispWidget = static_cast<QTadsDisplayWidgetInput*>(this->dispWidget);
+	this->dispWidget = new DisplayWidgetInput(this, formatter);
+	this->fCastDispWidget = static_cast<DisplayWidgetInput*>(this->dispWidget);
 	this->setWidget(this->dispWidget);
 
 	QPalette p(this->palette());

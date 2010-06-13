@@ -28,7 +28,7 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 
   private:
 	// Our display widget casted for easier access.
-	class QTadsDisplayWidgetInput* fCastDispWidget;
+	class DisplayWidgetInput* fCastDispWidget;
 
 	// We have a finished user input.
 	bool fInputReady;

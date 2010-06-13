@@ -22,7 +22,7 @@
 #include "qtadssound.h"
 #include "globals.h"
 #include "sysframe.h"
-#include "qtadssettings.h"
+#include "settings.h"
 #include "syssoundwav.h"
 
 

@@ -14,8 +14,8 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef QTADSDISPWIDGET_H
-#define QTADSDISPWIDGET_H
+#ifndef DISPWIDGET_H
+#define DISPWIDGET_H
 
 #include <QDebug>
 #include <QWidget>
@@ -24,7 +24,7 @@
 /* The widget where CHtmlSysWin* performs actual paint operations.  It also
  * handles mouse events.
  */
-class QTadsDisplayWidget: public QWidget {
+class DisplayWidget: public QWidget {
   private:
 	// We track the current link the mouse is currently hovering over and the
 	// link over which the mouse button has been pressed but not released yet.
@@ -58,7 +58,7 @@ class QTadsDisplayWidget: public QWidget {
 	mouseReleaseEvent( QMouseEvent* e );
 
   public:
-	QTadsDisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
+	DisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
 
 	// When our parent's notify_clear_contents() is called, we need to know
 	// about it so we can perform link tracking invalidation.

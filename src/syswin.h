@@ -77,19 +77,19 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	HTML_BannerWin_Units_t bannerSizeUnits;
 
 	// Our display widget.
-	class QTadsDisplayWidget* dispWidget;
+	class DisplayWidget* dispWidget;
 
 	virtual void
 	keyPressEvent( QKeyEvent* event );
 
   public:
-	CHtmlSysWinQt( class CHtmlFormatter* formatter, class QTadsDisplayWidget* dispWidget, QWidget* parent );
+	CHtmlSysWinQt( class CHtmlFormatter* formatter, class DisplayWidget* dispWidget, QWidget* parent );
 
 	virtual
 	~CHtmlSysWinQt();
 
 	// Returns our display widget.
-	class QTadsDisplayWidget*
+	class DisplayWidget*
 	displayWidget() const
 	{ return this->dispWidget; }
 

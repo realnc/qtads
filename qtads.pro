@@ -102,7 +102,7 @@ UI_DIR = tmp
 # $$HTDIR/notes/porting.htm
 
 FORMS += \
-	src/qtadsconfdialog.ui \
+	src/confdialog.ui \
 	src/gameinfodialog.ui
 
 # QTads headers
@@ -130,13 +130,13 @@ HEADERS += \
 	src/qtadscharmap.h \
 	src/qtadsimage.h \
 	src/qtadssound.h \
-	src/qtadsdispwidget.h \
-	src/qtadsdispwidgetinput.h \
+	src/dispwidget.h \
+	src/dispwidgetinput.h \
 	src/qtadshostifc.h \
 	src/qtadstimer.h \
 	src/vmuni.h \
-	src/qtadsconfdialog.h \
-	src/qtadssettings.h \
+	src/confdialog.h \
+	src/settings.h \
 	src/gameinfodialog.h \
 	src/kcolorbutton.h
 
@@ -159,10 +159,10 @@ SOURCES += \
 	src/qtadsimage.cc \
 	src/qtadssound.cc \
 	src/main.cc \
-	src/qtadsdispwidget.cc \
-	src/qtadsdispwidgetinput.cc \
-	src/qtadsconfdialog.cpp \
-	src/qtadssettings.cc \
+	src/dispwidget.cc \
+	src/dispwidgetinput.cc \
+	src/confdialog.cc \
+	src/settings.cc \
 	src/gameinfodialog.cc \
 	src/kcolorbutton.cc
 

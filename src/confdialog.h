@@ -14,49 +14,37 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef QTADSSETTINGS_H
-#define QTADSSETTINGS_H
+#ifndef CONFDIALOG_H
+#define CONFDIALOG_H
 
-#include "sysfont.h"
+#include <QDialog>
 
 
-class QTadsSettings {
+namespace Ui {
+	class ConfDialog;
+}
+
+class ConfDialog: public QDialog {
+	Q_OBJECT
+
   public:
+	ConfDialog( class CHtmlSysWinGroupQt* parent = 0 );
+	~ConfDialog();
+
+  protected:
 	void
-	loadFromDisk();
+	changeEvent( QEvent* e );
 
+  private:
+	Ui::ConfDialog* ui;
+
+	// Makes the dialog's controls apply instantly when they change.
 	void
-	saveToDisk();
+	fMakeInstantApply();
 
-	bool enableGraphics;
-	bool enableDigitalSound;
-	bool enableMidiSound;
-	bool enableLinks;
-
-	QColor mainTextColor;
-	QColor mainBgColor;
-	QColor bannerTextColor;
-	QColor bannerBgColor;
-	QColor inputColor;
-
-	bool underlineLinks;
-	bool highlightLinks;
-	QColor unvisitedLinkColor;
-	QColor hoveringLinkColor;
-	QColor clickedLinkColor;
-
-	CHtmlSysFontQt mainFont;
-	CHtmlSysFontQt fixedFont;
-	CHtmlSysFontQt serifFont;
-	CHtmlSysFontQt sansFont;
-	CHtmlSysFontQt scriptFont;
-	CHtmlSysFontQt writerFont;
-	CHtmlSysFontQt inputFont;
-
-	QStringList recentGamesList;
-	static const int recentGamesCapacity = 10;
-
-	QSize appSize;
+  private slots:
+	void
+	fApplySettings();
 };
 
 

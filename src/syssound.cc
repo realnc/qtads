@@ -19,7 +19,7 @@
 
 #include "globals.h"
 #include "sysframe.h"
-#include "qtadssettings.h"
+#include "settings.h"
 #include "syssoundmidi.h"
 #include "syssoundwav.h"
 #include "syssoundogg.h"

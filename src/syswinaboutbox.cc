@@ -17,7 +17,7 @@
 #include "htmlfmt.h"
 
 #include "syswinaboutbox.h"
-#include "qtadsdispwidget.h"
+#include "dispwidget.h"
 
 
 CHtmlSysWinAboutBoxQt::CHtmlSysWinAboutBoxQt( class CHtmlFormatter* formatter, QWidget* parent )

@@ -23,12 +23,12 @@
 #include "htmlfmt.h"
 #include "htmldisp.h"
 
-#include "qtadsdispwidget.h"
-#include "qtadssettings.h"
+#include "dispwidget.h"
+#include "settings.h"
 #include "syswininput.h"
 
 
-QTadsDisplayWidget::QTadsDisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
+DisplayWidget::DisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
   : QWidget(parent), fHoverLink(0), fClickedLink(0), parentSysWin(parent), formatter(formatter)
 {
 	this->setForegroundRole(QPalette::Text);
@@ -41,7 +41,7 @@ QTadsDisplayWidget::QTadsDisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* f
 
 
 void
-QTadsDisplayWidget::fInvalidateLinkTracking()
+DisplayWidget::fInvalidateLinkTracking()
 {
 	// If we're tracking links (hover/click), forget about them.
 	if (this->fHoverLink != 0 or this->fClickedLink != 0) {
@@ -60,7 +60,7 @@ QTadsDisplayWidget::fInvalidateLinkTracking()
 
 
 void
-QTadsDisplayWidget::paintEvent( QPaintEvent* e )
+DisplayWidget::paintEvent( QPaintEvent* e )
 {
 	//qDebug() << Q_FUNC_INFO << "called";
 
@@ -72,7 +72,7 @@ QTadsDisplayWidget::paintEvent( QPaintEvent* e )
 
 
 void
-QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
+DisplayWidget::mouseMoveEvent( QMouseEvent* e )
 {
 	// Get the display object containing the position.
 	CHtmlPoint pos;
@@ -146,14 +146,14 @@ QTadsDisplayWidget::mouseMoveEvent( QMouseEvent* e )
 
 
 void
-QTadsDisplayWidget::leaveEvent( QEvent* e )
+DisplayWidget::leaveEvent( QEvent* e )
 {
 	this->fInvalidateLinkTracking();
 }
 
 
 void
-QTadsDisplayWidget::mousePressEvent( QMouseEvent* e )
+DisplayWidget::mousePressEvent( QMouseEvent* e )
 {
 	if (this->fHoverLink == 0) {
 		// We're not hover-tracking a link; there's nothing to do here.
@@ -170,7 +170,7 @@ QTadsDisplayWidget::mousePressEvent( QMouseEvent* e )
 
 
 void
-QTadsDisplayWidget::mouseReleaseEvent( QMouseEvent* e )
+DisplayWidget::mouseReleaseEvent( QMouseEvent* e )
 {
 	if (this->fClickedLink == 0) {
 		// We're not click-tracking a link; there's nothing to do here.

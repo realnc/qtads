@@ -14,13 +14,13 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef QTADSDISPWIDGETINPUT_H
-#define QTADSDISPWIDGETINPUT_H
+#ifndef DISPWIDGETINPUT_H
+#define DISPWIDGETINPUT_H
 
-#include "qtadsdispwidget.h"
+#include "dispwidget.h"
 
 
-class QTadsDisplayWidgetInput: public QTadsDisplayWidget {
+class DisplayWidgetInput: public DisplayWidget {
 	Q_OBJECT
 
   private:
@@ -53,7 +53,7 @@ class QTadsDisplayWidgetInput: public QTadsDisplayWidget {
 	paintEvent( QPaintEvent* e );
 
   public:
-	QTadsDisplayWidgetInput( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
+	DisplayWidgetInput( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
 
 	// Change the text cursor position.
 	void

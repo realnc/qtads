@@ -19,13 +19,13 @@
 #include <QDebug>
 #include <QFileInfo>
 
-#include "qtadssettings.h"
+#include "settings.h"
 #include "syswingroup.h"
 #include "globals.h"
 
 
 void
-QTadsSettings::loadFromDisk()
+Settings::loadFromDisk()
 {
 	QSettings sett;
 
@@ -77,7 +77,7 @@ QTadsSettings::loadFromDisk()
 
 
 void
-QTadsSettings::saveToDisk()
+Settings::saveToDisk()
 {
 	QSettings sett;
 

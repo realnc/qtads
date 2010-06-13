@@ -25,14 +25,14 @@
 #include "htmlinp.h"
 #include "htmldisp.h"
 
-#include "qtadssettings.h"
+#include "settings.h"
 #include "syswingroup.h"
 #include "syswin.h"
-#include "qtadsdispwidgetinput.h"
+#include "dispwidgetinput.h"
 
 
-QTadsDisplayWidgetInput::QTadsDisplayWidgetInput( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
-: QTadsDisplayWidget(parent, formatter), fCursorPos(0, 0), fLastCursorPos(0, 0), fCursorVisible(false),
+DisplayWidgetInput::DisplayWidgetInput( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
+: DisplayWidget(parent, formatter), fCursorPos(0, 0), fLastCursorPos(0, 0), fCursorVisible(false),
   fBlinkVisible(false), fBlinkTimer(new QTimer(this))
 {
 	connect(this->fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
@@ -44,11 +44,11 @@ QTadsDisplayWidgetInput::QTadsDisplayWidgetInput( CHtmlSysWinQt* parent, CHtmlFo
 
 
 void
-QTadsDisplayWidgetInput::paintEvent( QPaintEvent* e )
+DisplayWidgetInput::paintEvent( QPaintEvent* e )
 {
 	//qDebug() << Q_FUNC_INFO << "called";
 
-	QTadsDisplayWidget::paintEvent(e);
+	DisplayWidget::paintEvent(e);
 	QPainter painter(this);
 	if (this->fCursorVisible and this->fBlinkVisible) {
 		painter.drawLine(this->fCursorPos.x(), this->fCursorPos.y(),
@@ -58,7 +58,7 @@ QTadsDisplayWidgetInput::paintEvent( QPaintEvent* e )
 
 
 void
-QTadsDisplayWidgetInput::fBlinkCursor()
+DisplayWidgetInput::fBlinkCursor()
 {
 	this->fBlinkVisible = not this->fBlinkVisible;
 	this->update(this->fCursorPos.x(), this->fCursorPos.y(),
@@ -67,7 +67,7 @@ QTadsDisplayWidgetInput::fBlinkCursor()
 
 
 void
-QTadsDisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* tadsBuffer,
+DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* tadsBuffer,
 										  CHtmlTagTextInput* tag )
 {
 	// Reset the blink timer.

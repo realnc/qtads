@@ -23,8 +23,8 @@
 #include <QMessageBox>
 
 #include "syswinaboutbox.h"
-#include "qtadsconfdialog.h"
-#include "qtadssettings.h"
+#include "confdialog.h"
+#include "settings.h"
 #include "gameinfodialog.h"
 
 
@@ -176,7 +176,7 @@ CHtmlSysWinGroupQt::fShowConfDialog()
 		this->fConfDialog->raise();
 		return;
 	}
-	this->fConfDialog = new QTadsConfDialog(this);
+	this->fConfDialog = new ConfDialog(this);
 	this->fConfDialog->setWindowTitle(tr("QTads Preferences"));
 	connect(this->fConfDialog, SIGNAL(finished(int)), this, SLOT(fHideConfDialog()));
 #ifdef Q_WS_MAC

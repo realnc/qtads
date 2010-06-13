@@ -33,7 +33,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 
   private:
 	// Preferences (fonts, colors, etc.)
-	class QTadsSettings* fSettings;
+	class Settings* fSettings;
 
 	// Tads2 application container context.
 	appctxdef fAppctx;
@@ -123,7 +123,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	virtual
 	~CHtmlSysFrameQt();
 
-	class QTadsSettings*
+	class Settings*
 	settings()
 	{ return this->fSettings; }
 
@@ -203,7 +203,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 
 	// Notify the application that preferences have changed.
 	void
-	notifyPreferencesChange( const class QTadsSettings* sett );
+	notifyPreferencesChange( const class Settings* sett );
 
 	// Advance the event loop.
 	void
