@@ -35,28 +35,33 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	QTadsSettings* sett = qFrame->settings();
 	sett->loadFromDisk();
 
+#ifdef Q_WS_MAC
+	// On the Mac, make the color selection buttons smaller so that they
+	// become square instead of round.
+	QSize macSize(48, 24);
+	ui->mainBgColorButton->setFixedSize(macSize);
+	ui->mainTextColorButton->setFixedSize(macSize);
+	ui->bannerBgColorButton->setFixedSize(macSize);
+	ui->bannerTextColorButton->setFixedSize(macSize);
+	ui->inputColorButton->setFixedSize(macSize);
+	ui->linkUnvisitedColorButton->setFixedSize(macSize);
+	ui->linkHoveringColorButton->setFixedSize(macSize);
+	ui->linkClickedColorButton->setFixedSize(macSize);
+#endif
+
 	ui->allowGraphicsCheckBox->setChecked(sett->enableGraphics);
 	ui->allowDigitalCheckBox->setChecked(sett->enableDigitalSound);
 	ui->allowMidiCheckBox->setChecked(sett->enableMidiSound);
 	ui->allowLinksCheckBox->setChecked(sett->enableLinks);
 
-	const QByteArray buttonStyle("*{background:");
-	this->fTmpMainBgColor = qFrame->settings()->mainBgColor;
-	ui->mainBgColorButton->setStyleSheet(buttonStyle + this->fTmpMainBgColor.name() + "}");
-	this->fTmpMainTextColor = qFrame->settings()->mainTextColor;
-	ui->mainTextColorButton->setStyleSheet(buttonStyle + this->fTmpMainTextColor.name() + "}");
-	this->fTmpBannerBgColor = qFrame->settings()->bannerBgColor;
-	ui->bannerBgColorButton->setStyleSheet(buttonStyle + this->fTmpBannerBgColor.name() + "}");
-	this->fTmpBannerTextColor = qFrame->settings()->bannerTextColor;
-	ui->bannerTextColorButton->setStyleSheet(buttonStyle + this->fTmpBannerTextColor.name() + "}");
-	this->fTmpInputColor = qFrame->settings()->inputColor;
-	ui->inputColorButton->setStyleSheet(buttonStyle + this->fTmpInputColor.name() + "}");
-	this->fTmpUnvisitedLinkColor = qFrame->settings()->unvisitedLinkColor;
-	ui->linkUnvisitedColorButton->setStyleSheet(buttonStyle + this->fTmpUnvisitedLinkColor.name() + "}");
-	this->fTmpHoveringLinkColor = qFrame->settings()->hoveringLinkColor;
-	ui->linkHoveringColorButton->setStyleSheet(buttonStyle + this->fTmpHoveringLinkColor.name() + "}");
-	this->fTmpClickedLinkColor = qFrame->settings()->clickedLinkColor;
-	ui->linkClickedColorButton->setStyleSheet(buttonStyle + this->fTmpClickedLinkColor.name() + "}");
+	ui->mainBgColorButton->setColor(sett->mainBgColor);
+	ui->mainTextColorButton->setColor(sett->mainTextColor);
+	ui->bannerBgColorButton->setColor(sett->bannerBgColor);
+	ui->bannerTextColorButton->setColor(sett->bannerTextColor);
+	ui->inputColorButton->setColor(sett->inputColor);
+	ui->linkUnvisitedColorButton->setColor(sett->unvisitedLinkColor);
+	ui->linkHoveringColorButton->setColor(sett->hoveringLinkColor);
+	ui->linkClickedColorButton->setColor(sett->clickedLinkColor);
 
 	ui->underlineLinksCheckBox->setChecked(sett->underlineLinks);
 	ui->highlightLinksCheckBox->setChecked(sett->highlightLinks);
@@ -78,25 +83,6 @@ QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
 	ui->inputFontBox->setCurrentFont(sett->inputFont);
 	ui->inputFontItalicCheckBox->setChecked(sett->inputFont.italic());
 	ui->inputFontBoldCheckBox->setChecked(sett->inputFont.bold());
-
-	QSignalMapper* sigMapper = new QSignalMapper(this);
-	sigMapper->setMapping(ui->mainTextColorButton, 1);
-	sigMapper->setMapping(ui->mainBgColorButton, 2);
-	sigMapper->setMapping(ui->bannerTextColorButton, 3);
-	sigMapper->setMapping(ui->bannerBgColorButton, 4);
-	sigMapper->setMapping(ui->linkUnvisitedColorButton, 5);
-	sigMapper->setMapping(ui->linkHoveringColorButton, 6);
-	sigMapper->setMapping(ui->linkClickedColorButton, 7);
-	sigMapper->setMapping(ui->inputColorButton, 8);
-	connect(ui->mainTextColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
-	connect(ui->mainBgColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
-	connect(ui->bannerTextColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
-	connect(ui->bannerBgColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
-	connect(ui->inputColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
-	connect(ui->linkUnvisitedColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
-	connect(ui->linkHoveringColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
-	connect(ui->linkClickedColorButton, SIGNAL(clicked()), sigMapper, SLOT(map()));
-	connect(sigMapper, SIGNAL(mapped(int)), this, SLOT(fSelectColor(int)));
 
 #ifdef Q_WS_MAC
 	// On Mac OS X, the dialog should not have any buttons, and settings
@@ -154,6 +140,7 @@ QTadsConfDialog::fMakeInstantApply()
 	connect(ui->scriptFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
 	connect(ui->writerFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
 	connect(ui->inputFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
+
 	connect(ui->mainFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
 	connect(ui->fixedFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
 	connect(ui->serifFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
@@ -161,6 +148,7 @@ QTadsConfDialog::fMakeInstantApply()
 	connect(ui->scriptFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
 	connect(ui->writerFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
 	connect(ui->inputFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+
 	connect(ui->inputFontItalicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 	connect(ui->inputFontBoldCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 	connect(ui->underlineLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -169,6 +157,15 @@ QTadsConfDialog::fMakeInstantApply()
 	connect(ui->allowDigitalCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 	connect(ui->allowMidiCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 	connect(ui->allowLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+
+	connect(ui->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
+	connect(ui->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
+	connect(ui->bannerTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
+	connect(ui->bannerBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
+	connect(ui->inputColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
+	connect(ui->linkUnvisitedColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
+	connect(ui->linkHoveringColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
+	connect(ui->linkClickedColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
 }
 
 
@@ -182,14 +179,15 @@ QTadsConfDialog::fApplySettings()
 	sett->enableMidiSound = ui->allowMidiCheckBox->isChecked();
 	sett->enableLinks = ui->allowLinksCheckBox->isChecked();
 
-	sett->mainBgColor = this->fTmpMainBgColor;
-	sett->mainTextColor = this->fTmpMainTextColor;
-	sett->bannerBgColor = this->fTmpBannerBgColor;
-	sett->bannerTextColor = this->fTmpBannerTextColor;
-	sett->inputColor = this->fTmpInputColor;
-	sett->unvisitedLinkColor = this->fTmpUnvisitedLinkColor;
-	sett->hoveringLinkColor = this->fTmpHoveringLinkColor;
-	sett->clickedLinkColor = this->fTmpClickedLinkColor;
+	sett->mainBgColor = ui->mainBgColorButton->color();
+	sett->mainTextColor = ui->mainTextColorButton->color();
+	sett->bannerBgColor = ui->bannerBgColorButton->color();
+	sett->bannerTextColor = ui->bannerTextColorButton->color();
+	sett->inputColor = ui->inputColorButton->color();
+	sett->unvisitedLinkColor = ui->linkUnvisitedColorButton->color();
+	sett->hoveringLinkColor = ui->linkHoveringColorButton->color();
+	sett->clickedLinkColor = ui->linkClickedColorButton->color();
+
 	sett->underlineLinks = ui->underlineLinksCheckBox->isChecked();
 	sett->highlightLinks = ui->highlightLinksCheckBox->isChecked();
 
@@ -215,69 +213,4 @@ QTadsConfDialog::fApplySettings()
 	qFrame->notifyPreferencesChange(sett);
 
 	sett->saveToDisk();
-}
-
-
-void
-QTadsConfDialog::fSelectColor( int i )
-{
-	QToolButton* button;
-	QColor* tmpColor;
-	QColor newColor;
-
-	switch (i) {
-	  case 1:
-		button = ui->mainTextColorButton;
-		tmpColor = &this->fTmpMainTextColor;
-		newColor = this->fTmpMainTextColor;
-		break;
-	  case 2:
-		button = ui->mainBgColorButton;
-		tmpColor = &this->fTmpMainBgColor;
-		newColor = this->fTmpMainBgColor;
-		break;
-	  case 3:
-		button = ui->bannerTextColorButton;
-		tmpColor = &this->fTmpBannerTextColor;
-		newColor = this->fTmpBannerTextColor;
-		break;
-	  case 4:
-		button = ui->bannerBgColorButton;
-		tmpColor = &this->fTmpBannerBgColor;
-		newColor = this->fTmpBannerBgColor;
-		break;
-	  case 5:
-		button = ui->linkUnvisitedColorButton;
-		tmpColor = &this->fTmpUnvisitedLinkColor;
-		newColor = this->fTmpUnvisitedLinkColor;
-		break;
-	  case 6:
-		button = ui->linkHoveringColorButton;
-		tmpColor = &this->fTmpHoveringLinkColor;
-		newColor = this->fTmpHoveringLinkColor;
-		break;
-	  case 7:
-		button = ui->linkClickedColorButton;
-		tmpColor = &this->fTmpClickedLinkColor;
-		newColor = this->fTmpClickedLinkColor;
-		break;
-	  case 8:
-		button = ui->inputColorButton;
-		tmpColor = &this->fTmpInputColor;
-		newColor = this->fTmpInputColor;
-		break;
-	}
-
-	newColor = QColorDialog::getColor(newColor);
-	if (not newColor.isValid()) {
-		// User canceled the dialog.
-		return;
-	}
-
-	*tmpColor = newColor;
-	button->setStyleSheet(QByteArray("*{background:") + newColor.name() + "}");
-
-	if (this->fInstantApply) {
-		this->fApplySettings();
-	}
 }

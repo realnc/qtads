@@ -2,9 +2,6 @@
 <ui version="4.0">
  <class>QTadsConfDialog</class>
  <widget class="QDialog" name="QTadsConfDialog">
-  <property name="windowTitle">
-   <string>Dialog</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
@@ -332,7 +329,14 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QToolButton" name="mainTextColorButton"/>
+             <widget class="KColorButton" name="mainTextColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="label_9">
@@ -345,7 +349,14 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QToolButton" name="mainBgColorButton"/>
+             <widget class="KColorButton" name="mainBgColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item row="2" column="0">
              <widget class="QLabel" name="label_15">
@@ -358,7 +369,14 @@
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QToolButton" name="inputColorButton"/>
+             <widget class="KColorButton" name="inputColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -383,7 +401,14 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QToolButton" name="bannerTextColorButton"/>
+             <widget class="KColorButton" name="bannerTextColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="label_11">
@@ -396,7 +421,14 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QToolButton" name="bannerBgColorButton"/>
+             <widget class="KColorButton" name="bannerBgColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -439,7 +471,14 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QToolButton" name="linkUnvisitedColorButton"/>
+             <widget class="KColorButton" name="linkUnvisitedColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="label_13">
@@ -452,7 +491,14 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QToolButton" name="linkHoveringColorButton"/>
+             <widget class="KColorButton" name="linkHoveringColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item row="2" column="0">
              <widget class="QLabel" name="label_14">
@@ -465,7 +511,14 @@
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QToolButton" name="linkClickedColorButton"/>
+             <widget class="KColorButton" name="linkClickedColorButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -546,6 +599,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KColorButton</class>
+   <extends>QPushButton</extends>
+   <header>kcolorbutton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

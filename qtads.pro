@@ -137,7 +137,8 @@ HEADERS += \
 	src/vmuni.h \
 	src/qtadsconfdialog.h \
 	src/qtadssettings.h \
-	src/gameinfodialog.h
+	src/gameinfodialog.h \
+	src/kcolorbutton.h
 
 # QTads sources.
 SOURCES += \
@@ -162,7 +163,8 @@ SOURCES += \
 	src/qtadsdispwidgetinput.cc \
 	src/qtadsconfdialog.cpp \
 	src/qtadssettings.cc \
-	src/gameinfodialog.cc
+	src/gameinfodialog.cc \
+	src/kcolorbutton.cc
 
 # Portable Tads headers.  We simply include every header from the Tads
 # directories.  It's sub-optimal, but the safest solution.

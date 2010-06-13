@@ -38,16 +38,6 @@ class QTadsConfDialog: public QDialog {
   private:
 	Ui::QTadsConfDialog* ui;
 
-	// Temporary settings (before being applied.)
-	QColor fTmpMainBgColor;
-	QColor fTmpMainTextColor;
-	QColor fTmpBannerBgColor;
-	QColor fTmpBannerTextColor;
-	QColor fTmpInputColor;
-	QColor fTmpUnvisitedLinkColor;
-	QColor fTmpHoveringLinkColor;
-	QColor fTmpClickedLinkColor;
-
 	bool fInstantApply;
 
 	// Makes the dialog's controls apply instantly when they change.
@@ -57,9 +47,6 @@ class QTadsConfDialog: public QDialog {
   private slots:
 	void
 	fApplySettings();
-
-	void
-	fSelectColor( int i );
 };
 
 
