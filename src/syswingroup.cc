@@ -70,7 +70,9 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	connect(this->fEndCurrentGameAction, SIGNAL(triggered()), this, SLOT(fEndCurrentGame()));
 	menu->addSeparator();
 	act = new QAction(tr("&Quit"), this);
+#if QT_VERSION >= 0x040600
 	act->setShortcuts(QKeySequence::Quit);
+#endif
 	menu->addAction(act);
 	connect(act, SIGNAL(triggered()), this, SLOT(close()));
 
