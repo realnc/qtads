@@ -38,8 +38,6 @@ class QTadsConfDialog: public QDialog {
   private:
 	Ui::QTadsConfDialog* ui;
 
-	bool fInstantApply;
-
 	// Makes the dialog's controls apply instantly when they change.
 	void
 	fMakeInstantApply();

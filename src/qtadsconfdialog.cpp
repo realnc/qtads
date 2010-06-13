@@ -28,8 +28,7 @@
 
 
 QTadsConfDialog::QTadsConfDialog( CHtmlSysWinGroupQt* parent )
-  : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::QTadsConfDialog),
-	fInstantApply(false)
+  : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::QTadsConfDialog)
 {
 	ui->setupUi(this);
 	QTadsSettings* sett = qFrame->settings();
@@ -131,8 +130,6 @@ void QTadsConfDialog::changeEvent(QEvent *e)
 void
 QTadsConfDialog::fMakeInstantApply()
 {
-	this->fInstantApply = true;
-
 	connect(ui->mainFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
 	connect(ui->fixedFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
 	connect(ui->serifFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
