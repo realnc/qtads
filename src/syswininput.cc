@@ -33,8 +33,7 @@
 
 
 CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* parent )
-: CHtmlSysWinQt(formatter, 0, parent), fInputReady(false),
-  fAcceptInput(false), fSingleKeyInput(false), fLastKeyEvent(Qt::Key_Any)
+: CHtmlSysWinQt(formatter, 0, parent), fInputMode(NoInput), fInputReady(false), fLastKeyEvent(Qt::Key_Any)
 {
 	this->dispWidget = new DisplayWidgetInput(this, formatter);
 	this->fCastDispWidget = static_cast<DisplayWidgetInput*>(this->dispWidget);
@@ -51,8 +50,7 @@ void
 CHtmlSysWinInputQt::fStartLineInput( CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput* tag )
 {
 	this->fInputReady = false;
-	this->fAcceptInput = true;
-	this->fSingleKeyInput = false;
+	this->fInputMode = NormalInput;
 	this->fTag = tag;
 	this->fTadsBuffer = tadsBuffer;
 	tadsBuffer->setbuf(tadsBuffer->getbuf(), 1000, 0);
@@ -64,8 +62,7 @@ void
 CHtmlSysWinInputQt::fStartKeypressInput()
 {
 	this->fInputReady = false;
-	this->fAcceptInput = true;
-	this->fSingleKeyInput = true;
+	this->fInputMode = SingleKeyInput;
 	this->fHrefEvent.clear();
 }
 
@@ -98,13 +95,13 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 	}
 
 	// If we're not currently accepting input, ignore this.
-	if (not this->fAcceptInput) {
+	if (this->fInputMode == NoInput) {
 		return;
 	}
 
 	// If we're waiting for a single key-press event and the command isn't some
 	// sort of special OS_CMD command, it's an HREF event.
-	if (this->fAcceptInput and this->fSingleKeyInput and os_cmd_id == OS_CMD_NONE) {
+	if (this->fInputMode == SingleKeyInput and os_cmd_id == OS_CMD_NONE) {
 		this->fHrefEvent = QString::fromUtf8(cmd);
 		return;
 	}
@@ -130,7 +127,7 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 	// let the player continue editing this command.
 	if (enter) {
 		this->fInputReady = true;
-		this->fAcceptInput = false;
+		this->fInputMode = NoInput;
 	}
 }
 
@@ -151,12 +148,12 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 
 	//qDebug() << "Key pressed:" << hex << event->key();
 
-	if (not this->fAcceptInput or not qFrame->gameRunning()) {
+	if (this->fInputMode == NoInput or not qFrame->gameRunning()) {
 		QScrollArea::keyPressEvent(e);
 		return;
 	}
 
-	if (this->fSingleKeyInput) {
+	if (this->fInputMode == SingleKeyInput) {
 		this->singleKeyPressEvent(e);
 		return;
 	}
@@ -171,7 +168,7 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 	} else if (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return) {
 #endif
 		this->fInputReady = true;
-		this->fAcceptInput = false;
+		this->fInputMode = NoInput;
 		this->fTadsBuffer->add_hist();
 		return;
 	} else if (e->matches(QKeySequence::Delete)) {
@@ -236,8 +233,7 @@ void
 CHtmlSysWinInputQt::singleKeyPressEvent( QKeyEvent* event )
 {
 	//qDebug() << Q_FUNC_INFO;
-	Q_ASSERT(this->fAcceptInput);
-	Q_ASSERT(this->fSingleKeyInput);
+	Q_ASSERT(this->fInputMode == SingleKeyInput);
 
 	this->fLastKeyEvent = static_cast<Qt::Key>(0);
 	this->fLastKeyText = 0;
@@ -285,8 +281,7 @@ CHtmlSysWinInputQt::singleKeyPressEvent( QKeyEvent* event )
 		this->fLastKeyText = event->text().at(0);
 	}
 
-	this->fAcceptInput = false;
-	this->fSingleKeyInput = false;
+	this->fInputMode = NoInput;
 	this->fInputReady = true;
 }
 

@@ -27,6 +27,24 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	friend class CHtmlSysWinQt;
 
   private:
+	// These values specify the exact input-mode we are in.
+	enum InputMode {
+		// We aren't in input-mode.
+		NoInput,
+
+		// Return-terminated input.
+		NormalInput,
+
+		// Single keypress input.
+		SingleKeyInput,
+
+		// We are waiting for a response to continue scrolling.
+		PagePauseInput
+	};
+
+	// The input-mode we are currently in.
+	InputMode fInputMode;
+
 	// Our display widget casted for easier access.
 	class DisplayWidgetInput* fCastDispWidget;
 
@@ -34,11 +52,11 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	bool fInputReady;
 
 	// We are accepting input.
-	bool fAcceptInput;
+	//bool fAcceptInput;
 
 	// If we're accepting input, should we get a whole line, or a single
 	// keypress.
-	bool fSingleKeyInput;
+	//bool fSingleKeyInput;
 
 	// In single keypress input mode, these store the last pressed key.  Only
 	// one of fLastKeyEvent and fLastKeyText can be valid.
