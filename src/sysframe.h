@@ -209,6 +209,13 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	void
 	advanceEventLoop( QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents )
 	{
+		// Guard against re-entrancy.
+		static bool working = false;
+		if (working) {
+			return;
+		}
+		working = true;
+
 		// DeferredDelete events need to be dispatched manually, since we don't
 		// return to the main event loop while a game is running.
 #ifndef Q_WS_MAC
@@ -220,18 +227,27 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 		this->sendPostedEvents();
 		this->processEvents(flags);
 		this->sendPostedEvents();
+		working = false;
 	}
 
 	// Advance the event loop with a timeout.
 	void
 	advanceEventLoop( QEventLoop::ProcessEventsFlags flags, int maxtime )
 	{
+		// Guard against re-entrancy.
+		static bool working = false;
+		if (working) {
+			return;
+		}
+		working = true;
+
 #ifndef Q_WS_MAC
 		this->sendPostedEvents(0, QEvent::DeferredDelete);
 #endif
 		this->sendPostedEvents();
 		this->processEvents(flags, maxtime);
 		this->sendPostedEvents();
+		working = false;
 	}
 
 	//
