@@ -176,10 +176,6 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	tads3()
 	{ return this->fTads3; }
 
-	// Return a list of all banners that are childs of 'parent'.
-	const QList<CHtmlSysWinQt*>&
-	childBannersOf( const CHtmlSysWinQt* parent );
-
 	// Recalculate and adjust the sizes of all HTML banners.
 	void
 	adjustBannerSizes();
