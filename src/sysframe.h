@@ -131,6 +131,10 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	gameWindow()
 	{ return this->fGameWin; }
 
+	const QList<class CHtmlSysWinQt*>&
+	bannerList()
+	{ return this->fBannerList; }
+
 	HTML_color_t
 	inputColor()
 	{ return this->fInputColor; }
