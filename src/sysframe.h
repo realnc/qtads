@@ -186,7 +186,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 
 	// Reformat all HTML banners.
 	void
-	reformatBanners();
+	reformatBanners( bool showStatus, bool freezeDisplay, bool resetSounds );
 
 	// Schedule a reformat.
 	void

@@ -158,6 +158,11 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 		return;
 	}
 
+	if (this->fInputMode == PagePauseInput) {
+		this->pagePauseKeyPressEvent(e);
+		return;
+	}
+
 	if (e->matches(QKeySequence::MoveToStartOfLine) or e->matches(QKeySequence::MoveToStartOfBlock)) {
 		this->fTadsBuffer->start_of_line(false);
 	} else if (e->matches(QKeySequence::MoveToEndOfLine) or e->matches(QKeySequence::MoveToEndOfBlock)) {
@@ -286,13 +291,22 @@ CHtmlSysWinInputQt::singleKeyPressEvent( QKeyEvent* event )
 }
 
 
+void
+CHtmlSysWinInputQt::pagePauseKeyPressEvent( QKeyEvent* e )
+{
+	if (e->key() == Qt::Key_Space) {
+		this->fInputMode = NoInput;
+	}
+}
+
+
 bool
 CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 {
 	//qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(tadsBuffer != 0);
 
-	this->verticalScrollBar()->setValue(this->verticalScrollBar()->maximum());
+	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 	CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(this->formatter_);
 	formatter->prepare_for_input();
 	while (formatter->more_to_do()) {
@@ -307,6 +321,9 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 	this->fCastDispWidget->setCursorVisible(true);
 	this->fCastDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
 	this->fStartLineInput(tadsBuffer, tag);
+	// Reset the MORE prompt position to this point, since the user has seen
+	// everything up to here.
+	this->lastInputHeight = this->formatter_->get_max_y_pos();
 	while (qFrame->gameRunning() and not this->fInputReady) {
 		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 	}
@@ -363,14 +380,16 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 		formatter->do_formatting();
 	}
 
-	// Scroll to bottom.
-	this->verticalScrollBar()->setValue(this->verticalScrollBar()->maximum());
+	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 
 	// Clear any pending HREF event.
 	this->fHrefEvent.clear();
 
 	extKey = 0;
 	this->fStartKeypressInput();
+	// Reset the MORE prompt position to this point, since the user has seen
+	// everything up to here.
+	this->lastInputHeight = this->formatter_->get_max_y_pos();
 	if (useTimeout) {
 		QTime t;
 		t.start();
@@ -442,6 +461,18 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 	// our next call.
 	done = false;
 	return 0;
+}
+
+
+void
+CHtmlSysWinInputQt::pagePause()
+{
+	InputMode lastMode = this->fInputMode;
+	this->fInputMode = PagePauseInput;
+	while (this->fInputMode == PagePauseInput and qFrame->gameRunning()) {
+		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
+	}
+	this->fInputMode = lastMode;
 }
 
 

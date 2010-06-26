@@ -507,25 +507,22 @@ CHtmlSysFrameQt::adjustBannerSizes()
 
 
 void
-CHtmlSysFrameQt::reformatBanners()
+CHtmlSysFrameQt::reformatBanners( bool showStatus, bool freezeDisplay, bool resetSounds )
 {
 	if (this->fGameWin == 0) {
 		return;
 	}
 
-	// First, reformat the main game window.
-	this->fGameWin->get_formatter()->start_at_top(false);
-	this->fGameWin->do_formatting(false, false, true);
-	this->fGameWin->displayWidget()->resize(this->fGameWin->get_formatter()->get_outer_max_line_width(),
-											this->fGameWin->get_formatter()->get_max_y_pos());
+	// Recalculate the banner layout, in case any of the underlying units (such
+	// as the default font size) changed.
+	this->adjustBannerSizes();
 
-	// Now reformat all active banner windows.
+	// Always reformat the main panel window.
+	this->fGameWin->doReformat(showStatus, freezeDisplay, resetSounds);
+
+	// Reformat each banner window.
 	for (int i = 0; i < this->fBannerList.size(); ++i) {
-		CHtmlSysWinQt* win = this->fBannerList.at(i);
-		win->get_formatter()->start_at_top(false);
-		win->do_formatting(false, false, false);
-		win->displayWidget()->resize(win->get_formatter()->get_outer_max_line_width(),
-									 win->get_formatter()->get_max_y_pos());
+		this->fBannerList.at(i)->doReformat(showStatus, freezeDisplay, false);
 	}
 }
 
@@ -537,7 +534,7 @@ void CHtmlSysFrameQt::pruneParseTree()
 	// If there's a reformat pending, perform it.
 	if (this->fReformatPending) {
 		this->fReformatPending = false;
-		this->reformatBanners();
+		this->reformatBanners(true, true, false);
 	}
 
 	// Skip this entirely most of the time; only check every so often, so that
@@ -554,9 +551,9 @@ void CHtmlSysFrameQt::pruneParseTree()
 		return;
 	}
 
-	// Perform the pruning, reformat and adjust all banners.
+	// Perform the pruning and reformat all banners.
 	this->fParser->prune_tree(65536 / 2);
-	this->reformatBanners();
+	this->reformatBanners(false, true, false);
 }
 
 
@@ -579,7 +576,7 @@ CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
 	// Change the text cursor's height according to the new input font's height.
 	qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett->inputFont).height());
 
-	qFrame->reformatBanners();
+	qFrame->reformatBanners(true, true, false);
 }
 
 
@@ -590,14 +587,19 @@ CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 	this->fParser->parse(&this->fBuffer, qWinGroup);
 	this->fBuffer.clear();
 
-	// Reformat the main game window, if requested.
+	// If desired, run the parsed source through the formatter and display it.
 	if (fmt) {
-		this->fGameWin->do_formatting(false, true, not immediate_redraw);
+		this->fGameWin->do_formatting(false, false, false);
 	}
 
 	// Also flush all banner windows.
 	for (int i = 0; i < this->fBannerList.size(); ++i) {
 		this->fBannerList.at(i)->get_formatter()->flush_txtbuf(fmt);
+	}
+
+	// If desired, immediately update the display.
+	if (immediate_redraw) {
+		this->fMainWin->centralWidget()->update();
 	}
 }
 
@@ -629,17 +631,8 @@ CHtmlSysFrameQt::start_new_page()
 	// Notify the main game window that we're clearing the page.
 	this->fGameWin->notify_clear_contents();
 
-	// Reformat main game window and all banners. All currently playing sounds
-	// should be reset.
-	this->fFormatter->start_at_top(true);
-	this->fGameWin->do_formatting(false, true, false);
-	for (int i = 0; i < this->fBannerList.size(); ++i) {
-		this->fBannerList.at(i)->get_formatter()->start_at_top(true);
-		this->fBannerList.at(i)->do_formatting(false, true, false);
-	}
-
-	// Re-adjust all banners.
-	this->adjustBannerSizes();
+	// Reformat the window for the new blank page.
+	this->reformatBanners(false, false, true);
 }
 
 
@@ -876,7 +869,7 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 	}
 
 	// Add the banner and store it in our list.
-	castParent->addBanner(banner, where, castOther, pos, style);
+	castParent->addBanner(banner, window_type, where, castOther, pos, style);
 	this->fBannerList.append(banner);
 	return banner;
 }

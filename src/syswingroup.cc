@@ -22,6 +22,7 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 
+#include "syswininput.h"
 #include "syswinaboutbox.h"
 #include "confdialog.h"
 #include "settings.h"
@@ -31,10 +32,7 @@
 void
 CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
 {
-	if (qFrame->gameWindow() != 0) {
-		qFrame->adjustBannerSizes();
-		qFrame->reformatBanners();
-	}
+	qFrame->reformatBanners(true, true, false);
 }
 
 

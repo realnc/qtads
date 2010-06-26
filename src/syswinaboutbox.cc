@@ -43,7 +43,7 @@ CHtmlSysWinAboutBoxQt::sizeHint() const
 {
 	// Ensure that we're always large enough to show the whole contents of the
 	// "about" content.
-	return this->displayWidget()->size();
+	return this->dispWidget->size();
 }
 
 

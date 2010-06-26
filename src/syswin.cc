@@ -14,7 +14,6 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-
 #include <QBoxLayout>
 #include <QPainter>
 #include <QScrollBar>
@@ -32,8 +31,9 @@
 
 
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidget, QWidget* parent )
-  : QScrollArea(parent), CHtmlSysWin(formatter), fBannerStyleAutoVScroll(true), fDontReformat(0),
-	fParentBanner(0), fBgImage(0), margins(8, 2, 8, 2), bannerSize(0), bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
+  : QScrollArea(parent), CHtmlSysWin(formatter), fBannerStyleAutoVScroll(true), fBannerStyleGrid(false),
+	fDontReformat(0), fParentBanner(0), fBgImage(0), lastInputHeight(0), margins(8, 2, 8, 2), bannerSize(0),
+	bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
 {
 	if (dispWidget == 0) {
 		this->dispWidget = new DisplayWidget(this, formatter);
@@ -216,14 +216,31 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 		qFrame->scheduleReformat();
 	}
 
-	qFrame->gameWindow()->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+	//qFrame->gameWindow()->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 	--this->fDontReformat;
 }
 
 
 void
-CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other, HTML_BannerWin_Pos_t pos,
-						  unsigned long style )
+CHtmlSysWinQt::doReformat( int showStatus, int freezeDisplay, int resetSounds)
+{
+	// Forget any tracking links.
+	this->dispWidget->notifyClearContents();
+
+	// Restart the formatter.
+	this->formatter_->start_at_top(resetSounds);
+
+	// Make sure we redraw everything.
+	this->viewport()->update();
+
+	// Format the window contents.
+	this->do_formatting(showStatus, not freezeDisplay, freezeDisplay);
+}
+
+
+void
+CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int where,
+						  CHtmlSysWinQt* other, HTML_BannerWin_Pos_t pos, unsigned long style )
 {
 	Q_ASSERT(banner->fParentBanner == 0);
 
@@ -243,6 +260,7 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other
 		banner->fBannerStyleHScroll = true;
 	}
 
+	banner->fBannerStyleGrid = type & HTML_BANNERWIN_TEXTGRID;
 	banner->fParentBanner = this;
 	banner->fBannerPos = pos;
 	banner->fBannerWhere = where;
@@ -479,50 +497,81 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 		return false;
 	}
 
-	// Freeze the display, if requested.
+	// If desired, freeze display updating while we're working.
 	if (freeze_display) {
 		this->formatter_->freeze_display(true);
 	}
 
-	// Format all remaining lines.
-	while (this->formatter_->more_to_do()) {
-		this->formatter_->do_formatting();
-		this->dispWidget->resize(this->dispWidget->width(), this->formatter_->get_max_y_pos());
-		if (update_win) {
-			if (this->fBannerStyleAutoVScroll) {
-				this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+	// Redraw the window before we start, so that something happens immediately
+	// and the window doesn't look frozen.
+	if (update_win) {
+		this->viewport()->update();
+		qFrame->advanceEventLoop();
+	}
+
+	// Get the window area in document coordinates, so we'll know when we've
+	// formatted past the bottom of the current display area.  Note that we'll
+	// ignore the presence or absence of a horizontal scrollbar, since it could
+	// come or go while we're formatting; by assuming that it won't be there,
+	// we'll be maximally conservative about redrawing the whole area.
+	long winBottom = qMax(static_cast<unsigned long>(this->height()), this->formatter_->get_max_y_pos());
+
+	// We don't have enough formatting done yet to draw the window.
+	bool drawn = false;
+
+	// Reformat everything, drawing as soon as possible, if desired.
+	if (update_win) {
+		while (formatter_->more_to_do() and not drawn) {
+			// Format another line.
+			this->formatter_->do_formatting();
+
+			// If we have enough content to do so, redraw the window; we're not
+			// really done with the formatting yet, but at least we'll update
+			// the window as soon as we can, so the user isn't staring at a
+			// blank window longer than necessary.
+			if (this->formatter_->get_max_y_pos() >= winBottom) {
+				// If the formatter's updating is frozen, invalidate the window;
+				// the formatter won't have been invalidating it as it goes.
+				if (freeze_display) {
+					this->viewport()->update();
+				}
+
+				// Let the event loop redraw the window.
+				qFrame->advanceEventLoop();
+
+				// We've now drawn it.
+				drawn = true;
 			}
-			qFrame->advanceEventLoop();
 		}
 	}
 
-	// We make the view a bit higher (5 pixels) than required by the real
-	// document height so that we get a bit of extra space under the input
-	// prompt because it looks nicer.  This is only done if we're the main game
-	// window.
-	//
-	// FIXME: Disable it for now until we fix the "jumping text" problem.
-	/*
-	unsigned long height = this->formatter_->get_max_y_pos();
-	if (this == qFrame->gameWindow()) {
-		height += 5;
-	}
-	this->fDispWidget->resize(this->formatter_->get_outer_max_line_width(), height);
-	*/
-
-	if (this->fBannerStyleAutoVScroll) {
-		this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+	// After drawing, keep going until we've formatted everything.
+	while (this->formatter_->more_to_do()) {
+		this->formatter_->do_formatting();
 	}
 
-	if (update_win) {
-		this->dispWidget->update();
-	}
-
-	// Unfreeze the display if we froze it before.
+	// Unfreeze the display if we froze it.
 	if (freeze_display) {
 		this->formatter_->freeze_display(false);
 	}
-	return true;
+
+	if (this->fBannerStyleGrid) {
+		this->dispWidget->resize(this->viewport()->size());
+	} else {
+		this->dispWidget->resize(this->formatter_->get_outer_max_line_width(), this->formatter_->get_max_y_pos());
+	}
+
+	// If we didn't do any drawing, and we updated the window coming in,
+	// invalidate the window - the initial redraw will have validated
+	// everything, but we've just made it all invalid again and didn't get
+	// around to drawing it.  Do the same thing if we froze the display and we
+	// didn't do any updating.
+	if ((update_win and not drawn) or freeze_display) {
+		this->viewport()->update();
+	}
+
+	// Return an indication of whether we did any updating.
+	return drawn;
 }
 
 
@@ -605,7 +654,12 @@ CHtmlSysWinQt::fmt_adjust_hscroll()
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	if (this->formatter_->get_outer_max_line_width() > this->dispWidget->width()) {
+	if (this->fBannerStyleGrid) {
+		this->dispWidget->resize(this->viewport()->width(), this->dispWidget->height());
+		return;
+	}
+
+	if (this->formatter_->get_outer_max_line_width() != this->dispWidget->width()) {
 		this->dispWidget->resize(this->formatter_->get_outer_max_line_width(), this->dispWidget->height());
 	}
 }
@@ -616,9 +670,43 @@ CHtmlSysWinQt::fmt_adjust_vscroll()
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	if (this->formatter_->get_max_y_pos() > static_cast<unsigned long>(this->dispWidget->height())) {
-		this->dispWidget->resize(this->dispWidget->width(), this->formatter_->get_max_y_pos());
+	// Get the target height.
+	int targetHt = static_cast<int>(this->formatter_->get_max_y_pos());
+
+	if (targetHt == this->dispWidget->height()) {
+		// No change in height, so nothing to do.
+		return;
 	}
+
+	if (this->fBannerStyleGrid) {
+		this->dispWidget->resize(this->dispWidget->width(), this->viewport()->height());
+		return;
+	}
+
+	if (not this->fBannerStyleAutoVScroll) {
+		this->dispWidget->resize(this->dispWidget->width(), targetHt);
+		return;
+	}
+
+	/*
+	while (this->dispWidget->height() < targetHt) {
+		if (targetHt - this->lastInputHeight > this->viewport()->height()) {
+			this->dispWidget->resize(this->dispWidget->width(),
+									 this->dispWidget->height()
+									 + this->viewport()->height()
+									 - this->verticalScrollBar()->singleStep()
+									 - (targetHt - this->lastInputHeight));
+			this->lastInputHeight = this->dispWidget->height();
+			qFrame->gameWindow()->pagePause();
+		} else {
+			this->dispWidget->resize(this->dispWidget->width(), targetHt);
+		}
+	}
+	*/
+
+	this->dispWidget->resize(this->dispWidget->width(), targetHt);
+	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+	qFrame->advanceEventLoop();
 }
 
 
@@ -704,11 +792,7 @@ CHtmlSysWinQt::set_html_text_color( HTML_color_t color, int use_default )
 
 	if (use_default) {
 		QPalette p(this->palette());
-		if (this == qFrame->gameWindow()) {
-			p.setColor(QPalette::Text, qFrame->settings()->mainTextColor);
-		} else {
-			p.setColor(QPalette::Text, qFrame->settings()->bannerTextColor);
-		}
+		p.setColor(QPalette::Text, qFrame->settings()->mainTextColor);
 		this->setPalette(p);
 		return;
 	}
@@ -863,9 +947,7 @@ CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
 			this->fBgImage->remove_ref();
 			this->fBgImage = 0;
 		}
-		QPalette p(this->palette());
-		p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
-		this->setPalette(p);
+		this->set_html_bg_color(0, true);
 		return;
 	}
 

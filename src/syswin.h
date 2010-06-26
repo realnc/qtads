@@ -48,6 +48,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	bool fBannerStyleVScroll;
 	bool fBannerStyleAutoVScroll;
 	bool fBannerStyleHScroll;
+	bool fBannerStyleGrid;
 
 	// Do not attempt to reformat during a resize event.  This is set when in
 	// the process of creating a new banner.  If we reformat during that
@@ -67,7 +68,15 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	// Our banner background image.
 	class CHtmlResCacheObject* fBgImage;
 
-  protected:
+  protected:	
+	// The content height at the time of the last user input.  When the
+	// formatter is producing a long run of output, we pause between screens to
+	// make sure the user has had a chance to see all of the text before we
+	// scroll it away.  This member records the position of the last input, so
+	// we can be sure not to add more than another screenfull without getting
+	// more input.
+	int lastInputHeight;
+
 	// Margins.
 	CHtmlRect margins;
 
@@ -100,9 +109,13 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	void
 	calcChildBannerSizes( QRect& parentSize );
 
+	// Do a complete reformat.
 	void
-	addBanner( CHtmlSysWinQt* banner, int where, CHtmlSysWinQt* other, HTML_BannerWin_Pos_t pos,
-			   unsigned long style );
+	doReformat( int showStatus, int freezeDisplay, int resetSounds);
+
+	void
+	addBanner( CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int where, CHtmlSysWinQt* other,
+			   HTML_BannerWin_Pos_t pos, unsigned long style );
 
 	// Our parent banner, if there is one.
 	CHtmlSysWinQt*
