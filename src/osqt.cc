@@ -392,7 +392,7 @@ void
 os_cvt_url_dir( char* result_buf, size_t result_buf_size, const char* src_url, int end_sep )
 {
 	QString res(QString::fromLocal8Bit(src_url));
-	if (end_sep == TRUE and not res.endsWith("/")) {
+	if (end_sep == true and not res.endsWith("/")) {
 		res += '/';
 	}
 	strncpy(result_buf, res.toLocal8Bit(), result_buf_size);
@@ -683,7 +683,7 @@ os_settype( const char*, os_filetype_t )
 int
 os_paramfile( char* /*buf*/ )
 {
-	return FALSE;
+	return false;
 }
 
 
