@@ -19,6 +19,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 
+#include "settings.h"
 #include "sysframe.h"
 #include "qtadssound.h"
 #include "syssoundmidi.h"
@@ -53,7 +54,7 @@ int main( int argc, char** argv )
 		}
 	}
 
-	if (gameFileName.isEmpty()) {
+	if (gameFileName.isEmpty() and app->settings()->askForGameFile) {
 		gameFileName = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run", "",
 													"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
 	}
