@@ -83,6 +83,8 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
 	ui->inputFontItalicCheckBox->setChecked(sett->inputFont.italic());
 	ui->inputFontBoldCheckBox->setChecked(sett->inputFont.bold());
 
+	ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
+
 #ifdef Q_WS_MAC
 	// On Mac OS X, the dialog should not have any buttons, and settings
 	// changes should apply instantly.
@@ -163,6 +165,8 @@ ConfDialog::fMakeInstantApply()
 	connect(ui->linkUnvisitedColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
 	connect(ui->linkHoveringColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
 	connect(ui->linkClickedColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
+
+	connect(ui->askForGameFileCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 }
 
 
@@ -205,6 +209,8 @@ ConfDialog::fApplySettings()
 	sett->scriptFont.setPointSize(ui->scriptFontSizeSpinBox->value());
 	sett->writerFont.setPointSize(ui->writerFontSizeSpinBox->value());
 	sett->inputFont.setPointSize(ui->inputFontSizeSpinBox->value());
+
+	sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
 
 	// Notify the application that preferences have changed.
 	qFrame->notifyPreferencesChange(sett);

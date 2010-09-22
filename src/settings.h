@@ -53,6 +53,8 @@ class Settings {
 	CHtmlSysFontQt writerFont;
 	CHtmlSysFontQt inputFont;
 
+	bool askForGameFile;
+
 	QStringList recentGamesList;
 	static const int recentGamesCapacity = 10;
 

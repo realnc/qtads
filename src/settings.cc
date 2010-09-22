@@ -59,6 +59,10 @@ Settings::loadFromDisk()
 	this->inputFont.fromString(sett.value("input", "serif").toString());
 	sett.endGroup();
 
+	sett.beginGroup("misc");
+	this->askForGameFile = sett.value("askforfileatstart", false).toBool();
+	sett.endGroup();
+
 	sett.beginGroup("recent");
 	this->recentGamesList = sett.value("games", QStringList()).toStringList();
 	Q_ASSERT(this->recentGamesList.size() <= this->recentGamesCapacity);
@@ -109,6 +113,10 @@ Settings::saveToDisk()
 	sett.setValue("script", this->scriptFont.toString());
 	sett.setValue("typewriter", this->writerFont.toString());
 	sett.setValue("input", this->inputFont.toString());
+	sett.endGroup();
+
+	sett.beginGroup("misc");
+	sett.setValue("askforfileatstart", this->askForGameFile);
 	sett.endGroup();
 
 	sett.beginGroup("recent");
