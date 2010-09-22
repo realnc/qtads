@@ -64,7 +64,12 @@ class DisplayWidget: public QWidget {
 	// about it so we can perform link tracking invalidation.
 	void
 	notifyClearContents()
-	{ this->fInvalidateLinkTracking(); }
+	{
+		// When clearing contents, the display items are already gone. Set them
+		// Null so we won't try to access them.
+		this->fClickedLink = this->fHoverLink = 0;
+		this->fInvalidateLinkTracking();
+	}
 
 	// Update link tracking for specified mouse position.  If the specified
 	// position isNull(), it will be autodetected.
