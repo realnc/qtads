@@ -133,7 +133,14 @@ DisplayWidget::updateLinkTracking( const QPoint& mousePos )
 {
 	// Get the display object containing the position.
 	CHtmlPoint docPos;
-	docPos.set(mousePos.x(), mousePos.y());
+	// If specified mouse position is invalid, map it from the current global
+	// position.
+	if (mousePos.isNull()) {
+		const QPoint pos(this->mapFromGlobal(QCursor::pos()));
+		docPos.set(pos.x(), pos.y());
+	} else {
+		docPos.set(mousePos.x(), mousePos.y());
+	}
 	CHtmlDisp* disp = this->formatter->find_by_pos(docPos, true);
 
 	// If there's nothing, no need to continue.
