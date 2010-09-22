@@ -53,9 +53,9 @@ DisplayWidget::fInvalidateLinkTracking()
 			this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
 			this->fHoverLink = 0;
 		}
-		this->unsetCursor();
-		qWinGroup->statusBar()->clearMessage();
 	}
+	this->unsetCursor();
+	qWinGroup->statusBar()->clearMessage();
 }
 
 
