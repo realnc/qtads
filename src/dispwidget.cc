@@ -74,74 +74,7 @@ DisplayWidget::paintEvent( QPaintEvent* e )
 void
 DisplayWidget::mouseMoveEvent( QMouseEvent* e )
 {
-	// Get the display object containing the position.
-	CHtmlPoint pos;
-	pos.set(e->pos().x(), e->pos().y());
-	CHtmlDisp* disp = this->formatter->find_by_pos(pos, true);
-
-	// If there's nothing, no need to continue.
-	if (disp == 0) {
-		// If we were tracking anything, forget about it.
-		if (this->fHoverLink != 0) {
-			this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
-			this->fHoverLink = 0;
-			this->unsetCursor();
-			qWinGroup->statusBar()->clearMessage();
-		}
-		return;
-	}
-
-	// It could be a link.
-	if (qFrame->settings()->enableLinks) {
-		CHtmlDispLink* link = disp->get_link(this->formatter, pos.x, pos.y);
-
-		// If we're already tracking a hover over this link, we don't need to
-		// do anything else.
-		if (link == this->fHoverLink) {
-			return;
-		}
-
-		// If we're tracking a hover and it's a new link, track this one and
-		// forget about the previous one.
-		if (link != this->fHoverLink) {
-			if (this->fHoverLink != 0) {
-				this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
-			}
-			this->fHoverLink = link;
-		}
-
-		// If it's a clickable link, also change the mouse cursor shape and
-		// hovering color.
-		if (link != 0 and link->is_clickable_link()) {
-			this->setCursor(Qt::PointingHandCursor);
-			// Only change its color if we're not click-tracking another link.
-			if (qFrame->settings()->highlightLinks and this->fClickedLink == 0) {
-				link->set_clicked(this->parentSysWin, CHtmlDispLink_hover);
-			}
-		}
-
-		// If we found something that has ALT text, show it in the status bar.
-		if (disp->get_alt_text() != 0 and strlen(disp->get_alt_text()) > 0) {
-			qWinGroup->statusBar()->showMessage(disp->get_alt_text());
-			return;
-		}
-
-		// It could be a clickable link without any ALT text.  In that case, show
-		// its contents.
-		if (link != 0 and link->is_clickable_link()) {
-			qWinGroup->statusBar()->showMessage(link->href_.get_url());
-			return;
-		}
-	}
-
-	// We don't know what it was.  Clear status bar message, reset cursor shape
-	// and forget about any link we were tracking.
-	qWinGroup->statusBar()->clearMessage();
-	this->unsetCursor();
-	if (this->fHoverLink != 0) {
-		this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
-		this->fHoverLink = 0;
-	}
+	this->updateLinkTracking(e->pos());
 }
 
 
@@ -192,4 +125,78 @@ DisplayWidget::mouseReleaseEvent( QMouseEvent* e )
 	}
 	// Stop click-tracking it.
 	this->fClickedLink = 0;
+}
+
+
+void
+DisplayWidget::updateLinkTracking( const QPoint& mousePos )
+{
+	// Get the display object containing the position.
+	CHtmlPoint docPos;
+	docPos.set(mousePos.x(), mousePos.y());
+	CHtmlDisp* disp = this->formatter->find_by_pos(docPos, true);
+
+	// If there's nothing, no need to continue.
+	if (disp == 0) {
+		// If we were tracking anything, forget about it.
+		if (this->fHoverLink != 0) {
+			this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+			this->fHoverLink = 0;
+			this->unsetCursor();
+			qWinGroup->statusBar()->clearMessage();
+		}
+		return;
+	}
+
+	// It could be a link.
+	if (qFrame->settings()->enableLinks) {
+		CHtmlDispLink* link = disp->get_link(this->formatter, docPos.x, docPos.y);
+
+		// If we're already tracking a hover over this link, we don't need to
+		// do anything else.
+		if (link == this->fHoverLink) {
+			return;
+		}
+
+		// If we're tracking a hover and it's a new link, track this one and
+		// forget about the previous one.
+		if (link != this->fHoverLink) {
+			if (this->fHoverLink != 0) {
+				this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+			}
+			this->fHoverLink = link;
+		}
+
+		// If it's a clickable link, also change the mouse cursor shape and
+		// hovering color.
+		if (link != 0 and link->is_clickable_link()) {
+			this->setCursor(Qt::PointingHandCursor);
+			// Only change its color if we're not click-tracking another link.
+			if (qFrame->settings()->highlightLinks and this->fClickedLink == 0) {
+				link->set_clicked(this->parentSysWin, CHtmlDispLink_hover);
+			}
+		}
+
+		// If we found something that has ALT text, show it in the status bar.
+		if (disp->get_alt_text() != 0 and strlen(disp->get_alt_text()) > 0) {
+			qWinGroup->statusBar()->showMessage(disp->get_alt_text());
+			return;
+		}
+
+		// It could be a clickable link without any ALT text.  In that case, show
+		// its contents.
+		if (link != 0 and link->is_clickable_link()) {
+			qWinGroup->statusBar()->showMessage(link->href_.get_url());
+			return;
+		}
+	}
+
+	// We don't know what it was.  Clear status bar message, reset cursor shape
+	// and forget about any link we were tracking.
+	qWinGroup->statusBar()->clearMessage();
+	this->unsetCursor();
+	if (this->fHoverLink != 0) {
+		this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+		this->fHoverLink = 0;
+	}
 }

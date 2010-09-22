@@ -65,6 +65,10 @@ class DisplayWidget: public QWidget {
 	void
 	notifyClearContents()
 	{ this->fInvalidateLinkTracking(); }
+
+	// Update link tracking for specified mouse position.
+	void
+	updateLinkTracking( const QPoint& pos );
 };
 
 
