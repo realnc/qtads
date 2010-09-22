@@ -38,7 +38,6 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 								  const char* orgName, const char* orgDomain )
 : QApplication(argc, argv), fGameWin(0), fGameRunning(false), fReformatPending(false)
 {
-
 	//qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(qFrame == 0);
 
@@ -572,6 +571,11 @@ void CHtmlSysFrameQt::pruneParseTree()
 void
 CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
 {
+	// Bail out if we currently don't have an active formatter.
+	if (this->fFormatter == 0) {
+		return;
+	}
+
 	// If digital sounds are now turned off, cancel sound playback in the
 	// effects layers
 	if (not sett->enableDigitalSound) {
