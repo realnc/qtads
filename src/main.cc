@@ -56,9 +56,6 @@ int main( int argc, char** argv )
 	if (gameFileName.isEmpty()) {
 		gameFileName = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run", "",
 													"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
-		if (gameFileName.isNull()) {
-			return 0;
-		}
 	}
 
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
