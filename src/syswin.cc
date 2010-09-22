@@ -243,9 +243,6 @@ CHtmlSysWinQt::doReformat( int showStatus, int freezeDisplay, int resetSounds)
 
 	// Format the window contents.
 	this->do_formatting(showStatus, not freezeDisplay, freezeDisplay);
-
-	// Make sure we don't lose any link we were previously tracking.
-	this->dispWidget->updateLinkTracking(QPoint());
 }
 
 
@@ -744,6 +741,9 @@ CHtmlSysWinQt::advise_clearing_disp_list()
 {
 	//qDebug() << Q_FUNC_INFO;
 	this->dispWidget->notifyClearContents();
+
+	// Make sure we don't lose any link we were previously tracking.
+	this->dispWidget->updateLinkTracking(QPoint());
 }
 
 
