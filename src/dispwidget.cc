@@ -44,15 +44,13 @@ void
 DisplayWidget::fInvalidateLinkTracking()
 {
 	// If we're tracking links (hover/click), forget about them.
-	if (this->fHoverLink != 0 or this->fClickedLink != 0) {
-		if (this->fClickedLink != 0) {
-			this->fClickedLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
-			this->fClickedLink = 0;
-		}
-		if (this->fHoverLink != 0) {
-			this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
-			this->fHoverLink = 0;
-		}
+	if (this->fClickedLink != 0) {
+		this->fClickedLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+		this->fClickedLink = 0;
+	}
+	if (this->fHoverLink != 0) {
+		this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
+		this->fHoverLink = 0;
 	}
 	this->unsetCursor();
 	qWinGroup->statusBar()->clearMessage();
