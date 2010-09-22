@@ -102,7 +102,13 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 	// If we're waiting for a single key-press event and the command isn't some
 	// sort of special OS_CMD command, it's an HREF event.
 	if (this->fInputMode == SingleKeyInput and os_cmd_id == OS_CMD_NONE) {
-		this->fHrefEvent = QString::fromUtf8(cmd);
+		// If the HREF string is empty, use a single space so that we know that
+		// an HREF event actually occured.
+		if (cmd[0] == '\0') {
+			this->fHrefEvent = " ";
+		} else {
+			this->fHrefEvent = QString::fromUtf8(cmd);
+		}
 		return;
 	}
 
