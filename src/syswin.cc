@@ -92,6 +92,14 @@ CHtmlSysWinQt::keyPressEvent( QKeyEvent* event )
 
 
 void
+CHtmlSysWinQt::scrollContentsBy(int dx, int dy)
+{
+	QScrollArea::scrollContentsBy(dx, dy);
+	this->dispWidget->updateLinkTracking(QPoint());
+}
+
+
+void
 CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 {
 	//qDebug() << Q_FUNC_INFO;
