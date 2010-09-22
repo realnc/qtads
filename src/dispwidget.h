@@ -66,7 +66,10 @@ class DisplayWidget: public QWidget {
 	notifyClearContents()
 	{ this->fInvalidateLinkTracking(); }
 
-	// Update link tracking for specified mouse position.
+	// Update link tracking for specified mouse position.  If the specified
+	// position isNull(), it will be autodetected.
+	//
+	// TODO: What happens with multi-pointer systems?
 	void
 	updateLinkTracking( const QPoint& pos );
 };
