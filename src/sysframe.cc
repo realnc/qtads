@@ -108,14 +108,26 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 	while (not this->fOrhpanBannerList.isEmpty()) {
 		os_banner_delete(this->fOrhpanBannerList.takeLast());
 	}
-	delete this->fGameWin;
+	if (this->fGameWin != 0) {
+		delete this->fGameWin;
+	}
 
 	// Release the parser and delete our parser, buffers and formatter.
-	this->fFormatter->release_parser();
-	delete this->fParser;
-	delete[] this->fInputBuffer;
-	delete this->fTadsBuffer;
-	delete this->fFormatter;
+	if (this->fFormatter != 0) {
+		this->fFormatter->release_parser();
+	}
+	if (this->fParser != 0) {
+		delete this->fParser;
+	}
+	if (this->fInputBuffer != 0) {
+		delete[] this->fInputBuffer;
+	}
+	if (this->fTadsBuffer != 0) {
+		delete this->fTadsBuffer;
+	}
+	if (this->fFormatter != 0) {
+		delete this->fFormatter;
+	}
 
 	// Delete cached fonts.
 	while (not this->fFontList.isEmpty()) {
