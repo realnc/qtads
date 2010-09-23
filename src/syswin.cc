@@ -578,6 +578,9 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 		this->viewport()->update();
 	}
 
+	// Make sure we don't lose any link we were previously tracking.
+	this->dispWidget->updateLinkTracking(QPoint());
+
 	// Return an indication of whether we did any updating.
 	return drawn;
 }
@@ -741,9 +744,6 @@ CHtmlSysWinQt::advise_clearing_disp_list()
 {
 	//qDebug() << Q_FUNC_INFO;
 	this->dispWidget->notifyClearContents();
-
-	// Make sure we don't lose any link we were previously tracking.
-	this->dispWidget->updateLinkTracking(QPoint());
 }
 
 
