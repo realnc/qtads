@@ -16,7 +16,7 @@ macx {
 # LIBS += -lmikmod -lsmpeg -lvorbisfile -lvorbis -logg -ldxguid -lpthread
 
 #CONFIG += debug
-CONFIG += release
+#CONFIG += release
 
 # We use warn_off to allow only default warnings, not to supress them all.
 QMAKE_CXXFLAGS_WARN_OFF =
