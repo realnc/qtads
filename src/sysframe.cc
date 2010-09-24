@@ -226,6 +226,7 @@ CHtmlSysFrameQt::fRunGame()
 				this->fSettings->recentGamesList.prepend(finfo.absoluteFilePath());
 			}
 			this->fMainWin->updateRecentGames();
+			this->fSettings->saveToDisk();
 
 			// Run the appropriate VM.
 			this->fGameRunning = true;
