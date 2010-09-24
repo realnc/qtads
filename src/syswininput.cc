@@ -17,6 +17,7 @@
 
 #include <QKeyEvent>
 #include <QScrollBar>
+#include <QTimer>
 #include <QTime>
 #include <QDesktopServices>
 #include <QClipboard>
@@ -134,6 +135,7 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 	if (enter) {
 		this->fInputReady = true;
 		this->fInputMode = NoInput;
+		emit inputReady();
 	}
 }
 
@@ -181,6 +183,7 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 		this->fInputReady = true;
 		this->fInputMode = NoInput;
 		this->fTadsBuffer->add_hist();
+		emit inputReady();
 		return;
 	} else if (e->matches(QKeySequence::Delete)) {
 		this->fTadsBuffer->del_right();
@@ -294,6 +297,7 @@ CHtmlSysWinInputQt::singleKeyPressEvent( QKeyEvent* event )
 
 	this->fInputMode = NoInput;
 	this->fInputReady = true;
+	emit inputReady();
 }
 
 
@@ -397,12 +401,14 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 	// everything up to here.
 	this->lastInputHeight = this->formatter_->get_max_y_pos();
 	if (useTimeout) {
-		QTime t;
-		t.start();
-		while (static_cast<unsigned long>(t.elapsed()) < timeout and qFrame->gameRunning()
-			   and not this->fInputReady) {
-			qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents, timeout - t.elapsed());
-		}
+		QEventLoop idleLoop;
+		QTimer timer;
+		timer.setSingleShot(true);
+		connect(&timer, SIGNAL(timeout()), &idleLoop, SLOT(quit()));
+		connect(qFrame, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
+		connect(this, SIGNAL(inputReady()), &idleLoop, SLOT(quit()));
+		timer.start(timeout);
+		idleLoop.exec();
 	} else while (not this->fInputReady and this->fHrefEvent.isEmpty() and qFrame->gameRunning()) {
 		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 	}

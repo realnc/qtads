@@ -93,6 +93,10 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	void
 	pagePauseKeyPressEvent( QKeyEvent* e );
 
+  signals:
+	// Emitted when an input operation has finished successfully.
+	void inputReady();
+
   public:
 	CHtmlSysWinInputQt( class CHtmlFormatter* formatter, QWidget* parent );
 
