@@ -51,13 +51,6 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	// We have a finished user input.
 	bool fInputReady;
 
-	// We are accepting input.
-	//bool fAcceptInput;
-
-	// If we're accepting input, should we get a whole line, or a single
-	// keypress.
-	//bool fSingleKeyInput;
-
 	// In single keypress input mode, these store the last pressed key.  Only
 	// one of fLastKeyEvent and fLastKeyText can be valid.
 	//
