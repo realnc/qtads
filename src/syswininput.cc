@@ -368,30 +368,9 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer, unsigned long timeout, 
 	} else while (qFrame->gameRunning() and not this->fInputReady) {
 		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 	}
-	tadsBuffer->hide_caret();
-	this->fCastDispWidget->setCursorVisible(false);
-	formatter->end_input();
 
-	// Add the line-break after the command.
-	if (qFrame->get_parser()->get_obey_markups()) {
-		// we're in parsed mode, so write our sequence as HTML
-		qFrame->display_output("<br>", 4);
-	} else {
-		// we're in literal mode, so write out a literal newline
-		qFrame->display_output("\n", 1);
-	}
-
-	// Tell the formatter to add an extra line's worth of spacing, to ensure
-	// that we have some immediate visual feedback (in the form of scrolling
-	// the window up a line) when the user presses the Enter key.
-	this->formatter_->add_line_to_disp_height();
-
-	// Flush the newline, and update the window immediately, in case the
-	// operation takes a while to complete.
-	qFrame->flush_txtbuf(true, true);
-
-	// Done with the tag.
-	this->fTag = 0;
+	// We're finished with input.
+	this->cancelInput(true);
 
 	if (not qFrame->gameRunning()) {
 		return false;
