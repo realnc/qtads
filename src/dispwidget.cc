@@ -184,14 +184,14 @@ DisplayWidget::updateLinkTracking( const QPoint& mousePos )
 
 		// If we found something that has ALT text, show it in the status bar.
 		if (disp->get_alt_text() != 0 and strlen(disp->get_alt_text()) > 0) {
-			qWinGroup->statusBar()->showMessage(disp->get_alt_text());
+			qWinGroup->statusBar()->showMessage(QString::fromUtf8(disp->get_alt_text()));
 			return;
 		}
 
 		// It could be a clickable link without any ALT text.  In that case, show
 		// its contents.
 		if (link != 0 and link->is_clickable_link()) {
-			qWinGroup->statusBar()->showMessage(link->href_.get_url());
+			qWinGroup->statusBar()->showMessage(QString::fromUtf8(link->href_.get_url()));
 			return;
 		}
 	}
