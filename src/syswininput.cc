@@ -34,7 +34,8 @@
 
 
 CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* parent )
-: CHtmlSysWinQt(formatter, 0, parent), fInputMode(NoInput), fInputReady(false), fLastKeyEvent(Qt::Key_Any)
+: CHtmlSysWinQt(formatter, 0, parent), fInputMode(NoInput), fInputReady(false), fRestoreFromCancel(false),
+  fLastKeyEvent(Qt::Key_Any), fTag(0), fTadsBuffer(0)
 {
 	this->dispWidget = new DisplayWidgetInput(this, formatter);
 	this->fCastDispWidget = static_cast<DisplayWidgetInput*>(this->dispWidget);
@@ -44,18 +45,6 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
 	p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
 	p.setColor(QPalette::Text, qFrame->settings()->mainTextColor);
 	this->setPalette(p);
-}
-
-
-void
-CHtmlSysWinInputQt::fStartLineInput( CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput* tag )
-{
-	this->fInputReady = false;
-	this->fInputMode = NormalInput;
-	this->fTag = tag;
-	this->fTadsBuffer = tadsBuffer;
-	tadsBuffer->setbuf(tadsBuffer->getbuf(), 1000, 0);
-	tadsBuffer->set_sel_range(0, 0, 0);
 }
 
 
@@ -311,30 +300,72 @@ CHtmlSysWinInputQt::pagePauseKeyPressEvent( QKeyEvent* e )
 
 
 bool
-CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
+CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer, unsigned long timeout, bool useTimeout, bool* timedOut )
 {
 	//qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(tadsBuffer != 0);
 
 	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 	CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(this->formatter_);
+	CHtmlTagTextInput* tag;
+
+	bool resuming = this->fTag != 0;
+
+	// Correct any ill-formed HTML prior to input.
 	formatter->prepare_for_input();
-	while (formatter->more_to_do()) {
-		formatter->do_formatting();
+
+	if (resuming) {
+		// We're resuming; set up our existing input tag with the new buffer.
+		tag = this->fTag;
+		tag->change_buf(formatter, tadsBuffer->getbuf());
+		this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
+		// We treat canceled inputs with reset=false as if they were resumes.
+		// The difference is that in that case, we need to restore the cursor.
+		if (this->fRestoreFromCancel) {
+			this->fCastDispWidget->setCursorVisible(true);
+			this->fCastDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
+			this->fRestoreFromCancel = false;
+		}
+	} else {
+		// Since we're not resuming, make sure we've formatted all available
+		// input and tell the formatter to begin a new input.
+		while (formatter->more_to_do()) {
+			formatter->do_formatting();
+		}
+		tag = formatter->begin_input(tadsBuffer->getbuf(), 0);
+		this->fTag = tag;
+		if (tag->ready_to_format()) {
+			tag->format(this, this->formatter_);
+		}
+		tadsBuffer->show_caret();
+		this->fCastDispWidget->setCursorVisible(true);
+		this->fCastDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
+		tadsBuffer->setbuf(tadsBuffer->getbuf(), 1000, 0);
+		tadsBuffer->set_sel_range(0, 0, 0);
 	}
 
-	CHtmlTagTextInput* tag = formatter->begin_input(tadsBuffer->getbuf(), 0);
-	if (tag->ready_to_format()) {
-		tag->format(this, this->formatter_);
-	}
-	tadsBuffer->show_caret();
-	this->fCastDispWidget->setCursorVisible(true);
-	this->fCastDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
-	this->fStartLineInput(tadsBuffer, tag);
+	this->fInputReady = false;
+	this->fInputMode = NormalInput;
+	this->fTadsBuffer = tadsBuffer;
+
 	// Reset the MORE prompt position to this point, since the user has seen
 	// everything up to here.
 	this->lastInputHeight = this->formatter_->get_max_y_pos();
-	while (qFrame->gameRunning() and not this->fInputReady) {
+
+	if (useTimeout) {
+		QEventLoop idleLoop;
+		QTimer timer;
+		timer.setSingleShot(true);
+		connect(&timer, SIGNAL(timeout()), &idleLoop, SLOT(quit()));
+		connect(qFrame, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
+		connect(this, SIGNAL(inputReady()), &idleLoop, SLOT(quit()));
+		timer.start(timeout);
+		idleLoop.exec();
+		if (timedOut != 0 and not this->fInputReady and qFrame->gameRunning()) {
+			*timedOut = true;
+			return true;
+		}
+	} else while (qFrame->gameRunning() and not this->fInputReady) {
 		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 	}
 	tadsBuffer->hide_caret();
@@ -359,10 +390,53 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer )
 	// operation takes a while to complete.
 	qFrame->flush_txtbuf(true, true);
 
+	// Done with the tag.
+	this->fTag = 0;
+
 	if (not qFrame->gameRunning()) {
 		return false;
 	}
 	return true;
+}
+
+
+void
+CHtmlSysWinInputQt::cancelInput( bool reset )
+{
+	if (this->fTag == 0) {
+		// There's nothing to cancel.
+		return;
+	}
+
+	this->fTadsBuffer->hide_caret();
+	this->fCastDispWidget->setCursorVisible(false);
+	static_cast<CHtmlFormatterInput*>(this->formatter_)->end_input();
+
+	// Add the line-break after the command.
+	if (qFrame->get_parser()->get_obey_markups()) {
+		// we're in parsed mode, so write our sequence as HTML
+		qFrame->display_output("<br>", 4);
+	} else {
+		// we're in literal mode, so write out a literal newline
+		qFrame->display_output("\n", 1);
+	}
+
+	// Tell the formatter to add an extra line's worth of spacing, to ensure
+	// that we have some immediate visual feedback (in the form of scrolling
+	// the window up a line) when the user presses the Enter key.
+	this->formatter_->add_line_to_disp_height();
+
+	// Flush the newline, and update the window immediately, in case the
+	// operation takes a while to complete.
+	qFrame->flush_txtbuf(true, true);
+
+	// Done with the tag.
+	if (reset) {
+		this->fTag = 0;
+		this->fRestoreFromCancel = false;
+	} else {
+		this->fRestoreFromCancel = true;
+	}
 }
 
 

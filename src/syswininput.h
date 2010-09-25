@@ -51,6 +51,11 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	// We have a finished user input.
 	bool fInputReady;
 
+	// cancelInput(false) was called, meaning that next time getInput() is
+	// called, we'll need to provide the same input contents from the previous
+	// session, even though we're not actually resuming.
+	bool fRestoreFromCancel;
+
 	// In single keypress input mode, these store the last pressed key.  Only
 	// one of fLastKeyEvent and fLastKeyText can be valid.
 	//
@@ -73,9 +78,6 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 
 	// The externally managed input buffer.
 	class CHtmlInputBuf* fTadsBuffer;
-
-	void
-	fStartLineInput( class CHtmlInputBuf* tadsBuffer, class CHtmlTagTextInput* tag );
 
 	void
 	fStartKeypressInput();
@@ -113,7 +115,12 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 
 	// Read a line of input.
 	bool
-	getInput( class CHtmlInputBuf* tadsBuffer );
+	getInput( class CHtmlInputBuf* tadsBuffer, unsigned long timeout = 0, bool useTimeout = false,
+			  bool* timedOut = 0 );
+
+	// Cancel an interrupted input.  See CHtmlSysFrame::get_input_cancel().
+	void
+	cancelInput( bool reset );
 
 	// Uses os_getc_raw() semantics, but with a timeout.
 	//

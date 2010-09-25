@@ -711,10 +711,24 @@ CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned lon
 	//qDebug() << Q_FUNC_INFO;
 
 	if (use_timeout) {
-		return OS_EVT_NOTIMEOUT;
-	}
+		// Flush and prune before input.
+		this->flush_txtbuf(true, false);
+		this->pruneParseTree();
 
-	this->get_input(buf, buflen);
+		bool timedOut = false;
+		this->fGameWin->getInput(this->fTadsBuffer, timeout, true, &timedOut);
+
+		// If input exceeds the buffer size, make sure we don't overflow.
+		int len = this->fTadsBuffer->getlen() > buflen ? buflen : this->fTadsBuffer->getlen();
+		strncpy(buf, this->fTadsBuffer->getbuf(), len);
+		buf[len] = '\0';
+
+		if (timedOut) {
+			return OS_EVT_TIMEOUT;
+		}
+	} else {
+		this->get_input(buf, buflen);
+	}
 
 	// Return EOF if we're quitting the game.
 	if (not this->fGameRunning) {
@@ -728,6 +742,7 @@ void
 CHtmlSysFrameQt::get_input_cancel( int reset )
 {
 	//qDebug() << Q_FUNC_INFO;
+	this->fGameWin->cancelInput(reset);
 }
 
 
