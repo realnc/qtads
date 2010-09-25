@@ -305,7 +305,6 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer, unsigned long timeout, 
 	//qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(tadsBuffer != 0);
 
-	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 	CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(this->formatter_);
 	CHtmlTagTextInput* tag;
 
