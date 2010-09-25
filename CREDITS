@@ -1,29 +1,32 @@
 All entries are listed alphabetically by first name.
 
-The very first versions of QTads were private releases to beta-testers
-(by email and non-public URLs):
+Thanks fly out to:
 
   Adrien Beau
+  Andrew Plotkin
+  Alan Mead
+  Beni Serfaty
+  Chris Odhner
+  Christophe Antoine
+  Curt Siffert
+  Daniel Schepler
+  Eric Forgeot
+  Erik Temple
   Guilherme De Sousa
+  Jim Aikin
   Joe Mason
   Kodath duMatri
   Kris Kennaway
-  Ming Hua
-
-Thanks to all of you!  I hope you have forgiven me the ugliness and
-instability of QTads alpha 1.
-
-Thanks fly out to:
-
-  Alan Mead
-  Beni Serfaty
-  Christophe Antoine
-  Curt Siffert
   Leif Huhn
+  Ming Hua
+  Nicolas Lécureuil
   Ornithopter
   Petter Sjölund
+  Poster
+  Rune Berg
   Samuel Verschelde
   Stefan Müller
+  Thom Brown
   Tony Houlbrooke
   Xenius
 
@@ -31,4 +34,4 @@ for the ideas, source code and bug reports.
 
 And of course, Mike Roberts; if there would be no Mike, there would be
 no Tads!  (In case you don't already know, the very core of QTads,
-namely the portable reference implementation, is written by Mike.)
+namely the portable reference implementation, is written by Mike Roberts.)

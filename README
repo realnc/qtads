@@ -29,19 +29,8 @@ the distribution include:
     NEWS
       Contains the list of changes between QTads versions.
 
-    PORTABILITY
-      A list of systems and compilers where QTads is known to run
-      (few), and also those where it is supposed to run (many).
-
     SOURCE_README
       If you want to contribute code, read this.
-
-    TIPS
-      Contains some useful information.  Make sure to check it out.
-
-    TODO
-      Features/enhancements that are planned to be added.  Help is more
-      than welcome.
 
     qtads.6.gz
       Manual page (compressed with GNU Zip).  This won't actually get
@@ -88,8 +77,8 @@ On what systems does it run?
 ============================
 
 Theoretically, it should run on *any* system for which a Qt-port exists
-(many Unices, including Linux and Mac OSX, Windows, even embedded devices like
-cell phones and PDAs).
+(many Unices, including Linux and Mac OSX, Windows, Haiku, even embedded
+devices like cell phones and PDAs).
 
 
 What's Interactive Fiction?
@@ -98,65 +87,12 @@ What's Interactive Fiction?
 Well, this is just a poor README file and therefore not the appropriate
 place for an introduction to Interactive Fiction.  For more information
 about Interactive Fiction (or "IF" for short), just go to the Tads page
-(see above) and follow some links.  Or go to the Google search engine
-(http://www.google.com) and search for "interactive fiction"; you'll be
-amazed about how many results you'll get.  And you'll be even more
-amazed about how active the IF community is.
+(see above) and follow some links.  Or search for "interactive fiction"
+in Google; you'll be amazed about how many results you'll get.  And
+you'll be even more amazed about how active the IF community is.
 
-There are two Usenet newsgroups for IF related things.  The first is
-RGIF, which is short for:
-
-    rec.games.int-fiction
-
-where people are talking about IF games in general; things they like in
-games, things they don't like, things they hope to see in future games,
-requests for hints and solutions, reviews of games, announcements of
-new games/software or happenings, flames (mostly funny ones; keep
-this in mind when you "flame" ;-).  Stuff like that.
-
-The other newsgroup is RAIF, which stands for:
-
-    rec.arts.int-fiction
-
-This newsgroup is for everyone who is interested in creating games.
-Most IF authors use to hang around there, so this newsgroup is an
-excellent place to post questions about IF theory, authorship and
-programming.
-
-
-Where do I find games for QTads?
-================================
-
-As I said above, the IF community is a very active one.  New games are
-released all the time.  There's a large repository for IF-related stuff
-(with *lots* of games!) called "The Interactive Fiction Archive".  You
-can access it by HTTP:
-
-    http://www.ifarchive.org (very slow)
-
-or by FTP:
-
-    ftp://ftp.ifarchive.org (also very slow)
-
-The archive has mirrors that are usually much, much faster, like:
-
-    http://mirror.ifarchive.org (faster than light)
-
-Which, at the time of this writing, is the fastest of all.  Please use
-the mirrors instead of the main archive!  You'll save yourself (and
-others) quite a few headaches.  (The full list of mirrors is displayed
-in the main archive's title-page.)
-
-Since the archive is actually just a (huge) bunch of data thrown
-together (more or less), a nice fellow has created a site that will
-guide you through the archive.  The site is called "Baf's Guide to the
-IF Archive" and is located at:
-
-    http://wurb.com/if
-
-It contains many cool things, like a "Genre Map" for the games
-located in the archive along with descriptions, reviews and ratings, as
-well as many useful links.
+At qtads.sourceforge.net you can find further information about online
+places where the community gathers and where to find games.
 
 
 I don't like QTads.  It sucks.
@@ -165,45 +101,6 @@ I don't like QTads.  It sucks.
 Then help me improve it.  Send me suggestions and bug reports, or even
 code if you know C++ and Qt.  Now!  Don't be afraid to do it.  Thank
 you.
-
-
-OK, I'll send some code.  How do I do this?
-===========================================
-
-If you decide to send me code, please read the SOURCE_README file first
-(not needed for small amounts of code).  Also, drop me a mail to inform
-me on what you're working on (this is to ensure that we won't be trying
-to solve the same problem or add the same feature).
-
-Files should be compressed with bzip2 or gzip (or even zip or rar)
-using the highest compression level and sent to my email address at
-SourceForge:
-
-	realnc@gmail.com
-
-You can send whole files or simply diffs created with (guess) the
-`diff' utility.  I also accept diffs created with `xdelta'.  With
-`diff', use either the -c or -u option, *not* the default (-e) to
-generate the patches.  Here's an example, where "qtads-1.7" is the
-directory containing the original 1.7 sources, and "qtads-modified" the
-directory with your modified sources:
-
-  diff -Naur qtads-1.7 qtads-modified > patch
-  bzip2 patch
-
-This will create a file "patch.bz2" containing your modifications.  The
-general format of the `diff' command is:
-
-  diff -Naur ORIGINAL_DIRECTORY MODIFIED_DIRECTORY > PATCH_FILENAME
-
-Do not include a slash ("/") when specifying the directories.
-
-If your code is good (which means: if it doesn't suck the way my own
-does ;-), I'll include it in the next version.  Note that your code
-will be placed under the GPL and you will maintain your copyright.  Since
-QTads is a simple interpreter for Tads games and not a nuclear war
-simulator, I'm not requesting signed forms from your boss/school/etc.
-Just send the damn code, will ya? ;-)
 
 
 Copyright

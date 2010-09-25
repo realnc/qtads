@@ -2,16 +2,11 @@
 ================
 
 QTads 2 is a new major version, bringing multimedia capabilities (HTML Tads)
-and is based on Qt version 4 (4.6.2 was used during development).  Lots of
-stuff had to go during the rewrite of major parts of the code, so it looks
-pretty bare-bone right now.  This was necessary in order to decrease the
-initial porting effort and to release something that works in a reasonable
-time frame.  I'm hoping to bring everything back bit by bit as development
-progresses.
-
-Note that the "2.0" version is following "1.9" just by coincidence; it is
-possible that further updates will be released in the 1.x series (like 1.10)
-fixing issues for people who still prefer a text-only GUI interpreter.
+and is based on Qt version 4 (4.4 and newer).  Some stuff had to go during
+the rewrite of major parts of the code.  This was necessary in order to
+decrease the initial porting effort and to release something that works
+within a reasonable time frame.  I'm hoping to bring everything back bit by
+bit as development progresses.
 
 
 1.9 - 2009/06/24
