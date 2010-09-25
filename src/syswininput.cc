@@ -226,9 +226,9 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 	this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
 	if (this->fTag->ready_to_format()) {
 		this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
+		this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 	}
 	this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
-	//static_cast<CHtmlSysWinQt*>(this->widget())->do_formatting(false, true, false);
 }
 
 
