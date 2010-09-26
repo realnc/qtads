@@ -362,6 +362,7 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer, unsigned long timeout, 
 		idleLoop.exec();
 		if (timedOut != 0 and not this->fInputReady and qFrame->gameRunning()) {
 			*timedOut = true;
+			this->fInputMode = NoInput;
 			return true;
 		}
 	} else while (qFrame->gameRunning() and not this->fInputReady) {
