@@ -400,20 +400,39 @@ void
 CHtmlSysWinQt::draw_text_space( int hilite, long x, long y, CHtmlSysFont* font, long wid )
 {
 	//qDebug() << Q_FUNC_INFO;
-	/*
-	QByteArray str;
-	str.append('_');
-	const QFontMetrics& tmpMetr = QFontMetrics(*static_cast<CHtmlSysFontQt*>(font));
-	long res = this->measure_text(font, str.constData(), str.size(), 0).x;
-	qDebug() << "--- til now:" << str;
-	while (res < wid*wid) {
-		str.append('_');
-		res = tmpMetr.boundingRect(str).width();
-		qDebug() << "--- til now:" << str;
+
+	QPainter painter(this->dispWidget);
+	const CHtmlSysFontQt& fontCast = *static_cast<CHtmlSysFontQt*>(font);
+	painter.setFont(fontCast);
+
+	if (fontCast.use_font_color()) {
+		// The font has its own color; use it.
+		HTML_color_t color = fontCast.get_font_color();
+		painter.setPen(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
+	} else if (font->get_font_color() == HTML_COLOR_INPUT) {
+		painter.setPen(qFrame->inputColor());
 	}
-	//this->draw_text(hilite, x, y, font, str.constData(), str.size());
-	this->draw_text(hilite, x, y, font, "XXXXXXXXX", 9);
-	*/
+
+	if (hilite) {
+		painter.setBackgroundMode(Qt::OpaqueMode);
+		painter.setBackground(QApplication::palette().highlight());
+		painter.setPen(QApplication::palette().color(QPalette::HighlightedText));
+	}
+
+	if (fontCast.use_font_bgcolor()) {
+		painter.setBackgroundMode(Qt::OpaqueMode);
+		HTML_color_t color = fontCast.get_font_bgcolor();
+		painter.setBackground(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
+	}
+
+	// Construct a string of spaces that's at least 'width' pixels wide.
+	QString str(' ');
+	QFontMetrics metr(*static_cast<CHtmlSysFontQt*>(font));
+	while (metr.boundingRect(str).width() < wid) {
+		str += ' ';
+	}
+
+	painter.drawText(x, y, wid, metr.height(), Qt::AlignLeft, str);
 }
 
 
