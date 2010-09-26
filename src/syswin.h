@@ -66,6 +66,9 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	// Our banner background image.
 	class CHtmlResCacheObject* fBgImage;
 
+	void
+	fSetupPainterForFont( QPainter& painter, bool hilite, CHtmlSysFont* font );
+
   protected:	
 	// The content height at the time of the last user input.  When the
 	// formatter is producing a long run of output, we pause between screens to

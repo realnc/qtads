@@ -85,6 +85,34 @@ CHtmlSysWinQt::~CHtmlSysWinQt()
 
 
 void
+CHtmlSysWinQt::fSetupPainterForFont( QPainter& painter, bool hilite, CHtmlSysFont* font )
+{
+	const CHtmlSysFontQt& fontCast = *static_cast<CHtmlSysFontQt*>(font);
+	painter.setFont(fontCast);
+
+	if (fontCast.use_font_color()) {
+		// The font has its own color; use it.
+		HTML_color_t color = fontCast.get_font_color();
+		painter.setPen(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
+	} else if (font->get_font_color() == HTML_COLOR_INPUT) {
+		painter.setPen(qFrame->inputColor());
+	}
+
+	if (hilite) {
+		painter.setBackgroundMode(Qt::OpaqueMode);
+		painter.setBackground(QApplication::palette().highlight());
+		painter.setPen(QApplication::palette().color(QPalette::HighlightedText));
+	}
+
+	if (fontCast.use_font_bgcolor()) {
+		painter.setBackgroundMode(Qt::OpaqueMode);
+		HTML_color_t color = fontCast.get_font_bgcolor();
+		painter.setBackground(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
+	}
+}
+
+
+void
 CHtmlSysWinQt::keyPressEvent( QKeyEvent* event )
 {
 	qFrame->gameWindow()->keyPressEvent(event);
@@ -369,61 +397,16 @@ void
 CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str, size_t len )
 {
 	QPainter painter(this->dispWidget);
-	const CHtmlSysFontQt& fontCast = *static_cast<CHtmlSysFontQt*>(font);
-	painter.setFont(fontCast);
-
-	if (fontCast.use_font_color()) {
-		// The font has its own color; use it.
-		HTML_color_t color = fontCast.get_font_color();
-		painter.setPen(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
-	} else if (font->get_font_color() == HTML_COLOR_INPUT) {
-		painter.setPen(qFrame->inputColor());
-	}
-
-	if (hilite) {
-		painter.setBackgroundMode(Qt::OpaqueMode);
-		painter.setBackground(QApplication::palette().highlight());
-		painter.setPen(QApplication::palette().color(QPalette::HighlightedText));
-	}
-
-	if (fontCast.use_font_bgcolor()) {
-		painter.setBackgroundMode(Qt::OpaqueMode);
-		HTML_color_t color = fontCast.get_font_bgcolor();
-		painter.setBackground(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
-	}
-
-	painter.drawText(x, y + QFontMetrics(fontCast).ascent(), QString::fromUtf8(str, len));
+	this->fSetupPainterForFont(painter, hilite, font);
+	painter.drawText(x, y + QFontMetrics(*static_cast<CHtmlSysFontQt*>(font)).ascent(), QString::fromUtf8(str, len));
 }
 
 
 void
 CHtmlSysWinQt::draw_text_space( int hilite, long x, long y, CHtmlSysFont* font, long wid )
 {
-	//qDebug() << Q_FUNC_INFO;
-
 	QPainter painter(this->dispWidget);
-	const CHtmlSysFontQt& fontCast = *static_cast<CHtmlSysFontQt*>(font);
-	painter.setFont(fontCast);
-
-	if (fontCast.use_font_color()) {
-		// The font has its own color; use it.
-		HTML_color_t color = fontCast.get_font_color();
-		painter.setPen(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
-	} else if (font->get_font_color() == HTML_COLOR_INPUT) {
-		painter.setPen(qFrame->inputColor());
-	}
-
-	if (hilite) {
-		painter.setBackgroundMode(Qt::OpaqueMode);
-		painter.setBackground(QApplication::palette().highlight());
-		painter.setPen(QApplication::palette().color(QPalette::HighlightedText));
-	}
-
-	if (fontCast.use_font_bgcolor()) {
-		painter.setBackgroundMode(Qt::OpaqueMode);
-		HTML_color_t color = fontCast.get_font_bgcolor();
-		painter.setBackground(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
-	}
+	this->fSetupPainterForFont(painter, hilite, font);
 
 	// Construct a string of spaces that's at least 'width' pixels wide.
 	QString str(' ');
