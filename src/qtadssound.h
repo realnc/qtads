@@ -27,8 +27,6 @@
  * Ogg Vorbis and MP3).
  */
 class QTadsSound: public QObject {
-	Q_OBJECT
-
   public:
 	enum SoundType { WAV, OGG, MPEG };
 

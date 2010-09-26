@@ -23,9 +23,7 @@
 /* We need special handling for the "About this game" box.
  */
 class CHtmlSysWinAboutBoxQt: public CHtmlSysWinQt {
-	Q_OBJECT
-
-protected:
+  protected:
 	virtual void
 	keyPressEvent( QKeyEvent* e )
 	// It shouldn't be possible to do game input from the about box, so we

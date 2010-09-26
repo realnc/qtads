@@ -9,8 +9,6 @@ namespace Ui {
 
 class GameInfoDialog : public QDialog
 {
-	Q_OBJECT
-
 public:
 	explicit GameInfoDialog( const QByteArray& fname, QWidget* parent = 0 );
     ~GameInfoDialog();
