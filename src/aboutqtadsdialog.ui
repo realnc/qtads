@@ -108,7 +108,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>&lt;p&gt;For issues, queries, bug reports, or any other form of feedback, please contact:&lt;/p&gt;
+          <string>&lt;p&gt;For suggestions, issues, queries, bug reports, or any form of feedback, please contact:&lt;/p&gt;
 
 &lt;p&gt;&amp;nbsp;&amp;nbsp;&lt;a href=&quot;mailto:Nikos Chantziaras &lt;realnc@gmail.com&gt;&quot;&gt;Nikos Chantziaras &amp;lt;realnc@gmail.com&amp;gt;&lt;/a&gt;&lt;/p&gt;
 
