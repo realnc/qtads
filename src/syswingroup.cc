@@ -27,6 +27,7 @@
 #include "confdialog.h"
 #include "settings.h"
 #include "gameinfodialog.h"
+#include "aboutqtadsdialog.h"
 
 // For the version strings.
 #include "trd.h"
@@ -41,7 +42,7 @@ CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
 
 
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
-: fConfDialog(0), fGameInfoDialog(0), fAboutBoxDialog(0), fAboutBox(0), fVersionInfoDialog(0)
+: fConfDialog(0), fGameInfoDialog(0), fAboutBoxDialog(0), fAboutBox(0), fVersionInfoDialog(0), fAboutQtadsDialog(0)
 {
 	//qDebug() << Q_FUNC_INFO << "called";
 	Q_ASSERT(qWinGroup == 0);
@@ -97,6 +98,9 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	this->fVersionInfoAction = new QAction(tr("&Version Information"), this);
 	menu->addAction(this->fVersionInfoAction);
 	connect(this->fVersionInfoAction, SIGNAL(triggered()), this, SLOT(fShowVersionInfo()));
+	this->fAboutQtadsAction = new QAction(tr("A&bout QTads"), this);
+	menu->addAction(this->fAboutQtadsAction);
+	connect(this->fAboutQtadsAction, SIGNAL(triggered()), this, SLOT(fShowAboutQtads()));
 
 	this->setMenuBar(menuBar);
 
@@ -255,6 +259,32 @@ CHtmlSysWinGroupQt::fHideVersionInfo()
 	if (this->fVersionInfoDialog != 0) {
 		this->fVersionInfoDialog->deleteLater();
 		this->fVersionInfoDialog = 0;
+	}
+}
+
+
+void
+CHtmlSysWinGroupQt::fShowAboutQtads()
+{
+	// If the dialog is already open, simply activate and raise it.
+	if (this->fAboutQtadsDialog != 0) {
+		this->fAboutQtadsDialog->activateWindow();
+		this->fAboutQtadsDialog->raise();
+		return;
+	}
+
+	this->fAboutQtadsDialog = new AboutQtadsDialog(this);
+	connect(this->fAboutQtadsDialog, SIGNAL(finished(int)), this, SLOT(fHideAboutQtads()));
+	this->fAboutQtadsDialog->show();
+}
+
+
+void
+CHtmlSysWinGroupQt::fHideAboutQtads()
+{
+	if (this->fAboutQtadsDialog != 0) {
+		this->fAboutQtadsDialog->deleteLater();
+		this->fAboutQtadsDialog = 0;
 	}
 }
 

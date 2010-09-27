@@ -13,6 +13,7 @@ macx {
 	PKGCONFIG += sdl SDL_mixer
 	LIBS += -lsmpeg
 }
+RESOURCES += images.qrc
 
 # mingw32 static build
 # LIBS += -lmikmod -lsmpeg -lvorbisfile -lvorbis -logg -ldxguid -lpthread
@@ -103,7 +104,8 @@ UI_DIR = tmp
 
 FORMS += \
 	src/confdialog.ui \
-	src/gameinfodialog.ui
+	src/gameinfodialog.ui \
+	src/aboutqtadsdialog.ui
 
 # QTads headers
 HEADERS += \
@@ -138,7 +140,8 @@ HEADERS += \
 	src/confdialog.h \
 	src/settings.h \
 	src/gameinfodialog.h \
-	src/kcolorbutton.h
+	src/kcolorbutton.h \
+	src/aboutqtadsdialog.h
 
 # QTads sources.
 SOURCES += \
@@ -164,7 +167,8 @@ SOURCES += \
 	src/confdialog.cc \
 	src/settings.cc \
 	src/gameinfodialog.cc \
-	src/kcolorbutton.cc
+	src/kcolorbutton.cc \
+	src/aboutqtadsdialog.cc
 
 # Portable Tads headers.  We simply include every header from the Tads
 # directories.  It's sub-optimal, but the safest solution.
