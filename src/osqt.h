@@ -53,6 +53,7 @@ extern "C++" {
 
 /* Our Tads OEM identifier. */
 #define TADS_OEM_NAME "Nikos Chantziaras <realnc@gmail.com>"
+#define NO_T2_COPYRIGHT_NOTICE
 
 /* We assume that the C-compiler is mostly ANSI compatible. */
 #define OSANSI

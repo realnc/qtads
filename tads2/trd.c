@@ -752,12 +752,14 @@ int trdmain(int argc, char *argv[], appctxdef *appctx, char *save_ext)
     errini(&errctx, fp);
     
     /* copyright-date-string */
+#ifndef NO_T2_COPYRIGHT_NOTICE
     trdptf("%s - A %s TADS %s Interpreter.\n",
            G_tads_oem_app_name, G_tads_oem_display_mode,
            TADS_RUNTIME_VERSION);
     trdptf("%sopyright (c) 1993, 2007 by Michael J. Roberts.\n",
            G_tads_oem_copyright_prefix ? "TADS c" : "C");
     trdptf("%s\n", G_tads_oem_author);
+#endif
     
     ERRBEGIN(&errctx)
         trdmain1(&errctx, argc, argv, appctx, save_ext);
