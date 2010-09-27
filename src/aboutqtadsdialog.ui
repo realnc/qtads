@@ -79,7 +79,7 @@ p, li { white-space: pre-wrap; }
      </widget>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
-       <string>Version Information</string>
+       <string>Version</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
@@ -87,14 +87,67 @@ p, li { white-space: pre-wrap; }
          <property name="text">
           <string/>
          </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
          <property name="wordWrap">
           <bool>true</bool>
          </property>
          <property name="indent">
           <number>20</number>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextBrowserInteraction</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_4">
+      <attribute name="title">
+       <string>Contact</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>&lt;p&gt;For issues, queries, bug reports, or any other form of feedback, please contact:&lt;/p&gt;
+
+&lt;p&gt;&amp;nbsp;&amp;nbsp;&lt;a href=&quot;mailto:Nikos Chantziaras &lt;realnc@gmail.com&gt;&quot;&gt;Nikos Chantziaras &amp;lt;realnc@gmail.com&amp;gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;For up to date information about QTads, you can visit its &lt;a href=&quot;http://qtads.sourceforge.net&quot;&gt;homepage&lt;/a&gt;.&lt;/p&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="openExternalLinks">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextBrowserInteraction</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_5">
+      <attribute name="title">
+       <string>Begware</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>&lt;p&gt;QTads is Free and Open Source Software and hence you are free to use, copy and even modify it. It is also &amp;ldquo;Begware&amp;rdquo;, meaning that you can get it at no cost, but we beg you to make a donation if you think the software is worth it.&lt;/p&gt;
+
+&lt;center&gt;&lt;p&gt;
+&lt;a href=&quot;https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2S3Y8SMHHHUQL&quot;&gt;Donate through PayPal&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Thank you for supporting this project!&lt;/p&gt;&lt;/center&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="openExternalLinks">
+          <bool>true</bool>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::TextBrowserInteraction</set>
