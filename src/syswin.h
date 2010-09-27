@@ -200,7 +200,18 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 
 	virtual CHtmlSysFont*
 	get_font( const CHtmlFontDesc* font_desc )
-	{ return qFrame->createFont(font_desc); }
+	{
+		if (this->fBannerStyleGrid) {
+			// We're a text grid banner; use our internal font face,
+			// "qtads-grid", which will result in createFont() using the fixed
+			// width font configured in the user settings.
+			CHtmlFontDesc newDesc(*font_desc);
+			newDesc.copy_from(font_desc);
+			strcpy(newDesc.face, "qtads-grid");
+			return qFrame->createFont(&newDesc);
+		}
+		return qFrame->createFont(font_desc);
+	}
 
 	virtual CHtmlSysFont*
 	get_bullet_font( CHtmlSysFont* current_font )

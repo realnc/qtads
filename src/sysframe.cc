@@ -375,6 +375,12 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 					newFont.color(HTML_COLOR_INPUT);
 				}
 				matchFound = true;
+			} else if (s == "qtads-grid") {
+				// "qtads-grid" is an internal face name; it means we should
+				// return a font suitable for a text grid banner.
+				strcpy(newFontDesc.face, this->fSettings->fixedFont.family().toLatin1().constData());
+				base_point_size = this->fSettings->fixedFont.pointSize();
+				matchFound = true;
 			} else {
 				newFont.setFamily(s.toLower());
 				if (newFont.exactMatch()) {
