@@ -9,7 +9,9 @@ macx {
 		/Library/Frameworks/SDL_mixer.framework/Frameworks/smpeg.framework/Headers
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 } else {
-	LIBS += -lSDL_mixer -lSDL -lsmpeg
+	CONFIG += link_pkgconfig
+	PKGCONFIG += sdl SDL_mixer
+	LIBS += -lsmpeg
 }
 
 # mingw32 static build
@@ -33,8 +35,6 @@ QMAKE_CFLAGS_WARN_OFF =
 }
 
 !macx {
-	QMAKE_CFLAGS += $$system(sdl-config --cflags)
-	QMAKE_CXXFLAGS += $$system(sdl-config --cflags)
 	QMAKE_CFLAGS += $$system(smpeg-config --cflags)
 	QMAKE_CXXFLAGS += $$system(smpeg-config --cflags)
 }
