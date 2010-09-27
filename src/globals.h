@@ -2,6 +2,11 @@
 #define GLOBALS_H
 
 
+/* QTads version string.
+ */
+#define QTADS_VERSION "2.0"
+
+
 /* Works like qApp, but contains the global CHtmlSysFrameQt object instead.  If
  * this variable is 0, it means that no such object has been created yet.
  *

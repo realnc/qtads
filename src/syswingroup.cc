@@ -28,6 +28,10 @@
 #include "settings.h"
 #include "gameinfodialog.h"
 
+// For the version strings.
+#include "trd.h"
+#include "vmvsn.h"
+
 
 void
 CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
@@ -37,7 +41,7 @@ CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
 
 
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
-: fConfDialog(0), fAboutBoxDialog(0), fAboutBox(0), fGameInfoDialog(0)
+: fConfDialog(0), fGameInfoDialog(0), fAboutBoxDialog(0), fAboutBox(0), fAboutQtadsDialog(0)
 {
 	//qDebug() << Q_FUNC_INFO << "called";
 	Q_ASSERT(qWinGroup == 0);
@@ -90,6 +94,9 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	this->fAboutGameAction->setEnabled(false);
 	menu->addAction(this->fAboutGameAction);
 	connect(this->fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
+	this->fAboutQtadsAction = new QAction(tr("&Version Information"), this);
+	menu->addAction(this->fAboutQtadsAction);
+	connect(this->fAboutQtadsAction, SIGNAL(triggered()), this, SLOT(fShowAboutQtads()));
 
 	this->setMenuBar(menuBar);
 
@@ -213,6 +220,42 @@ CHtmlSysWinGroupQt::fShowAboutGame()
 	}
 	this->fAboutBoxDialog->resize(this->fAboutBox->size());
 	this->fAboutBoxDialog->show();
+}
+
+
+void
+CHtmlSysWinGroupQt::fShowAboutQtads()
+{
+	// If the dialog is already open, simply activate and raise it.
+	if (this->fAboutQtadsDialog != 0) {
+		this->fAboutQtadsDialog->activateWindow();
+		this->fAboutQtadsDialog->raise();
+		return;
+	}
+
+	// Construct a string holding all version info.
+	QString str;
+	str += tr("QTads version:") + "\t" + QTADS_VERSION + "\n\n"
+		   + tr("TADS 2 virtual machine:") + "\t" + TADS_RUNTIME_VERSION + "\n"
+		   + tr("TADS 3 virtual machine:") + "\t" + T3VM_VSN_STRING + " (" + T3VM_IDENTIFICATION + ")\n\n"
+		   + tr("Qt build version:") + "\t" + qVersion() + "\n"
+		   + tr("Qt runtime version:") + "\t" + QT_VERSION_STR;
+
+	this->fAboutQtadsDialog = new QMessageBox(QMessageBox::NoIcon, tr("Version Information"),
+											  str, QMessageBox::NoButton, this);
+	connect(this->fAboutQtadsDialog, SIGNAL(finished(int)), this, SLOT(fHideAboutQtads()));
+	this->fAboutQtadsDialog->setModal(false);
+	this->fAboutQtadsDialog->show();
+}
+
+
+void
+CHtmlSysWinGroupQt::fHideAboutQtads()
+{
+	if (this->fAboutQtadsDialog != 0) {
+		this->fAboutQtadsDialog->deleteLater();
+		this->fAboutQtadsDialog = 0;
+	}
 }
 
 
