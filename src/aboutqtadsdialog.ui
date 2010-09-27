@@ -26,7 +26,7 @@
          </property>
          <property name="text">
           <string>&lt;h2&gt;
-&lt;img src=&quot;:/qtads-logo.png&quot; /&gt;
+&lt;a href=&quot;http://qtads.sourceforge.net&quot;&gt;&lt;img src=&quot;:/qtads-logo.png&quot; /&gt;&lt;/a&gt;
 &lt;br&gt;A Multimedia TADS Interpreter
 &lt;/h2&gt;
 
@@ -43,6 +43,9 @@ QTads comes with NO WARRANTY, to the extent permitted by law. You may redistribu
           <set>Qt::AlignCenter</set>
          </property>
          <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="openExternalLinks">
           <bool>true</bool>
          </property>
          <property name="textInteractionFlags">
@@ -69,6 +72,32 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;  Adam Thornton&lt;br /&gt;  Adrien Beau&lt;br /&gt;  Andrew Plotkin&lt;br /&gt;  Alan Mead&lt;br /&gt;  Beni Serfaty&lt;br /&gt;  C.E.J. Pacian&lt;br /&gt;  Chris Odhner&lt;br /&gt;  Christophe Antoine&lt;br /&gt;  Curt Siffert&lt;br /&gt;  Daniel Schepler&lt;br /&gt;  Eric Eve&lt;br /&gt;  Eric Forgeot&lt;br /&gt;  Erik Temple&lt;br /&gt;  Greg Boettcher&lt;br /&gt;  Guilherme De Sousa&lt;br /&gt;  Jim Aikin&lt;br /&gt;  Joe Mason&lt;br /&gt;  Kodath duMatri&lt;br /&gt;  Kris Kennaway&lt;br /&gt;  Krister Fundin&lt;br /&gt;  Leif Huhn&lt;br /&gt;  Ming Hua&lt;br /&gt;  Nicolas Lécureuil&lt;br /&gt;  Ornithopter&lt;br /&gt;  Petter Sjölund&lt;br /&gt;  Poster&lt;br /&gt;  Rune Berg&lt;br /&gt;  Samuel Verschelde&lt;br /&gt;  Stefan Müller&lt;br /&gt;  Thom Brown&lt;br /&gt;  Tony Houlbrooke&lt;br /&gt;  Xenius &lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;for the ideas, source code, bug reports and donations. &lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;And of course, Mike Roberts; if there would be no Mike, there would be no Tads! &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Version Information</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="versionInfoLabel">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="indent">
+          <number>20</number>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextBrowserInteraction</set>
          </property>
         </widget>
        </item>

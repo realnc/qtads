@@ -50,13 +50,11 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	QTadsFrame* fFrame;
 	class QDialog* fAboutBoxDialog;
 	class CHtmlSysWinAboutBoxQt* fAboutBox;
-	class QMessageBox* fVersionInfoDialog;
 	class AboutQtadsDialog* fAboutQtadsDialog;
 	class QMenu* fRecentGamesMenu;
 	class QAction* fAboutGameAction;
 	class QAction* fEndCurrentGameAction;
 	class QAction* fGameInfoAction;
-	class QAction* fVersionInfoAction;
 	class QAction* fAboutQtadsAction;
 
 	bool
@@ -77,12 +75,6 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
 	void
 	fShowAboutGame();
-
-	void
-	fShowVersionInfo();
-
-	void
-	fHideVersionInfo();
 
 	void
 	fShowAboutQtads();
