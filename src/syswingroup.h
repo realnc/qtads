@@ -50,12 +50,12 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	QTadsFrame* fFrame;
 	class QDialog* fAboutBoxDialog;
 	class CHtmlSysWinAboutBoxQt* fAboutBox;
-	class QMessageBox* fAboutQtadsDialog;
+	class QMessageBox* fVersionInfoDialog;
 	class QMenu* fRecentGamesMenu;
 	class QAction* fAboutGameAction;
 	class QAction* fEndCurrentGameAction;
 	class QAction* fGameInfoAction;
-	class QAction* fAboutQtadsAction;
+	class QAction* fVersionInfoAction;
 
 	bool
 	fAskQuitGameDialog();
@@ -77,10 +77,10 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	fShowAboutGame();
 
 	void
-	fShowAboutQtads();
+	fShowVersionInfo();
 
 	void
-	fHideAboutQtads();
+	fHideVersionInfo();
 
 	void
 	fOpenNewGame();

@@ -41,7 +41,7 @@ CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
 
 
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
-: fConfDialog(0), fGameInfoDialog(0), fAboutBoxDialog(0), fAboutBox(0), fAboutQtadsDialog(0)
+: fConfDialog(0), fGameInfoDialog(0), fAboutBoxDialog(0), fAboutBox(0), fVersionInfoDialog(0)
 {
 	//qDebug() << Q_FUNC_INFO << "called";
 	Q_ASSERT(qWinGroup == 0);
@@ -94,9 +94,9 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	this->fAboutGameAction->setEnabled(false);
 	menu->addAction(this->fAboutGameAction);
 	connect(this->fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
-	this->fAboutQtadsAction = new QAction(tr("&Version Information"), this);
-	menu->addAction(this->fAboutQtadsAction);
-	connect(this->fAboutQtadsAction, SIGNAL(triggered()), this, SLOT(fShowAboutQtads()));
+	this->fVersionInfoAction = new QAction(tr("&Version Information"), this);
+	menu->addAction(this->fVersionInfoAction);
+	connect(this->fVersionInfoAction, SIGNAL(triggered()), this, SLOT(fShowVersionInfo()));
 
 	this->setMenuBar(menuBar);
 
@@ -224,12 +224,12 @@ CHtmlSysWinGroupQt::fShowAboutGame()
 
 
 void
-CHtmlSysWinGroupQt::fShowAboutQtads()
+CHtmlSysWinGroupQt::fShowVersionInfo()
 {
 	// If the dialog is already open, simply activate and raise it.
-	if (this->fAboutQtadsDialog != 0) {
-		this->fAboutQtadsDialog->activateWindow();
-		this->fAboutQtadsDialog->raise();
+	if (this->fVersionInfoDialog != 0) {
+		this->fVersionInfoDialog->activateWindow();
+		this->fVersionInfoDialog->raise();
 		return;
 	}
 
@@ -241,20 +241,20 @@ CHtmlSysWinGroupQt::fShowAboutQtads()
 		   + tr("Qt build version:") + "\t" + qVersion() + "\n"
 		   + tr("Qt runtime version:") + "\t" + QT_VERSION_STR;
 
-	this->fAboutQtadsDialog = new QMessageBox(QMessageBox::NoIcon, tr("Version Information"),
+	this->fVersionInfoDialog = new QMessageBox(QMessageBox::NoIcon, tr("Version Information"),
 											  str, QMessageBox::NoButton, this);
-	connect(this->fAboutQtadsDialog, SIGNAL(finished(int)), this, SLOT(fHideAboutQtads()));
-	this->fAboutQtadsDialog->setModal(false);
-	this->fAboutQtadsDialog->show();
+	connect(this->fVersionInfoDialog, SIGNAL(finished(int)), this, SLOT(fHideVersionInfo()));
+	this->fVersionInfoDialog->setModal(false);
+	this->fVersionInfoDialog->show();
 }
 
 
 void
-CHtmlSysWinGroupQt::fHideAboutQtads()
+CHtmlSysWinGroupQt::fHideVersionInfo()
 {
-	if (this->fAboutQtadsDialog != 0) {
-		this->fAboutQtadsDialog->deleteLater();
-		this->fAboutQtadsDialog = 0;
+	if (this->fVersionInfoDialog != 0) {
+		this->fVersionInfoDialog->deleteLater();
+		this->fVersionInfoDialog = 0;
 	}
 }
 
