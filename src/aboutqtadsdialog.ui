@@ -34,7 +34,7 @@ QTads Copyright © 2010 Nikos Chantziaras
 &lt;/p&gt;
 
 &lt;p&gt;
-QTads comes with NO WARRANTY, to the extent permitted by law. You may redistribute copies of QTads under certain terms and conditions. See the file named COPYING for more information.
+QTads comes with NO WARRANTY, to the extent permitted by law. You may redistribute copies of QTads under certain terms and conditions. Click on the &amp;ldquo;License&amp;rdquo; tab for more information.
 &lt;/p&gt;</string>
          </property>
          <property name="alignment">
@@ -186,6 +186,25 @@ And of course, Mike Roberts; if there would be no Mike, there would be no Tads!<
          </property>
          <property name="textInteractionFlags">
           <set>Qt::TextBrowserInteraction</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_6">
+      <attribute name="title">
+       <string>License</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QTextBrowser" name="textBrowser">
+         <property name="source">
+          <url>
+           <string>qrc:/gpl-2.0-standalone.html</string>
+          </url>
+         </property>
+         <property name="openExternalLinks">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

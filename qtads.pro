@@ -13,7 +13,7 @@ macx {
 	PKGCONFIG += sdl SDL_mixer
 	LIBS += -lsmpeg
 }
-RESOURCES += images.qrc
+RESOURCES += resources.qrc
 
 # mingw32 static build
 # LIBS += -lmikmod -lsmpeg -lvorbisfile -lvorbis -logg -ldxguid -lpthread
