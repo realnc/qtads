@@ -24,8 +24,8 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget *parent)
 	str += tr("QTads version:") + "\t" + QTADS_VERSION + "\n\n"
 		   + tr("TADS 2 virtual machine:") + "\t" + TADS_RUNTIME_VERSION + "\n"
 		   + tr("TADS 3 virtual machine:") + "\t" + T3VM_VSN_STRING + " (" + T3VM_IDENTIFICATION + ")\n\n"
-		   + tr("Qt build version:") + "\t" + qVersion() + "\n"
-		   + tr("Qt runtime version:") + "\t" + QT_VERSION_STR;
+		   + tr("Qt build version:") + "\t" + QT_VERSION_STR + "\n"
+		   + tr("Qt runtime version:") + "\t" + qVersion();
 	ui->versionInfoLabel->setText(str);
 }
 
