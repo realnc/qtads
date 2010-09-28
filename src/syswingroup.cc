@@ -232,6 +232,11 @@ CHtmlSysWinGroupQt::fShowAboutQtads()
 
 	this->fAboutQtadsDialog = new AboutQtadsDialog(this);
 	connect(this->fAboutQtadsDialog, SIGNAL(finished(int)), this, SLOT(fHideAboutQtads()));
+#ifdef Q_WS_MAC
+	// Similar bug to the config dialog one.  Again, 4 pixels heigher fixes it.
+	this->fAboutQtadsDialog->layout()->activate();
+	this->fAboutQtadsDialog->setMinimumHeight(this->fAboutQtadsDialog->minimumHeight() + 4);
+#endif
 	this->fAboutQtadsDialog->show();
 }
 
