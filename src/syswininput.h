@@ -89,6 +89,9 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	virtual void
 	keyPressEvent( QKeyEvent* e );
 
+	virtual void
+	inputMethodEvent( QInputMethodEvent* e );
+
 	void
 	singleKeyPressEvent( QKeyEvent* event );
 

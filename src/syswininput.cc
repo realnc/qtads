@@ -45,6 +45,8 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
 	p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
 	p.setColor(QPalette::Text, qFrame->settings()->mainTextColor);
 	this->setPalette(p);
+
+	this->setAttribute(Qt::WA_InputMethodEnabled);
 }
 
 
@@ -143,7 +145,7 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	//qDebug() << "Key pressed:" << hex << event->key();
+	//qDebug() << "Key pressed:" << hex << e->key();
 
 	if (this->fInputMode == NoInput or not qFrame->gameRunning()) {
 		QScrollArea::keyPressEvent(e);
@@ -224,6 +226,44 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 		this->fTadsBuffer->add_string(e->text().toUtf8().constData(), e->text().toUtf8().length(), true);
 	}
 
+	this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
+	if (this->fTag->ready_to_format()) {
+		this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
+		this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+	}
+	this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
+}
+
+
+void
+CHtmlSysWinInputQt::inputMethodEvent( QInputMethodEvent* e )
+{
+	qDebug() << "Oua";
+
+	if (this->fInputMode == NoInput or not qFrame->gameRunning() or this->fInputMode == PagePauseInput
+		or e->commitString().isEmpty())
+	{
+		QScrollArea::inputMethodEvent(e);
+		return;
+	}
+
+	if (this->fInputMode == SingleKeyInput) {
+		this->fLastKeyEvent = static_cast<Qt::Key>(0);
+		this->fLastKeyText = 0;
+		// If the keypress doesn't correspond to exactly one character, ignore
+		// it.
+		if (e->commitString().size() != 1) {
+			QScrollArea::inputMethodEvent(e);
+			return;
+		}
+		this->fLastKeyText = e->commitString().at(0);
+		this->fInputMode = NoInput;
+		this->fInputReady = true;
+		emit inputReady();
+		return;
+	}
+
+	this->fTadsBuffer->add_string(e->commitString().toUtf8().constData(), e->commitString().toUtf8().length(), true);
 	this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
 	if (this->fTag->ready_to_format()) {
 		this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
