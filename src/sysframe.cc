@@ -198,7 +198,8 @@ CHtmlSysFrameQt::fRunGame()
 			// Recreate them.
 			this->fParser = new CHtmlParser(true);
 			this->fInputBuffer = new textchar_t[1024];
-			this->fTadsBuffer =new CHtmlInputBuf(fInputBuffer, 1024, 100);
+			this->fTadsBuffer = new CHtmlInputBuf(fInputBuffer, 1024, 100);
+			this->fTadsBuffer->set_utf8_mode(true);
 			this->fFormatter = new CHtmlFormatterInput(this->fParser);
 			// Tell the resource finder about our appctx.
 			this->fFormatter->get_res_finder()->init_appctx(&this->fAppctx);
