@@ -120,9 +120,6 @@ And of course, Mike Roberts; if there would be no Mike, there would be no Tads!<
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QLabel" name="versionInfoLabel">
-         <property name="text">
-          <string/>
-         </property>
          <property name="wordWrap">
           <bool>true</bool>
          </property>
