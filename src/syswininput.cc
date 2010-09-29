@@ -218,6 +218,7 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 		this->fTadsBuffer->backspace();
 	} else {
 		if (e->text().isEmpty() or not e->text().at(0).isPrint()) {
+			QScrollArea::keyPressEvent(e);
 			return;
 		}
 		this->fTadsBuffer->add_string(e->text().toUtf8().constData(), e->text().toUtf8().length(), true);
