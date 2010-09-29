@@ -238,8 +238,6 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 void
 CHtmlSysWinInputQt::inputMethodEvent( QInputMethodEvent* e )
 {
-	qDebug() << "Oua";
-
 	if (this->fInputMode == NoInput or not qFrame->gameRunning() or this->fInputMode == PagePauseInput
 		or e->commitString().isEmpty())
 	{
