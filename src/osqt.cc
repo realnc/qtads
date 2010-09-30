@@ -418,12 +418,19 @@ os_rand( long* val )
 {
 	Q_ASSERT(val != 0);
 
-	time_t t = time(0);
+	// Is this the first call to os_rand()?
+	static bool initial = true;
 
-	if (t == static_cast<time_t>(-1)) {
-		std::srand(std::rand());
-	} else {
-		std::srand(static_cast<unsigned int>(t));
+	if (initial) {
+		// It's the first time we're called.  Initialize the random number
+		// generator.
+		initial = false;
+		time_t t = time(0);
+		if (t == static_cast<time_t>(-1)) {
+			std::srand(std::rand());
+		} else {
+			std::srand(static_cast<unsigned int>(t));
+		}
 	}
 
 	// Generate a random number by using high-order bits, because on some
