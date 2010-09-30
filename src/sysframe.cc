@@ -669,7 +669,7 @@ CHtmlSysFrameQt::start_new_page()
 void
 CHtmlSysFrameQt::set_nonstop_mode( int flag )
 {
-	qDebug() << Q_FUNC_INFO;
+	//qDebug() << Q_FUNC_INFO;
 }
 
 
