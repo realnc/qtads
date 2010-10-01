@@ -69,7 +69,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	void
 	fSetupPainterForFont( QPainter& painter, bool hilite, CHtmlSysFont* font );
 
-  protected:	
+  protected:
 	// The content height at the time of the last user input.  When the
 	// formatter is producing a long run of output, we pause between screens to
 	// make sure the user has had a chance to see all of the text before we
