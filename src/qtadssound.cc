@@ -213,10 +213,21 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
 		memcpy(buf, sample->buffer, sample->buffer_size);
 		Sound_FreeSample(sample);
 		chunk = Mix_QuickLoad_RAW(buf, sample->buffer_size);
+		if (chunk == 0) {
+			qWarning() << "ERROR:" << Mix_GetError();
+			Mix_SetError("");
+			free(buf);
+			return 0;
+		}
 	} else {
 		Q_ASSERT(type == OGG);
 		SDL_RWops* rw = SDL_RWFromConstMem(data.constData(), data.size());
 		chunk = Mix_LoadWAV_RW(rw, true);
+		if (chunk == 0) {
+			qWarning() << "ERROR:" << Mix_GetError();
+			Mix_SetError("");
+			return 0;
+		}
 	}
 
 	// Alternative way of decoding MPEG, utilizing SMPEG directly.  It sucks,
