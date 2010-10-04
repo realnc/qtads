@@ -177,6 +177,14 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
 		return 0;
 	}
 
+	// Create the RWops through which the data will be read later.
+	SDL_RWops* rw = SDL_RWFromConstMem(data.constData(), data.size());
+	if (rw == 0) {
+		qWarning() << "ERROR:" << SDL_GetError();
+		SDL_ClearError();
+		return 0;
+	}
+
 	// The chunk that will hold the final, decoded sound.
 	Mix_Chunk* chunk;
 
@@ -186,7 +194,6 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
 	// sometimes with MP3s.  SDL_sound can't cope well with Ogg Vorbis that
 	// have more then two channels.
 	if (type == MPEG or type == WAV) {
-		SDL_RWops* rw = SDL_RWFromConstMem(data.constData(), data.size());
 		if (rw == 0) {
 			qWarning() << "ERROR:" << SDL_GetError();
 			SDL_ClearError();
@@ -221,7 +228,6 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
 		}
 	} else {
 		Q_ASSERT(type == OGG);
-		SDL_RWops* rw = SDL_RWFromConstMem(data.constData(), data.size());
 		chunk = Mix_LoadWAV_RW(rw, true);
 		if (chunk == 0) {
 			qWarning() << "ERROR:" << Mix_GetError();
