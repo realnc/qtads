@@ -24,6 +24,7 @@
 #include "sysframe.h"
 #include "settings.h"
 #include "syssoundwav.h"
+#include "syssoundogg.h"
 #include "syssoundmpeg.h"
 
 
@@ -281,12 +282,12 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
 
 	  case OGG:
 		//qDebug() << "Sound type: OGG";
-		sound = new CHtmlSysSoundWavQt(0, chunk, OGG);
+		sound = new CHtmlSysSoundOggQt(0, chunk, OGG);
 		break;
 
 	  case MPEG:
 		//qDebug() << "Sound type: MPEG";
-		sound = new CHtmlSysSoundWavQt(0, chunk, MPEG);
+		sound = new CHtmlSysSoundMpegQt(0, chunk, MPEG);
 		break;
 	}
 	return sound;
