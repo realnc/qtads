@@ -1,4 +1,15 @@
-2.0 - 2010/??/??
+2.0.1 - 2010/10/??
+==================
+
+  - Sometimes, MP3 and WAV sounds would play at double speed in some systems.
+	This has been fixed by using SDL_sound for MP3 and WAV decoding.  Before
+	that, SMPEG was used for MP3 and SDL_mixer for WAV.
+
+  - Input of non-ASCII characters for languages that use compose keys ("dead
+	keys") should now work correctly for TADS 3.
+
+
+2.0 - 2010/09/28
 ================
 
 QTads 2 is a new major version, bringing multimedia capabilities (HTML Tads)
