@@ -10,8 +10,11 @@ macx {
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 } else {
 	CONFIG += link_pkgconfig
-	PKGCONFIG += sdl SDL_mixer
-	LIBS += -lsmpeg
+	PKGCONFIG += sdl
+	# Normally we would use pkg-config for SDL_mixer too, but it has to appear
+	# in the linker flags before SDL_sound, which lacks pkg-config support, or
+	# else we crash.
+	LIBS += -lSDL_mixer -lSDL_sound
 }
 RESOURCES += resources.qrc
 

@@ -18,6 +18,7 @@
 #include <QFileDialog>
 #include <SDL.h>
 #include <SDL_mixer.h>
+#include <SDL_sound.h>
 
 #include "settings.h"
 #include "sysframe.h"
@@ -63,6 +64,9 @@ int main( int argc, char** argv )
 		qWarning("Unable to initialize sound system: %s", SDL_GetError());
 		return 1;
 	}
+
+	// Initialize SDL_sound.
+	Sound_Init();
 
 	// This will preload the needed codecs now instead of constantly loading
 	// and unloading them each time a sound is played/stopped.  This is only
@@ -128,6 +132,7 @@ int main( int argc, char** argv )
 	for (int i = 0; i < opened; ++i) {
 		Mix_CloseAudio();
 	}
+	Sound_Quit();
 	SDL_Quit();
 	return ret;
 }

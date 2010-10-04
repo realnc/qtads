@@ -17,13 +17,14 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <SDL_mixer.h>
-#include <smpeg.h>
+#include <SDL_sound.h>
 
 #include "qtadssound.h"
 #include "globals.h"
 #include "sysframe.h"
 #include "settings.h"
 #include "syssoundwav.h"
+#include "syssoundmpeg.h"
 
 
 
@@ -175,7 +176,52 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
 		return 0;
 	}
 
+	// The chunk that will hold the final, decoded sound.
 	Mix_Chunk* chunk;
+
+	// If it's an MP3 or WAV, we'll decode it with SDL_sound.  For Ogg Vorbis
+	// we use SDL_mixer.  The reason is that SDL_mixer plays WAV at wrong
+	// speeds if they're not 11, 22 or 44kHz (like 48kHz or 32kHz) and crashes
+	// sometimes with MP3s.  SDL_sound can't cope well with Ogg Vorbis that
+	// have more then two channels.
+	if (type == MPEG or type == WAV) {
+		SDL_RWops* rw = SDL_RWFromConstMem(data.constData(), data.size());
+		if (rw == 0) {
+			qWarning() << "ERROR:" << SDL_GetError();
+			SDL_ClearError();
+			return 0;
+		}
+		Sound_AudioInfo wantedFormat;
+		wantedFormat.channels = 2;
+		wantedFormat.rate = 44100;
+		wantedFormat.format = MIX_DEFAULT_FORMAT;
+		Sound_Sample* sample = Sound_NewSample(rw, type == WAV ? "WAV" : "MP3", &wantedFormat, 65536);
+		if (sample == 0) {
+			qWarning() << "ERROR:" << Sound_GetError();
+			Sound_ClearError();
+			return 0;
+		}
+		Uint32 bytes = Sound_DecodeAll(sample);
+		if (sample->flags & SOUND_SAMPLEFLAG_ERROR) {
+			// We don't abort since some of these errors can be non-fatal.
+			// Unfortunately, there's no way to tell :-/
+			qWarning() << "WARNING:" << Sound_GetError();
+			Sound_ClearError();
+		}
+		Uint8* buf = static_cast<Uint8*>(malloc(sample->buffer_size));
+		memcpy(buf, sample->buffer, sample->buffer_size);
+		Sound_FreeSample(sample);
+		chunk = Mix_QuickLoad_RAW(buf, sample->buffer_size);
+	} else {
+		Q_ASSERT(type == OGG);
+		SDL_RWops* rw = SDL_RWFromConstMem(data.constData(), data.size());
+		chunk = Mix_LoadWAV_RW(rw, true);
+	}
+
+	// Alternative way of decoding MPEG, utilizing SMPEG directly.  It sucks,
+	// since SMPEG, for the piece of crap it is, tends to play MP3s at double
+	// speed (chipmunks ahoy...)
+#if 0
 	if (type == MPEG) {
 		// The sound is an mp3.  We'll decode it into an SDL_Mixer chunk using
 		// SMPEG.
@@ -218,13 +264,8 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
 		// Adjust final buffer size to fit the decoded data exactly.
 		buf = static_cast<Uint8*>(realloc(buf, (bufSize - 8192) + bytesWritten));
 		chunk = Mix_QuickLoad_RAW(buf, (bufSize - 8192) + bytesWritten);
-	} else {
-		Q_ASSERT(type == WAV or type == OGG);
-		// The sound is either WAV or Ogg Vorbis data.  We'll just let
-		// SDL_Mixer handle it.
-		SDL_RWops* rw = SDL_RWFromConstMem(data.constData(), data.size());
-		chunk = Mix_LoadWAV_RW(rw, 1);
 	}
+#endif
 
 	// We have all the data we need; create the sound object.  It is
 	// *important* not to pass the CHtmlSysWin object as the parent in the
