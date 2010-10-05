@@ -186,7 +186,7 @@ CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								long fade_in, long fade_out, int crossfade )
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	return this->startPlaying(done_func, done_func_ctx, repeat, vol);
+	return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in);
 }
 
 
@@ -222,7 +222,7 @@ CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								long fade_in, long fade_out, int crossfade )
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	return this->startPlaying(done_func, done_func_ctx, repeat, vol);
+	return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in);
 }
 
 
@@ -258,7 +258,7 @@ CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 								 long fade_in, long fade_out, int crossfade )
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	return this->startPlaying(done_func, done_func_ctx, repeat, vol);
+	return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in);
 }
 
 

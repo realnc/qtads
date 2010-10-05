@@ -35,6 +35,7 @@ class QTadsSound: public QObject {
 	int fChannel;
 	SoundType fType;
 	bool fPlaying;
+	int fFadeIn;
 
 	// TADS callback to invoke on stop.
 	void (*fDone_func)(void*, int repeat_count);
@@ -74,7 +75,8 @@ class QTadsSound: public QObject {
 	static void effectCallback( int chan, void* stream, int len, void* udata );
 
 	int
-	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol );
+	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
+				  long fadeIn );
 
 	void
 	cancelPlaying( bool sync );

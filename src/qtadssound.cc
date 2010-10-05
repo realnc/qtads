@@ -32,7 +32,7 @@
 QList<QTadsSound*> QTadsSound::fObjList;
 
 QTadsSound::QTadsSound( QObject* parent, Mix_Chunk* chunk, SoundType type )
-: QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fPlaying(false), fDone_func(0),
+: QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fPlaying(false), fFadeIn(0), fDone_func(0),
   fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
 {
 	this->fLength = (this->fChunk->alen * 8) / (2 * 16 * 44.1);
@@ -67,7 +67,11 @@ QTadsSound::callback( int channel )
 	// If it's an infinite loop sound, or it has not reached the wanted repeat
 	// count yet, play again on the same channel.
 	if ((mObj->fRepeatsWanted == 0) or (mObj->fRepeats < mObj->fRepeatsWanted)) {
-		Mix_PlayChannel(channel, mObj->fChunk, 0);
+		if (mObj->fFadeIn > 0) {
+			Mix_FadeInChannel(channel, mObj->fChunk, 0, mObj->fFadeIn);
+		} else {
+			Mix_PlayChannel(channel, mObj->fChunk, 0);
+		}
 		++mObj->fRepeats;
 		return;
 	}
@@ -92,8 +96,8 @@ QTadsSound::effectCallback( int chan, void* stream, int len, void* udata )
 
 
 int
-QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
-								int vol )
+QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
+						  long fadeIn )
 {
 	// Check if user disabled digital sound.
 	if (not qFrame->settings()->enableDigitalSound) {
@@ -117,7 +121,12 @@ QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done
 	Mix_VolumeChunk(this->fChunk, vol);
 
 	this->fRepeatsWanted = repeat;
-	this->fChannel = Mix_PlayChannel(-1, this->fChunk, 0);
+	if (fadeIn > 0) {
+		this->fChannel = Mix_FadeInChannel(-1, this->fChunk, 0, fadeIn);
+		this->fFadeIn = fadeIn;
+	} else {
+		this->fChannel = Mix_PlayChannel(-1, this->fChunk, 0);
+	}
 	if (this->fChannel == -1) {
 		qWarning() << "Error: Can't play sound:" << Mix_GetError();
 	} else {
