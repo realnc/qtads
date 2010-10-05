@@ -16,6 +16,7 @@
  */
 #include <QDebug>
 #include <QFileInfo>
+#include <QTimer>
 #include <SDL_mixer.h>
 #include <SDL_sound.h>
 
@@ -32,11 +33,13 @@
 QList<QTadsSound*> QTadsSound::fObjList;
 
 QTadsSound::QTadsSound( QObject* parent, Mix_Chunk* chunk, SoundType type )
-: QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fPlaying(false), fFadeIn(0), fDone_func(0),
-  fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
+: QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fPlaying(false), fFadeOut(0),
+  fDone_func(0), fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
 {
+	// FIXME: Calculate sound length in a safer way.
 	this->fLength = (this->fChunk->alen * 8) / (2 * 16 * 44.1);
 	//qDebug() << "Sound length:" << this->fLength;
+	connect(this, SIGNAL(readyToLoop()), SLOT(fDoLoop()));
 }
 
 
@@ -48,6 +51,30 @@ QTadsSound::~QTadsSound()
 		Mix_HaltChannel(this->fChannel);
 	}
 	Mix_FreeChunk(this->fChunk);
+}
+
+
+void
+QTadsSound::fDoFadeOut()
+{
+	Q_ASSERT(Mix_Playing(this->fChannel) == 1);
+
+	Mix_FadeOutChannel(this->fChannel, this->fFadeOut);
+}
+
+
+void
+QTadsSound::fDoLoop()
+{
+	Q_ASSERT(Mix_Playing(this->fChannel) == 0);
+
+	Mix_PlayChannel(this->fChannel, this->fChunk, 0);
+	// If this is the last iteration and we have a fade-out, set the fade-out
+	// timer.
+	if (this->fFadeOut > 0 and this->fRepeatsWanted != 0 and this->fRepeats == this->fRepeatsWanted) {
+		QTimer::singleShot(this->fLength - this->fFadeOut, this, SLOT(fDoFadeOut()));
+	}
+	++this->fRepeats;
 }
 
 
@@ -67,12 +94,7 @@ QTadsSound::callback( int channel )
 	// If it's an infinite loop sound, or it has not reached the wanted repeat
 	// count yet, play again on the same channel.
 	if ((mObj->fRepeatsWanted == 0) or (mObj->fRepeats < mObj->fRepeatsWanted)) {
-		if (mObj->fFadeIn > 0) {
-			Mix_FadeInChannel(channel, mObj->fChunk, 0, mObj->fFadeIn);
-		} else {
-			Mix_PlayChannel(channel, mObj->fChunk, 0);
-		}
-		++mObj->fRepeats;
+		mObj->emitReadyToLoop();
 		return;
 	}
 
@@ -89,15 +111,9 @@ QTadsSound::callback( int channel )
 }
 
 
-void
-QTadsSound::effectCallback( int chan, void* stream, int len, void* udata )
-{
-}
-
-
 int
 QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
-						  long fadeIn )
+						  int fadeIn, int fadeOut )
 {
 	// Check if user disabled digital sound.
 	if (not qFrame->settings()->enableDigitalSound) {
@@ -123,21 +139,26 @@ QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done
 	this->fRepeatsWanted = repeat;
 	if (fadeIn > 0) {
 		this->fChannel = Mix_FadeInChannel(-1, this->fChunk, 0, fadeIn);
-		this->fFadeIn = fadeIn;
 	} else {
 		this->fChannel = Mix_PlayChannel(-1, this->fChunk, 0);
 	}
 	if (this->fChannel == -1) {
 		qWarning() << "Error: Can't play sound:" << Mix_GetError();
 	} else {
-		this->fTime.start();
-		//Mix_UnregisterAllEffects(this->fChannel);
-		//Mix_RegisterEffect(this->fChannel, effectCallback, 0, this);
 		this->fPlaying = true;
 		this->fRepeats = 1;
 		QTadsSound::fObjList.append(this);
 		this->fDone_func = done_func;
 		this->fDone_func_ctx = done_func_ctx;
+		if (fadeOut > 0) {
+			this->fFadeOut = fadeOut;
+			if (repeat == 0) {
+				// The sound should only be played once.  We need to set the
+				// fade-out timer here since otherwise the sound won't get a
+				// chance to fade-out.
+				QTimer::singleShot(this->fLength - this->fFadeOut, this, SLOT(fDoFadeOut()));
+			}
+		}
 	}
 	return 0;
 }

@@ -859,6 +859,7 @@ os_get_sysinfo( int code, void* /*param*/, long* result )
 	  case SYSINFO_MNG_TRANS:
 	  case SYSINFO_MNG_ALPHA:
 	  case SYSINFO_TEXT_HILITE:
+	  case SYSINFO_AUDIO_FADE:
 		*result = 1;
 		break;
 
@@ -874,9 +875,8 @@ os_get_sysinfo( int code, void* /*param*/, long* result )
 		*result = SYSINFO_ICLASS_HTML;
 		break;
 
-	  case SYSINFO_AUDIO_FADE:
 	  case SYSINFO_AUDIO_CROSSFADE:
-		// For now, we don't support any of this.
+		// For now, we don't support crossfades.
 		*result = 0;
 		break;
 

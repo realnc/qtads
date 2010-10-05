@@ -27,6 +27,8 @@
  * Ogg Vorbis and MP3).
  */
 class QTadsSound: public QObject {
+	Q_OBJECT
+
   public:
 	enum SoundType { WAV, OGG, MPEG };
 
@@ -35,7 +37,7 @@ class QTadsSound: public QObject {
 	int fChannel;
 	SoundType fType;
 	bool fPlaying;
-	int fFadeIn;
+	int fFadeOut;
 
 	// TADS callback to invoke on stop.
 	void (*fDone_func)(void*, int repeat_count);
@@ -50,9 +52,6 @@ class QTadsSound: public QObject {
 	// 0 means repeat forever.
 	int fRepeatsWanted;
 
-	// How long has the sound been playing.
-	QTime fTime;
-
 	// Total length of the sound in milliseconds.
 	unsigned fLength;
 
@@ -64,19 +63,37 @@ class QTadsSound: public QObject {
 	// to invoke the TADS callback based on the channel number.
 	static QList<QTadsSound*> fObjList;
 
+	// We can't call SDL_mixer functions from inside an SDL_mixer callback, so
+	// we use the following method: when the sound stops and the callback gets
+	// called, we don't play it again (if it's looped) from inside the callback
+	// but emit a signal which connects to a slot which plays the sound one
+	// more time.
+	void
+	emitReadyToLoop()
+	{ emit readyToLoop(); }
+
+  private slots:
+	void
+	fDoFadeOut();
+
+	void
+	fDoLoop();
+
+  signals:
+	void readyToLoop();
+
   public:
 	QTadsSound( QObject* parent, struct Mix_Chunk* chunk, SoundType type );
 
 	virtual
 	~QTadsSound();
 
-	// The SDL_Mixer callbacks.
+	// The SDL_Mixer callback for when a sound finished playing.
 	static void callback( int channel );
-	static void effectCallback( int chan, void* stream, int len, void* udata );
 
 	int
 	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
-				  long fadeIn );
+				  int fadeIn, int fadeOut );
 
 	void
 	cancelPlaying( bool sync );
