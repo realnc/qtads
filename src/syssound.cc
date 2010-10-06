@@ -186,14 +186,14 @@ CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								long fade_in, long fade_out, int crossfade )
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out);
+	return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out, crossfade);
 }
 
 
 void
 CHtmlSysSoundWavQt::add_crossfade( CHtmlSysWin* win, long ms )
 {
-	qDebug() << Q_FUNC_INFO << "\n Crossfades not implemented yet.";
+	this->addCrossFade(ms);
 }
 
 
@@ -202,7 +202,7 @@ CHtmlSysSoundWavQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, 
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	this->cancelPlaying(sync);
+	this->cancelPlaying(sync, fade_out_ms, fade_in_bg);
 }
 
 
@@ -222,14 +222,14 @@ CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 								long fade_in, long fade_out, int crossfade )
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out);
+	return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out, crossfade);
 }
 
 
 void
 CHtmlSysSoundOggQt::add_crossfade( CHtmlSysWin* win, long ms )
 {
-	qDebug() << Q_FUNC_INFO << "\n Crossfades not implemented yet.";
+	this->addCrossFade(ms);
 }
 
 
@@ -238,7 +238,7 @@ CHtmlSysSoundOggQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, 
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	this->cancelPlaying(sync);
+	this->cancelPlaying(sync, fade_out_ms, fade_in_bg);
 }
 
 
@@ -258,14 +258,14 @@ CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 								 long fade_in, long fade_out, int crossfade )
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-	return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out);
+	return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out, crossfade);
 }
 
 
 void
 CHtmlSysSoundMpegQt::add_crossfade( CHtmlSysWin* win, long ms )
 {
-	qDebug() << Q_FUNC_INFO << "\n Crossfades not implemented yet.";
+	this->addCrossFade(ms);
 }
 
 
@@ -274,7 +274,7 @@ CHtmlSysSoundMpegQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms,
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	this->cancelPlaying(sync);
+	this->cancelPlaying(sync, fade_out_ms, fade_in_bg);
 }
 
 

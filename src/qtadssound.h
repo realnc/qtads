@@ -18,6 +18,7 @@
 #define QTADSSOUND_H
 
 #include <QObject>
+#include <QTimer>
 #include <QTime>
 
 #include "tadshtml.h"
@@ -38,6 +39,9 @@ class QTadsSound: public QObject {
 	SoundType fType;
 	bool fPlaying;
 	int fFadeOut;
+	bool fCrossFade;
+	QTimer fFadeOutTimer;
+	QTime fTimePos;
 
 	// TADS callback to invoke on stop.
 	void (*fDone_func)(void*, int repeat_count);
@@ -72,6 +76,10 @@ class QTadsSound: public QObject {
 	emitReadyToLoop()
 	{ emit readyToLoop(); }
 
+	void
+	emitReadyToFadeOut()
+	{ emit readyToFadeOut(); }
+
   private slots:
 	void
 	fDoFadeOut();
@@ -79,8 +87,12 @@ class QTadsSound: public QObject {
 	void
 	fDoLoop();
 
+	void
+	fPrepareFadeOut();
+
   signals:
 	void readyToLoop();
+	void readyToFadeOut();
 
   public:
 	QTadsSound( QObject* parent, struct Mix_Chunk* chunk, SoundType type );
@@ -93,10 +105,13 @@ class QTadsSound: public QObject {
 
 	int
 	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
-				  int fadeIn, int fadeOut );
+				  int fadeIn, int fadeOut, bool crossFade );
 
 	void
-	cancelPlaying( bool sync );
+	cancelPlaying( bool sync, int fadeOut, bool fadeOutInBg );
+
+	void
+	addCrossFade( int ms );
 
 	static class CHtmlSysSound*
 	createSound( const class CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
