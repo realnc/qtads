@@ -50,19 +50,31 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	// "File" menu.
 	QMenu* menu = menuBar->addMenu(tr("&File"));
 	QAction* act = new QAction(tr("&Open New Game"), this);
+#if QT_VERSION >= 0x040600
+	act->setIcon(QIcon::fromTheme("document-open"));
+#endif
 	act->setShortcuts(QKeySequence::Open);
 	menu->addAction(act);
 	connect(act, SIGNAL(triggered()), this, SLOT(fOpenNewGame()));
 	act = new QAction(tr("&Recent Games"), this);
+#if QT_VERSION >= 0x040600
+	act->setIcon(QIcon::fromTheme("document-open-recent"));
+#endif
 	this->fRecentGamesMenu = new QMenu("Recent Games", this);
 	act->setMenu(this->fRecentGamesMenu);
 	menu->addAction(act);
 	connect(this->fRecentGamesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fRecentGameTriggered(QAction*)));
 	this->fGameInfoAction = new QAction(tr("Game &Information"), this);
+#if QT_VERSION >= 0x040600
+	this->fGameInfoAction->setIcon(QIcon::fromTheme("document-properties"));
+#endif
 	menu->addAction(this->fGameInfoAction);
 	this->fGameInfoAction->setEnabled(false);
 	connect(this->fGameInfoAction, SIGNAL(triggered()), this, SLOT(fShowGameInfoDialog()));
 	this->fEndCurrentGameAction = new QAction(tr("&End Current Game"), this);
+#if QT_VERSION >= 0x040600
+	this->fEndCurrentGameAction->setIcon(QIcon::fromTheme("process-stop"));
+#endif
 	this->fEndCurrentGameAction->setShortcuts(QKeySequence::Close);
 	menu->addAction(this->fEndCurrentGameAction);
 	this->fEndCurrentGameAction->setEnabled(false);
@@ -70,6 +82,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	menu->addSeparator();
 	act = new QAction(tr("&Quit"), this);
 #if QT_VERSION >= 0x040600
+	act->setIcon(QIcon::fromTheme("application-exit"));
 	act->setShortcuts(QKeySequence::Quit);
 #endif
 	menu->addAction(act);
@@ -79,6 +92,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	menu = menuBar->addMenu(tr("&Edit"));
 	act = new QAction(tr("&Preferences"), this);
 #if QT_VERSION >= 0x040600
+	act->setIcon(QIcon::fromTheme("preferences-other"));
 	act->setShortcuts(QKeySequence::Preferences);
 #endif
 	menu->addAction(act);
@@ -92,6 +106,9 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	menu->addAction(this->fAboutGameAction);
 	connect(this->fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
 	this->fAboutQtadsAction = new QAction(tr("A&bout QTads"), this);
+#if QT_VERSION >= 0x040600
+	this->fAboutQtadsAction->setIcon(QIcon::fromTheme("help-about"));
+#endif
 	menu->addAction(this->fAboutQtadsAction);
 	connect(this->fAboutQtadsAction, SIGNAL(triggered()), this, SLOT(fShowAboutQtads()));
 
