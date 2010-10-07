@@ -312,14 +312,12 @@ CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 }
 
 
-bool
+void
 CHtmlSysWinGroupQt::fEndCurrentGame()
 {
 	if (qFrame->gameRunning() and this->fAskQuitGameDialog()) {
 		qFrame->setGameRunning(false);
-		return true;
 	}
-	return false;
 }
 
 

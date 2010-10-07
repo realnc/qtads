@@ -92,7 +92,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	void
 	fRecentGameTriggered( QAction* action );
 
-	bool
+	void
 	fEndCurrentGame();
 
 	void
