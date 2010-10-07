@@ -134,16 +134,17 @@ QTadsSound::callback( int channel )
 		return;
 	}
 
+	// Remove the object from the list.  Since it can be included several
+	// times, only remove the instance we associated to the channel we're
+	// handling.
+	fObjList.removeAt(index);
+
 	// Sound has repeated enough times, or it has been halted.  In either case,
 	// we need to invoke the TADS callback, if there is one.
 	mObj->fPlaying = false;
 	if (mObj->fDone_func) {
 		mObj->fDone_func(mObj->fDone_func_ctx, mObj->fRepeats);
 	}
-	// Remove the object from the list.  Since it can be included several
-	// times, only remove the instance we associated to the channel we're
-	// handling.
-	fObjList.removeAt(index);
 }
 
 
