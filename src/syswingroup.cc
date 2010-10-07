@@ -71,6 +71,14 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	menu->addAction(this->fGameInfoAction);
 	this->fGameInfoAction->setEnabled(false);
 	connect(this->fGameInfoAction, SIGNAL(triggered()), this, SLOT(fShowGameInfoDialog()));
+	this->fRestartCurrentGameAction = new QAction(tr("Re&start Current Game"), this);
+#if QT_VERSION >= 0x040600
+	this->fRestartCurrentGameAction->setIcon(QIcon::fromTheme("view-refresh"));
+#endif
+	this->fRestartCurrentGameAction->setShortcut(QKeySequence("Ctrl+R"));
+	menu->addAction(this->fRestartCurrentGameAction);
+	this->fRestartCurrentGameAction->setEnabled(false);
+	connect(this->fRestartCurrentGameAction, SIGNAL(triggered()), this, SLOT(fRestartCurrentGame()));
 	this->fEndCurrentGameAction = new QAction(tr("&End Current Game"), this);
 #if QT_VERSION >= 0x040600
 	this->fEndCurrentGameAction->setIcon(QIcon::fromTheme("process-stop"));
@@ -151,6 +159,21 @@ CHtmlSysWinGroupQt::fAskQuitGameDialog()
 	if (QMessageBox::question(0, tr("End Current Game") + " - " + qFrame->applicationName(),
 							  tr("If you didn't save the current game, all progress will be lost. Do you wish"
 								 " to quit the game?"), QMessageBox::Yes | QMessageBox::Cancel,
+							  QMessageBox::Cancel)
+		== QMessageBox::Yes)
+	{
+		return true;
+	}
+	return false;
+}
+
+
+bool
+CHtmlSysWinGroupQt::fAskRestartGameDialog()
+{
+	if (QMessageBox::question(0, tr("Restart Current Game") + " - " + qFrame->applicationName(),
+							  tr("If you didn't save the current game, all progress will be lost. Do you wish"
+								 " to restart the game?"), QMessageBox::Yes | QMessageBox::Cancel,
 							  QMessageBox::Cancel)
 		== QMessageBox::Yes)
 	{
@@ -301,9 +324,19 @@ CHtmlSysWinGroupQt::fEndCurrentGame()
 
 
 void
+CHtmlSysWinGroupQt::fRestartCurrentGame()
+{
+	if (qFrame->gameRunning() and this->fAskRestartGameDialog()) {
+		qFrame->setNextGame(qFrame->gameFile());
+	}
+}
+
+
+void
 CHtmlSysWinGroupQt::fNotifyGameQuitting()
 {
 	this->fGameInfoAction->setEnabled(false);
+	this->fRestartCurrentGameAction->setEnabled(false);
 	this->fEndCurrentGameAction->setEnabled(false);
 }
 
@@ -313,6 +346,7 @@ CHtmlSysWinGroupQt::fNotifyGameStarting()
 {
 	this->fHideGameInfoDialog();
 	this->fGameInfoAction->setEnabled(GameInfoDialog::gameHasMetaInfo(qFrame->gameFile()));
+	this->fRestartCurrentGameAction->setEnabled(true);
 	this->fEndCurrentGameAction->setEnabled(true);
 }
 

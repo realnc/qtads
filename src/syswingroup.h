@@ -54,11 +54,15 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	class QMenu* fRecentGamesMenu;
 	class QAction* fAboutGameAction;
 	class QAction* fEndCurrentGameAction;
+	class QAction* fRestartCurrentGameAction;
 	class QAction* fGameInfoAction;
 	class QAction* fAboutQtadsAction;
 
 	bool
 	fAskQuitGameDialog();
+
+	bool
+	fAskRestartGameDialog();
 
   private slots:
 	void
@@ -90,6 +94,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
 	bool
 	fEndCurrentGame();
+
+	void
+	fRestartCurrentGame();
 
 	void
 	fNotifyGameQuitting();
