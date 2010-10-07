@@ -10,6 +10,8 @@
   - Input of non-ASCII characters for languages that use compose keys ("dead
     keys") should now work correctly for TADS 3.
 
+  - MP3 and WAV sounds should not leak memory anymore.
+
 
 2.0 - 2010/09/28
 ================
