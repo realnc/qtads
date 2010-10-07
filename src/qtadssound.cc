@@ -246,7 +246,12 @@ QTadsSound::addCrossFade( int ms )
 
 	if (this->fPlaying) {
 		this->fRepeatsWanted = -1;
-		this->fFadeOutTimer.start(this->fLength - this->fFadeOut - this->fTimePos.elapsed());
+		int timeFromNow = this->fLength - this->fFadeOut - this->fTimePos.elapsed();
+		if (timeFromNow < 1) {
+			timeFromNow = 1;
+			this->fFadeOut = this->fLength - this->fTimePos.elapsed();
+		}
+		this->fFadeOutTimer.start(timeFromNow);
 	}
 }
 
