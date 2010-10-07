@@ -62,6 +62,10 @@ QTadsSound::~QTadsSound()
 			SDL_Delay(10);
 		}
 	}
+	// Free the raw audio data buffer if SDL_mixer didn't allocate it itself.
+	if (not this->fChunk->allocated) {
+		free(this->fChunk->abuf);
+	}
 	Mix_FreeChunk(this->fChunk);
 }
 
