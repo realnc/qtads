@@ -258,7 +258,7 @@ QTadsSound::addCrossFade( int ms )
 
 CHtmlSysSound*
 QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-							   unsigned long filesize, CHtmlSysWin* win, SoundType type )
+						 unsigned long filesize, CHtmlSysWin* win, SoundType type )
 {
 	//qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
 	//		<< "url:" << url->get_url();
