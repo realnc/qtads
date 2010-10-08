@@ -21,11 +21,13 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget *parent)
 
 	// Construct a string holding all version info.
 	QString str;
-	str += tr("QTads version:") + "\t" + QTADS_VERSION + "\n\n"
-		   + tr("TADS 2 virtual machine:") + "\t" + TADS_RUNTIME_VERSION + "\n"
-		   + tr("TADS 3 virtual machine:") + "\t" + T3VM_VSN_STRING + " (" + T3VM_IDENTIFICATION + ")\n\n"
-		   + tr("Qt build version:") + "\t" + QT_VERSION_STR + "\n"
-		   + tr("Qt runtime version:") + "\t" + qVersion();
+	str += "<table border=\"0\" width=\"100%\"><tr><td>";
+	str += tr("QTads version:") + "</td><td>" + QTADS_VERSION + "<br></td></tr><tr><td>"
+		   + tr("TADS 2 virtual machine:") + "</td><td>\t" + TADS_RUNTIME_VERSION + "</td></tr><tr><td>"
+		   + tr("TADS 3 virtual machine:") + "</td><td>\t" + T3VM_VSN_STRING + " (" + T3VM_IDENTIFICATION
+		   + ")<br></td></tr><tr><td>"
+		   + tr("Qt build version:") + "</td><td>" + QT_VERSION_STR + "</td></tr><tr><td>"
+		   + tr("Qt runtime version:") + "</td><td>" + qVersion() + "</td></tr></table>";
 	ui->versionInfoLabel->setText(str);
 }
 
