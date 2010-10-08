@@ -2,11 +2,12 @@ TEMPLATE = app
 CONFIG += qt silent warn_off
 macx {
 	#QMAKE_INFO_PLIST = Info.plist
-	LIBS += -framework SDL_mixer -framework SDL
+	LIBS += -framework SDL_mixer -framework SDL_sound -framework SDL
 	INCLUDEPATH += \
 		/Library/Frameworks/SDL.framework/Headers \
 		/Library/Frameworks/SDL_mixer.framework/Headers \
-		/Library/Frameworks/SDL_mixer.framework/Frameworks/smpeg.framework/Headers
+		/Library/Frameworks/smpeg.framework/Headers \
+		/Library/Frameworks/SDL_sound.framework/Headers
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 } else {
 	CONFIG += link_pkgconfig
