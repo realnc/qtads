@@ -314,7 +314,16 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
 		wantedFormat.channels = 2;
 		wantedFormat.rate = 44100;
 		wantedFormat.format = MIX_DEFAULT_FORMAT;
-		Sound_Sample* sample = Sound_NewSample(rw, type == WAV ? "WAV" : "MP3", &wantedFormat, 65536);
+		// Note that we use a large buffer size to speed-up decoding of large
+		// MP3s on Windows; the decoding will take extremely long with small
+		// buffer sizes.
+		Sound_Sample* sample = Sound_NewSample(rw, type == WAV ? "WAV" : "MP3", &wantedFormat,
+#ifdef Q_WS_WIN
+											   6291456
+#else
+											   131072
+#endif
+											   );
 		if (sample == 0) {
 			qWarning() << "ERROR:" << Sound_GetError();
 			Sound_ClearError();
