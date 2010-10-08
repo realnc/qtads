@@ -38,6 +38,13 @@ QTadsSound::QTadsSound( QObject* parent, Mix_Chunk* chunk, SoundType type )
 {
 	// FIXME: Calculate sound length in a safer way.
 	this->fLength = (this->fChunk->alen * 8) / (2 * 16 * 44.1);
+	// Pretend that the sound is 30ms shorter than it really is in order to
+	// compensate for wacky OS timers (Windows and low-Hz systems).
+	if (this->fLength > 30) {
+		this->fLength -= 30;
+	} else {
+		this->fLength = 0;
+	}
 	//qDebug() << "Sound length:" << this->fLength;
 	connect(this, SIGNAL(readyToLoop()), SLOT(fDoLoop()));
 	connect(this, SIGNAL(readyToFadeOut()), SLOT(fPrepareFadeOut()));
