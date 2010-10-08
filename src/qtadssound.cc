@@ -34,7 +34,7 @@ QList<QTadsSound*> QTadsSound::fObjList;
 
 QTadsSound::QTadsSound( QObject* parent, Mix_Chunk* chunk, SoundType type )
 : QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fPlaying(false), fFadeOut(0), fCrossFade(false),
-  fDone_func(0), fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
+  fFadeOutTimer(new QTimer(0)), fDone_func(0), fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
 {
 	// FIXME: Calculate sound length in a safer way.
 	this->fLength = (this->fChunk->alen * 8) / (2 * 16 * 44.1);
@@ -48,10 +48,11 @@ QTadsSound::QTadsSound( QObject* parent, Mix_Chunk* chunk, SoundType type )
 	//qDebug() << "Sound length:" << this->fLength;
 	connect(this, SIGNAL(readyToLoop()), SLOT(fDoLoop()));
 	connect(this, SIGNAL(readyToFadeOut()), SLOT(fPrepareFadeOut()));
-	connect(&this->fFadeOutTimer, SIGNAL(timeout()), this, SLOT(fDoFadeOut()));
+	connect(this->fFadeOutTimer, SIGNAL(timeout()), this, SLOT(fDoFadeOut()));
+	connect(this, SIGNAL(destroyed()), SLOT(fDeleteTimer()));
 
 	// Make sure the timer only calls our fade-out slot *once* and then stops.
-	this->fFadeOutTimer.setSingleShot(true);
+	this->fFadeOutTimer->setSingleShot(true);
 }
 
 
@@ -105,7 +106,7 @@ QTadsSound::fDoLoop()
 	// If this is the last iteration and we have a fade-out, set the fade-out
 	// timer.
 	if (this->fFadeOut > 0 and (this->fRepeatsWanted == -1 or this->fRepeats == this->fRepeatsWanted)) {
-		this->fFadeOutTimer.start(this->fLength - this->fFadeOut);
+		this->fFadeOutTimer->start(this->fLength - this->fFadeOut);
 	}
 }
 
@@ -113,7 +114,14 @@ QTadsSound::fDoLoop()
 void
 QTadsSound::fPrepareFadeOut()
 {
-	this->fFadeOutTimer.start(this->fLength - this->fFadeOut);
+	this->fFadeOutTimer->start(this->fLength - this->fFadeOut);
+}
+
+
+void
+QTadsSound::fDeleteTimer()
+{
+	delete this->fFadeOutTimer;
 }
 
 
@@ -258,7 +266,7 @@ QTadsSound::addCrossFade( int ms )
 			timeFromNow = 1;
 			this->fFadeOut = this->fLength - this->fTimePos.elapsed();
 		}
-		this->fFadeOutTimer.start(timeFromNow);
+		this->fFadeOutTimer->start(timeFromNow);
 	}
 }
 

@@ -18,7 +18,6 @@
 #define QTADSSOUND_H
 
 #include <QObject>
-#include <QTimer>
 #include <QTime>
 
 #include "tadshtml.h"
@@ -40,7 +39,7 @@ class QTadsSound: public QObject {
 	bool fPlaying;
 	int fFadeOut;
 	bool fCrossFade;
-	QTimer fFadeOutTimer;
+	class QTimer* fFadeOutTimer;
 	QTime fTimePos;
 
 	// TADS callback to invoke on stop.
@@ -89,6 +88,9 @@ class QTadsSound: public QObject {
 
 	void
 	fPrepareFadeOut();
+
+	void
+	fDeleteTimer();
 
   signals:
 	void readyToLoop();
