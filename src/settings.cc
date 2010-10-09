@@ -49,14 +49,32 @@ Settings::loadFromDisk()
 	this->clickedLinkColor = sett.value("clickedlinks", QColor(Qt::cyan)).value<QColor>();
 	sett.endGroup();
 
+#ifdef Q_WS_MAC
+#  define DEFAULT_SERIF   "Georgia,15"
+#  define DEFAULT_SANS    "Helvetica,15"
+#  define DEFAULT_MONO    "Andale Mono,15"
+#  define DEFAULT_SCRIPT  "Apple Chancery,17"
+#else
+#ifdef Q_WS_WIN
+#  define DEFAULT_SERIF   "Times New Roman,12"
+#  define DEFAULT_SANS    "Verdana,12"
+#  define DEFAULT_MONO    "Courier New,12"
+#  define DEFAULT_SCRIPT  "Comic Sans MS,12"
+#else
+#  define DEFAULT_SERIF   "serif"
+#  define DEFAULT_SANS    "sans-serif"
+#  define DEFAULT_MONO    "monospace"
+#  define DEFAULT_SCRIPT  "cursive"
+#endif
+#endif
 	sett.beginGroup("fonts");
-	this->mainFont.fromString(sett.value("main", "serif").toString());
-	this->fixedFont.fromString(sett.value("fixed", "monospace").toString());
-	this->serifFont.fromString(sett.value("serif", "serif").toString());
-	this->sansFont.fromString(sett.value("sans", "sans-serif").toString());
-	this->scriptFont.fromString(sett.value("script", "cursive").toString());
-	this->writerFont.fromString(sett.value("typewriter", "monospace").toString());
-	this->inputFont.fromString(sett.value("input", "serif").toString());
+	this->mainFont.fromString(sett.value("main", DEFAULT_SERIF).toString());
+	this->fixedFont.fromString(sett.value("fixed", DEFAULT_MONO).toString());
+	this->serifFont.fromString(sett.value("serif", DEFAULT_SERIF).toString());
+	this->sansFont.fromString(sett.value("sans", DEFAULT_SANS).toString());
+	this->scriptFont.fromString(sett.value("script", DEFAULT_SCRIPT).toString());
+	this->writerFont.fromString(sett.value("typewriter", DEFAULT_MONO).toString());
+	this->inputFont.fromString(sett.value("input", DEFAULT_SERIF).toString());
 	sett.endGroup();
 
 	sett.beginGroup("misc");
