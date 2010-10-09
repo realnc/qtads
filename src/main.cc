@@ -26,13 +26,17 @@
 #include "syssoundmidi.h"
 
 
-// On OS X, SDL does weird stuff with main() and redefines it to SDLMain().
-// We don't like that.
-#ifdef Q_WS_MAC
-#  ifdef main
-#    undef main
-#  endif
+// On some platforms, SDL redefines main in order to provide a
+// platform-specific main() implementation.  However, Qt handles this too,
+// so things can get weird.  We need to make sure main is not redefined so
+// that Qt can find our own implementation and SDL will not try to do
+// platform-specific initialization work (like launching the Cocoa event-loop
+// or setting up the application menu on OS X, or redirecting stdout and stderr
+// to text files on Windows), which would break things.
+#ifdef main
+#  undef main
 #endif
+
 int main( int argc, char** argv )
 {
 	CHtmlResType::add_basic_types();
