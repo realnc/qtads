@@ -20,15 +20,15 @@ with their development headers/tools installed.  At this time, this would be:
   Qt4 development tools (qmake, uic, etc.)
   SDL
   SDL_mixer
-  SMPEG
+  SDL_sound
 
 Most Linux distributions provide the development versions in packages that have
-"-dev" appended to the package name.  On Ubuntu it usually is enough to install
-the following:
+"-dev" appended to the package name.  On Ubuntu and Debian, it is usually enough
+to install the following packages in order to be able to build QTads:
 
   libqt4-dev
   libsdl-mixer1.2-dev
-  libsmpeg-dev
+  libsdl-sound1.2-dev
 
 Debian Lenny users should note that even though QTads will build and run with
 Qt 4.4 (Lenny only offers that version), the results will be less than

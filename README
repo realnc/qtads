@@ -18,25 +18,19 @@ the distribution include:
       /usr/share/common-licenses/GPL-2 or in the "Help->About" menu of
       the program.)
 
-    CREDITS
-      People who contributed to QTads in one way or another.  Help me
-      make QTads better and your name will appear there too!
+    HTML_TADS_LICENSE
+      The HTML TADS Freeware Source Code License.  QTads can be
+      distributed and modified under the terms of this license if you
+      cannot or don't want to accept the terms of the GPL.
 
     INSTALL
-      Installation and usage instructions.  The first thing you should
-      read (after this README file).
+      Installation and usage instructions.
 
     NEWS
       Contains the list of changes between QTads versions.
 
-    SOURCE_README
-      If you want to contribute code, read this.
-
     qtads.6.gz
-      Manual page (compressed with GNU Zip).  This won't actually get
-      installed.  It's for people who want to create RPM or Debian
-      packages for QTads.  (If you installed QTads by using such a
-      package, it might have been installed.)
+      Manual page.
 
 The newest version of QTads can be downloaded from its homepage at:
 
@@ -78,7 +72,8 @@ On what systems does it run?
 
 Theoretically, it should run on *any* system for which a Qt-port exists
 (many Unices, including Linux and Mac OSX, Windows, Haiku, even embedded
-devices like cell phones and PDAs).
+devices like cell phones and PDAs).  The systems it is known to run are
+Linux, Mac OS X 10.5 and newer, MS Windows XP/Vista/7 and Haiku.
 
 
 What's Interactive Fiction?
@@ -108,10 +103,13 @@ Copyright
 
 QTads is Copyright (C) 2010 by Nikos Chantziaras.
 
-QTads is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2 of the License, or (at your
-option) any later version.
+QTads is free software; you can redistribute it and/or modify it either
+under the terms of the HTML TADS Freeware Source Code License as
+appearing in the file HTML_TADS_LICENSE included in the packaging of
+this file, or under the terms of the GNU General Public License as
+published by the Free Software Foundation and appearing in the file
+COPYING included in the packaging of this file; either version 2 of the
+License, or (at your option) any later version.
 
 QTads is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
