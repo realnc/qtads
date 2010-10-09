@@ -26,6 +26,8 @@
     desktop environment's current theme will be used for the various menu
     iems.
 
+  - A sane set of default fonts and sizes is now used on Mac and Windows.
+
 
 2.0 - 2010/09/28
 ================
