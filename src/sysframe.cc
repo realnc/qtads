@@ -714,7 +714,15 @@ CHtmlSysFrameQt::get_input( textchar_t* buf, size_t bufsiz )
 
 	// If input exceeds the buffer size, make sure we don't overflow.
 	int len = this->fTadsBuffer->getlen() > bufsiz ? bufsiz : this->fTadsBuffer->getlen();
-	strncpy(buf, this->fTadsBuffer->getbuf(), len);
+
+	// For TADS 3, we use the result as-is; it's already in UTF-8.  For TADS 2,
+	// we will need to use the prefered encoding.
+	if (this->fTads3) {
+		strncpy(buf, this->fTadsBuffer->getbuf(), len);
+	} else {
+		QTextCodec* codec = QTextCodec::codecForName(this->fSettings->tads2Encoding);
+		strncpy(buf, codec->fromUnicode(QString::fromUtf8(this->fTadsBuffer->getbuf())).constData(), len);
+	}
 	buf[len] = '\0';
 	return ret;
 }
@@ -735,7 +743,15 @@ CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned lon
 
 		// If input exceeds the buffer size, make sure we don't overflow.
 		int len = this->fTadsBuffer->getlen() > buflen ? buflen : this->fTadsBuffer->getlen();
-		strncpy(buf, this->fTadsBuffer->getbuf(), len);
+
+		// For TADS 3, we use the result as-is; it's already in UTF-8.  For TADS 2,
+		// we will need to use the prefered encoding.
+		if (this->fTads3) {
+			strncpy(buf, this->fTadsBuffer->getbuf(), len);
+		} else {
+			QTextCodec* codec = QTextCodec::codecForName(this->fSettings->tads2Encoding);
+			strncpy(buf, codec->fromUnicode(QString::fromUtf8(this->fTadsBuffer->getbuf())).constData(), len);
+		}
 		buf[len] = '\0';
 
 		if (timedOut) {
@@ -787,7 +803,16 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
 	if (res == -2) {
 		// It was an HREF event (user clicked a hyperlink).  Get the last
 		// pending HREF event.
-		strncpy(info->href, this->fGameWin->pendingHrefEvent().toUtf8().constData(), sizeof(info->href) - 1);
+		// For TADS 3, we use the result as-is; it's already in UTF-8.  For TADS 2,
+		// we will need to use the prefered encoding.
+		if (this->fTads3) {
+			strncpy(info->href, this->fGameWin->pendingHrefEvent().toUtf8().constData(),
+					sizeof(info->href) - 1);
+		} else {
+			QTextCodec* codec = QTextCodec::codecForName(this->fSettings->tads2Encoding);
+			strncpy(info->href, codec->fromUnicode(this->fGameWin->pendingHrefEvent()).constData(),
+					sizeof(info->href) - 1);
+		}
 		info->href[sizeof(info->href) - 1] = '\0';
 		return OS_EVT_HREF;
 	} else if (res == 0) {
