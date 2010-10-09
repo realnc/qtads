@@ -721,7 +721,8 @@ CHtmlSysFrameQt::get_input( textchar_t* buf, size_t bufsiz )
 		strncpy(buf, this->fTadsBuffer->getbuf(), len);
 	} else {
 		QTextCodec* codec = QTextCodec::codecForName(this->fSettings->tads2Encoding);
-		strncpy(buf, codec->fromUnicode(QString::fromUtf8(this->fTadsBuffer->getbuf())).constData(), len);
+		strncpy(buf, codec->fromUnicode(QString::fromUtf8(this->fTadsBuffer->getbuf(),
+														  this->fTadsBuffer->getlen())).constData(), len);
 	}
 	buf[len] = '\0';
 	return ret;
@@ -750,7 +751,8 @@ CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned lon
 			strncpy(buf, this->fTadsBuffer->getbuf(), len);
 		} else {
 			QTextCodec* codec = QTextCodec::codecForName(this->fSettings->tads2Encoding);
-			strncpy(buf, codec->fromUnicode(QString::fromUtf8(this->fTadsBuffer->getbuf())).constData(), len);
+			strncpy(buf, codec->fromUnicode(QString::fromUtf8(this->fTadsBuffer->getbuf(),
+															  this->fTadsBuffer->getlen())).constData(), len);
 		}
 		buf[len] = '\0';
 
