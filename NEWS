@@ -24,9 +24,12 @@
 
   - When built on Linux with Qt 4.6 or newer, appropriate icons from the
     desktop environment's current theme will be used for the various menu
-    iems.
+    items.
 
   - A sane set of default fonts and sizes is now used on Mac and Windows.
+ 
+  - Sometimes the interpreter would not scroll down to the bottom when opening
+    TADS 2 games.  This should no longer be occuring.
 
 
 2.0 - 2010/09/28
