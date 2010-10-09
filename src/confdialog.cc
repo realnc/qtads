@@ -87,7 +87,23 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
 	const QList<QByteArray>& aliases = QTextCodec::availableCodecs();
 	QList<QByteArray> codecs;
 	for (int i = 0; i < aliases.size(); ++i) {
-		codecs.append(QTextCodec::codecForName(aliases.at(i))->name());
+		const QByteArray codecName = QTextCodec::codecForName(aliases.at(i))->name();
+		// Only allow some of the possible sets, otherwise we would get a big
+		// list with most of the encodings being irrelevant.  The only Unicode
+		// encoding we allow is UTF-8, since it's a single-byte character set
+		// and therefore can be used by TADS 2 games (though I'm not aware of
+		// any that actually use UTF-8.)
+		if (codecName == "UTF-8"
+			or codecName.startsWith("windows-")
+			or codecName.startsWith("ISO-")
+			or codecName.startsWith("KOI8-")
+			or codecName.startsWith("IBM")
+			or codecName.startsWith("EUC-")
+			or codecName.startsWith("jisx020")
+			or codecName.startsWith("cp949"))
+		{
+			codecs.append(codecName);
+		}
 	}
 	qSort(codecs);
 	for (int i = 0; i < codecs.size(); ++i) {
