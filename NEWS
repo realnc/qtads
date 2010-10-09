@@ -1,22 +1,30 @@
-2.0.1 - 2010/10/??
+2.0.1 - 2010/10/10
 ==================
 
-  - There is now support for digital sound fade-in, fade-out and cross-fades.
+  - A new "Restart Current Game" menu option has been added.
 
-  - Sometimes, MP3 and WAV sounds would play at double speed in some systems.
-    This has been fixed by using SDL_sound for MP3 and WAV decoding.  Before
-    that, SMPEG was used for MP3 and SDL_mixer for WAV.
+  - Digital sound fade-in, fade-out and cross-fades are now fully supported on
+    all operating systems.  I think...
+
+  - MP3 and WAV sounds that use "odd" sampling rates should now play correctly.
+    Previously, they sometimes were playing at double speed.
 
   - Input of non-ASCII characters for languages that use compose keys ("dead
     keys") should now work correctly for TADS 3.
 
-  - MP3 and WAV sounds should not leak memory anymore.
+  - A memory leak during unloading of MP3 and WAV sounds has been fixed.
+
+  - Decoding of long MP3s on Windows should not take several millenia anymore.
 
   - A new configuration option was introduced that allows for selecting the
     character set encoding to be used when playing TADS 2 games.  Previously,
     the interpreter was treating TADS 2 games the same as TADS 3 ones, which
     wouldn't work correctly with games that use characters outside the ASCII
     range.
+
+  - When built on Linux with Qt 4.6 or newer, appropriate icons from the
+    desktop environment's current theme will be used for the various menu
+    iems.
 
 
 2.0 - 2010/09/28
