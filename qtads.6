@@ -1,0 +1,40 @@
+.\" Process this file with
+.\" groff -man -Tascii qtads.6
+.TH QTADS 6 "April 2010" " " "User Manuals"
+.SH NAME
+QTads \- Multimedia interpreter for TADS games
+.SH SYNOPSIS
+.B qtads [
+.I game-file
+.B ]
+.SH DESCRIPTION
+.B QTads
+is an interpreter that can run games written in TADS. TADS is a programming language written
+by Michael J.\ Roberts, designed to implement text-adventure games (Interactive Fiction),
+similar to those developed by Infocom in 1980-1990, as well as other companies (like Legend
+Entertainment, Level 9, etc). If you liked games like "Zork", "Adventure", "Trinity", or
+"Eric the Unready", you'll feel right at home.
+.PP
+This version of QTads supports both TADS versions in use today; traditional TADS 2 as well as
+the new TADS 3 format. It runs on a variety of systems, including MS Windows and every Unix
+system for which the Qt library is available, including Linux and Mac OSX.
+.SH OPTIONS
+With no arguments, QTads will by default ask you for a filename, unless this prompting has
+been disabled in the configuration dialog.
+.PP
+The optional
+.I filename
+can be used to start a game immediately.
+.SH LICENSE
+QTads is a Free program, dual-licensed under the GNU General Public License (GPL) as well as
+the HTML TADS Freeware Source Code License.  See the file COPYING (included in the package of
+the program), or the "Help->About" menu for details.
+.SH AUTHORS
+This program is written and maintained by Nikos Chantziaras <realnc@gmail.com>.
+.SH ACKNOWLEDGEMENTS
+The reference implementation of the TADS VM was done by Mike Roberts. Several people helped
+making QTads a better program. See the file CREDITS or the "Help->About" menu for a list of
+names.
+.SH "SEE ALSO"
+.BR frotz (6),
+.BR inform (1)
