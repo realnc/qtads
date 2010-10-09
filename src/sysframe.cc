@@ -19,7 +19,7 @@
 #include <QLabel>
 #include <QStatusBar>
 #include <QDir>
-#include <QTextDecoder>
+#include <QTextCodec>
 
 #include "qtadshostifc.h"
 #include "settings.h"
@@ -685,8 +685,8 @@ CHtmlSysFrameQt::display_output( const textchar_t *buf, size_t len )
 		this->fBuffer.append(buf, len);
 	} else {
 		// TADS 2 does not use UTF-8; use the encoding from our settings.
-		QTextDecoder decoder(QTextCodec::codecForName(this->fSettings->tads2Encoding));
-		this->fBuffer.append(decoder.toUnicode(buf, len).toUtf8().constData());
+		QTextCodec* codec = QTextCodec::codecForName(this->fSettings->tads2Encoding);
+		this->fBuffer.append(codec->toUnicode(buf, len).toUtf8().constData());
 	}
 }
 
