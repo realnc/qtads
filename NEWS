@@ -12,6 +12,12 @@
 
   - MP3 and WAV sounds should not leak memory anymore.
 
+  - A new configuration option was introduced that allows for selecting the
+    character set encoding to be used when playing TADS 2 games.  Previously,
+    the interpreter was treating TADS 2 games the same as TADS 3 ones, which
+    wouldn't work correctly with games that use characters outside the ASCII
+    range.
+
 
 2.0 - 2010/09/28
 ================
