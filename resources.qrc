@@ -1,6 +1,6 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-	<file>qtads-logo.png</file>
-	<file>gpl-2.0-standalone.html</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>qtads-logo.png</file>
+        <file>gpl-2.0-standalone.html</file>
+    </qresource>
 </RCC>
