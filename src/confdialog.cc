@@ -18,6 +18,8 @@
 #include <QColorDialog>
 #include <QSignalMapper>
 #include <QPushButton>
+#include <QTextCodec>
+#include <QDebug>
 
 #include "confdialog.h"
 #include "ui_confdialog.h"
@@ -82,6 +84,19 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
 	ui->inputFontBox->setCurrentFont(sett->inputFont);
 	ui->inputFontItalicCheckBox->setChecked(sett->inputFont.italic());
 	ui->inputFontBoldCheckBox->setChecked(sett->inputFont.bold());
+
+	const QList<QByteArray>& aliases = QTextCodec::availableCodecs();
+	QList<QByteArray> codecs;
+	for (int i = 0; i < aliases.size(); ++i) {
+		codecs.append(QTextCodec::codecForName(aliases.at(i))->name());
+	}
+	qSort(codecs);
+	for (int i = 0; i < codecs.size(); ++i) {
+		if (ui->encodingComboBox->findText(codecs.at(i)) == -1) {
+			ui->encodingComboBox->addItem(codecs.at(i));
+		}
+	}
+	ui->encodingComboBox->setCurrentIndex(ui->encodingComboBox->findText(sett->tads2Encoding));
 
 	ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
 
@@ -166,6 +181,7 @@ ConfDialog::fMakeInstantApply()
 	connect(ui->linkHoveringColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
 	connect(ui->linkClickedColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
 
+	connect(ui->encodingComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(fApplySettings()));
 	connect(ui->askForGameFileCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 }
 
@@ -210,6 +226,7 @@ ConfDialog::fApplySettings()
 	sett->writerFont.setPointSize(ui->writerFontSizeSpinBox->value());
 	sett->inputFont.setPointSize(ui->inputFontSizeSpinBox->value());
 
+	sett->tads2Encoding = ui->encodingComboBox->currentText().toAscii();
 	sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
 
 	// Notify the application that preferences have changed.

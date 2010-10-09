@@ -19,6 +19,7 @@
 #include <QLabel>
 #include <QStatusBar>
 #include <QDir>
+#include <QTextDecoder>
 
 #include "qtadshostifc.h"
 #include "settings.h"
@@ -678,8 +679,15 @@ CHtmlSysFrameQt::display_output( const textchar_t *buf, size_t len )
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	// Just add the new text to our buffer.
-	this->fBuffer.append(buf, len);
+	// Just add the new text to our buffer.  Append it as-is if we're running
+	// a TADS 3 game, since it's already UTF-8 encoded.
+	if (this->fTads3) {
+		this->fBuffer.append(buf, len);
+	} else {
+		// TADS 2 does not use UTF-8; use the encoding from our settings.
+		QTextDecoder decoder(QTextCodec::codecForName(this->fSettings->tads2Encoding));
+		this->fBuffer.append(decoder.toUnicode(buf, len).toUtf8().constData());
+	}
 }
 
 

@@ -53,6 +53,7 @@ class Settings {
 	CHtmlSysFontQt writerFont;
 	CHtmlSysFontQt inputFont;
 
+	QByteArray tads2Encoding;
 	bool askForGameFile;
 
 	QStringList recentGamesList;
