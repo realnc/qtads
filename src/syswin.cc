@@ -248,6 +248,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 	// Set our new window position if it differs from the old one.
 	if (newSize != oldSize) {
 		this->setGeometry(newSize);
+
 		// Since we changed size, we will need a reformat.
 		qFrame->scheduleReformat();
 	}

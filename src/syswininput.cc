@@ -261,7 +261,8 @@ CHtmlSysWinInputQt::inputMethodEvent( QInputMethodEvent* e )
 		return;
 	}
 
-	this->fTadsBuffer->add_string(e->commitString().toUtf8().constData(), e->commitString().toUtf8().length(), true);
+	this->fTadsBuffer->add_string(e->commitString().toUtf8().constData(),
+								  e->commitString().toUtf8().length(), true);
 	this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
 	if (this->fTag->ready_to_format()) {
 		this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
@@ -365,8 +366,10 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer, unsigned long timeout, 
 			this->fRestoreFromCancel = false;
 		}
 	} else {
-		// Since we're not resuming, make sure we've formatted all available
-		// input and tell the formatter to begin a new input.
+		// Since we're not resuming, make sure we scroll down and that we've
+		// formatted all available input and tell the formatter to begin a new
+		// input.
+		this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
 		while (formatter->more_to_do()) {
 			formatter->do_formatting();
 		}
