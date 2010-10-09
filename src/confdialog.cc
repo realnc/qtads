@@ -19,7 +19,6 @@
 #include <QSignalMapper>
 #include <QPushButton>
 #include <QTextCodec>
-#include <QDebug>
 
 #include "confdialog.h"
 #include "ui_confdialog.h"
