@@ -570,7 +570,13 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	if (this->fBannerStyleGrid) {
 		this->dispWidget->resize(this->viewport()->size());
 	} else {
-		this->dispWidget->resize(this->formatter_->get_outer_max_line_width(), this->formatter_->get_max_y_pos());
+		long newWidth;
+		if (this->formatter_->get_outer_max_line_width() > this->viewport()->width()) {
+			newWidth = this->formatter_->get_outer_max_line_width();
+		} else {
+			newWidth = this->viewport()->width();
+		}
+		this->dispWidget->resize(newWidth, this->formatter_->get_max_y_pos());
 	}
 
 	// If we didn't do any drawing, and we updated the window coming in,
@@ -675,7 +681,13 @@ CHtmlSysWinQt::fmt_adjust_hscroll()
 	}
 
 	if (this->formatter_->get_outer_max_line_width() != this->dispWidget->width()) {
-		this->dispWidget->resize(this->formatter_->get_outer_max_line_width(), this->dispWidget->height());
+		long newWidth;
+		if (this->formatter_->get_outer_max_line_width() > this->viewport()->width()) {
+			newWidth = this->formatter_->get_outer_max_line_width();
+		} else {
+			newWidth = this->viewport()->width();
+		}
+		this->dispWidget->resize(newWidth, this->dispWidget->height());
 	}
 }
 
