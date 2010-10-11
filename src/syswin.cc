@@ -399,7 +399,8 @@ CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const 
 {
 	QPainter painter(this->dispWidget);
 	this->fSetupPainterForFont(painter, hilite, font);
-	painter.drawText(x, y + QFontMetrics(*static_cast<CHtmlSysFontQt*>(font)).ascent(), QString::fromUtf8(str, len));
+	painter.drawText(x, y + QFontMetrics(*static_cast<CHtmlSysFontQt*>(font)).ascent(),
+					 QString::fromUtf8(str, len));
 }
 
 
