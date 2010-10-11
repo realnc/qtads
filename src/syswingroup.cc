@@ -100,7 +100,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	menu = menuBar->addMenu(tr("&Edit"));
 	act = new QAction(tr("&Preferences"), this);
 #if QT_VERSION >= 0x040600
-	act->setIcon(QIcon::fromTheme("preferences-other"));
+	act->setIcon(QIcon::fromTheme("configure"));
 	act->setShortcuts(QKeySequence::Preferences);
 #endif
 	menu->addAction(act);
