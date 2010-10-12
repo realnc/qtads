@@ -249,6 +249,13 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 	if (newSize != oldSize) {
 		this->setGeometry(newSize);
 
+		// Resizing the display widget by the height we gained or lost during
+		// the resize avoids cutting-off the bottom of the output.  I've no
+		// idea why; the problem probably lies elsewhere, but for now, this
+		// seems to fix it.
+		this->dispWidget->resize(this->dispWidget->width(),
+								 this->dispWidget->height() + (newSize.height() - oldSize.height()));
+
 		// Since we changed size, we will need a reformat.
 		qFrame->scheduleReformat();
 	}
