@@ -397,6 +397,10 @@ CHtmlSysWinQt::get_max_chars_in_width( CHtmlSysFont* font, const textchar_t* str
 void
 CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str, size_t len )
 {
+	if (len == 0) {
+		// Huh?
+		return;
+	}
 	QPainter painter(this->dispWidget);
 	this->fSetupPainterForFont(painter, hilite, font);
 	painter.drawText(x, y + QFontMetrics(*static_cast<CHtmlSysFontQt*>(font)).ascent(),
