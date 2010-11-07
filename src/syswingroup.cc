@@ -387,7 +387,9 @@ CHtmlSysWinGroupQt::dragEnterEvent( QDragEnterEvent* e )
 void
 CHtmlSysWinGroupQt::dropEvent( QDropEvent* e )
 {
-	qFrame->setNextGame(e->mimeData()->urls().at(0).toLocalFile());
+	if (this->fAskQuitGameDialog()) {
+		qFrame->setNextGame(e->mimeData()->urls().at(0).toLocalFile());
+	}
 }
 
 
