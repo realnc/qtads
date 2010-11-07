@@ -21,6 +21,7 @@
 #include <QFileDialog>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QUrl>
 
 #include "syswininput.h"
 #include "syswinaboutbox.h"
@@ -42,6 +43,9 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 {
 	//qDebug() << Q_FUNC_INFO << "called";
 	Q_ASSERT(qWinGroup == 0);
+
+	// Make sure we can drag&drop (files in our case) into the main window.
+	this->setAcceptDrops(true);
 
 	// We make our menu bar parentless so it will be shared by all our windows
 	// in Mac OS X.
@@ -364,6 +368,26 @@ CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
 			e->ignore();
 		}
 	}
+}
+
+
+void
+CHtmlSysWinGroupQt::dragEnterEvent( QDragEnterEvent* e )
+{
+	// Only accept the event if there is exactly one URL which points to a
+	// local file.
+	if (e->mimeData()->hasUrls() and e->mimeData()->urls().size() == 1
+		and not e->mimeData()->urls().at(0).toLocalFile().isEmpty())
+	{
+		e->acceptProposedAction();
+	}
+}
+
+
+void
+CHtmlSysWinGroupQt::dropEvent( QDropEvent* e )
+{
+	qFrame->setNextGame(e->mimeData()->urls().at(0).toLocalFile());
 }
 
 

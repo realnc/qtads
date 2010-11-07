@@ -108,6 +108,12 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	virtual void
 	closeEvent( QCloseEvent* e );
 
+	virtual void
+	dragEnterEvent( QDragEnterEvent* e );
+
+	virtual void
+	dropEvent( QDropEvent* e );
+
   public:
 	CHtmlSysWinGroupQt();
 
