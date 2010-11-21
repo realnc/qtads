@@ -53,6 +53,8 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidg
 	p.setColor(QPalette::Text, qFrame->settings()->bannerTextColor);
 	this->setPalette(p);
 
+	this->setAttribute(Qt::WA_InputMethodEnabled);
+
 	// TEMP: Just to make the area of this widget visibly more apparent.
 	//this->viewport()->setBackgroundRole(QPalette::ToolTipBase);
 }

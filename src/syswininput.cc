@@ -45,8 +45,6 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
 	p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
 	p.setColor(QPalette::Text, qFrame->settings()->mainTextColor);
 	this->setPalette(p);
-
-	this->setAttribute(Qt::WA_InputMethodEnabled);
 }
 
 
