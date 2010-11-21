@@ -257,6 +257,9 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 								 this->dispWidget->height() + (newSize.height() - oldSize.height()));
 
 		// Since we changed size, we will need a reformat.
+		//if (this != qFrame->gameWindow())
+		//qDebug() << newSize.width();
+		//if (newSize.width() != oldSize.width())
 		qFrame->scheduleReformat();
 	}
 
@@ -571,6 +574,18 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	// After drawing, keep going until we've formatted everything.
 	while (this->formatter_->more_to_do()) {
 		this->formatter_->do_formatting();
+		/*
+		long newWidth;
+		if (this->formatter_->get_outer_max_line_width() > this->viewport()->width()) {
+			newWidth = this->formatter_->get_outer_max_line_width();
+		} else {
+			newWidth = this->viewport()->width();
+		}
+		if (this == qFrame->gameWindow()) {
+			qDebug() << this->formatter_->get_max_y_pos();
+		}
+		this->dispWidget->resize(newWidth, this->formatter_->get_max_y_pos());
+		*/
 	}
 
 	// Unfreeze the display if we froze it.
@@ -741,6 +756,18 @@ CHtmlSysWinQt::fmt_adjust_vscroll()
 		}
 	}
 	*/
+
+	//if (targetHt > this->dispWidget->height()) {
+		//if (this == qFrame->gameWindow())
+			//qDebug() << this->dispWidget->height();
+		//this->dispWidget->resize(this->dispWidget->width(), targetHt);
+	//}
+	//while (this->verticalScrollBar()->value() < this->verticalScrollBar()->maximum()) {
+		//this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+		//usleep(80000);
+		//this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderSingleStepAdd);
+		//qFrame->advanceEventLoop(QEventLoop::ExcludeUserInputEvents);
+	//}
 
 	this->dispWidget->resize(this->dispWidget->width(), targetHt);
 	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
