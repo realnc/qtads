@@ -120,6 +120,13 @@ CHtmlSysWinQt::keyPressEvent( QKeyEvent* event )
 
 
 void
+CHtmlSysWinQt::inputMethodEvent( QInputMethodEvent* e )
+{
+	qFrame->gameWindow()->inputMethodEvent(e);
+}
+
+
+void
 CHtmlSysWinQt::scrollContentsBy(int dx, int dy)
 {
 	QScrollArea::scrollContentsBy(dx, dy);

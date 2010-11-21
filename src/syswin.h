@@ -93,6 +93,9 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	keyPressEvent( QKeyEvent* event );
 
 	virtual void
+	inputMethodEvent( QInputMethodEvent* e );
+
+	virtual void
 	scrollContentsBy(int dx, int dy);
 
   public:
