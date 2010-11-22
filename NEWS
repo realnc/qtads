@@ -1,3 +1,16 @@
+2.0.2 - 2010/??/??
+==================
+
+  - In games that use background images, there was a visual glitch in the part
+    of the background image near the vertical scrollbar.  This has been fixed.
+
+  - You can now drag&drop TADS game files into the application window to load
+    them into the interpreter.
+
+  - Clicking on a banner window no longer results in not being able to compose
+    accented characters (or other characters requiring "dead keys".)
+
+
 2.0.1 - 2010/10/10
 ==================
 
