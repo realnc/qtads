@@ -847,7 +847,11 @@ CHtmlSysWinQt::set_html_bg_color( HTML_color_t color, int use_default )
 
 	if (use_default) {
 		QPalette p(this->palette());
-		p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
+		if (this->fBannerStyleGrid) {
+			p.setColor(QPalette::Base, Qt::black);
+		} else {
+			p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
+		}
 		this->setPalette(p);
 		return;
 	}
@@ -866,7 +870,11 @@ CHtmlSysWinQt::set_html_text_color( HTML_color_t color, int use_default )
 
 	if (use_default) {
 		QPalette p(this->palette());
-		p.setColor(QPalette::Text, qFrame->settings()->mainTextColor);
+		if (this->fBannerStyleGrid) {
+			p.setColor(QPalette::Text, Qt::lightGray);
+		} else {
+			p.setColor(QPalette::Text, qFrame->settings()->mainTextColor);
+		}
 		this->setPalette(p);
 		return;
 	}
