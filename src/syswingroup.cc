@@ -389,6 +389,9 @@ CHtmlSysWinGroupQt::dropEvent( QDropEvent* e )
 {
 	if (this->fAskQuitGameDialog()) {
 		qFrame->setNextGame(e->mimeData()->urls().at(0).toLocalFile());
+		e->acceptProposedAction();
+	} else {
+		e->ignore();
 	}
 }
 
