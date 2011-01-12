@@ -30,6 +30,8 @@
 #include <QTimer>
 #include <QTextCodec>
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QPushButton>
 #include <QDebug>
 #include <cstdio>
 #include <cstdlib>
@@ -38,6 +40,7 @@
 
 #include "os.h"
 #include "globals.h"
+#include "settings.h"
 #include "sysframe.h"
 #include "syswininput.h"
 
@@ -536,86 +539,85 @@ os_askfile( const char* prompt, char* fname_buf, int fname_buf_len, int prompt_t
 // --------------------------------------------------------------------
 
 /* Ask for input through a dialog.
- *
- * TODO: Implement default-button.
  */
 int
-os_input_dialog( int
-#ifdef DEBUG
-		// Suppress "unused parameter" warning when building
-		// the release version.
-		icon_id
-#endif
-		, const char* prompt, int standard_button_set, const char** buttons,
-		int button_count, int default_index, int cancel_index )
+os_input_dialog( int icon_id, const char* prompt, int standard_button_set, const char** buttons,
+				 int button_count, int default_index, int cancel_index )
 {
 	Q_ASSERT(prompt != 0);
-	//Q_ASSERT(icon_id == OS_INDLG_ICON_NONE or icon_id == OS_INDLG_ICON_WARNING
-	//	 or icon_id == OS_INDLG_ICON_INFO or icon_id == OS_INDLG_ICON_QUESTION
-	//	 or icon_id == OS_INDLG_ICON_ERROR);
+	Q_ASSERT(icon_id == OS_INDLG_ICON_NONE or icon_id == OS_INDLG_ICON_WARNING
+			 or icon_id == OS_INDLG_ICON_INFO or icon_id == OS_INDLG_ICON_QUESTION
+			 or icon_id == OS_INDLG_ICON_ERROR);
 	Q_ASSERT(standard_button_set == 0 or standard_button_set == OS_INDLG_OK
-		 or standard_button_set == OS_INDLG_OKCANCEL
-		 or standard_button_set == OS_INDLG_YESNO
-		 or standard_button_set == OS_INDLG_YESNOCANCEL);
+			 or standard_button_set == OS_INDLG_OKCANCEL
+			 or standard_button_set == OS_INDLG_YESNO
+			 or standard_button_set == OS_INDLG_YESNOCANCEL);
 
-	//QMessageBox::Icon = icon;
+	QMessageBox dialog(qWinGroup);
 
-	/*
+	// We'll use that if we're running a T2 game.
+	QTextCodec* t2Codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
+
+	dialog.setText(qFrame->tads3() ? QString::fromUtf8(prompt) : t2Codec->toUnicode(prompt));
+
 	switch (icon_id) {
 	  case OS_INDLG_ICON_NONE:
-		icon = QMessageBox::NoIcon;
+		dialog.setIcon(QMessageBox::NoIcon);
 		break;
 	  case OS_INDLG_ICON_WARNING:
-		icon = QMessageBox::Warning;
+		dialog.setIcon(QMessageBox::Warning);
 		break;
 	  case OS_INDLG_ICON_INFO:
-		icon = QMessageBox::Information;
+		dialog.setIcon(QMessageBox::Information);
 		break;
 	  case OS_INDLG_ICON_QUESTION:
-		icon = QMessageBox::Information;
+		dialog.setIcon(QMessageBox::Question);
 		break;
 	  case OS_INDLG_ICON_ERROR:
-		icon = QMessageBox::Critical;
+		dialog.setIcon(QMessageBox::Critical);
 		break;
 	}
-	*/
 
-	std::vector<QString> buttonVec;
-
+	QList<QPushButton*> buttonList;
 	if (standard_button_set != 0) {
 		switch (standard_button_set) {
 		  case OS_INDLG_OK:
-			buttonVec.push_back(QObject::tr("O&K"));
+			buttonList.append(dialog.addButton(QMessageBox::Ok));
 			break;
 		  case OS_INDLG_OKCANCEL:
-			buttonVec.push_back(QObject::tr("O&K"));
-			buttonVec.push_back(QObject::tr("&Cancel"));
+			buttonList.append(dialog.addButton(QMessageBox::Ok));
+			buttonList.append(dialog.addButton(QMessageBox::Cancel));
 			break;
 		  case OS_INDLG_YESNO:
-			buttonVec.push_back(QObject::tr("&Yes"));
-			buttonVec.push_back(QObject::tr("&No"));
+			buttonList.append(dialog.addButton(QMessageBox::Yes));
+			buttonList.append(dialog.addButton(QMessageBox::No));
 			break;
 		  case OS_INDLG_YESNOCANCEL:
-			buttonVec.push_back(QObject::tr("&Yes"));
-			buttonVec.push_back(QObject::tr("&No"));
-			buttonVec.push_back(QObject::tr("&Cancel"));
+			buttonList.append(dialog.addButton(QMessageBox::Yes));
+			buttonList.append(dialog.addButton(QMessageBox::No));
+			buttonList.append(dialog.addButton(QMessageBox::Cancel));
 			break;
 		  default:
 			qWarning("os_input_dialog: unrecognized button set");
 		}
 	} else for (int i = 0; i < button_count; ++i) {
 		Q_ASSERT(buttons[i] != 0);
-		buttonVec.push_back(buttons[i]);
+		const QString& buttonText = qFrame->tads3() ? QString::fromUtf8(buttons[i]) : t2Codec->toUnicode(buttons[i]);
+		buttonList.append(dialog.addButton(buttonText, QMessageBox::InvalidRole));
 	}
 
-#ifndef HTMLQT
-	// TODO: HTML QTads implementation.
-	int res = QTadsIO::inputDialog(QTadsIO::t3Mode()
-					   ? QString::fromLocal8Bit(prompt)
-				       : ::qtf2QString(prompt),
-				       buttonVec, default_index);
-	return (res == 0) ? cancel_index : res;
-#endif
+	if (default_index != 0) {
+		dialog.setDefaultButton(buttonList[default_index - 1]);
+	}
+	if (cancel_index != 0) {
+		dialog.setEscapeButton(buttonList[default_index - 1]);
+	}
+	dialog.exec();
+	QAbstractButton* result = dialog.clickedButton();
+	if (result == 0) {
+		return cancel_index;
+	}
+	return buttonList.indexOf(static_cast<QPushButton*>(result)) + 1;
 }
 
 
