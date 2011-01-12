@@ -17,10 +17,11 @@ macx {
 	# else we crash.
 	LIBS += -lSDL_mixer -lSDL_sound
 }
-RESOURCES += resources.qrc
+win32 {
+	LIBS += -lvorbisfile -lvorbis -lm -logg
+}
 
-# mingw32 static build
-# LIBS += -lmikmod -lsmpeg -lvorbisfile -lvorbis -logg -ldxguid -lpthread
+RESOURCES += resources.qrc
 
 #CONFIG += debug
 #CONFIG += release
