@@ -612,6 +612,9 @@ os_input_dialog( int icon_id, const char* prompt, int standard_button_set, const
 	if (cancel_index != 0) {
 		dialog.setEscapeButton(buttonList[default_index - 1]);
 	}
+	// We append a space to the window title to avoid the "<2>" that would
+	// otherwise be appended automatically by some window managers (like KDE.)
+	dialog.setWindowTitle(qWinGroup->windowTitle() + " ");
 	dialog.exec();
 	QAbstractButton* result = dialog.clickedButton();
 	if (result == 0) {
