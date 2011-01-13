@@ -19,7 +19,7 @@ macx {
 	LIBS += -lSDL_mixer -lSDL_sound
 }
 win32 {
-	LIBS += -lvorbisfile -lvorbis -lm -logg
+	LIBS += -lvorbisfile -lvorbis -logg
 }
 
 RESOURCES += resources.qrc
