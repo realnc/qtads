@@ -132,10 +132,14 @@ int main( int argc, char** argv )
 	Mix_ChannelFinished(0);
 	Mix_HookMusicFinished(0);
 	// Close the audio device as many times as it was opened.
+	// We disable this for now since it results in a crash in some systems.
+	// It looks like a clash between SDL_mixer and SDL_sound.
+	/*
 	int opened = Mix_QuerySpec(0, 0, 0);
 	for (int i = 0; i < opened; ++i) {
 		Mix_CloseAudio();
 	}
+	*/
 	Sound_Quit();
 	SDL_Quit();
 	return ret;
