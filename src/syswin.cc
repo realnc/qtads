@@ -96,7 +96,7 @@ CHtmlSysWinQt::fSetupPainterForFont( QPainter& painter, bool hilite, CHtmlSysFon
 		// The font has its own color; use it.
 		HTML_color_t color = fontCast.get_font_color();
 		painter.setPen(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
-	} else if (font->get_font_color() == HTML_COLOR_INPUT) {
+	} else if (font->get_font_color() == static_cast<HTML_color_t>(HTML_COLOR_INPUT)) {
 		painter.setPen(qFrame->inputColor());
 	}
 
@@ -549,7 +549,7 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	// ignore the presence or absence of a horizontal scrollbar, since it could
 	// come or go while we're formatting; by assuming that it won't be there,
 	// we'll be maximally conservative about redrawing the whole area.
-	long winBottom = qMax(static_cast<unsigned long>(this->height()), this->formatter_->get_max_y_pos());
+	unsigned long winBottom = qMax(static_cast<unsigned long>(this->height()), this->formatter_->get_max_y_pos());
 
 	// We don't have enough formatting done yet to draw the window.
 	bool drawn = false;

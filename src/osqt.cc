@@ -209,11 +209,11 @@ os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
 		if (not dir.exists() and not dir.mkpath(dirStr)) {
 			// TODO: Error dialog.
 			qWarning() << "Could not create directory path:" << dirStr;
-			Q_ASSERT(QDir::tempPath().toLocal8Bit().size() < buflen);
+			Q_ASSERT(QDir::tempPath().toLocal8Bit().size() < static_cast<int>(buflen));
 			strncpy(buf, QDir::tempPath().toLocal8Bit().constData(), buflen);
 			return;
 		}
-		Q_ASSERT(dirStr.toLocal8Bit().size() < buflen);
+		Q_ASSERT(dirStr.toLocal8Bit().size() < static_cast<int>(buflen));
 		strncpy(buf, dirStr.toLocal8Bit().constData(), buflen);
 		buf[buflen - 1] = '\0';
 		break;

@@ -344,7 +344,7 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
 			Sound_ClearError();
 			return 0;
 		}
-		Uint32 bytes = Sound_DecodeAll(sample);
+		Sound_DecodeAll(sample);
 		if (sample->flags & SOUND_SAMPLEFLAG_ERROR) {
 			// We don't abort since some of these errors can be non-fatal.
 			// Unfortunately, there's no way to tell :-/
