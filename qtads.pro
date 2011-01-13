@@ -1,5 +1,6 @@
 TEMPLATE = app
 CONFIG += qt silent warn_off
+VERSION = 2.0.2
 macx {
 	#QMAKE_INFO_PLIST = Info.plist
 	LIBS += -framework SDL_mixer -framework SDL_sound -framework SDL

@@ -1,4 +1,4 @@
-2.0.2 - 2010/??/??
+2.0.2 - 2011/01/13
 ==================
 
   - In games that use background images, there was a visual glitch in the part
@@ -14,6 +14,9 @@
     (light gray/black) when a game doesn't explicitly set them.
 
   - Games are now able again to display dialog windows with buttons.
+
+  - A crash at exit that occured on some systems after running games that play
+    MIDI music has been fixed.
 
 
 2.0.1 - 2010/10/10
