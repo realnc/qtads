@@ -9,6 +9,7 @@ macx {
 		/Library/Frameworks/smpeg.framework/Headers \
 		/Library/Frameworks/SDL_sound.framework/Headers
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
+	QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.5.sdk
 } else {
 	CONFIG += link_pkgconfig
 	PKGCONFIG += sdl
