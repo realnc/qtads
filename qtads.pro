@@ -55,7 +55,6 @@ T3DIR = tads3
 HTDIR = htmltads
 
 DEFINES += \
-	HTMLQT \
 	TROLLTECH_QT \
 	_M_QT \
 	T3_COMPILING_FOR_HTML \

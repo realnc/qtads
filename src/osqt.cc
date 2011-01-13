@@ -730,10 +730,6 @@ void
 os_term( int /*status*/ )
 {
 	qDebug() << Q_FUNC_INFO;
-#ifndef HTMLQT
-	// Tell the main-loop to quit the app.
-	QTadsIO::quitApp = true;
-#endif
 }
 
 
@@ -770,9 +766,7 @@ os_get_charmap( char* mapname, int charmap_id )
 {
 	//qDebug() << Q_FUNC_INFO;
 
-#ifndef HTMLQT
-	Q_ASSERT(QTadsIO::t3Mode());
-#endif
+	Q_ASSERT(qFrame->tads3());
 
 	switch(charmap_id) {
 	  case OS_CHARMAP_DISPLAY:
@@ -799,16 +793,10 @@ void
 os_gen_charmap_filename( char* filename, char* internal_id, char* /*argv0*/ )
 {
 	qDebug() << Q_FUNC_INFO;
-
-#ifndef HTMLQT
 	Q_ASSERT(filename != 0);
 
-	std::strncpy(filename, QString(QString::fromLocal8Bit(::CHARMAP_INST_DIR) + "/"
-			 + QString(internal_id).lower() + ".tcp").toLocal8Bit(), OSFNMAX);
+	std::strncpy(filename, QString(QString::fromAscii(internal_id) + ".tcp").toLocal8Bit().constData(), OSFNMAX);
 	filename[OSFNMAX - 1] = '\0';
-#else
-	filename[0] = '\0';
-#endif
 }
 
 
