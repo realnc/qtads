@@ -10,6 +10,11 @@
   - Clicking on a banner window no longer results in not being able to compose
     accented characters (or other characters requiring "dead keys".)
 
+  - Text grid banners should now have the correct foreground/background color
+    (light gray/black) when a game doesn't explicitly set them.
+
+  - Games are now able again to display dialog windows with buttons.
+
 
 2.0.1 - 2010/10/10
 ==================
