@@ -116,6 +116,19 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	void
 	main( QString gameFileName );
 
+	// Set the game file to be loaded by runNextGame(). This is intended to be
+	// used in cases where a slot that takes no arguments is needed in order
+	// to load a game file. Otherwise, setNextGame(const QString&) can be used
+	// instead.
+	void
+	scheduleNextGame( const QString& fname )
+	{ this->fNextGame = fname; }
+
+	// Run the game file previously set by scheduleNextGame().
+	void
+	runNextGame()
+	{ this->setNextGame(this->fNextGame); }
+
   public:
 	CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
 					 const char* orgDomain );

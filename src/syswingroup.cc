@@ -16,6 +16,7 @@
  */
 #include <Qt>
 #include <QDebug>
+#include <QTimer>
 #include <QMenuBar>
 #include <QCloseEvent>
 #include <QFileDialog>
@@ -394,8 +395,13 @@ void
 CHtmlSysWinGroupQt::dropEvent( QDropEvent* e )
 {
 	if (this->fAskQuitGameDialog()) {
-		qFrame->setNextGame(e->mimeData()->urls().at(0).toLocalFile());
 		e->acceptProposedAction();
+		// Don't call qFrame->setNextGame() since that will block. We need to
+		// return in order for the drop event to end, so we invoke a 100ms
+		// timer instead. That should give us plenty of time to return before
+		// the game file gets loaded.
+		qFrame->scheduleNextGame(e->mimeData()->urls().at(0).toLocalFile());
+		QTimer::singleShot(100, qFrame, SLOT(runNextGame()));
 	} else {
 		e->ignore();
 	}
