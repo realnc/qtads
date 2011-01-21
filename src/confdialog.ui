@@ -557,16 +557,16 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="allowDigitalCheckBox">
+            <widget class="QCheckBox" name="allowSoundEffectsCheckBox">
              <property name="text">
-              <string>Allow &amp;Digital Sound</string>
+              <string>Allow &amp;Sound Effects</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="allowMidiCheckBox">
+            <widget class="QCheckBox" name="allowMusicCheckBox">
              <property name="text">
-              <string>Allow &amp;MIDI Sound</string>
+              <string>Allow Background &amp;Music</string>
              </property>
             </widget>
            </item>

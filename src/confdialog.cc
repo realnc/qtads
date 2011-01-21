@@ -50,8 +50,8 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
 #endif
 
 	ui->allowGraphicsCheckBox->setChecked(sett->enableGraphics);
-	ui->allowDigitalCheckBox->setChecked(sett->enableDigitalSound);
-	ui->allowMidiCheckBox->setChecked(sett->enableMidiSound);
+	ui->allowSoundEffectsCheckBox->setChecked(sett->enableSoundEffects);
+	ui->allowMusicCheckBox->setChecked(sett->enableMusic);
 	ui->allowLinksCheckBox->setChecked(sett->enableLinks);
 
 	ui->mainBgColorButton->setColor(sett->mainBgColor);
@@ -183,8 +183,8 @@ ConfDialog::fMakeInstantApply()
 	connect(ui->underlineLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 	connect(ui->highlightLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 	connect(ui->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-	connect(ui->allowDigitalCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-	connect(ui->allowMidiCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+	connect(ui->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+	connect(ui->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 	connect(ui->allowLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 
 	connect(ui->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
@@ -207,8 +207,8 @@ ConfDialog::fApplySettings()
 	Settings* sett = qFrame->settings();
 
 	sett->enableGraphics = ui->allowGraphicsCheckBox->isChecked();
-	sett->enableDigitalSound = ui->allowDigitalCheckBox->isChecked();
-	sett->enableMidiSound = ui->allowMidiCheckBox->isChecked();
+	sett->enableSoundEffects = ui->allowSoundEffectsCheckBox->isChecked();
+	sett->enableMusic = ui->allowMusicCheckBox->isChecked();
 	sett->enableLinks = ui->allowLinksCheckBox->isChecked();
 
 	sett->mainBgColor = ui->mainBgColorButton->color();

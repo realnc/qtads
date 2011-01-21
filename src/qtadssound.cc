@@ -168,7 +168,7 @@ QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done
 						  int fadeIn, int fadeOut, bool crossFade )
 {
 	// Check if user disabled digital sound.
-	if (not qFrame->settings()->enableDigitalSound) {
+	if (not qFrame->settings()->enableSoundEffects) {
 		return 1;
 	}
 

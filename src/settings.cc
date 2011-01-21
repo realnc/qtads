@@ -31,8 +31,8 @@ Settings::loadFromDisk()
 
 	sett.beginGroup("media");
 	this->enableGraphics = sett.value("graphics", true).toBool();
-	this->enableDigitalSound = sett.value("sounds", true).toBool();
-	this->enableMidiSound = sett.value("music", true).toBool();
+	this->enableSoundEffects = sett.value("sounds", true).toBool();
+	this->enableMusic = sett.value("music", true).toBool();
 	this->enableLinks = sett.value("links", true).toBool();
 	sett.endGroup();
 
@@ -106,8 +106,8 @@ Settings::saveToDisk()
 
 	sett.beginGroup("media");
 	sett.setValue("graphics", this->enableGraphics);
-	sett.setValue("sounds", this->enableDigitalSound);
-	sett.setValue("music", this->enableMidiSound);
+	sett.setValue("sounds", this->enableSoundEffects);
+	sett.setValue("music", this->enableMusic);
 	sett.setValue("links", this->enableLinks);
 	sett.endGroup();
 

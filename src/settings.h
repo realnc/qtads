@@ -29,8 +29,8 @@ class Settings {
 	saveToDisk();
 
 	bool enableGraphics;
-	bool enableDigitalSound;
-	bool enableMidiSound;
+	bool enableSoundEffects;
+	bool enableMusic;
 	bool enableLinks;
 
 	QColor mainTextColor;

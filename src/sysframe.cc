@@ -587,14 +587,14 @@ CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
 
 	// If digital sounds are now turned off, cancel sound playback in the
 	// effects layers
-	if (not sett->enableDigitalSound) {
+	if (not sett->enableSoundEffects) {
 		this->fFormatter->cancel_sound(HTML_Attrib_ambient, 0.0, false, false);
 		this->fFormatter->cancel_sound(HTML_Attrib_bgambient, 0.0, false, false);
 		this->fFormatter->cancel_sound(HTML_Attrib_foreground, 0.0, false, false);
 	}
 
 	// If MIDI is now turned off, cancel playback in the music layer.
-	if (not sett->enableMidiSound) {
+	if (not sett->enableMusic) {
 		this->fFormatter->cancel_sound(HTML_Attrib_background, 0.0, false, false);
 	}
 
