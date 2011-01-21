@@ -379,7 +379,6 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer, unsigned long timeout, 
 		tadsBuffer->show_caret();
 		this->fCastDispWidget->setCursorVisible(true);
 		this->fCastDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
-		tadsBuffer->setbuf(tadsBuffer->getbuf(), 1000, 0);
 		tadsBuffer->set_sel_range(0, 0, 0);
 	}
 

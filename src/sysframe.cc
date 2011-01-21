@@ -199,6 +199,7 @@ CHtmlSysFrameQt::fRunGame()
 			// Recreate them.
 			this->fParser = new CHtmlParser(true);
 			this->fInputBuffer = new textchar_t[1024];
+			this->fInputBufferLen = 1024;
 			this->fTadsBuffer = new CHtmlInputBuf(fInputBuffer, 1024, 100);
 			this->fTadsBuffer->set_utf8_mode(true);
 			this->fFormatter = new CHtmlFormatterInput(this->fParser);
@@ -710,6 +711,9 @@ CHtmlSysFrameQt::get_input( textchar_t* buf, size_t bufsiz )
 	this->flush_txtbuf(true, false);
 	this->pruneParseTree();
 
+	this->fTadsBuffer->setbuf(this->fInputBuffer,
+							  bufsiz > this->fInputBufferLen ? this->fInputBufferLen - 1 : bufsiz - 1,
+							  0);
 	int ret = this->fGameWin->getInput(this->fTadsBuffer);
 
 	// If input exceeds the buffer size, make sure we don't overflow.
@@ -740,6 +744,9 @@ CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned lon
 		this->pruneParseTree();
 
 		bool timedOut = false;
+		this->fTadsBuffer->setbuf(this->fInputBuffer,
+								  buflen > this->fInputBufferLen ? this->fInputBufferLen - 1 : buflen - 1,
+								  0);
 		this->fGameWin->getInput(this->fTadsBuffer, timeout, true, &timedOut);
 
 		// If input exceeds the buffer size, make sure we don't overflow.
