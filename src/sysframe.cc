@@ -594,7 +594,7 @@ CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
 		this->fFormatter->cancel_sound(HTML_Attrib_foreground, 0.0, false, false);
 	}
 
-	// If MIDI is now turned off, cancel playback in the music layer.
+	// If background music is now turned off, cancel playback in the music layer.
 	if (not sett->enableMusic) {
 		this->fFormatter->cancel_sound(HTML_Attrib_background, 0.0, false, false);
 	}

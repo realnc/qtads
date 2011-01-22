@@ -89,7 +89,7 @@ CHtmlSysSoundMidiQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 {
 	//qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 
-	// Check if user disabled MIDI sound.
+	// Check if the user disabled background music.
 	if (not qFrame->settings()->enableMusic) {
 		return 1;
 	}
