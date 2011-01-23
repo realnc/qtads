@@ -80,6 +80,7 @@ Settings::loadFromDisk()
 	sett.beginGroup("misc");
 	this->tads2Encoding = sett.value("tads2encoding", QByteArray("windows-1250")).toByteArray();
 	this->askForGameFile = sett.value("askforfileatstart", false).toBool();
+	this->lastFileOpenDir = sett.value("lastFileOpenDir", "").toString();
 	sett.endGroup();
 
 	sett.beginGroup("recent");
@@ -137,6 +138,7 @@ Settings::saveToDisk()
 	sett.beginGroup("misc");
 	sett.setValue("tads2encoding", this->tads2Encoding);
 	sett.setValue("askforfileatstart", this->askForGameFile);
+	sett.setValue("lastFileOpenDir", this->lastFileOpenDir);
 	sett.endGroup();
 
 	sett.beginGroup("recent");

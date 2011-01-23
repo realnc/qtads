@@ -15,6 +15,9 @@
     system's settings.)  Furthermore, blinking will only occur for as long as
     the interpreter window has focus.
 
+  - The last entered directory for the "Open New Game" dialog is now remembered
+    between sessions.
+
 
 2.0.2 - 2011/01/13
 ==================

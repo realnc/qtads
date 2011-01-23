@@ -305,9 +305,11 @@ CHtmlSysWinGroupQt::fHideAboutQtads()
 void
 CHtmlSysWinGroupQt::fOpenNewGame()
 {
-	const QString& fname = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run", "",
+	const QString& fname = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run",
+														qFrame->settings()->lastFileOpenDir,
 														"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
 	if (not fname.isEmpty()) {
+		qFrame->settings()->lastFileOpenDir = QFileInfo(fname).absolutePath();
 		qFrame->setNextGame(fname);
 	}
 }

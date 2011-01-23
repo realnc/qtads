@@ -55,6 +55,7 @@ class Settings {
 
 	QByteArray tads2Encoding;
 	bool askForGameFile;
+	QString lastFileOpenDir;
 
 	QStringList recentGamesList;
 	static const int recentGamesCapacity = 10;
