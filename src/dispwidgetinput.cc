@@ -54,8 +54,8 @@ DisplayWidgetInput::paintEvent( QPaintEvent* e )
 	DisplayWidget::paintEvent(e);
 	QPainter painter(this);
 	if (this->fCursorVisible and this->fBlinkVisible) {
-		painter.drawLine(this->fCursorPos.x(), this->fCursorPos.y(),
-						 this->fCursorPos.x(), this->fCursorPos.y() + this->fHeight);
+		painter.drawLine(this->fCursorPos.x(), this->fCursorPos.y(), this->fCursorPos.x(),
+						 this->fCursorPos.y() + this->fHeight);
 	}
 }
 
@@ -64,8 +64,8 @@ void
 DisplayWidgetInput::fBlinkCursor()
 {
 	this->fBlinkVisible = not this->fBlinkVisible;
-	this->update(this->fCursorPos.x(), this->fCursorPos.y(),
-				 this->fCursorPos.x() + 1, this->fCursorPos.y() + this->fHeight);
+	this->update(this->fCursorPos.x(), this->fCursorPos.y(), this->fCursorPos.x() + 1,
+				 this->fCursorPos.y() + this->fHeight);
 }
 
 
@@ -94,8 +94,7 @@ DisplayWidgetInput::fHandleFocusChange( QWidget* old, QWidget* now )
 
 
 void
-DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* tadsBuffer,
-										  CHtmlTagTextInput* tag )
+DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput* tag )
 {
 	// Reset the blink timer.
 	if (this->fBlinkTimer->isActive()) {

@@ -29,7 +29,7 @@
 
 
 DisplayWidget::DisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
-  : QWidget(parent), fHoverLink(0), fClickedLink(0), parentSysWin(parent), formatter(formatter)
+: QWidget(parent), fHoverLink(0), fClickedLink(0), parentSysWin(parent), formatter(formatter)
 {
 	this->setForegroundRole(QPalette::Text);
 	this->setBackgroundRole(QPalette::Base);

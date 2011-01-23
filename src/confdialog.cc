@@ -29,7 +29,7 @@
 
 
 ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
-  : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::ConfDialog)
+: QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::ConfDialog)
 {
 	ui->setupUi(this);
 	Settings* sett = qFrame->settings();
@@ -121,8 +121,8 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
 	this->fMakeInstantApply();
 	ui->buttonBox->setStandardButtons(QDialogButtonBox::NoButton);
 #else
-	QDialogButtonBox::ButtonLayout layoutPolicy =
-			QDialogButtonBox::ButtonLayout(ui->buttonBox->style()->styleHint(QStyle::SH_DialogButtonLayout));
+	QDialogButtonBox::ButtonLayout layoutPolicy
+		= QDialogButtonBox::ButtonLayout(ui->buttonBox->style()->styleHint(QStyle::SH_DialogButtonLayout));
 	if (layoutPolicy == QDialogButtonBox::GnomeLayout) {
 		// On Gnome (and other Gtk-based environments, like XFCE), we follow
 		// Gnome standards. We only provide a "Close" button and settings
