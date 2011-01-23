@@ -700,11 +700,11 @@ CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned lon
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	if (use_timeout) {
-		// Flush and prune before input.
-		this->flush_txtbuf(true, false);
-		this->pruneParseTree();
+	// Flush and prune before input.
+	this->flush_txtbuf(true, false);
+	this->pruneParseTree();
 
+	if (use_timeout) {
 		bool timedOut = false;
 		this->fGameWin->getInput(buf, buflen, timeout, true, &timedOut);
 
