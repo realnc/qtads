@@ -77,6 +77,11 @@ class DisplayWidgetInput: public DisplayWidget {
 	void
 	updateCursorPos( class CHtmlFormatter* formatter, class CHtmlInputBuf* tadsBuffer,
 					 class CHtmlTagTextInput* tag );
+
+	// Reset cursor blink timer.  This will read the blinking rate from the
+	// desktop environment and ajust the blink timer as needed.
+	void
+	resetCursorBlinking();
 };
 
 

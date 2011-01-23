@@ -36,7 +36,7 @@ DisplayWidgetInput::DisplayWidgetInput( CHtmlSysWinQt* parent, CHtmlFormatter* f
   fBlinkVisible(false), fBlinkTimer(new QTimer(this))
 {
 	connect(this->fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
-	this->fBlinkTimer->start(QApplication::cursorFlashTime() / 2);
+	this->resetCursorBlinking();
 
 	// Our initial height is the height of the current input font.
 	this->fHeight = QFontMetrics(qFrame->settings()->inputFont).height();
@@ -71,8 +71,9 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* t
 										  CHtmlTagTextInput* tag )
 {
 	// Reset the blink timer.
-	this->fBlinkTimer->stop();
-	this->fBlinkTimer->start();
+	if (this->fBlinkTimer->isActive()) {
+		this->fBlinkTimer->start();
+	}
 
 	// Blink-out first to ensure the cursor won't stay visible at the previous
 	// position after we move it.
@@ -99,5 +100,15 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* t
 	if (disp != 0) {
 		const CHtmlRect& itemRect = disp->get_pos();
 		this->update(0, itemRect.top, this->width(), itemRect.bottom - itemRect.top);
+	}
+}
+
+
+void
+DisplayWidgetInput::resetCursorBlinking()
+{
+	// Start the timer unless cursor blinking is disabled.
+	if (QApplication::cursorFlashTime() > 1) {
+		this->fBlinkTimer->start(QApplication::cursorFlashTime() / 2);
 	}
 }
