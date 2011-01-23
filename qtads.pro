@@ -3,12 +3,13 @@ CONFIG += qt silent warn_off
 VERSION = 2.0.99
 macx {
 	#QMAKE_INFO_PLIST = Info.plist
+	QMAKE_LFLAGS += -F./Frameworks
 	LIBS += -framework SDL_mixer -framework SDL_sound -framework SDL
 	INCLUDEPATH += \
-		/Library/Frameworks/SDL.framework/Headers \
-		/Library/Frameworks/SDL_mixer.framework/Headers \
-		/Library/Frameworks/smpeg.framework/Headers \
-		/Library/Frameworks/SDL_sound.framework/Headers
+		./Frameworks/SDL.framework/Headers \
+		./Frameworks/SDL_mixer.framework/Headers \
+		./Frameworks/smpeg.framework/Headers \
+		./Frameworks/SDL_sound.framework/Headers
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 	QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.5.sdk
 } else {
