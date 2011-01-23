@@ -707,7 +707,6 @@ CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned lon
 	if (use_timeout) {
 		bool timedOut = false;
 		this->fGameWin->getInput(buf, buflen, timeout, true, &timedOut);
-
 		if (timedOut) {
 			return OS_EVT_TIMEOUT;
 		}
