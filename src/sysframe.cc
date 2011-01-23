@@ -580,10 +580,10 @@ CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
 		this->fFormatter->cancel_sound(HTML_Attrib_background, 0.0, false, false);
 	}
 
+	qFrame->reformatBanners(true, true, false);
+
 	// Change the text cursor's height according to the new input font's height.
 	qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett->inputFont).height());
-
-	qFrame->reformatBanners(true, true, false);
 }
 
 
