@@ -48,6 +48,11 @@ class DisplayWidgetInput: public DisplayWidget {
 	void
 	fBlinkCursor();
 
+	// We need to know when the application loses focus entirely so that we
+	// can disable keyboard cursor blinking when we lose focus.
+	void
+	fHandleFocusChange( QWidget* old, QWidget* now );
+
   protected:
 	virtual void
 	paintEvent( QPaintEvent* e );

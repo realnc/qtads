@@ -40,6 +40,9 @@ DisplayWidgetInput::DisplayWidgetInput( CHtmlSysWinQt* parent, CHtmlFormatter* f
 
 	// Our initial height is the height of the current input font.
 	this->fHeight = QFontMetrics(qFrame->settings()->inputFont).height();
+
+	// We need to check whether the application lost focus.
+	connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), SLOT(fHandleFocusChange(QWidget*,QWidget*)));
 }
 
 
@@ -63,6 +66,23 @@ DisplayWidgetInput::fBlinkCursor()
 	this->fBlinkVisible = not this->fBlinkVisible;
 	this->update(this->fCursorPos.x(), this->fCursorPos.y(),
 				 this->fCursorPos.x() + 1, this->fCursorPos.y() + this->fHeight);
+}
+
+
+void
+DisplayWidgetInput::fHandleFocusChange( QWidget* old, QWidget* now )
+{
+	if (now == 0) {
+		// The application window lost focus.  Disable cursor blinking.
+		// Make sure cursor will be visible before disabling the timer.
+		if (not this->fBlinkVisible) {
+			this->fBlinkCursor();
+		}
+		this->fBlinkTimer->stop();
+	} else if (old == 0 and now != 0) {
+		// The application window gained focus.  Reset cursor blinking.
+		this->resetCursorBlinking();
+	}
 }
 
 
