@@ -76,8 +76,10 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	// The input tag we use to communicate with the base code.
 	class CHtmlTagTextInput* fTag;
 
-	// The externally managed input buffer.
+	// Our command input buffer.
 	class CHtmlInputBuf* fTadsBuffer;
+	textchar_t* fInputBuffer;
+	size_t fInputBufferSize;
 
 	void
 	fStartKeypressInput();
@@ -106,8 +108,7 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	CHtmlSysWinInputQt( class CHtmlFormatter* formatter, QWidget* parent );
 
 	virtual
-	~CHtmlSysWinInputQt()
-	{ }
+	~CHtmlSysWinInputQt();
 
 	// Change the height of the text cursor.
 	void
@@ -118,7 +119,7 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 
 	// Read a line of input.
 	bool
-	getInput( class CHtmlInputBuf* tadsBuffer, unsigned long timeout = 0, bool useTimeout = false,
+	getInput( textchar_t* buf, size_t buflen, unsigned long timeout = 0, bool useTimeout = false,
 			  bool* timedOut = 0 );
 
 	// Cancel an interrupted input.  See CHtmlSysFrame::get_input_cancel().

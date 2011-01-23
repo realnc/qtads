@@ -15,6 +15,7 @@
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <QDebug>
 #include <QLayout>
 #include <QLabel>
 #include <QStatusBar>
@@ -23,12 +24,10 @@
 
 #include "qtadshostifc.h"
 #include "settings.h"
-#include "dispwidget.h"
 #include "syswinaboutbox.h"
 #include "syswininput.h"
 
 #include "htmlprs.h"
-#include "htmlinp.h"
 #include "htmlfmt.h"
 #include "htmlrf.h"
 #include "htmltxar.h"
@@ -57,8 +56,6 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 	this->fInputColor = HTML_make_color(tmpCol.red(), tmpCol.green(), tmpCol.blue());
 
 	this->fParser = 0;
-	this->fInputBuffer = 0;
-	this->fTadsBuffer = 0;
 	this->fFormatter = 0;
 
 	// Clear the TADS appctx; all unused fields must be 0.
@@ -112,18 +109,12 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
 		delete this->fGameWin;
 	}
 
-	// Release the parser and delete our parser, buffers and formatter.
+	// Release the parser and delete our parser and formatter.
 	if (this->fFormatter != 0) {
 		this->fFormatter->release_parser();
 	}
 	if (this->fParser != 0) {
 		delete this->fParser;
-	}
-	if (this->fInputBuffer != 0) {
-		delete[] this->fInputBuffer;
-	}
-	if (this->fTadsBuffer != 0) {
-		delete this->fTadsBuffer;
 	}
 	if (this->fFormatter != 0) {
 		delete this->fFormatter;
@@ -174,18 +165,12 @@ CHtmlSysFrameQt::fRunGame()
 				delete this->fGameWin;
 			}
 
-			// Delete current HTML parser, input buffer and main game window formatter.
+			// Delete current HTML parser and main game window formatter.
 			if (this->fFormatter != 0) {
 				this->fFormatter->release_parser();
 			}
 			if (this->fParser != 0) {
 				delete this->fParser;
-			}
-			if (this->fInputBuffer != 0) {
-				delete[] this->fInputBuffer;
-			}
-			if (this->fTadsBuffer != 0) {
-				delete this->fTadsBuffer;
 			}
 			if (this->fFormatter != 0) {
 				delete this->fFormatter;
@@ -198,10 +183,6 @@ CHtmlSysFrameQt::fRunGame()
 
 			// Recreate them.
 			this->fParser = new CHtmlParser(true);
-			this->fInputBuffer = new textchar_t[1024];
-			this->fInputBufferLen = 1024;
-			this->fTadsBuffer = new CHtmlInputBuf(fInputBuffer, 1024, 100);
-			this->fTadsBuffer->set_utf8_mode(true);
 			this->fFormatter = new CHtmlFormatterInput(this->fParser);
 			// Tell the resource finder about our appctx.
 			this->fFormatter->get_res_finder()->init_appctx(&this->fAppctx);
@@ -711,25 +692,7 @@ CHtmlSysFrameQt::get_input( textchar_t* buf, size_t bufsiz )
 	this->flush_txtbuf(true, false);
 	this->pruneParseTree();
 
-	this->fTadsBuffer->setbuf(this->fInputBuffer,
-							  bufsiz > this->fInputBufferLen ? this->fInputBufferLen - 1 : bufsiz - 1,
-							  0);
-	int ret = this->fGameWin->getInput(this->fTadsBuffer);
-
-	// If input exceeds the buffer size, make sure we don't overflow.
-	int len = this->fTadsBuffer->getlen() > bufsiz ? bufsiz : this->fTadsBuffer->getlen();
-
-	// For TADS 3, we use the result as-is; it's already in UTF-8.  For TADS 2,
-	// we will need to use the prefered encoding.
-	if (this->fTads3) {
-		strncpy(buf, this->fTadsBuffer->getbuf(), len);
-	} else {
-		QTextCodec* codec = QTextCodec::codecForName(this->fSettings->tads2Encoding);
-		strncpy(buf, codec->fromUnicode(QString::fromUtf8(this->fTadsBuffer->getbuf(),
-														  this->fTadsBuffer->getlen())).constData(), len);
-	}
-	buf[len] = '\0';
-	return ret;
+	return this->fGameWin->getInput(buf, bufsiz);
 }
 
 
@@ -744,24 +707,7 @@ CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned lon
 		this->pruneParseTree();
 
 		bool timedOut = false;
-		this->fTadsBuffer->setbuf(this->fInputBuffer,
-								  buflen > this->fInputBufferLen ? this->fInputBufferLen - 1 : buflen - 1,
-								  0);
-		this->fGameWin->getInput(this->fTadsBuffer, timeout, true, &timedOut);
-
-		// If input exceeds the buffer size, make sure we don't overflow.
-		int len = this->fTadsBuffer->getlen() > buflen ? buflen : this->fTadsBuffer->getlen();
-
-		// For TADS 3, we use the result as-is; it's already in UTF-8.  For TADS 2,
-		// we will need to use the prefered encoding.
-		if (this->fTads3) {
-			strncpy(buf, this->fTadsBuffer->getbuf(), len);
-		} else {
-			QTextCodec* codec = QTextCodec::codecForName(this->fSettings->tads2Encoding);
-			strncpy(buf, codec->fromUnicode(QString::fromUtf8(this->fTadsBuffer->getbuf(),
-															  this->fTadsBuffer->getlen())).constData(), len);
-		}
-		buf[len] = '\0';
+		this->fGameWin->getInput(buf, buflen, timeout, true, &timedOut);
 
 		if (timedOut) {
 			return OS_EVT_TIMEOUT;

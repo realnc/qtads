@@ -22,6 +22,7 @@
 #include <QDesktopServices>
 #include <QClipboard>
 #include <QUrl>
+#include <QTextCodec>
 
 #include "settings.h"
 #include "dispwidgetinput.h"
@@ -35,11 +36,16 @@
 
 CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* parent )
 : CHtmlSysWinQt(formatter, 0, parent), fInputMode(NoInput), fInputReady(false), fRestoreFromCancel(false),
-  fLastKeyEvent(Qt::Key_Any), fTag(0), fTadsBuffer(0)
+  fLastKeyEvent(Qt::Key_Any), fTag(0)
 {
 	this->dispWidget = new DisplayWidgetInput(this, formatter);
 	this->fCastDispWidget = static_cast<DisplayWidgetInput*>(this->dispWidget);
 	this->setWidget(this->dispWidget);
+
+	this->fInputBuffer = new textchar_t[1024];
+	this->fInputBufferSize = 1024;
+	this->fTadsBuffer = new CHtmlInputBuf(this->fInputBuffer, 1024, 100);
+	this->fTadsBuffer->set_utf8_mode(true);
 
 	QPalette p(this->palette());
 	p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
@@ -47,6 +53,12 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
 	this->setPalette(p);
 }
 
+
+CHtmlSysWinInputQt::~CHtmlSysWinInputQt()
+{
+	delete this->fTadsBuffer;
+	delete[] this->fInputBuffer;
+}
 
 void
 CHtmlSysWinInputQt::fStartKeypressInput()
@@ -338,13 +350,13 @@ CHtmlSysWinInputQt::pagePauseKeyPressEvent( QKeyEvent* e )
 
 
 bool
-CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer, unsigned long timeout, bool useTimeout, bool* timedOut )
+CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long timeout, bool useTimeout,
+							  bool* timedOut )
 {
 	//qDebug() << Q_FUNC_INFO;
-	Q_ASSERT(tadsBuffer != 0);
+	Q_ASSERT(buf != 0);
 
 	CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(this->formatter_);
-	CHtmlTagTextInput* tag;
 
 	bool resuming = this->fTag != 0;
 
@@ -352,15 +364,14 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer, unsigned long timeout, 
 	formatter->prepare_for_input();
 
 	if (resuming) {
-		// We're resuming; set up our existing input tag with the new buffer.
-		tag = this->fTag;
-		tag->change_buf(formatter, tadsBuffer->getbuf());
+		// We're resuming; reuse our existing input tag with the new buffer.
+		this->fTag->change_buf(formatter, this->fTadsBuffer->getbuf());
 		this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
 		// We treat canceled inputs with reset=false as if they were resumes.
 		// The difference is that in that case, we need to restore the cursor.
 		if (this->fRestoreFromCancel) {
 			this->fCastDispWidget->setCursorVisible(true);
-			this->fCastDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
+			this->fCastDispWidget->updateCursorPos(formatter, this->fTadsBuffer, this->fTag);
 			this->fRestoreFromCancel = false;
 		}
 	} else {
@@ -371,20 +382,22 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer, unsigned long timeout, 
 		while (formatter->more_to_do()) {
 			formatter->do_formatting();
 		}
-		tag = formatter->begin_input(tadsBuffer->getbuf(), 0);
+		this->fTadsBuffer->setbuf(this->fInputBuffer,
+								  buflen > this->fInputBufferSize ? this->fInputBufferSize - 1 : buflen - 1,
+								  0);
+		CHtmlTagTextInput* tag = formatter->begin_input(this->fTadsBuffer->getbuf(), 0);
 		this->fTag = tag;
 		if (tag->ready_to_format()) {
 			tag->format(this, this->formatter_);
 		}
-		tadsBuffer->show_caret();
+		this->fTadsBuffer->show_caret();
 		this->fCastDispWidget->setCursorVisible(true);
-		this->fCastDispWidget->updateCursorPos(formatter, tadsBuffer, tag);
-		tadsBuffer->set_sel_range(0, 0, 0);
+		this->fCastDispWidget->updateCursorPos(formatter, this->fTadsBuffer, tag);
+		this->fTadsBuffer->set_sel_range(0, 0, 0);
 	}
 
 	this->fInputReady = false;
 	this->fInputMode = NormalInput;
-	this->fTadsBuffer = tadsBuffer;
 
 	// Reset the MORE prompt position to this point, since the user has seen
 	// everything up to here.
@@ -410,6 +423,20 @@ CHtmlSysWinInputQt::getInput( CHtmlInputBuf* tadsBuffer, unsigned long timeout, 
 
 	// We're finished with input.
 	this->cancelInput(true);
+
+	// If input exceeds the buffer size, make sure we don't overflow.
+	int len = this->fTadsBuffer->getlen() > buflen ? buflen : this->fTadsBuffer->getlen();
+
+	// For TADS 3, we use the result as-is; it's already in UTF-8.  For TADS 2,
+	// we will need to use the prefered encoding.
+	if (qFrame->tads3()) {
+		strncpy(buf, this->fTadsBuffer->getbuf(), len);
+	} else {
+		QTextCodec* codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
+		strncpy(buf, codec->fromUnicode(QString::fromUtf8(this->fTadsBuffer->getbuf(),
+														  this->fTadsBuffer->getlen())).constData(), len);
+	}
+	buf[len] = '\0';
 
 	if (not qFrame->gameRunning()) {
 		return false;

@@ -43,9 +43,6 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	class CVmMainClientConsole* fClientifc;
 
 	class CHtmlTextBuffer fBuffer;
-	textchar_t* fInputBuffer;
-	size_t fInputBufferLen;
-	class CHtmlInputBuf* fTadsBuffer;
 
 	// Main window.
 	class CHtmlSysWinGroupQt* fMainWin;
