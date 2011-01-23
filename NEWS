@@ -6,6 +6,15 @@
     input to be much longer than what the VM accepts and the extra characters
     were simply truncated.
 
+  - Renamed the Digital Sound/MIDI Music sound options.  They were misleading.
+    The "Enable MIDI Sound" option did not control MIDI but rather the
+    background sound layer, which is not restricted to MIDI.
+
+  - The interpreter will now correctly disable keyboard cursor blinking if
+    needed (for example when blinking has been disabled in the operating
+    system's settings.)  Furthermore, blinking will only occur for as long as
+    the interpreter window has focus.
+
 
 2.0.2 - 2011/01/13
 ==================
