@@ -580,6 +580,15 @@ CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
 		this->fFormatter->cancel_sound(HTML_Attrib_background, 0.0, false, false);
 	}
 
+	// Links in the main game window are not invalidated for some reason, so we
+	// invalidate them manually here.
+	const QRect& widgetRect = this->fGameWin->widget()->visibleRegion().boundingRect();
+	CHtmlRect documentRect(widgetRect.x(), widgetRect.y(),
+						   widgetRect.x() + widgetRect.width(), widgetRect.y() + widgetRect.height());
+	this->fFormatter->inval_links_on_screen(&documentRect);
+
+	// Reformat everything so that changes in fonts/colors/etc become visible
+	// immediately.
 	qFrame->reformatBanners(true, true, false);
 
 	// Change the text cursor's height according to the new input font's height.
