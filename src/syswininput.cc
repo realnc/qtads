@@ -73,6 +73,7 @@ void
 CHtmlSysWinInputQt::setCursorHeight( unsigned height )
 {
 	this->fCastDispWidget->setCursorHeight(height);
+	this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
 }
 
 
