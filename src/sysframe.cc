@@ -688,11 +688,10 @@ CHtmlSysFrameQt::get_input( textchar_t* buf, size_t bufsiz )
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	// Flush and prune before input.
-	this->flush_txtbuf(true, false);
-	this->pruneParseTree();
-
-	return this->fGameWin->getInput(buf, bufsiz);
+	if (this->get_input_timeout(buf, bufsiz, 0, false) == OS_EVT_EOF) {
+		return false;
+	}
+	return true;
 }
 
 
@@ -713,7 +712,7 @@ CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned lon
 			return OS_EVT_TIMEOUT;
 		}
 	} else {
-		this->get_input(buf, buflen);
+		this->fGameWin->getInput(buf, buflen);
 	}
 
 	// Return EOF if we're quitting the game.

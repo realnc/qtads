@@ -349,7 +349,7 @@ CHtmlSysWinInputQt::pagePauseKeyPressEvent( QKeyEvent* e )
 }
 
 
-bool
+void
 CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long timeout, bool useTimeout,
 							  bool* timedOut )
 {
@@ -415,7 +415,7 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
 		if (timedOut != 0 and not this->fInputReady and qFrame->gameRunning()) {
 			*timedOut = true;
 			this->fInputMode = NoInput;
-			return true;
+			return;
 		}
 	} else while (qFrame->gameRunning() and not this->fInputReady) {
 		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
@@ -437,11 +437,6 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
 														  this->fTadsBuffer->getlen())).constData(), len);
 	}
 	buf[len] = '\0';
-
-	if (not qFrame->gameRunning()) {
-		return false;
-	}
-	return true;
 }
 
 

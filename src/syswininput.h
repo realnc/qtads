@@ -118,7 +118,7 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	processCommand( const textchar_t* cmd, size_t len, int append, int enter, int os_cmd_id );
 
 	// Read a line of input.
-	bool
+	void
 	getInput( textchar_t* buf, size_t buflen, unsigned long timeout = 0, bool useTimeout = false,
 			  bool* timedOut = 0 );
 
