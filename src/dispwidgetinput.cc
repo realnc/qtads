@@ -74,7 +74,7 @@ DisplayWidgetInput::fHandleFocusChange( QWidget* old, QWidget* now )
 {
 	if (now == 0) {
 		// The application window lost focus.  Disable cursor blinking.
-		// Make sure cursor will be visible/hidden before disabling the timer.
+		this->fBlinkTimer->stop();
 #ifdef Q_WS_MAC
 		// On the Mac, when applications lose focus the cursor must be disabled.
 		if (this->fBlinkVisible) {
@@ -86,7 +86,6 @@ DisplayWidgetInput::fHandleFocusChange( QWidget* old, QWidget* now )
 			this->fBlinkCursor();
 		}
 #endif
-		this->fBlinkTimer->stop();
 	} else if (old == 0 and now != 0) {
 		// The application window gained focus.  Reset cursor blinking.
 		this->resetCursorBlinking();
