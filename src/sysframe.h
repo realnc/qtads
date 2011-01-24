@@ -95,6 +95,14 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	void
 	fRunT3Game( const QString& fname );
 
+#ifdef Q_WS_MAC
+  protected:
+	// On the Mac, dropping a file on our application icon will generate a
+	// FileOpen event, so we override this to be able to handle it.
+	virtual bool
+	event( QEvent* );
+#endif
+
   signals:
 	// Emitted just prior to starting a game.  The game has not started yet
 	// when this is emitted.

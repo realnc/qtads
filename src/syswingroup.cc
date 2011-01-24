@@ -474,6 +474,26 @@ CHtmlSysWinGroupQt::updateRecentGames()
 }
 
 
+#ifdef Q_WS_MAC
+bool
+CHtmlSysWinGroupQt::handleFileOpenEvent( class QFileOpenEvent* e )
+{
+	if (e->file().isEmpty() or not this->fAskQuitGameDialog()) {
+		e->ignore();
+		return false;
+	}
+	e->accept();
+	// Don't call setNextGame() since that will block. We need to
+	// return in order for the drop event to end, so we invoke a 100ms
+	// timer instead. That should give us plenty of time to return before
+	// the game file gets loaded.
+	qFrame->scheduleNextGame(e->file());
+	QTimer::singleShot(100, qFrame, SLOT(runNextGame()));
+	return true;
+}
+#endif
+
+
 oshtml_charset_id_t
 CHtmlSysWinGroupQt::get_default_win_charset() const
 {

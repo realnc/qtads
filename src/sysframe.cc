@@ -270,6 +270,20 @@ CHtmlSysFrameQt::fRunT3Game( const QString& fname )
 }
 
 
+#ifdef Q_WS_MAC
+#include <QFileOpenEvent>
+bool
+CHtmlSysFrameQt::event( QEvent* e )
+{
+	// We only handle the FileOpen event.
+	if (e->type() != QEvent::FileOpen) {
+		return QApplication::event(e);
+	}
+	return qWinGroup->handleFileOpenEvent(static_cast<QFileOpenEvent*>(e));
+}
+#endif
+
+
 void
 CHtmlSysFrameQt::main( QString gameFileName )
 {

@@ -1,6 +1,9 @@
 2.?.? - 2011/??/??
 ==================
 
+  - On the Mac, running a game by dropping its file on the QTads icon is now
+    supported.
+
   - When the VM requests input from the player, the maximum allowed length of
     input is now taken into account.  Previously, the interpreter would allow
     input to be much longer than what the VM accepts and the extra characters

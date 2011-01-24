@@ -133,6 +133,12 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	void
 	updateRecentGames();
 
+#ifdef Q_WS_MAC
+	// Handler for FileOpen events.  They only occur in OS X.
+	bool
+	handleFileOpenEvent( class QFileOpenEvent* e );
+#endif
+
 	//
 	// CHtmlSysWinGroup interface implementation.
 	//
