@@ -19,6 +19,7 @@
 
 #include <QMainWindow>
 #include <QScrollArea>
+#include <QNetworkReply>
 
 #include "htmlsys.h"
 
@@ -57,6 +58,8 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	class QAction* fRestartCurrentGameAction;
 	class QAction* fGameInfoAction;
 	class QAction* fAboutQtadsAction;
+	class QNetworkAccessManager* fNetManager;
+	class QNetworkReply* fReply;
 
 	bool
 	fAskQuitGameDialog();
@@ -65,6 +68,15 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	fAskRestartGameDialog();
 
   private slots:
+	void
+	fCheckForUpdates();
+
+	void
+	fReplyFinished( QNetworkReply* reply );
+
+	void
+	fErrorOccurred( QNetworkReply::NetworkError code );
+
 	void
 	fShowGameInfoDialog();
 

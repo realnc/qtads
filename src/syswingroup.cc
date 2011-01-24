@@ -23,6 +23,7 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 #include <QUrl>
+#include <QDesktopServices>
 
 #include "syswininput.h"
 #include "syswinaboutbox.h"
@@ -40,7 +41,7 @@ CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
 
 
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
-: fConfDialog(0), fGameInfoDialog(0), fAboutBoxDialog(0), fAboutBox(0), fAboutQtadsDialog(0)
+: fConfDialog(0), fGameInfoDialog(0), fAboutBoxDialog(0), fAboutBox(0), fAboutQtadsDialog(0), fNetManager(0)
 {
 	//qDebug() << Q_FUNC_INFO << "called";
 	Q_ASSERT(qWinGroup == 0);
@@ -124,6 +125,9 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 #endif
 	menu->addAction(this->fAboutQtadsAction);
 	connect(this->fAboutQtadsAction, SIGNAL(triggered()), this, SLOT(fShowAboutQtads()));
+	act = new QAction(tr("&Check for Updates"), this);
+	menu->addAction(act);
+	connect(act, SIGNAL(triggered()), this, SLOT(fCheckForUpdates()));
 
 	this->setMenuBar(menuBar);
 
@@ -191,6 +195,97 @@ CHtmlSysWinGroupQt::fAskRestartGameDialog()
 		return true;
 	}
 	return false;
+}
+
+
+void
+CHtmlSysWinGroupQt::fCheckForUpdates()
+{
+	// If there's already an update check in progress, don't do anything.
+	if (this->fNetManager != 0) {
+		return;
+	}
+
+	this->fNetManager = new QNetworkAccessManager(this);
+	connect(this->fNetManager, SIGNAL(finished(QNetworkReply*)), SLOT(fReplyFinished(QNetworkReply*)));
+
+	this->fReply = this->fNetManager->get(QNetworkRequest(QUrl("http://qtads.sourceforge.net/currentversion")));
+	connect(this->fReply, SIGNAL(error(QNetworkReply::NetworkError)),
+			SLOT(fErrorOccurred(QNetworkReply::NetworkError)));
+}
+
+
+void
+CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
+{
+	if (reply->error() != QNetworkReply::NoError) {
+		// There was an error.  Don't do anything; the error slot will
+		// take care of it.
+		return;
+	}
+
+	// Convert current version to hex.
+	QString str(QTADS_VERSION);
+	// If this is a git snapshot, strip the " git".
+	if (str.endsWith(" git", Qt::CaseInsensitive)) {
+		str.chop(4);
+	}
+	QStringList strList = str.split('.');
+	int curVersion = QT_VERSION_CHECK(strList.at(0).toInt(), strList.at(1).toInt(), strList.at(2).toInt());
+
+	// Do the same with the retrieved version.
+	str = reply->readLine(10);
+	// Chop the newline at the end, if there is one.
+	if (str.endsWith('\n')) {
+		str.chop(1);
+	}
+	strList = str.split('.');
+	int newVersion = QT_VERSION_CHECK(strList.at(0).toInt(), strList.at(1).toInt(), strList.at(2).toInt());
+
+	QMessageBox* msgBox = new QMessageBox(this);
+	msgBox->setTextFormat(Qt::RichText);
+	msgBox->setWindowTitle(tr("Check for Updates"));
+	if (newVersion > curVersion) {
+		// There's a new version available.  Retrieve the rest of the remote
+		// file.  For security, provide a sane upper limit of characters to
+		// read.
+		QString text;
+		while (reply->canReadLine() and text.length() < 2500) {
+			text += reply->readLine(100);
+		}
+		if (text.length() > 2) {
+			msgBox->setDetailedText(text);
+		}
+		msgBox->setIcon(QMessageBox::Question);
+		msgBox->setText(tr("A new version of QTads is available:") + " " + str);
+		msgBox->setInformativeText(tr("Do you want to visit the download page?"));
+		msgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+		msgBox->setDefaultButton(QMessageBox::Yes);
+		if (msgBox->exec() == QMessageBox::Yes) {
+			QDesktopServices::openUrl(QUrl("http://qtads.sourceforge.net/downloads.shtml"));
+		}
+	} else {
+		msgBox->setIcon(QMessageBox::Information);
+		msgBox->setText(tr("This version of QTads is up to date."));
+		msgBox->exec();
+	}
+	this->fNetManager->deleteLater();
+	this->fReply->deleteLater();
+	this->fNetManager = 0;
+}
+
+void
+CHtmlSysWinGroupQt::fErrorOccurred( QNetworkReply::NetworkError code )
+{
+	QMessageBox* msg = new QMessageBox(QMessageBox::Critical, tr("Check for Updates - Error"),
+									   tr("It was not possible to retrieve update information. Please try again later,"
+										  " as the problem is probably temporary. If the problem persists, feel free"
+										  " to contact the author."));
+	msg->setDetailedText(this->fReply->errorString());
+	msg->show();
+	this->fNetManager->deleteLater();
+	this->fReply->deleteLater();
+	this->fNetManager = 0;
 }
 
 

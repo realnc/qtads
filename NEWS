@@ -1,6 +1,9 @@
 2.?.? - 2011/??/??
 ==================
 
+  - QTads is now able to check online for new version through the
+    "Help->Check for Updates" menu item.
+
   - On the Mac, running a game by dropping its file on the QTads icon is now
     supported.
 
