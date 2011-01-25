@@ -172,12 +172,21 @@ CHtmlSysWinGroupQt::fAskQuitGameDialog()
 	if (not qFrame->gameRunning()) {
 		return true;
 	}
-	if (QMessageBox::question(0, tr("End Current Game") + " - " + qFrame->applicationName(),
-							  tr("If you didn't save the current game, all progress will be lost. Do you wish"
-								 " to quit the game?"), QMessageBox::Yes | QMessageBox::Cancel,
-							  QMessageBox::Cancel)
-		== QMessageBox::Yes)
-	{
+
+	QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
+										  tr("Quit Current Game") + " - " + qFrame->applicationName(),
+										  tr("If you didn't save the current game, all progress will"
+											 " be lost. Do you wish to quit the game?"),
+										  QMessageBox::Yes | QMessageBox::Cancel, this);
+	msgBox->setInformativeText(tr("This action will try to forcibly quit the game. Some games do not properly"
+								  " support this and can leave a stale process running in the background."
+								  " You should issue an in-game \"quit\" command in such cases."));
+#ifdef Q_WS_MAC
+	// This presents the dialog as a sheet in OS X.
+	msgBox->setWindowModality(Qt::WindowModal);
+#endif
+
+	if (msgBox->exec() == QMessageBox::Yes) {
 		return true;
 	}
 	return false;
@@ -190,12 +199,21 @@ CHtmlSysWinGroupQt::fAskRestartGameDialog()
 	if (not qFrame->gameRunning()) {
 		return true;
 	}
-	if (QMessageBox::question(0, tr("Restart Current Game") + " - " + qFrame->applicationName(),
-							  tr("If you didn't save the current game, all progress will be lost. Do you wish"
-								 " to restart the game?"), QMessageBox::Yes | QMessageBox::Cancel,
-							  QMessageBox::Cancel)
-		== QMessageBox::Yes)
-	{
+
+	QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
+										  tr("Restart Current Game") + " - " + qFrame->applicationName(),
+										  tr("If you didn't save the current game, all progress will be lost."
+											 " Do you wish to restart the game?"),
+										  QMessageBox::Yes | QMessageBox::Cancel, this);
+	msgBox->setInformativeText(tr("This action will try to forcibly quit and then restart the game. Some games"
+								  " do not properly support this and can leave a stale process running in the"
+								  " background. You should issue an in-game \"restart\" command in such cases."));
+#ifdef Q_WS_MAC
+	// This presents the dialog as a sheet in OS X.
+	msgBox->setWindowModality(Qt::WindowModal);
+#endif
+
+	if (msgBox->exec() == QMessageBox::Yes) {
 		return true;
 	}
 	return false;
@@ -465,17 +483,27 @@ CHtmlSysWinGroupQt::fNotifyGameStarting()
 void
 CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
 {
-	if (qFrame->gameRunning()) {
-		if (QMessageBox::question(0, tr("Quit Interpreter") + " - " + qFrame->applicationName(),
-								  tr("A game is currently running. Abandon the game and quit the interpreter?"),
-								  QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel)
-			== QMessageBox::Yes)
-		{
-			qFrame->setGameRunning(false);
-			e->accept();
-		} else {
-			e->ignore();
-		}
+	if (not qFrame->gameRunning()) {
+		return;
+	}
+
+	QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
+										  tr("Quit QTads"),
+										  tr("A game is currently running. Abandon the game and quit the interpreter?"),
+										  QMessageBox::Yes | QMessageBox::Cancel, this);
+	msgBox->setInformativeText(tr("This action will try to forcibly quit the game. Some games do not properly"
+								  " support this and can leave a stale process running in the background."
+								  " You should issue an in-game \"quit\" command first in such cases."));
+#ifdef Q_WS_MAC
+	// This presents the dialog as a sheet in OS X.
+	msgBox->setWindowModality(Qt::WindowModal);
+#endif
+
+	if (msgBox->exec() == QMessageBox::Yes) {
+		qFrame->setGameRunning(false);
+		e->accept();
+	} else {
+		e->ignore();
 	}
 }
 
