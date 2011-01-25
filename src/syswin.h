@@ -47,6 +47,10 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	bool fBannerStyleAutoVScroll;
 	bool fBannerStyleHScroll;
 	bool fBannerStyleGrid;
+	bool fBannerStyleBorder;
+
+	// Our border, if we have one.
+	QFrame fBorderLine;
 
 	// Do not attempt to reformat during a resize event.  This is set when in
 	// the process of creating a new banner.  If we reformat during that

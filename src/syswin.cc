@@ -31,9 +31,9 @@
 
 
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidget, QWidget* parent )
-  : QScrollArea(parent), CHtmlSysWin(formatter), fBannerStyleAutoVScroll(true), fBannerStyleGrid(false),
-	fDontReformat(0), fParentBanner(0), fBgImage(0), lastInputHeight(0), margins(8, 2, 8, 2), bannerSize(0),
-	bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
+: QScrollArea(parent), CHtmlSysWin(formatter), fBannerStyleAutoVScroll(true), fBannerStyleGrid(false),
+  fBannerStyleBorder(0), fDontReformat(0), fParentBanner(0), fBgImage(0), fBorderLine(qWinGroup->centralWidget()),
+  lastInputHeight(0), margins(8, 2, 8, 2), bannerSize(0), bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
 {
 	if (dispWidget == 0) {
 		this->dispWidget = new DisplayWidget(this, formatter);
@@ -47,6 +47,7 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidg
 	this->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
 	this->setLineWidth(0);
 	this->setContentsMargins(0, 0, 0, 0);
+	this->fBorderLine.setFrameStyle(QFrame::Box | QFrame::Plain);
 
 	QPalette p(this->palette());
 	p.setColor(QPalette::Base, qFrame->settings()->bannerBgColor);
@@ -159,6 +160,17 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 	// otherwise, we must be a top-level window, so take the entire available
 	// space for ourselves.
 	if (this != qFrame->gameWindow()) {
+		QFrame& borderLine = this->fBorderLine;
+
+		// Should be draw a border?
+		bool drawBorder = this->fBannerStyleBorder;
+
+		if (this->bannerSize == 0) {
+			// This is a zero-size banner.  Don't use a border or margins.
+			// A zero-size banner really should be a zero-size banner.
+			drawBorder = false;
+		}
+
 		// Calculate our current on-screen size.
 		int wid = oldSize.width();
 		int ht = oldSize.height();
@@ -168,12 +180,20 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 		  case HTML_BANNERWIN_UNITS_PIX:
 			// Pixels - use the stored width directly.
 			wid = this->bannerSize;
+			// Add space for the border if needed.
+			if (drawBorder) {
+				++wid;
+			}
 			break;
 
 		  case HTML_BANNERWIN_UNITS_CHARS:
 			// Character cells - calculate the size in terms of the width of a
 			// "0" character in the window's default font.
 			wid = this->bannerSize * measure_text(get_default_font(), "0", 1, 0).x;
+			// Add space for the border if needed.
+			if (drawBorder) {
+				++wid;
+			}
 			break;
 
 		  case HTML_BANNERWIN_UNITS_PCT:
@@ -188,12 +208,19 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 		  case HTML_BANNERWIN_UNITS_PIX:
 			// Pixels - use the stored height directly.
 			ht = this->bannerSize;
+			// Add space for the border if needed.
+			if (drawBorder) {
+				++ht;
+			}
 			break;
 
 		  case HTML_BANNERWIN_UNITS_CHARS:
 			// Character cells - calculate the size in terms of the height of a
 			// "0" character in the window's default font.
 			ht = this->bannerSize * measure_text(get_default_font(), "0", 1, 0).y;
+			if (drawBorder) {
+				++ht;
+			}
 			break;
 
 		  case HTML_BANNERWIN_UNITS_PCT:
@@ -213,37 +240,79 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 
 		// Position the banner according to our alignment type.
 		switch(this->fBannerPos) {
-		case HTML_BANNERWIN_POS_TOP:
-			// Align the banner at the top of the window.
-			newSize.setBottom(newSize.top() + ht - 1);
+		  case HTML_BANNERWIN_POS_TOP:
+			if (drawBorder) {
+				// Adjust for the border by taking the space for it out of
+				// the banner.
+				newSize.setBottom(newSize.top() + ht - 2);
+
+				// Position the border window at the bottom of our area.
+				borderLine.setGeometry(newSize.left(), newSize.top() + ht - 1, newSize.left() + newSize.width(), 1);
+			} else {
+				// Align the banner at the top of the window.
+				newSize.setBottom(newSize.top() + ht - 1);
+			}
 
 			// Take the space out of the top of the parent window.
 			parentSize.setTop(parentSize.top() + ht);
 			break;
 
-		case HTML_BANNERWIN_POS_BOTTOM:
-			// Align the banner at the bottom of the window.
-			newSize.setTop((newSize.top() + newSize.height()) - ht + 1);
+		  case HTML_BANNERWIN_POS_BOTTOM:
+			if (drawBorder) {
+				// Adjust for the border by taking the space for it out of
+				// the banner.
+				newSize.setTop(newSize.top() + newSize.height() - ht + 2);
+
+				// Position the border window at the top of our area.
+				borderLine.setGeometry(newSize.left(), newSize.top() - 1, newSize.left() + newSize.width(), 1);
+			} else {
+				// Align the banner at the bottom of the window.
+				newSize.setTop(newSize.top() + newSize.height() - ht + 1);
+			}
 
 			// Take the space out of the bottom of the parent area.
 			parentSize.setBottom((parentSize.top() + parentSize.height()) - ht);
 			break;
 
-		case HTML_BANNERWIN_POS_LEFT:
-			// Align the banner at the left of the window.
-			newSize.setRight(newSize.left() + wid - 1);
+		  case HTML_BANNERWIN_POS_LEFT:
+			if (drawBorder) {
+				// Adjust for the border by taking the space for it out of
+				// the banner.
+				newSize.setRight(newSize.left() + wid - 2);
+
+				// Position the border window at the right of our area.
+				borderLine.setGeometry(newSize.left() + width(), newSize.top(), 1, newSize.height());
+			} else {
+				// Align the banner at the left of the window.
+				newSize.setRight(newSize.left() + wid - 1);
+			}
 
 			// Take the space from the left of the parent window.
 			parentSize.setLeft(parentSize.left() + wid);
 			break;
 
-		case HTML_BANNERWIN_POS_RIGHT:
-			// Align the banner at the right of the window.
-			newSize.setLeft(newSize.left() + newSize.width() - wid + 1);
+		  case HTML_BANNERWIN_POS_RIGHT:
+			if (drawBorder) {
+				// Adjust for the border by taking the space for it out of
+				// the banner.
+				newSize.setLeft(newSize.left() + newSize.width() - wid + 2);
+
+				// Position the border window at the left of our area.
+				borderLine.setGeometry(newSize.left() - 1, newSize.top(), 1, newSize.height());
+			} else {
+				// Align the banner at the right of the window.
+				newSize.setLeft(newSize.left() + newSize.width() - wid + 1);
+			}
 
 			// Take the space from the right of the parent window.
 			parentSize.setRight(parentSize.left() + parentSize.width() - wid);
 			break;
+		}
+
+		if (drawBorder) {
+			borderLine.show();
+		} else {
+			borderLine.hide();
 		}
 	}
 
@@ -321,6 +390,7 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int
 	banner->fBannerPos = pos;
 	banner->fBannerWhere = where;
 	banner->fBannerStyleAutoVScroll = style & OS_BANNER_STYLE_AUTO_VSCROLL;
+	banner->fBannerStyleBorder = style & OS_BANNER_STYLE_BORDER;
 
 	banner->setGeometry(this->geometry());
 	// Qt will not update the viewport() geometry unless the widget is shown
@@ -1103,10 +1173,8 @@ CHtmlSysWinQt::set_banner_info( HTML_BannerWin_Pos_t pos, unsigned long style )
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	// Set the new auto-vscroll flag.
 	this->fBannerStyleAutoVScroll = style & OS_BANNER_STYLE_AUTO_VSCROLL;
-
-	// Set the new alignemnt.
+	this->fBannerStyleBorder = style & OS_BANNER_STYLE_BORDER;
 	this->fBannerPos = pos;
 
 	// FIXME: ignore the scrollbar changes (for now, anyway)
@@ -1126,6 +1194,9 @@ CHtmlSysWinQt::get_banner_info( HTML_BannerWin_Pos_t* pos, unsigned long* style 
 	*style = 0;
 	if (this->fBannerStyleAutoVScroll) {
 		*style |= OS_BANNER_STYLE_AUTO_VSCROLL;
+	}
+	if (this->fBannerStyleBorder) {
+		*style |= OS_BANNER_STYLE_BORDER;
 	}
 
 	// We provide full HTML interpretation, so we support <TAB>.
