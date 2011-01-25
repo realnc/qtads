@@ -161,6 +161,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 	// space for ourselves.
 	if (this != qFrame->gameWindow()) {
 		QFrame& borderLine = this->fBorderLine;
+		CHtmlRect margins = this->formatter_->get_phys_margins();
 
 		// Should be draw a border?
 		bool drawBorder = this->fBannerStyleBorder;
@@ -169,6 +170,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 			// This is a zero-size banner.  Don't use a border or margins.
 			// A zero-size banner really should be a zero-size banner.
 			drawBorder = false;
+			margins.set(0, 0, 0, 0);
 		}
 
 		// Calculate our current on-screen size.
@@ -194,6 +196,8 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 			if (drawBorder) {
 				++wid;
 			}
+			// Add the horizontal margins.
+			wid += margins.left + margins.right;
 			break;
 
 		  case HTML_BANNERWIN_UNITS_PCT:
@@ -221,6 +225,8 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 			if (drawBorder) {
 				++ht;
 			}
+			// Add the vertical margins.
+			ht += margins.top + margins.bottom;
 			break;
 
 		  case HTML_BANNERWIN_UNITS_PCT:
