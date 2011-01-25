@@ -257,8 +257,9 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
 			msgBox->setDetailedText(text);
 		}
 		msgBox->setIcon(QMessageBox::Question);
-		msgBox->setText(tr("A new version of QTads is available:") + " " + str);
-		msgBox->setInformativeText(tr("Do you want to visit the download page?"));
+		msgBox->setText(tr("A newer version of QTads is available. Do you want to visit the download page?"));
+		msgBox->setInformativeText(tr("Note that this is only a check for new versions. Nothing will be downloaded"
+									  " or installed automatically."));
 		msgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 		msgBox->setDefaultButton(QMessageBox::Yes);
 		if (msgBox->exec() == QMessageBox::Yes) {
