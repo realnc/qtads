@@ -60,6 +60,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	class QAction* fAboutQtadsAction;
 	class QNetworkAccessManager* fNetManager;
 	class QNetworkReply* fReply;
+	QString fGameFileFromDropEvent;
 
 	bool
 	fAskQuitGameDialog();
@@ -115,6 +116,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
 	void
 	fNotifyGameStarting();
+
+	void
+	fRunDropEventFile();
 
   protected:
 	virtual void

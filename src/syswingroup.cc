@@ -524,16 +524,17 @@ CHtmlSysWinGroupQt::dragEnterEvent( QDragEnterEvent* e )
 void
 CHtmlSysWinGroupQt::dropEvent( QDropEvent* e )
 {
+	e->acceptProposedAction();
+	this->fGameFileFromDropEvent = e->mimeData()->urls().at(0).toLocalFile();
+	QTimer::singleShot(100, this, SLOT(fRunDropEventFile()));
+}
+
+
+void
+CHtmlSysWinGroupQt::fRunDropEventFile()
+{
 	if (this->fAskQuitGameDialog()) {
-		e->acceptProposedAction();
-		// Don't call qFrame->setNextGame() since that will block. We need to
-		// return in order for the drop event to end, so we invoke a 100ms
-		// timer instead. That should give us plenty of time to return before
-		// the game file gets loaded.
-		qFrame->scheduleNextGame(e->mimeData()->urls().at(0).toLocalFile());
-		QTimer::singleShot(100, qFrame, SLOT(runNextGame()));
-	} else {
-		e->ignore();
+		qFrame->setNextGame(this->fGameFileFromDropEvent);
 	}
 }
 
@@ -606,17 +607,13 @@ CHtmlSysWinGroupQt::updateRecentGames()
 bool
 CHtmlSysWinGroupQt::handleFileOpenEvent( class QFileOpenEvent* e )
 {
-	if (e->file().isEmpty() or not this->fAskQuitGameDialog()) {
+	if (e->file().isEmpty()) {
 		e->ignore();
 		return false;
 	}
 	e->accept();
-	// Don't call setNextGame() since that will block. We need to
-	// return in order for the drop event to end, so we invoke a 100ms
-	// timer instead. That should give us plenty of time to return before
-	// the game file gets loaded.
-	qFrame->scheduleNextGame(e->file());
-	QTimer::singleShot(100, qFrame, SLOT(runNextGame()));
+	this->fGameFileFromDropEvent = e->file();
+	QTimer::singleShot(100, this, SLOT(fRunDropEventFile()));
 	return true;
 }
 #endif
