@@ -126,6 +126,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	menu->addAction(this->fAboutQtadsAction);
 	connect(this->fAboutQtadsAction, SIGNAL(triggered()), this, SLOT(fShowAboutQtads()));
 	act = new QAction(tr("&Check for Updates"), this);
+	act->setMenuRole(QAction::ApplicationSpecificRole);
 	menu->addAction(act);
 	connect(act, SIGNAL(triggered()), this, SLOT(fCheckForUpdates()));
 
