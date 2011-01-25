@@ -193,7 +193,13 @@ CHtmlSysFrameQt::fRunGame()
 
 			// Set the application's window title to contain the filename of the game
 			// we're running.  The game is free to change that later on.
+#ifdef Q_WS_MAC
+			// Just use the filename on OS X.  Seems to be the norm there.
+			qWinGroup->setWindowTitle(finfo.fileName());
+#else
+			// On all other systems, also append the application name.
 			qWinGroup->setWindowTitle(finfo.fileName() + " - " + qFrame->applicationName());
+#endif
 
 			// Add the game file to our "recent games" list.
 			int recentIdx = this->fSettings->recentGamesList.indexOf(finfo.absoluteFilePath());
