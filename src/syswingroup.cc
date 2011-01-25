@@ -53,16 +53,16 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	// in Mac OS X.
 	QMenuBar* menuBar = new QMenuBar(0);
 
-	// "File" menu.
-	QMenu* menu = menuBar->addMenu(tr("&File"));
-	QAction* act = new QAction(tr("&Open New Game"), this);
+	// "Game" menu.
+	QMenu* menu = menuBar->addMenu(tr("&Game"));
+	QAction* act = new QAction(tr("&Open") + "...", this);
 #if QT_VERSION >= 0x040600
 	act->setIcon(QIcon::fromTheme("document-open"));
 #endif
 	act->setShortcuts(QKeySequence::Open);
 	menu->addAction(act);
 	connect(act, SIGNAL(triggered()), this, SLOT(fOpenNewGame()));
-	act = new QAction(tr("&Recent Games"), this);
+	act = new QAction(tr("Open &Recent"), this);
 #if QT_VERSION >= 0x040600
 	act->setIcon(QIcon::fromTheme("document-open-recent"));
 #endif
@@ -70,14 +70,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	act->setMenu(this->fRecentGamesMenu);
 	menu->addAction(act);
 	connect(this->fRecentGamesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fRecentGameTriggered(QAction*)));
-	this->fGameInfoAction = new QAction(tr("Game &Information"), this);
-#if QT_VERSION >= 0x040600
-	this->fGameInfoAction->setIcon(QIcon::fromTheme("document-properties"));
-#endif
-	menu->addAction(this->fGameInfoAction);
-	this->fGameInfoAction->setEnabled(false);
-	connect(this->fGameInfoAction, SIGNAL(triggered()), this, SLOT(fShowGameInfoDialog()));
-	this->fRestartCurrentGameAction = new QAction(tr("Re&start Current Game"), this);
+	this->fRestartCurrentGameAction = new QAction(tr("Re&start"), this);
 #if QT_VERSION >= 0x040600
 	this->fRestartCurrentGameAction->setIcon(QIcon::fromTheme("view-refresh"));
 #endif
@@ -85,7 +78,8 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	menu->addAction(this->fRestartCurrentGameAction);
 	this->fRestartCurrentGameAction->setEnabled(false);
 	connect(this->fRestartCurrentGameAction, SIGNAL(triggered()), this, SLOT(fRestartCurrentGame()));
-	this->fEndCurrentGameAction = new QAction(tr("&End Current Game"), this);
+	this->fEndCurrentGameAction = new QAction(tr("Qui&t"), this);
+	this->fEndCurrentGameAction->setMenuRole(QAction::NoRole);
 #if QT_VERSION >= 0x040600
 	this->fEndCurrentGameAction->setIcon(QIcon::fromTheme("process-stop"));
 #endif
@@ -94,7 +88,21 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 	this->fEndCurrentGameAction->setEnabled(false);
 	connect(this->fEndCurrentGameAction, SIGNAL(triggered()), this, SLOT(fEndCurrentGame()));
 	menu->addSeparator();
-	act = new QAction(tr("&Quit"), this);
+	this->fAboutGameAction = new QAction(tr("&About This Game"), this);
+	this->fAboutGameAction->setMenuRole(QAction::NoRole);
+	this->fAboutGameAction->setEnabled(false);
+	menu->addAction(this->fAboutGameAction);
+	connect(this->fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
+	this->fGameInfoAction = new QAction(tr("View Metadata"), this);
+#if QT_VERSION >= 0x040600
+	this->fGameInfoAction->setIcon(QIcon::fromTheme("document-properties"));
+#endif
+	menu->addAction(this->fGameInfoAction);
+	this->fGameInfoAction->setEnabled(false);
+	connect(this->fGameInfoAction, SIGNAL(triggered()), this, SLOT(fShowGameInfoDialog()));
+	menu->addSeparator();
+	act = new QAction(tr("&Quit QTads"), this);
+	act->setMenuRole(QAction::QuitRole);
 #if QT_VERSION >= 0x040600
 	act->setIcon(QIcon::fromTheme("application-exit"));
 	act->setShortcuts(QKeySequence::Quit);
@@ -114,11 +122,6 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
 	// "Help" menu.
 	menu = menuBar->addMenu(tr("&Help"));
-	this->fAboutGameAction = new QAction(tr("&About This Game"), this);
-	this->fAboutGameAction->setMenuRole(QAction::ApplicationSpecificRole);
-	this->fAboutGameAction->setEnabled(false);
-	menu->addAction(this->fAboutGameAction);
-	connect(this->fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
 	this->fAboutQtadsAction = new QAction(tr("A&bout QTads"), this);
 #if QT_VERSION >= 0x040600
 	this->fAboutQtadsAction->setIcon(QIcon::fromTheme("help-about"));
