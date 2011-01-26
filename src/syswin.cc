@@ -198,9 +198,11 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 		  case HTML_BANNERWIN_UNITS_PIX:
 			// Pixels - use the stored width directly.
 			wid = this->bannerSize;
+			ht = this->bannerSize;
 			// Add space for the border if needed.
 			if (drawBorder) {
 				++wid;
+				++ht;
 			}
 			break;
 
@@ -208,46 +210,21 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 			// Character cells - calculate the size in terms of the width of a
 			// "0" character in the window's default font.
 			wid = this->bannerSize * measure_text(get_default_font(), "0", 1, 0).x;
+			ht = this->bannerSize * measure_text(get_default_font(), "0", 1, 0).y;
 			// Add space for the border if needed.
 			if (drawBorder) {
 				++wid;
+				++ht;
 			}
-			// Add the horizontal margins.
+			// Add the margins.
 			wid += margins.left + margins.right;
+			ht += margins.top + margins.bottom;
 			break;
 
 		  case HTML_BANNERWIN_UNITS_PCT:
 			// Percentage - calculate the width as a percentage of the parent
 			// size.
 			wid = (this->bannerSize * parentSize.width()) / 100;
-			break;
-		}
-
-		// Convert the height units to pixels.
-		switch (this->bannerSizeUnits) {
-		  case HTML_BANNERWIN_UNITS_PIX:
-			// Pixels - use the stored height directly.
-			ht = this->bannerSize;
-			// Add space for the border if needed.
-			if (drawBorder) {
-				++ht;
-			}
-			break;
-
-		  case HTML_BANNERWIN_UNITS_CHARS:
-			// Character cells - calculate the size in terms of the height of a
-			// "0" character in the window's default font.
-			ht = this->bannerSize * measure_text(get_default_font(), "0", 1, 0).y;
-			if (drawBorder) {
-				++ht;
-			}
-			// Add the vertical margins.
-			ht += margins.top + margins.bottom;
-			break;
-
-		  case HTML_BANNERWIN_UNITS_PCT:
-			// Percentage - calculate the size as a percentage of the parent
-			// size.
 			ht = (this->bannerSize * parentSize.height()) / 100;
 			break;
 		}
