@@ -138,6 +138,19 @@ CHtmlSysWinQt::scrollContentsBy(int dx, int dy)
 
 
 void
+CHtmlSysWinQt::wheelEvent( QWheelEvent* e )
+{
+	// Only allow the event if the banner has a vertical scrollbar.  Banners
+	// without one are not supposed to be scrollable.
+	if (this == qFrame->gameWindow() or this->fBannerStyleVScroll) {
+		QScrollArea::wheelEvent(e);
+	} else {
+		e->ignore();
+	}
+}
+
+
+void
 CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 {
 	//qDebug() << Q_FUNC_INFO;
