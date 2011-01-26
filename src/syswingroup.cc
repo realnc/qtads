@@ -178,6 +178,7 @@ CHtmlSysWinGroupQt::fAskQuitGameDialog()
 										  tr("If you didn't save the current game, all progress will"
 											 " be lost. Do you wish to quit the game?"),
 										  QMessageBox::Yes | QMessageBox::Cancel, this);
+	msgBox->setDefaultButton(QMessageBox::Cancel);
 	msgBox->setInformativeText(tr("This action will try to forcibly quit the game. Some games do not properly"
 								  " support this and can leave a stale process running in the background."
 								  " You should issue an in-game \"quit\" command in such cases."));
@@ -205,6 +206,7 @@ CHtmlSysWinGroupQt::fAskRestartGameDialog()
 										  tr("If you didn't save the current game, all progress will be lost."
 											 " Do you wish to restart the game?"),
 										  QMessageBox::Yes | QMessageBox::Cancel, this);
+	msgBox->setDefaultButton(QMessageBox::Cancel);
 	msgBox->setInformativeText(tr("This action will try to forcibly quit and then restart the game. Some games"
 								  " do not properly support this and can leave a stale process running in the"
 								  " background. You should issue an in-game \"restart\" command in such cases."));
@@ -491,6 +493,7 @@ CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
 										  tr("Quit QTads"),
 										  tr("A game is currently running. Abandon the game and quit the interpreter?"),
 										  QMessageBox::Yes | QMessageBox::Cancel, this);
+	msgBox->setDefaultButton(QMessageBox::Cancel);
 	msgBox->setInformativeText(tr("This action will try to forcibly quit the game. Some games do not properly"
 								  " support this and can leave a stale process running in the background."
 								  " You should issue an in-game \"quit\" command first in such cases."));
