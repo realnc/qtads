@@ -48,8 +48,11 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidg
 	this->setLineWidth(0);
 	this->setContentsMargins(0, 0, 0, 0);
 	this->fBorderLine.setFrameStyle(QFrame::Box | QFrame::Plain);
+	QPalette p(this->fBorderLine.palette());
+	p.setColor(QPalette::WindowText, QApplication::palette().color(QPalette::Shadow));
+	this->fBorderLine.setPalette(p);
 
-	QPalette p(this->palette());
+	p = this->palette();
 	p.setColor(QPalette::Base, qFrame->settings()->bannerBgColor);
 	p.setColor(QPalette::Text, qFrame->settings()->bannerTextColor);
 	this->setPalette(p);
