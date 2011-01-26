@@ -107,7 +107,6 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* t
 		this->fBlinkCursor();
 	}
 
-	this->parentSysWin->do_formatting(false, false, false);
 	CHtmlPoint cursorPos = formatter->get_text_pos(tag->get_text_ofs() + tadsBuffer->get_caret());
 	this->moveCursorPos(QPoint(cursorPos.x, cursorPos.y));
 
@@ -120,12 +119,6 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* t
 	// Blink-in.
 	if (not this->fBlinkVisible) {
 		this->fBlinkCursor();
-	}
-
-	CHtmlDisp* disp = formatter->find_by_pos(cursorPos, false);
-	if (disp != 0) {
-		const CHtmlRect& itemRect = disp->get_pos();
-		this->update(0, itemRect.top, this->width(), itemRect.bottom - itemRect.top);
 	}
 }
 
