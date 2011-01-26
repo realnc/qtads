@@ -598,6 +598,7 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	//qDebug() << Q_FUNC_INFO;
 
 	if (this->fDontReformat != 0) {
+		qWarning() << "Reentrancy detected in" << Q_FUNC_INFO << "\nThis should not happen.";
 		return false;
 	}
 
