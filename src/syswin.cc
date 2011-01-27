@@ -812,45 +812,9 @@ CHtmlSysWinQt::fmt_adjust_vscroll()
 
 	if (this->fBannerStyleGrid) {
 		this->dispWidget->resize(this->dispWidget->width(), this->viewport()->height());
-		return;
-	}
-
-	if (not this->fBannerStyleAutoVScroll) {
+	} else {
 		this->dispWidget->resize(this->dispWidget->width(), targetHt);
-		return;
 	}
-
-	/*
-	while (this->dispWidget->height() < targetHt) {
-		if (targetHt - this->lastInputHeight > this->viewport()->height()) {
-			this->dispWidget->resize(this->dispWidget->width(),
-									 this->dispWidget->height()
-									 + this->viewport()->height()
-									 - this->verticalScrollBar()->singleStep()
-									 - (targetHt - this->lastInputHeight));
-			this->lastInputHeight = this->dispWidget->height();
-			qFrame->gameWindow()->pagePause();
-		} else {
-			this->dispWidget->resize(this->dispWidget->width(), targetHt);
-		}
-	}
-	*/
-
-	//if (targetHt > this->dispWidget->height()) {
-		//if (this == qFrame->gameWindow())
-			//qDebug() << this->dispWidget->height();
-		//this->dispWidget->resize(this->dispWidget->width(), targetHt);
-	//}
-	//while (this->verticalScrollBar()->value() < this->verticalScrollBar()->maximum()) {
-		//this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
-		//usleep(80000);
-		//this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderSingleStepAdd);
-		//qFrame->advanceEventLoop(QEventLoop::ExcludeUserInputEvents);
-	//}
-
-	this->dispWidget->resize(this->dispWidget->width(), targetHt);
-	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
-	qFrame->advanceEventLoop();
 }
 
 

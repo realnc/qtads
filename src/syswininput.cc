@@ -470,8 +470,8 @@ CHtmlSysWinInputQt::cancelInput( bool reset )
 	// Flush the newline, and update the window immediately, in case the
 	// operation takes a while to complete.
 	qFrame->flush_txtbuf(true, true);
-	//this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
-	//qFrame->advanceEventLoop();
+	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+	qFrame->advanceEventLoop();
 
 	// Done with the tag.
 	if (reset) {
