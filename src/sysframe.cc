@@ -625,13 +625,7 @@ CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 
 	// If desired, run the parsed source through the formatter and display it.
 	if (fmt) {
-#if QT_VERSION < 0x040500
-		// For some reason, setting update_win to false hangs with an infinite
-		// loop on Qt 4.4.  No idea what causes it.
-		this->fGameWin->do_formatting(false, true, false);
-#else
 		this->fGameWin->do_formatting(false, false, false);
-#endif
 	}
 
 	// Also flush all banner windows.
