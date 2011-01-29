@@ -427,7 +427,7 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int
 
 
 void
-CHtmlSysWinQt::scrollDown( bool force )
+CHtmlSysWinQt::scrollDown( bool force, bool justOneLine )
 {
 	// If we're very small, or shouldn't scroll, or there's nothing to scroll,
 	// ignore the call.
@@ -451,7 +451,11 @@ CHtmlSysWinQt::scrollDown( bool force )
 	QScrollBar* bar = this->verticalScrollBar();
 
 	if (this->fInPagePauseMode) {
-		bar->setValue(bar->value() + bar->pageStep() - bar->singleStep() * 2);
+		if (justOneLine) {
+			bar->triggerAction(QAbstractSlider::SliderSingleStepAdd);
+		} else {
+			bar->setValue(bar->value() + bar->pageStep() - bar->singleStep() * 2);
+		}
 	} else {
 		bar->setValue(this->lastInputHeight);
 	}
@@ -864,7 +868,7 @@ CHtmlSysWinQt::fmt_adjust_vscroll()
 		this->dispWidget->resize(this->dispWidget->width(), this->viewport()->height());
 	} else {
 		this->dispWidget->resize(this->dispWidget->width(), targetHt);
-		this->scrollDown(false);
+		this->scrollDown(false, false);
 	}
 }
 

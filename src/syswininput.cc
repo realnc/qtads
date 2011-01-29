@@ -78,7 +78,7 @@ CHtmlSysWinInputQt::fProcessPagePauseQueue()
 		return;
 	}
 
-	QLabel moreText(tr("*** MORE ***  [press a key to continue]"));
+	QLabel moreText(tr("*** MORE ***  [press space or enter to continue]"));
 	// Display a permanent QLabel instead of a temporary message.  This allows
 	// other status bar messages (like when hovering over hyperlinks) to
 	// temporary remove the MORE text instead of replacing it.
@@ -195,8 +195,15 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
 
 	if (this->fInputMode == PagePauseInput) {
 		if (e->key() == Qt::Key_Space) {
-			// Scroll down in the banner.
-			this->fPagePauseQueue.head()->scrollDown(true);
+			// Scroll down by a page.
+			this->fPagePauseQueue.head()->scrollDown(true, false);
+#if QT_VERSION >= 0x040500
+		} else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
+#else
+		} else if (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return) {
+#endif
+			// Scroll down by a line.
+			this->fPagePauseQueue.head()->scrollDown(true, true);
 		}
 		return;
 	}

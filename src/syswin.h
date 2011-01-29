@@ -144,7 +144,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	// 'force' flag controls whether we should scroll even while waiting for
 	// input in page-pause mode.
 	void
-	scrollDown( bool force );
+	scrollDown( bool force, bool justOneLine );
 
 	//
 	// CHtmlSysWin interface implementation.
