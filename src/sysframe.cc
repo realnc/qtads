@@ -36,7 +36,7 @@
 
 CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion,
 								  const char* orgName, const char* orgDomain )
-: QApplication(argc, argv), fGameWin(0), fGameRunning(false), fReformatPending(false)
+: QApplication(argc, argv), fGameWin(0), fGameRunning(false), fReformatPending(false), fNonStopMode(false)
 {
 	//qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(qFrame == 0);
@@ -682,6 +682,8 @@ void
 CHtmlSysFrameQt::set_nonstop_mode( int flag )
 {
 	//qDebug() << Q_FUNC_INFO;
+
+	this->fNonStopMode = flag;
 }
 
 

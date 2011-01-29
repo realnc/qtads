@@ -17,6 +17,8 @@
 
 #include <QKeyEvent>
 #include <QScrollBar>
+#include <QStatusBar>
+#include <QLabel>
 #include <QTimer>
 #include <QTime>
 #include <QDesktopServices>
@@ -70,6 +72,29 @@ CHtmlSysWinInputQt::fStartKeypressInput()
 
 
 void
+CHtmlSysWinInputQt::fProcessPagePauseQueue()
+{
+	if (this->fPagePauseQueue.isEmpty()) {
+		return;
+	}
+
+	QLabel moreText(tr("*** MORE ***  [press a key to continue]"));
+	// Display a permanent QLabel instead of a temporary message.  This allows
+	// other status bar messages (like when hovering over hyperlinks) to
+	// temporary remove the MORE text instead of replacing it.
+	moreText.setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+	moreText.setLineWidth(0);
+	moreText.setContentsMargins(0, 0, 0, 0);
+	qWinGroup->statusBar()->addWidget(&moreText);
+	this->fInputMode = PagePauseInput;
+	while (this->fInputMode == PagePauseInput and qFrame->gameRunning()) {
+		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
+	}
+	qWinGroup->statusBar()->removeWidget(&moreText);
+}
+
+
+void
 CHtmlSysWinInputQt::setCursorHeight( unsigned height )
 {
 	this->fCastDispWidget->setCursorHeight(height);
@@ -98,7 +123,7 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
 	}
 
 	// If we're not currently accepting input, ignore this.
-	if (this->fInputMode == NoInput) {
+	if (this->fInputMode == NoInput or this->fInputMode == PagePauseInput) {
 		return;
 	}
 
@@ -152,7 +177,7 @@ CHtmlSysWinInputQt::resizeEvent( QResizeEvent* event )
 
 
 void
-CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
+CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
 {
 	//qDebug() << Q_FUNC_INFO;
 
@@ -169,7 +194,10 @@ CHtmlSysWinInputQt::keyPressEvent ( QKeyEvent* e )
 	}
 
 	if (this->fInputMode == PagePauseInput) {
-		this->pagePauseKeyPressEvent(e);
+		if (e->key() == Qt::Key_Space) {
+			// Scroll down in the banner.
+			this->fPagePauseQueue.head()->scrollDown(true);
+		}
 		return;
 	}
 
@@ -342,15 +370,6 @@ CHtmlSysWinInputQt::singleKeyPressEvent( QKeyEvent* event )
 
 
 void
-CHtmlSysWinInputQt::pagePauseKeyPressEvent( QKeyEvent* e )
-{
-	if (e->key() == Qt::Key_Space) {
-		this->fInputMode = NoInput;
-	}
-}
-
-
-void
 CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long timeout, bool useTimeout,
 							  bool* timedOut )
 {
@@ -376,10 +395,8 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
 			this->fRestoreFromCancel = false;
 		}
 	} else {
-		// Since we're not resuming, make sure we scroll down and that we've
-		// formatted all available input and tell the formatter to begin a new
-		// input.
-		this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+		// Since we're not resuming, make sure that we've formatted all
+		// available input and tell the formatter to begin a new input.
 		while (formatter->more_to_do()) {
 			formatter->do_formatting();
 		}
@@ -396,6 +413,9 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
 		this->fCastDispWidget->updateCursorPos(formatter, this->fTadsBuffer, tag);
 		this->fTadsBuffer->set_sel_range(0, 0, 0);
 	}
+
+	// If we have banners waiting in page-pause mode, process them first.
+	this->fProcessPagePauseQueue();
 
 	this->fInputReady = false;
 	this->fInputMode = NormalInput;
@@ -449,6 +469,9 @@ CHtmlSysWinInputQt::cancelInput( bool reset )
 		return;
 	}
 
+	// Remember if we are at the bottom of the output.
+	bool wasAtBottom = this->verticalScrollBar()->value() == this->verticalScrollBar()->maximum();
+
 	this->fTadsBuffer->hide_caret();
 	this->fCastDispWidget->setCursorVisible(false);
 	static_cast<CHtmlFormatterInput*>(this->formatter_)->end_input();
@@ -469,9 +492,11 @@ CHtmlSysWinInputQt::cancelInput( bool reset )
 
 	// Flush the newline, and update the window immediately, in case the
 	// operation takes a while to complete.
-	qFrame->flush_txtbuf(true, true);
-	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
-	qFrame->advanceEventLoop();
+	if (wasAtBottom) {
+		qFrame->flush_txtbuf(true, true);
+		this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+		qFrame->advanceEventLoop();
+	}
 
 	// Done with the tag.
 	if (reset) {
@@ -507,7 +532,10 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 		formatter->do_formatting();
 	}
 
-	this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+	//this->scrollDown();
+
+	// If we have banners waiting in page-pause mode, process them first.
+	this->fProcessPagePauseQueue();
 
 	// Clear any pending HREF event.
 	this->fHrefEvent.clear();
@@ -594,14 +622,24 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 
 
 void
-CHtmlSysWinInputQt::pagePause()
+CHtmlSysWinInputQt::addToPagePauseQueue( CHtmlSysWinQt* banner )
 {
-	InputMode lastMode = this->fInputMode;
-	this->fInputMode = PagePauseInput;
-	while (this->fInputMode == PagePauseInput and qFrame->gameRunning()) {
-		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
+	if (not this->fPagePauseQueue.contains(banner)) {
+		this->fPagePauseQueue.enqueue(banner);
 	}
-	this->fInputMode = lastMode;
+}
+
+
+void
+CHtmlSysWinInputQt::removeFromPagePauseQueue( CHtmlSysWinQt* banner )
+{
+	if (this->fPagePauseQueue.isEmpty() or not this->fPagePauseQueue.contains(banner)) {
+		return;
+	}
+	this->fPagePauseQueue.removeOne(banner);
+	if (this->fPagePauseQueue.isEmpty() and this->fInputMode == PagePauseInput) {
+		this->fInputMode = NoInput;
+	}
 }
 
 

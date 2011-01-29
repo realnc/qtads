@@ -31,9 +31,10 @@
 
 
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidget, QWidget* parent )
-: QScrollArea(parent), CHtmlSysWin(formatter), fBannerStyleAutoVScroll(true), fBannerStyleGrid(false),
-  fBannerStyleBorder(0), fDontReformat(0), fParentBanner(0), fBgImage(0), fBorderLine(qWinGroup->centralWidget()),
-  lastInputHeight(0), margins(8, 2, 8, 2), bannerSize(0), bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
+: QScrollArea(parent), CHtmlSysWin(formatter), fBannerStyleModeMode(true), fBannerStyleAutoVScroll(true),
+  fBannerStyleGrid(false), fBannerStyleBorder(0), fDontReformat(0), fInPagePauseMode(false),
+  fParentBanner(0), fBgImage(0), fBorderLine(qWinGroup->centralWidget()), lastInputHeight(0),
+  margins(8, 2, 8, 2), bannerSize(0), bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
 {
 	if (dispWidget == 0) {
 		this->dispWidget = new DisplayWidget(this, formatter);
@@ -137,6 +138,12 @@ CHtmlSysWinQt::scrollContentsBy(int dx, int dy)
 {
 	QScrollArea::scrollContentsBy(dx, dy);
 	this->dispWidget->updateLinkTracking(QPoint());
+
+	// If we reached the bottom, clear page-pause mode.
+	if (this->fInPagePauseMode and this->verticalScrollBar()->value() == this->verticalScrollBar()->maximum()) {
+		this->fInPagePauseMode = false;
+		qFrame->gameWindow()->removeFromPagePauseQueue(this);
+	}
 }
 
 
@@ -346,7 +353,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 
 
 void
-CHtmlSysWinQt::doReformat( int showStatus, int freezeDisplay, int resetSounds)
+CHtmlSysWinQt::doReformat( int showStatus, int freezeDisplay, int resetSounds )
 {
 	// Forget any tracking links.
 	this->dispWidget->notifyClearContents();
@@ -354,11 +361,11 @@ CHtmlSysWinQt::doReformat( int showStatus, int freezeDisplay, int resetSounds)
 	// Restart the formatter.
 	this->formatter_->start_at_top(resetSounds);
 
-	// Make sure we redraw everything.
-	this->viewport()->update();
-
 	// Format the window contents.
 	this->do_formatting(showStatus, not freezeDisplay, freezeDisplay);
+
+	// Reset last seen position.
+	this->lastInputHeight = this->formatter_->get_max_y_pos();
 }
 
 
@@ -388,6 +395,7 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int
 	banner->fParentBanner = this;
 	banner->fBannerPos = pos;
 	banner->fBannerWhere = where;
+	banner->fBannerStyleModeMode = style & OS_BANNER_STYLE_MOREMODE;
 	banner->fBannerStyleAutoVScroll = style & OS_BANNER_STYLE_AUTO_VSCROLL;
 	banner->fBannerStyleBorder = style & OS_BANNER_STYLE_BORDER;
 
@@ -419,12 +427,62 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int
 
 
 void
+CHtmlSysWinQt::scrollDown( bool force )
+{
+	// If we're very small, or shouldn't scroll, or there's nothing to scroll,
+	// ignore the call.
+	if (this->width() < 10 or this->height() < 10 or not this->fBannerStyleAutoVScroll
+		or this->verticalScrollBar()->maximum() == this->verticalScrollBar()->minimum())
+	{
+		return;
+	}
+
+	// Simply scroll directly to the bottom if more-mode is disabled for this
+	// banner or the game is in non-stop mode.
+	if (not this->fBannerStyleModeMode or qFrame->nonStopMode()) {
+		this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+		return;
+	}
+
+	if (this->fInPagePauseMode and not force) {
+		return;
+	}
+
+	QScrollBar* bar = this->verticalScrollBar();
+
+	if (this->fInPagePauseMode) {
+		bar->setValue(bar->value() + bar->pageStep() - bar->singleStep() * 2);
+	} else {
+		bar->setValue(this->lastInputHeight);
+	}
+
+	// If we didn't arrive at the bottom, enable page-pause.
+	if (bar->value() < bar->maximum()) {
+		qFrame->gameWindow()->addToPagePauseQueue(this);
+		this->fInPagePauseMode = true;
+		// Note our new position.  Make sure that next time, we scroll down by
+		// *almost* a page; we leave two lines of context.
+		this->lastInputHeight += this->verticalScrollBar()->pageStep() - this->verticalScrollBar()->singleStep() * 2;
+		return;
+	}
+	this->fInPagePauseMode = false;
+	return;
+}
+
+
+void
 CHtmlSysWinQt::notify_clear_contents()
 {
 	//qDebug() << Q_FUNC_INFO;
 
 	// Tell our display widget about it.
 	this->dispWidget->notifyClearContents();
+
+	// Reset our last-seen position (for page-pause handling) back to the top
+	// and clear page-pause mode.
+	this->lastInputHeight = 0;
+	this->fInPagePauseMode = false;
+	qFrame->gameWindow()->removeFromPagePauseQueue(this);
 }
 
 
@@ -489,6 +547,7 @@ CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const 
 		// Huh?
 		return;
 	}
+
 	QPainter painter(this->dispWidget);
 	this->fSetupPainterForFont(painter, hilite, font);
 	painter.drawText(x, y + QFontMetrics(*static_cast<CHtmlSysFontQt*>(font)).ascent(),
@@ -610,7 +669,6 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	// Redraw the window before we start, so that something happens immediately
 	// and the window doesn't look frozen.
 	if (update_win) {
-		this->viewport()->update();
 		qFrame->advanceEventLoop();
 	}
 
@@ -625,6 +683,7 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	bool drawn = false;
 
 	// Reformat everything, drawing as soon as possible, if desired.
+	/*
 	if (update_win) {
 		while (formatter_->more_to_do() and not drawn) {
 			// Format another line.
@@ -649,22 +708,11 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 			}
 		}
 	}
+	*/
 
 	// After drawing, keep going until we've formatted everything.
 	while (this->formatter_->more_to_do()) {
 		this->formatter_->do_formatting();
-		/*
-		long newWidth;
-		if (this->formatter_->get_outer_max_line_width() > this->viewport()->width()) {
-			newWidth = this->formatter_->get_outer_max_line_width();
-		} else {
-			newWidth = this->viewport()->width();
-		}
-		if (this == qFrame->gameWindow()) {
-			qDebug() << this->formatter_->get_max_y_pos();
-		}
-		this->dispWidget->resize(newWidth, this->formatter_->get_max_y_pos());
-		*/
 	}
 
 	// Unfreeze the display if we froze it.
@@ -690,7 +738,7 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
 	// around to drawing it.  Do the same thing if we froze the display and we
 	// didn't do any updating.
 	if ((update_win and not drawn) or freeze_display) {
-		this->viewport()->update();
+		this->dispWidget->update();
 	}
 
 	// Make sure we don't lose any link we were previously tracking.
@@ -811,9 +859,12 @@ CHtmlSysWinQt::fmt_adjust_vscroll()
 	}
 
 	if (this->fBannerStyleGrid) {
+		// Text grid banners never scroll in any direction, so they only need
+		// to be the same size as the viewport.
 		this->dispWidget->resize(this->dispWidget->width(), this->viewport()->height());
 	} else {
 		this->dispWidget->resize(this->dispWidget->width(), targetHt);
+		this->scrollDown(false);
 	}
 }
 
@@ -1137,7 +1188,8 @@ CHtmlSysWinQt::set_banner_info( HTML_BannerWin_Pos_t pos, unsigned long style )
 {
 	//qDebug() << Q_FUNC_INFO;
 
-	this->fBannerStyleAutoVScroll = style & OS_BANNER_STYLE_AUTO_VSCROLL;
+	this->fBannerStyleModeMode = style & OS_BANNER_STYLE_MOREMODE;
+	this->fBannerStyleAutoVScroll = (style & OS_BANNER_STYLE_AUTO_VSCROLL) or this->fBannerStyleModeMode;
 	this->fBannerStyleBorder = style & OS_BANNER_STYLE_BORDER;
 	this->fBannerPos = pos;
 
@@ -1156,7 +1208,10 @@ CHtmlSysWinQt::get_banner_info( HTML_BannerWin_Pos_t* pos, unsigned long* style 
 
 	// Set the style flags.
 	*style = 0;
-	if (this->fBannerStyleAutoVScroll) {
+	if (this->fBannerStyleModeMode) {
+		*style |= OS_BANNER_STYLE_MOREMODE;
+	}
+	if (this->fBannerStyleAutoVScroll or this->fBannerStyleModeMode) {
 		*style |= OS_BANNER_STYLE_AUTO_VSCROLL;
 	}
 	if (this->fBannerStyleBorder) {

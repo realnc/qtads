@@ -19,6 +19,8 @@
 
 #include "syswin.h"
 
+#include <QQueue>
+
 
 /* An input-capable CHtmlSysWinQt.
  */
@@ -44,6 +46,9 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 
 	// The input-mode we are currently in.
 	InputMode fInputMode;
+
+	// Queue of banners who are currently in page-pause mode.
+	QQueue<CHtmlSysWinQt*> fPagePauseQueue;
 
 	// Our display widget casted for easier access.
 	class DisplayWidgetInput* fCastDispWidget;
@@ -84,6 +89,9 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	void
 	fStartKeypressInput();
 
+	void
+	fProcessPagePauseQueue();
+
   protected:
 	virtual void
 	resizeEvent( QResizeEvent* event );
@@ -96,9 +104,6 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 
 	void
 	singleKeyPressEvent( QKeyEvent* event );
-
-	void
-	pagePauseKeyPressEvent( QKeyEvent* e );
 
   signals:
 	// Emitted when an input operation has finished successfully.
@@ -141,9 +146,12 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 	int
 	getKeypress( unsigned long timeout = 0, bool useTimeout = false, bool* timedOut = 0 );
 
-	// Enable more mode ("page pause".)
+	// Add a banner to the queue of banners that are in page-pause mode.
 	void
-	pagePause();
+	addToPagePauseQueue( CHtmlSysWinQt* banner );
+
+	void
+	removeFromPagePauseQueue( CHtmlSysWinQt* banner );
 
 	// Return the currently pending HREF event (is there is one.)  This method
 	// will clear the event, so subsequent calls will return an empty string.

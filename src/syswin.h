@@ -43,6 +43,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	// window, we can't be a banner.
 	HTML_BannerWin_Pos_t fBannerPos;
 	int fBannerWhere;
+	bool fBannerStyleModeMode;
 	bool fBannerStyleVScroll;
 	bool fBannerStyleAutoVScroll;
 	bool fBannerStyleHScroll;
@@ -57,6 +58,9 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	// process, the formatter will call the banner-creating routine again and
 	// we will crash due to the re-entrancy.
 	int fDontReformat;
+
+	// Are we currently in page-pause mode?
+	bool fInPagePauseMode;
 
 	// Our parent banner, if any.  This is 0 if we don't have one.
 	CHtmlSysWinQt* fParentBanner;
@@ -125,7 +129,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 
 	// Do a complete reformat.
 	void
-	doReformat( int showStatus, int freezeDisplay, int resetSounds);
+	doReformat( int showStatus, int freezeDisplay, int resetSounds );
 
 	void
 	addBanner( CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int where, CHtmlSysWinQt* other,
@@ -135,6 +139,12 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	CHtmlSysWinQt*
 	parentBanner() const
 	{ return this->fParentBanner; }
+
+	// Scroll down by a page while keeping track of when to page-pause.  The
+	// 'force' flag controls whether we should scroll even while waiting for
+	// input in page-pause mode.
+	void
+	scrollDown( bool force );
 
 	//
 	// CHtmlSysWin interface implementation.

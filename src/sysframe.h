@@ -85,6 +85,9 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	// Current input font color.
 	HTML_color_t fInputColor;
 
+	// Are we in non-stop mode?
+	bool fNonStopMode;
+
 	// Run the game file contained in fNextGame.
 	void
 	fRunGame();
@@ -185,6 +188,10 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	bool
 	tads3()
 	{ return this->fTads3; }
+
+	bool
+	nonStopMode()
+	{ return this->fNonStopMode; }
 
 	// Recalculate and adjust the sizes of all HTML banners.
 	void
