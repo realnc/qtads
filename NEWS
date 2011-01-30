@@ -1,8 +1,26 @@
-2.?.? - 2011/??/??
+2.1.0 - 2011/??/??
 ==================
 
-  - QTads is now able to check online for new version through the
-    "Help->Check for Updates" menu item.
+  - Page-pauses (aka "MORE" prompts) are now occuring when the game displays
+    more content that will fit in the window.
+
+  - Banners can now have borders.  Note that borders are controlled by the
+    game; it's not a feature that can be switched on or off by the player.
+
+  - Banners now correctly take margins into account when calculating sizes.
+    This fixes the banner at the bottom in "Walker & Silhouette" for example.
+
+  - The interpreter will no longer allow scrolling in banners unless the game
+    allows it.
+
+  - Text rendering is now faster and performs less drawing operations.
+
+  - The interpreter is now able to perform on online check for new versions
+    through the "Help->Check for Updates" menu item.
+
+  - Some GUI elements were changed to better comply with various "Human
+    Interface Guidelines" on several platforms.  This includes changes in the
+    menus as well as using sheets for some dialogs on Mac OS X.
 
   - On the Mac, running a game by dropping its file on the QTads icon is now
     supported.
