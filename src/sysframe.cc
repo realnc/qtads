@@ -235,6 +235,13 @@ CHtmlSysFrameQt::fRunGame()
 			this->flush_txtbuf(true, false);
 			this->fFormatter->cancel_sound(HTML_Attrib_invalid, 0.0, false, false);
 			this->fFormatter->cancel_playback();
+
+			// Display a "game has ended" message. We use HTML, so Make sure
+			// the parser is in markup mode.
+			this->fParser->obey_markups(true);
+			QString endMsg("<p><br><font face=tads-roman size=-1>(The game has ended.)</font></p>");
+			this->display_output(endMsg.toUtf8().constData(), endMsg.length());
+			this->flush_txtbuf(true, false);
 		} else {
 			qWarning() << finfo.fileName() << "is not a TADS game file.";
 		}
