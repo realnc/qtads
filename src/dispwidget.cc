@@ -53,7 +53,9 @@ DisplayWidget::fInvalidateLinkTracking()
 		this->fHoverLink = 0;
 	}
 	this->unsetCursor();
+	qWinGroup->statusBar()->setUpdatesEnabled(false);
 	qWinGroup->statusBar()->clearMessage();
+	qWinGroup->statusBar()->setUpdatesEnabled(true);
 }
 
 
@@ -148,7 +150,9 @@ DisplayWidget::updateLinkTracking( const QPoint& mousePos )
 			this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);
 			this->fHoverLink = 0;
 			this->unsetCursor();
+			qWinGroup->statusBar()->setUpdatesEnabled(false);
 			qWinGroup->statusBar()->clearMessage();
+			qWinGroup->statusBar()->setUpdatesEnabled(true);
 		}
 		return;
 	}
@@ -184,21 +188,27 @@ DisplayWidget::updateLinkTracking( const QPoint& mousePos )
 
 		// If we found something that has ALT text, show it in the status bar.
 		if (disp->get_alt_text() != 0 and strlen(disp->get_alt_text()) > 0) {
+			qWinGroup->statusBar()->setUpdatesEnabled(false);
 			qWinGroup->statusBar()->showMessage(QString::fromUtf8(disp->get_alt_text()));
+			qWinGroup->statusBar()->setUpdatesEnabled(true);
 			return;
 		}
 
 		// It could be a clickable link without any ALT text.  In that case, show
 		// its contents.
 		if (link != 0 and link->is_clickable_link()) {
+			qWinGroup->statusBar()->setUpdatesEnabled(false);
 			qWinGroup->statusBar()->showMessage(QString::fromUtf8(link->href_.get_url()));
+			qWinGroup->statusBar()->setUpdatesEnabled(true);
 			return;
 		}
 	}
 
 	// We don't know what it was.  Clear status bar message, reset cursor shape
 	// and forget about any link we were tracking.
+	qWinGroup->statusBar()->setUpdatesEnabled(false);
 	qWinGroup->statusBar()->clearMessage();
+	qWinGroup->statusBar()->setUpdatesEnabled(true);
 	this->unsetCursor();
 	if (this->fHoverLink != 0) {
 		this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_none);

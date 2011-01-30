@@ -833,14 +833,18 @@ CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
 	moreText.setFrameStyle(QFrame::NoFrame | QFrame::Plain);
 	moreText.setLineWidth(0);
 	moreText.setContentsMargins(0, 0, 0, 0);
+	qWinGroup->statusBar()->setUpdatesEnabled(false);
 	qWinGroup->statusBar()->addWidget(&moreText);
+	qWinGroup->statusBar()->setUpdatesEnabled(true);
 
 	// Get the input.
 	os_event_info_t info;
 	ret = this->get_input_event(0, false, &info);
 
 	// Remove the status message.
+	qWinGroup->statusBar()->setUpdatesEnabled(false);
 	qWinGroup->statusBar()->removeWidget(&moreText);
+	qWinGroup->statusBar()->setUpdatesEnabled(true);
 
 	if (ret == OS_EVT_EOF) {
 		pendingCmd = CMD_EOF;

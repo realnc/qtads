@@ -85,12 +85,16 @@ CHtmlSysWinInputQt::fProcessPagePauseQueue()
 	moreText.setFrameStyle(QFrame::NoFrame | QFrame::Plain);
 	moreText.setLineWidth(0);
 	moreText.setContentsMargins(0, 0, 0, 0);
+	qWinGroup->statusBar()->setUpdatesEnabled(false);
 	qWinGroup->statusBar()->addWidget(&moreText);
+	qWinGroup->statusBar()->setUpdatesEnabled(true);
 	this->fInputMode = PagePauseInput;
 	while (this->fInputMode == PagePauseInput and qFrame->gameRunning()) {
 		qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
 	}
+	qWinGroup->statusBar()->setUpdatesEnabled(false);
 	qWinGroup->statusBar()->removeWidget(&moreText);
+	qWinGroup->statusBar()->setUpdatesEnabled(true);
 }
 
 
