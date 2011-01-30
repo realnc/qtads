@@ -50,7 +50,7 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidg
 	this->setContentsMargins(0, 0, 0, 0);
 	this->fBorderLine.setFrameStyle(QFrame::Box | QFrame::Plain);
 	QPalette p(this->fBorderLine.palette());
-	p.setColor(QPalette::WindowText, QApplication::palette().color(QPalette::Shadow));
+	p.setColor(QPalette::WindowText, Qt::darkGray);
 	this->fBorderLine.setPalette(p);
 
 	p = this->palette();
