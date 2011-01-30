@@ -96,6 +96,11 @@ DisplayWidgetInput::fHandleFocusChange( QWidget* old, QWidget* now )
 void
 DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput* tag )
 {
+	// Ignore the call if there's currently no active tag.
+	if (tag == 0) {
+		return;
+	}
+
 	// Reset the blink timer.
 	if (this->fBlinkTimer->isActive()) {
 		this->fBlinkTimer->start();
