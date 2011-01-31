@@ -1,7 +1,7 @@
 2.1.0 - 2011/??/??
 ==================
 
-  - Page-pauses (aka "MORE" prompts) are now occuring when the game displays
+  - Page-pauses (aka "MORE" prompts) are now occurring when the game displays
     more content that will fit in the window.
 
   - Banners can now have borders.  Note that borders are controlled by the
