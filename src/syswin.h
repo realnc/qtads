@@ -53,10 +53,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 	// Our border, if we have one.
 	QFrame fBorderLine;
 
-	// Do not attempt to reformat during a resize event.  This is set when in
-	// the process of creating a new banner.  If we reformat during that
-	// process, the formatter will call the banner-creating routine again and
-	// we will crash due to the re-entrancy.
+	// Guard against re-entrancy for do_formatting().
 	int fDontReformat;
 
 	// Are we currently in page-pause mode?
