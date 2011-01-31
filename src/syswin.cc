@@ -364,8 +364,10 @@ CHtmlSysWinQt::doReformat( int showStatus, int freezeDisplay, int resetSounds )
 	// Format the window contents.
 	this->do_formatting(showStatus, not freezeDisplay, freezeDisplay);
 
-	// Reset last seen position.
-	this->lastInputHeight = this->formatter_->get_max_y_pos();
+	// Reset last seen position.  Substract the top margin when doing this,
+	// since for scrolling purposes we need to take the whole area into
+	// account, not only the position where actual content starts.
+	this->lastInputHeight = this->formatter_->get_max_y_pos() - this->formatter_->get_phys_margins().top;
 }
 
 
