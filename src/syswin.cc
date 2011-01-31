@@ -137,6 +137,7 @@ void
 CHtmlSysWinQt::scrollContentsBy(int dx, int dy)
 {
 	QScrollArea::scrollContentsBy(dx, dy);
+
 	this->dispWidget->updateLinkTracking(QPoint());
 
 	// If we reached the bottom, clear page-pause mode.
@@ -156,6 +157,19 @@ CHtmlSysWinQt::wheelEvent( QWheelEvent* e )
 		QScrollArea::wheelEvent(e);
 	} else {
 		e->ignore();
+	}
+}
+
+
+void
+CHtmlSysWinQt::resizeEvent( QResizeEvent* e )
+{
+	QScrollArea::resizeEvent(e);
+
+	// If we reached the bottom, clear page-pause mode.
+	if (this->fInPagePauseMode and this->verticalScrollBar()->value() == this->verticalScrollBar()->maximum()) {
+		this->fInPagePauseMode = false;
+		qFrame->gameWindow()->removeFromPagePauseQueue(this);
 	}
 }
 
