@@ -11,10 +11,10 @@ class AboutQtadsDialog : public QDialog
 {
 public:
     explicit AboutQtadsDialog(QWidget *parent = 0);
-    ~AboutQtadsDialog();
+	~AboutQtadsDialog();
 
 private:
-    Ui::AboutQtadsDialog *ui;
+	Ui::AboutQtadsDialog *ui;
 };
 
 #endif // ABOUTQTADSDIALOG_H
