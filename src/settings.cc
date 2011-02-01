@@ -29,62 +29,62 @@ Settings::loadFromDisk()
 {
 	QSettings sett;
 
-	sett.beginGroup("media");
-	this->enableGraphics = sett.value("graphics", true).toBool();
-	this->enableSoundEffects = sett.value("sounds", true).toBool();
-	this->enableMusic = sett.value("music", true).toBool();
-	this->enableLinks = sett.value("links", true).toBool();
+	sett.beginGroup(QString::fromAscii("media"));
+	this->enableGraphics = sett.value(QString::fromAscii("graphics"), true).toBool();
+	this->enableSoundEffects = sett.value(QString::fromAscii("sounds"), true).toBool();
+	this->enableMusic = sett.value(QString::fromAscii("music"), true).toBool();
+	this->enableLinks = sett.value(QString::fromAscii("links"), true).toBool();
 	sett.endGroup();
 
-	sett.beginGroup("colors");
-	this->mainBgColor = sett.value("mainbg", QColor(Qt::white)).value<QColor>();
-	this->mainTextColor = sett.value("maintext", QColor(Qt::black)).value<QColor>();
-	this->bannerBgColor = sett.value("bannerbg", QColor(Qt::lightGray)).value<QColor>();
-	this->bannerTextColor = sett.value("bannertext", QColor(Qt::black)).value<QColor>();
-	this->inputColor = sett.value("input", QColor(70, 70, 70)).value<QColor>();
-	this->underlineLinks = sett.value("underlinelinks", false).toBool();
-	this->highlightLinks = sett.value("highlightlinks", true).toBool();
-	this->unvisitedLinkColor = sett.value("unvisitedlinks", QColor(Qt::blue)).value<QColor>();
-	this->hoveringLinkColor = sett.value("hoveringlinks", QColor(Qt::red)).value<QColor>();
-	this->clickedLinkColor = sett.value("clickedlinks", QColor(Qt::cyan)).value<QColor>();
+	sett.beginGroup(QString::fromAscii("colors"));
+	this->mainBgColor = sett.value(QString::fromAscii("mainbg"), QColor(Qt::white)).value<QColor>();
+	this->mainTextColor = sett.value(QString::fromAscii("maintext"), QColor(Qt::black)).value<QColor>();
+	this->bannerBgColor = sett.value(QString::fromAscii("bannerbg"), QColor(Qt::lightGray)).value<QColor>();
+	this->bannerTextColor = sett.value(QString::fromAscii("bannertext"), QColor(Qt::black)).value<QColor>();
+	this->inputColor = sett.value(QString::fromAscii("input"), QColor(70, 70, 70)).value<QColor>();
+	this->underlineLinks = sett.value(QString::fromAscii("underlinelinks"), false).toBool();
+	this->highlightLinks = sett.value(QString::fromAscii("highlightlinks"), true).toBool();
+	this->unvisitedLinkColor = sett.value(QString::fromAscii("unvisitedlinks"), QColor(Qt::blue)).value<QColor>();
+	this->hoveringLinkColor = sett.value(QString::fromAscii("hoveringlinks"), QColor(Qt::red)).value<QColor>();
+	this->clickedLinkColor = sett.value(QString::fromAscii("clickedlinks"), QColor(Qt::cyan)).value<QColor>();
 	sett.endGroup();
 
 #ifdef Q_WS_MAC
-#  define DEFAULT_SERIF   "Georgia,15"
-#  define DEFAULT_SANS    "Helvetica,15"
-#  define DEFAULT_MONO    "Andale Mono,15"
-#  define DEFAULT_SCRIPT  "Apple Chancery,17"
+	const QString& DEFAULT_SERIF = QString::fromAscii("Georgia,15");
+	const QString& DEFAULT_SANS = QString::fromAscii("Helvetica,15");
+	const QString& DEFAULT_MONO = QString::fromAscii("Andale Mono,15");
+	const QString& DEFAULT_SCRIPT = QString::fromAscii("Apple Chancery,17");
 #else
 #ifdef Q_WS_WIN
-#  define DEFAULT_SERIF   "Times New Roman,12"
-#  define DEFAULT_SANS    "Verdana,12"
-#  define DEFAULT_MONO    "Courier New,12"
-#  define DEFAULT_SCRIPT  "Comic Sans MS,12"
+	const QString& DEFAULT_SERIF = QString::fromAscii("Times New Roman,12")
+	const QString& DEFAULT_SANS = QString::fromAscii("Verdana,12")
+	const QString& DEFAULT_MONO = QString::fromAscii("Courier New,12")
+	const QString& DEFAULT_SCRIPT = QString::fromAscii("Comic Sans MS,12")
 #else
-#  define DEFAULT_SERIF   "serif"
-#  define DEFAULT_SANS    "sans-serif"
-#  define DEFAULT_MONO    "monospace"
-#  define DEFAULT_SCRIPT  "cursive"
+	const QString& DEFAULT_SERIF = QString::fromAscii("serif");
+	const QString& DEFAULT_SANS = QString::fromAscii("sans-serif");
+	const QString& DEFAULT_MONO = QString::fromAscii("monospace");
+	const QString& DEFAULT_SCRIPT = QString::fromAscii("cursive");
 #endif
 #endif
-	sett.beginGroup("fonts");
-	this->mainFont.fromString(sett.value("main", DEFAULT_SERIF).toString());
-	this->fixedFont.fromString(sett.value("fixed", DEFAULT_MONO).toString());
-	this->serifFont.fromString(sett.value("serif", DEFAULT_SERIF).toString());
-	this->sansFont.fromString(sett.value("sans", DEFAULT_SANS).toString());
-	this->scriptFont.fromString(sett.value("script", DEFAULT_SCRIPT).toString());
-	this->writerFont.fromString(sett.value("typewriter", DEFAULT_MONO).toString());
-	this->inputFont.fromString(sett.value("input", DEFAULT_SERIF).toString());
+	sett.beginGroup(QString::fromAscii("fonts"));
+	this->mainFont.fromString(sett.value(QString::fromAscii("main"), DEFAULT_SERIF).toString());
+	this->fixedFont.fromString(sett.value(QString::fromAscii("fixed"), DEFAULT_MONO).toString());
+	this->serifFont.fromString(sett.value(QString::fromAscii("serif"), DEFAULT_SERIF).toString());
+	this->sansFont.fromString(sett.value(QString::fromAscii("sans"), DEFAULT_SANS).toString());
+	this->scriptFont.fromString(sett.value(QString::fromAscii("script"), DEFAULT_SCRIPT).toString());
+	this->writerFont.fromString(sett.value(QString::fromAscii("typewriter"), DEFAULT_MONO).toString());
+	this->inputFont.fromString(sett.value(QString::fromAscii("input"), DEFAULT_SERIF).toString());
 	sett.endGroup();
 
-	sett.beginGroup("misc");
-	this->tads2Encoding = sett.value("tads2encoding", QByteArray("windows-1250")).toByteArray();
-	this->askForGameFile = sett.value("askforfileatstart", false).toBool();
-	this->lastFileOpenDir = sett.value("lastFileOpenDir", "").toString();
+	sett.beginGroup(QString::fromAscii("misc"));
+	this->tads2Encoding = sett.value(QString::fromAscii("tads2encoding"), QByteArray("windows-1250")).toByteArray();
+	this->askForGameFile = sett.value(QString::fromAscii("askforfileatstart"), false).toBool();
+	this->lastFileOpenDir = sett.value(QString::fromAscii("lastFileOpenDir"), QString::fromAscii("")).toString();
 	sett.endGroup();
 
-	sett.beginGroup("recent");
-	this->recentGamesList = sett.value("games", QStringList()).toStringList();
+	sett.beginGroup(QString::fromAscii("recent"));
+	this->recentGamesList = sett.value(QString::fromAscii("games"), QStringList()).toStringList();
 	Q_ASSERT(this->recentGamesList.size() <= this->recentGamesCapacity);
 	// Remove any files that don't exist or aren't readable.
 	for (int i = 0; i < this->recentGamesList.size(); ++i) {
@@ -96,7 +96,7 @@ Settings::loadFromDisk()
 	}
 	sett.endGroup();
 
-	this->appSize = sett.value("geometry/size", QSize(740, 540)).toSize();
+	this->appSize = sett.value(QString::fromAscii("geometry/size"), QSize(740, 540)).toSize();
 }
 
 
@@ -105,46 +105,46 @@ Settings::saveToDisk()
 {
 	QSettings sett;
 
-	sett.beginGroup("media");
-	sett.setValue("graphics", this->enableGraphics);
-	sett.setValue("sounds", this->enableSoundEffects);
-	sett.setValue("music", this->enableMusic);
-	sett.setValue("links", this->enableLinks);
+	sett.beginGroup(QString::fromAscii("media"));
+	sett.setValue(QString::fromAscii("graphics"), this->enableGraphics);
+	sett.setValue(QString::fromAscii("sounds"), this->enableSoundEffects);
+	sett.setValue(QString::fromAscii("music"), this->enableMusic);
+	sett.setValue(QString::fromAscii("links"), this->enableLinks);
 	sett.endGroup();
 
-	sett.beginGroup("colors");
-	sett.setValue("mainbg", this->mainBgColor);
-	sett.setValue("maintext", this->mainTextColor);
-	sett.setValue("bannerbg", this->bannerBgColor);
-	sett.setValue("bannertext", this->bannerTextColor);
-	sett.setValue("input", this->inputColor);
-	sett.setValue("underlinelinks", this->underlineLinks);
-	sett.setValue("highlightlinks", this->highlightLinks);
-	sett.setValue("unvisitedlinks", this->unvisitedLinkColor);
-	sett.setValue("hoveringlinks", this->hoveringLinkColor);
-	sett.setValue("clickedlinks", this->clickedLinkColor);
+	sett.beginGroup(QString::fromAscii("colors"));
+	sett.setValue(QString::fromAscii("mainbg"), this->mainBgColor);
+	sett.setValue(QString::fromAscii("maintext"), this->mainTextColor);
+	sett.setValue(QString::fromAscii("bannerbg"), this->bannerBgColor);
+	sett.setValue(QString::fromAscii("bannertext"), this->bannerTextColor);
+	sett.setValue(QString::fromAscii("input"), this->inputColor);
+	sett.setValue(QString::fromAscii("underlinelinks"), this->underlineLinks);
+	sett.setValue(QString::fromAscii("highlightlinks"), this->highlightLinks);
+	sett.setValue(QString::fromAscii("unvisitedlinks"), this->unvisitedLinkColor);
+	sett.setValue(QString::fromAscii("hoveringlinks"), this->hoveringLinkColor);
+	sett.setValue(QString::fromAscii("clickedlinks"), this->clickedLinkColor);
 	sett.endGroup();
 
-	sett.beginGroup("fonts");
-	sett.setValue("main", this->mainFont.toString());
-	sett.setValue("fixed", this->fixedFont.toString());
-	sett.setValue("serif", this->serifFont.toString());
-	sett.setValue("sans", this->sansFont.toString());
-	sett.setValue("script", this->scriptFont.toString());
-	sett.setValue("typewriter", this->writerFont.toString());
-	sett.setValue("input", this->inputFont.toString());
+	sett.beginGroup(QString::fromAscii("fonts"));
+	sett.setValue(QString::fromAscii("main"), this->mainFont.toString());
+	sett.setValue(QString::fromAscii("fixed"), this->fixedFont.toString());
+	sett.setValue(QString::fromAscii("serif"), this->serifFont.toString());
+	sett.setValue(QString::fromAscii("sans"), this->sansFont.toString());
+	sett.setValue(QString::fromAscii("script"), this->scriptFont.toString());
+	sett.setValue(QString::fromAscii("typewriter"), this->writerFont.toString());
+	sett.setValue(QString::fromAscii("input"), this->inputFont.toString());
 	sett.endGroup();
 
-	sett.beginGroup("misc");
-	sett.setValue("tads2encoding", this->tads2Encoding);
-	sett.setValue("askforfileatstart", this->askForGameFile);
-	sett.setValue("lastFileOpenDir", this->lastFileOpenDir);
+	sett.beginGroup(QString::fromAscii("misc"));
+	sett.setValue(QString::fromAscii("tads2encoding"), this->tads2Encoding);
+	sett.setValue(QString::fromAscii("askforfileatstart"), this->askForGameFile);
+	sett.setValue(QString::fromAscii("lastFileOpenDir"), this->lastFileOpenDir);
 	sett.endGroup();
 
-	sett.beginGroup("recent");
-	sett.setValue("games", this->recentGamesList);
+	sett.beginGroup(QString::fromAscii("recent"));
+	sett.setValue(QString::fromAscii("games"), this->recentGamesList);
 	sett.endGroup();
 
-	sett.setValue("geometry/size", qWinGroup->size());
+	sett.setValue(QString::fromAscii("geometry/size"), qWinGroup->size());
 	sett.sync();
 }

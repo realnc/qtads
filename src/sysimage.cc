@@ -63,13 +63,13 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 
 	// Create an object of the appropriate class for the specified image type.
 	// Also cast the object to a QTadsImage so we can loadFromData() later on.
-	if (imageType == "JPG" or imageType == "JPEG") {
+	if (imageType == QString::fromAscii("JPG") or imageType == QString::fromAscii("JPEG")) {
 		image = new CHtmlSysImageJpegQt;
 		cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImageJpegQt*>(image));
-	} else if (imageType == "PNG") {
+	} else if (imageType == QString::fromAscii("PNG")) {
 		image = new CHtmlSysImagePngQt;
 		cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImagePngQt*>(image));
-	} else if (imageType == "MNG") {
+	} else if (imageType == QString::fromAscii("MNG")) {
 		image = new CHtmlSysImageMngQt;
 		mngCast = static_cast<CHtmlSysImageMngQt*>(image);
 	} else {
@@ -86,7 +86,7 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 		return 0;
 	}
 
-	if (imageType == "MNG") {
+	if (imageType == QString::fromAscii("MNG")) {
 		QBuffer* buf = new QBuffer(mngCast);
 		buf->setData(data);
 		buf->open(QBuffer::ReadOnly);
@@ -106,7 +106,7 @@ CHtmlSysResource*
 CHtmlSysImageJpeg::create_jpeg( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
 								unsigned long filesize, CHtmlSysWin* win )
 {
-	return ::createImageFromFile(url, filename, seekpos, filesize, win, "JPG");
+	return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("JPG"));
 }
 
 
@@ -114,7 +114,7 @@ CHtmlSysResource*
 CHtmlSysImagePng::create_png( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
 							  unsigned long filesize, CHtmlSysWin* win )
 {
-	return ::createImageFromFile(url, filename, seekpos, filesize, win, "PNG");
+	return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("PNG"));
 }
 
 
@@ -122,5 +122,5 @@ CHtmlSysResource*
 CHtmlSysImageMng::create_mng( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
 							  unsigned long filesize, CHtmlSysWin* win )
 {
-	return ::createImageFromFile(url, filename, seekpos, filesize, win, "MNG");
+	return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("MNG"));
 }

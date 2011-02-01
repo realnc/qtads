@@ -50,18 +50,20 @@ int main( int argc, char** argv )
 	if (args.size() == 2) {
 		if (QFile::exists(args.at(1))) {
 			gameFileName = args.at(1);
-		} else if (QFile::exists(args.at(1) + ".gam")) {
-			gameFileName = args.at(1) + ".gam";
-		} else if (QFile::exists(args.at(1) + ".t3")) {
-			gameFileName = args.at(1) + ".t3";
+		} else if (QFile::exists(args.at(1) + QString::fromAscii(".gam"))) {
+			gameFileName = args.at(1) + QString::fromAscii(".gam");
+		} else if (QFile::exists(args.at(1) + QString::fromAscii(".t3"))) {
+			gameFileName = args.at(1) + QString::fromAscii(".t3");
 		} else {
 			qWarning() << "File" << args.at(1) << "not found.";
 		}
 	}
 
 	if (gameFileName.isEmpty() and app->settings()->askForGameFile) {
-		gameFileName = QFileDialog::getOpenFileName(0, "Choose the TADS game you wish to run", "",
-													"TADS Games (*.gam *.Gam *.GAM *.t3 *.T3)");
+		gameFileName = QFileDialog::getOpenFileName(0, QObject::tr("Choose the TADS game you wish to run"),
+													QString::fromAscii(""),
+													QObject::tr("TADS Games")
+													+ QString::fromAscii("(*.gam *.Gam *.GAM *.t3 *.T3)"));
 	}
 
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {

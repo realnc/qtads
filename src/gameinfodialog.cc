@@ -32,32 +32,33 @@ class QTadsGameInfoEnum: public CTadsGameInfo_enum
 	{
 		const QString& valStr = QString::fromUtf8(val);
 		const QString& nameStr = QString::fromUtf8(name).toLower();
-		if (nameStr == "name") {
-			this->gameName = QString("<b><center><font size=\"+1\">") + Qt::escape(valStr)
-							 + "</font></center></b>";
-		} else if (nameStr == "byline") {
-			this->byLine = QString("<i><center>") + Qt::escape(valStr) + "</center></i>";
-		} else if (nameStr == "htmlbyline") {
-			this->htmlByLine = QString("<i><center>") + valStr + "</center></i>";
-		} else if (nameStr == "authoremail") {
+		if (nameStr == QString::fromAscii("name")) {
+			this->gameName = QString::fromAscii("<b><center><font size=\"+1\">") + Qt::escape(valStr)
+							 + QString::fromAscii("</font></center></b>");
+		} else if (nameStr == QString::fromAscii("byline")) {
+			this->byLine = QString::fromAscii("<i><center>") + Qt::escape(valStr)
+						   + QString::fromAscii("</center></i>");
+		} else if (nameStr == QString::fromAscii("htmlbyline")) {
+			this->htmlByLine = QString::fromAscii("<i><center>") + valStr + QString::fromAscii("</center></i>");
+		} else if (nameStr == QString::fromAscii("authoremail")) {
 			this->email = valStr;
-		} else if (nameStr == "desc") {
-			this->desc = Qt::escape(valStr).replace("\\n", "<p>");
-		} else if (nameStr == "htmldesc") {
+		} else if (nameStr == QString::fromAscii("desc")) {
+			this->desc = Qt::escape(valStr).replace(QString::fromAscii("\\n"), QString::fromAscii("<p>"));
+		} else if (nameStr == QString::fromAscii("htmldesc")) {
 			this->htmlDesc = valStr;
-		} else if (nameStr == "version") {
+		} else if (nameStr == QString::fromAscii("version")) {
 			this->version = valStr;
-		} else if (nameStr == "releasedate") {
+		} else if (nameStr == QString::fromAscii("releasedate")) {
 			this->date = valStr;
-		} else if (nameStr == "language") {
+		} else if (nameStr == QString::fromAscii("language")) {
 			this->lang = valStr;
-		} else if (nameStr == "licensetype") {
+		} else if (nameStr == QString::fromAscii("licensetype")) {
 			this->license = valStr;
-		} else if (nameStr == "copyingrules") {
+		} else if (nameStr == QString::fromAscii("copyingrules")) {
 			this->copyRules = valStr;
-		} else if (nameStr == "firstpublished") {
+		} else if (nameStr == QString::fromAscii("firstpublished")) {
 			this->published = valStr;
-		} else if (nameStr == "ifid") {
+		} else if (nameStr == QString::fromAscii("ifid")) {
 			this->ifid = valStr;
 		}
 	}
@@ -89,7 +90,8 @@ GameInfoDialog::GameInfoDialog( const QByteArray& fname, QWidget* parent )
 	info.enum_values(&cb);
 
 	// Fill out the description.
-	QString tmp(cb.gameName + "<p>" + (cb.htmlByLine.isEmpty() ? cb.byLine : cb.htmlByLine) + "<p>");
+	QString tmp(cb.gameName + QString::fromAscii("<p>")
+				+ (cb.htmlByLine.isEmpty() ? cb.byLine : cb.htmlByLine) + QString::fromAscii("<p>"));
 	tmp += cb.htmlDesc.isEmpty() ? cb.desc : cb.htmlDesc;
 	ui->description->setHtml(tmp);
 

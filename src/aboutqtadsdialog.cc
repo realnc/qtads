@@ -21,13 +21,19 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget *parent)
 
 	// Construct a string holding all version info.
 	QString str;
-	str += "<table border=\"0\" width=\"100%\"><tr><td>";
-	str += tr("QTads version:") + "</td><td>" + QTADS_VERSION + "<br></td></tr><tr><td>"
-		   + tr("TADS 2 virtual machine:") + "</td><td>\t" + TADS_RUNTIME_VERSION + "</td></tr><tr><td>"
-		   + tr("TADS 3 virtual machine:") + "</td><td>\t" + T3VM_VSN_STRING + " (" + T3VM_IDENTIFICATION
-		   + ")<br></td></tr><tr><td>"
-		   + tr("Qt build version:") + "</td><td>" + QT_VERSION_STR + "</td></tr><tr><td>"
-		   + tr("Qt runtime version:") + "</td><td>" + qVersion() + "</td></tr></table>";
+	str += QString::fromAscii("<table border=\"0\" width=\"100%\"><tr><td>");
+	str += tr("QTads version:") + QString::fromAscii("</td><td>") + QString::fromAscii(QTADS_VERSION)
+		   + QString::fromAscii("<br></td></tr><tr><td>")
+		   + tr("TADS 2 virtual machine:") + QString::fromAscii("</td><td>\t")
+		   + QString::fromAscii(TADS_RUNTIME_VERSION) + QString::fromAscii("</td></tr><tr><td>")
+		   + tr("TADS 3 virtual machine:") + QString::fromAscii("</td><td>\t")
+		   + QString::fromAscii(T3VM_VSN_STRING) + QString::fromAscii(" (")
+		   + QString::fromAscii(T3VM_IDENTIFICATION)
+		   + QString::fromAscii(")<br></td></tr><tr><td>")
+		   + tr("Qt build version:") + QString::fromAscii("</td><td>") + QString::fromAscii(QT_VERSION_STR)
+		   + QString::fromAscii("</td></tr><tr><td>")
+		   + tr("Qt runtime version:") + QString::fromAscii("</td><td>") + QString::fromAscii(qVersion())
+		   + QString::fromAscii("</td></tr></table>");
 	ui->versionInfoLabel->setText(str);
 }
 

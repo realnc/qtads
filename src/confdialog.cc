@@ -107,11 +107,11 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
 	}
 	qSort(codecs);
 	for (int i = 0; i < codecs.size(); ++i) {
-		if (ui->encodingComboBox->findText(codecs.at(i)) == -1) {
-			ui->encodingComboBox->addItem(codecs.at(i));
+		if (ui->encodingComboBox->findText(QString::fromAscii(codecs.at(i))) == -1) {
+			ui->encodingComboBox->addItem(QString::fromAscii(codecs.at(i)));
 		}
 	}
-	ui->encodingComboBox->setCurrentIndex(ui->encodingComboBox->findText(sett->tads2Encoding));
+	ui->encodingComboBox->setCurrentIndex(ui->encodingComboBox->findText(QString::fromAscii(sett->tads2Encoding)));
 
 	ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
 

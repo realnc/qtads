@@ -157,7 +157,7 @@ os_exeseek( const char*, const char* )
 int
 os_get_exe_filename( char* buf, size_t buflen, const char* argv0 )
 {
-	QFileInfo file(argv0);
+	QFileInfo file(QString::fromLocal8Bit(argv0));
 	file.makeAbsolute();
 	if (not file.exists() or not file.isReadable()) {
 		return false;
@@ -174,12 +174,12 @@ os_get_exe_filename( char* buf, size_t buflen, const char* argv0 )
 		}
 	}
 
-	if (file.filePath().toLocal8Bit().length() + 1 > static_cast<int>(buflen)) {
+	const QByteArray& result = file.filePath().toLocal8Bit();
+	if (result.length() + 1 > static_cast<int>(buflen)) {
 		// The result would not fit in the buffer.
 		return false;
 	}
-
-	strcpy(buf, file.filePath().toLocal8Bit());
+	strcpy(buf, result.constData());
 	return true;
 }
 
@@ -243,14 +243,13 @@ os_locate( const char* fname, int /*flen*/, const char* /*arg0*/, char* buf, siz
 	Q_ASSERT(fname != 0);
 	Q_ASSERT(buf != 0);
 
-	if (QFile::exists(QString::fromLocal8Bit(fname))) {
-		Q_ASSERT(bufsiz > std::strlen(QFileInfo(fname).absoluteFilePath().toLocal8Bit()));
-
-		std::strncpy(buf, QFileInfo(QString::fromLocal8Bit(fname)).absoluteFilePath().toLocal8Bit(), bufsiz);
-		buf[bufsiz - 1] = '\0';
+	const QFileInfo& fileInfo = QFileInfo(QString::fromLocal8Bit(fname));
+	const QByteArray& result = fileInfo.absoluteFilePath().toLocal8Bit();
+	if (bufsiz > result.length() and QFile::exists(fileInfo.absoluteFilePath())) {
+		strcpy(buf, result.constData());
 		return true;
 	}
-	// Not found.
+	// Not found or buffer not big enough.
 	return false;
 }
 
@@ -384,7 +383,7 @@ os_build_full_path( char* fullpathbuf, size_t fullpathbuflen, const char* path, 
 void
 os_get_path_name( char* pathbuf, size_t pathbuflen, const char* fname )
 {
-	strncpy(pathbuf, QFileInfo(QString::fromLocal8Bit(fname)).path().toLocal8Bit(), pathbuflen);
+	strncpy(pathbuf, QFileInfo(QString::fromLocal8Bit(fname)).path().toLocal8Bit().constData(), pathbuflen);
 	pathbuf[pathbuflen - 1] = '\0';
 }
 
@@ -394,11 +393,11 @@ os_get_path_name( char* pathbuf, size_t pathbuflen, const char* fname )
 void
 os_cvt_url_dir( char* result_buf, size_t result_buf_size, const char* src_url, int end_sep )
 {
-	QString res(QString::fromLocal8Bit(src_url));
-	if (end_sep == true and not res.endsWith("/")) {
-		res += '/';
+	QString result(QString::fromLocal8Bit(src_url));
+	if (end_sep == true and not result.endsWith(QChar::fromAscii('/'))) {
+		result.append(QChar::fromAscii('/'));
 	}
-	strncpy(result_buf, res.toLocal8Bit(), result_buf_size);
+	strncpy(result_buf, result.toLocal8Bit().constData(), result_buf_size);
 	result_buf[result_buf_size - 1] = '\0';
 }
 
@@ -480,56 +479,67 @@ os_askfile( const char* prompt, char* fname_buf, int fname_buf_len, int prompt_t
 	Q_ASSERT(prompt != 0);
 	Q_ASSERT(fname_buf != 0);
 
-	QString res;
 	QString filter;
 	QString ext;
 
 	switch (file_type) {
 	  case OSFTGAME:
-		filter = QObject::tr("TADS 2 Games") + " (*.gam *.Gam *.GAM)";
+		filter = QObject::tr("TADS 2 Games") + QString::fromAscii(" (*.gam *.Gam *.GAM)");
 		break;
 	  case OSFTSAVE:
-		filter = QObject::tr("TADS 2 Saved Games") + " (*.sav *.Sav *.SAV)";
+		filter = QObject::tr("TADS 2 Saved Games") + QString::fromAscii(" (*.sav *.Sav *.SAV)");
 		break;
 	  case OSFTLOG:
-		filter = QObject::tr("Game Transcripts") + " (*.txt *.Txt *.TXT)";
+		filter = QObject::tr("Game Transcripts") + QString::fromAscii(" (*.txt *.Txt *.TXT)");
 		break;
 	  case OSFTT3IMG:
 		Q_ASSERT(qFrame->tads3());
-		filter = QObject::tr("TADS 3 Games") + " (*.t3 *.T3)";
+		filter = QObject::tr("TADS 3 Games") + QString::fromAscii(" (*.t3 *.T3)");
 		break;
 	  case OSFTT3SAV:
 		Q_ASSERT(qFrame->tads3());
-		filter = QObject::tr("TADS 3 Saved Games") + " (*.t3v *.T3v *.T3V)";
-		ext = "t3v";
+		filter = QObject::tr("TADS 3 Saved Games") + QString::fromAscii(" (*.t3v *.T3v *.T3V)");
+		ext = QString::fromAscii("t3v");
 		break;
 	}
 
 	// Always provide an "All Files" filter.
 	if (not filter.isEmpty()) {
-		filter += ";;";
-		filter += QObject::tr("All Files") + " (*)";
+		filter.append(QString::fromAscii(";;"));
+		filter.append(QObject::tr("All Files") + QString::fromAscii(" (*)"));
 	}
 
-	if (prompt_type == OS_AFP_OPEN) {
-		res = QFileDialog::getOpenFileName(qFrame->gameWindow(), prompt, QDir::currentPath(), filter);
+	QString promptStr;
+	if (qFrame->tads3()) {
+		promptStr = QString::fromUtf8(prompt);
 	} else {
-		res = QFileDialog::getSaveFileName(qFrame->gameWindow(), prompt, QDir::currentPath(), filter);
+		// TADS 2 does not use UTF-8; use the encoding from our settings for the
+		// prompt message.
+		QTextCodec* codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
+		promptStr = codec->toUnicode(prompt);
 	}
 
-	if (res.isEmpty()) {
+	QString filename;
+	if (prompt_type == OS_AFP_OPEN) {
+		filename = QFileDialog::getOpenFileName(qFrame->gameWindow(), promptStr, QDir::currentPath(), filter);
+	} else {
+		filename = QFileDialog::getSaveFileName(qFrame->gameWindow(), promptStr, QDir::currentPath(), filter);
+	}
+
+	if (filename.isEmpty()) {
 		// User cancelled.
 		return OS_AFE_CANCEL;
 	}
 
-	Q_ASSERT(fname_buf_len > res.toLocal8Bit().size());
-
-	std::strncpy(fname_buf, res.toLocal8Bit(), fname_buf_len);
-	fname_buf[fname_buf_len - 1] = '\0';
+	const QByteArray& result = filename.toLocal8Bit();
+	if (fname_buf_len <= result.length()) {
+		return OS_AFE_FAILURE;
+	}
+	strcpy(fname_buf, result.constData());
 	if (not ext.isEmpty()) {
-		// Since `ext' is non-empty, an extension should be
-		// appended (if none exists).
-		os_defext(fname_buf, ext.toLocal8Bit());
+		// Since `ext' is not empty, an extension should be
+		// appended (if none exists already).
+		os_defext(fname_buf, ext.toLocal8Bit().constData());
 		fname_buf[fname_buf_len - 1] = '\0';
 	}
 	return OS_AFE_SUCCESS;
@@ -614,7 +624,7 @@ os_input_dialog( int icon_id, const char* prompt, int standard_button_set, const
 	}
 	// We append a space to the window title to avoid the "<2>" that would
 	// otherwise be appended automatically by some window managers (like KDE.)
-	dialog.setWindowTitle(qWinGroup->windowTitle() + " ");
+	dialog.setWindowTitle(qWinGroup->windowTitle() + QChar::fromAscii(' '));
 	dialog.exec();
 	QAbstractButton* result = dialog.clickedButton();
 	if (result == 0) {
@@ -795,7 +805,8 @@ os_gen_charmap_filename( char* filename, char* internal_id, char* /*argv0*/ )
 	qDebug() << Q_FUNC_INFO;
 	Q_ASSERT(filename != 0);
 
-	std::strncpy(filename, QString(QString::fromAscii(internal_id) + ".tcp").toLocal8Bit().constData(), OSFNMAX);
+	strncpy(filename, QString(QString::fromAscii(internal_id)
+							  + QString::fromAscii(".tcp")).toLocal8Bit().constData(), OSFNMAX);
 	filename[OSFNMAX - 1] = '\0';
 }
 

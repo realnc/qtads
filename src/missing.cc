@@ -18,9 +18,13 @@
 #include <cctype>
 #include <cstring>
 #include <QString>
+#include <QTextCodec>
 #include <QDebug>
 
 #include "missing.h"
+#include "globals.h"
+#include "settings.h"
+#include "sysframe.h"
 
 #ifndef _WIN32
 int
@@ -44,18 +48,32 @@ memicmp( const char* s1, const char* s2, size_t len )
 int
 stricmp( const char* s1, const char* s2 )
 {
-	return QString::localeAwareCompare(QString(s1).toLower(), QString(s2).toLower());
+	if (qFrame->tads3()) {
+		return QString::localeAwareCompare(QString::fromUtf8(s1).toLower(), QString::fromUtf8(s2).toLower());
+	}
+	// TADS 2 does not use UTF-8; use the encoding from our settings.
+	QTextCodec* codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
+	return QString::localeAwareCompare(codec->toUnicode(s1).toLower(), codec->toUnicode(s2).toLower());
 }
 
 
 int
 strnicmp( const char* s1, const char* s2, size_t n )
 {
-	QString qs1(s1);
-	QString qs2(s2);
+	QString qs1;
+	QString qs2;
+
+	if (qFrame->tads3()) {
+		qs1 = QString::fromUtf8(s1);
+		qs2 = QString::fromUtf8(s2);
+	} else {
+		// TADS 2 does not use UTF-8; use the encoding from our settings.
+		QTextCodec* codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
+		qs1 = codec->toUnicode(s1);
+		qs2 = codec->toUnicode(s2);
+	}
 
 	qs1.truncate(n);
 	qs2.truncate(n);
-
 	return QString::compare(qs1.toLower(), qs2.toLower());
 }
