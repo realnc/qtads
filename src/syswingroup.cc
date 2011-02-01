@@ -378,16 +378,41 @@ CHtmlSysWinGroupQt::fHideConfDialog()
 void
 CHtmlSysWinGroupQt::fShowAboutGame()
 {
-	if (this->fAboutBoxDialog == 0) {
+	if (this->fAboutBox == 0) {
 		return;
 	}
-	if (this->fAboutBoxDialog->isVisible()) {
+	if (this->fAboutBoxDialog != 0 and this->fAboutBoxDialog->isVisible()) {
 		this->fAboutBoxDialog->activateWindow();
 		this->fAboutBoxDialog->raise();
 		return;
 	}
+	if (this->fAboutBoxDialog == 0) {
+		this->fAboutBoxDialog = new QDialog(this, Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+		this->fAboutBoxDialog->setWindowTitle(tr("About This Game"));
+		this->fAboutBox->setParent(this->fAboutBoxDialog);
+		QVBoxLayout* layout = new QVBoxLayout(this->fAboutBoxDialog);
+		layout->setContentsMargins(0, 0, 0, 0);
+		layout->addWidget(this->fAboutBox);
+		connect(this->fAboutBoxDialog, SIGNAL(finished(int)), SLOT(fHideAboutGame()));
+		// Only set the width to something comfortable.  The height will be
+		// calculated later when set_banner_size() is called on the about box.
+		//this->fAboutBoxDialog->resize(500, 0);
+		//this->fAboutBoxDialog->layout()->activate();
+	}
 	this->fAboutBoxDialog->resize(this->fAboutBox->size());
 	this->fAboutBoxDialog->show();
+}
+
+
+void
+CHtmlSysWinGroupQt::fHideAboutGame()
+{
+	// Destroy the dialog, but not the about box HTML banner.  We reparent
+	// the banner so it won't be automatically deleted by its parent.
+	this->fAboutBox->setParent(0);
+	this->fAboutBoxDialog->hide();
+	this->fAboutBoxDialog->deleteLater();
+	this->fAboutBoxDialog = 0;
 }
 
 
@@ -547,23 +572,13 @@ CHtmlSysWinGroupQt::createAboutBox( class CHtmlFormatter* formatter )
 {
 	// If there's already an "about" box, destroy it first.
 	if (this->fAboutBoxDialog != 0) {
-		this->fAboutBoxDialog->hide();
-		delete this->fAboutBoxDialog;
+		this->fHideAboutGame();
 	} else {
 		this->fAboutGameAction->setEnabled(true);
 	}
 
-	this->fAboutBoxDialog = new QDialog(this, Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-	this->fAboutBoxDialog->setWindowTitle(tr("About This Game"));
-	this->fAboutBox = new CHtmlSysWinAboutBoxQt(formatter, this->fAboutBoxDialog);
-	QVBoxLayout* layout = new QVBoxLayout(this->fAboutBoxDialog);
-	layout->setContentsMargins(0, 0, 0, 0);
-	layout->addWidget(this->fAboutBox);
-
-	// Only set the width to something comfortable.  The height will be
-	// calculated later when set_banner_size() is called on the about box.
-	this->fAboutBoxDialog->resize(500, 0);
-	this->fAboutBoxDialog->layout()->activate();
+	// We will reparent the banner when we show the actual dialog.
+	this->fAboutBox = new CHtmlSysWinAboutBoxQt(formatter, 0);
 	return this->fAboutBox;
 }
 
@@ -571,12 +586,13 @@ CHtmlSysWinGroupQt::createAboutBox( class CHtmlFormatter* formatter )
 void
 CHtmlSysWinGroupQt::deleteAboutBox()
 {
-	if (this->fAboutBoxDialog == 0) {
+	if (this->fAboutBox == 0) {
 		return;
 	}
-	this->fAboutBoxDialog->hide();
-	delete this->fAboutBoxDialog;
-	this->fAboutBoxDialog = 0;
+	if (this->fAboutBoxDialog != 0) {
+		this->fHideAboutGame();
+	}
+	delete this->fAboutBox;
 	this->fAboutBox = 0;
 	this->fAboutGameAction->setEnabled(false);
 }

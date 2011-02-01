@@ -94,6 +94,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	fShowAboutGame();
 
 	void
+	fHideAboutGame();
+
+	void
 	fShowAboutQtads();
 
 	void
