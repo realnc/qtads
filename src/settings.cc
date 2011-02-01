@@ -56,10 +56,10 @@ Settings::loadFromDisk()
 	const QString& DEFAULT_SCRIPT = QString::fromAscii("Apple Chancery,17");
 #else
 #ifdef Q_WS_WIN
-	const QString& DEFAULT_SERIF = QString::fromAscii("Times New Roman,12")
-	const QString& DEFAULT_SANS = QString::fromAscii("Verdana,12")
-	const QString& DEFAULT_MONO = QString::fromAscii("Courier New,12")
-	const QString& DEFAULT_SCRIPT = QString::fromAscii("Comic Sans MS,12")
+	const QString& DEFAULT_SERIF = QString::fromAscii("Times New Roman,12");
+	const QString& DEFAULT_SANS = QString::fromAscii("Verdana,12");
+	const QString& DEFAULT_MONO = QString::fromAscii("Courier New,12");
+	const QString& DEFAULT_SCRIPT = QString::fromAscii("Comic Sans MS,12");
 #else
 	const QString& DEFAULT_SERIF = QString::fromAscii("serif");
 	const QString& DEFAULT_SANS = QString::fromAscii("sans-serif");
