@@ -4,7 +4,7 @@
 
 /* QTads version string.
  */
-#define QTADS_VERSION "2.0.2 git"
+#define QTADS_VERSION "2.1.0"
 
 
 /* Works like qApp, but contains the global CHtmlSysFrameQt object instead.  If
