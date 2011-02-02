@@ -78,7 +78,7 @@ Settings::loadFromDisk()
 	sett.endGroup();
 
 	sett.beginGroup(QString::fromAscii("misc"));
-	this->tads2Encoding = sett.value(QString::fromAscii("tads2encoding"), QByteArray("windows-1250")).toByteArray();
+	this->tads2Encoding = sett.value(QString::fromAscii("tads2encoding"), QByteArray("windows-1252")).toByteArray();
 	this->askForGameFile = sett.value(QString::fromAscii("askforfileatstart"), false).toBool();
 	this->lastFileOpenDir = sett.value(QString::fromAscii("lastFileOpenDir"), QString::fromAscii("")).toString();
 	sett.endGroup();
