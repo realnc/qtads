@@ -396,10 +396,6 @@ CHtmlSysWinGroupQt::fShowAboutGame()
 		layout->setContentsMargins(0, 0, 0, 0);
 		layout->addWidget(this->fAboutBox);
 		connect(this->fAboutBoxDialog, SIGNAL(finished(int)), SLOT(fHideAboutGame()));
-		// Only set the width to something comfortable.  The height will be
-		// calculated later when set_banner_size() is called on the about box.
-		//this->fAboutBoxDialog->resize(500, 0);
-		//this->fAboutBoxDialog->layout()->activate();
 	}
 	this->fAboutBoxDialog->resize(this->fAboutBox->size());
 	this->fAboutBoxDialog->show();
@@ -582,6 +578,9 @@ CHtmlSysWinGroupQt::createAboutBox( class CHtmlFormatter* formatter )
 
 	// We will reparent the banner when we show the actual dialog.
 	this->fAboutBox = new CHtmlSysWinAboutBoxQt(formatter, 0);
+	// Only set the width to something comfortable.  The height will be
+	// calculated later when set_banner_size() is called on the about box.
+	this->fAboutBox->resize(500, 0);
 	return this->fAboutBox;
 }
 
