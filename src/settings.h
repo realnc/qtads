@@ -54,6 +54,8 @@ class Settings {
 	CHtmlSysFontQt inputFont;
 	bool useMainFontForInput;
 
+	int ioSafetyLevel;
+
 	QByteArray tads2Encoding;
 	bool askForGameFile;
 	QString lastFileOpenDir;

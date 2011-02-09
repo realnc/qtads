@@ -34,6 +34,14 @@
 #include "vmmaincn.h"
 
 
+int
+CHtmlSysFrameQt::fCtxGetIOSafetyLevel( void* )
+{
+	Q_ASSERT(qFrame != 0);
+	return qFrame->fSettings->ioSafetyLevel;
+}
+
+
 CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion,
 								  const char* orgName, const char* orgDomain )
 : QApplication(argc, argv), fGameWin(0), fGameRunning(false), fReformatPending(false), fNonStopMode(false)
@@ -60,6 +68,7 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 
 	// Clear the TADS appctx; all unused fields must be 0.
 	memset(&this->fAppctx, 0, sizeof(this->fAppctx));
+	this->fAppctx.get_io_safety_level = CHtmlSysFrameQt::fCtxGetIOSafetyLevel;
 
 	// Create the TADS host and client application interfaces.
 	this->fHostifc = new QTadsHostIfc(&this->fAppctx);

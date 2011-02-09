@@ -4,6 +4,9 @@
   - It is now possible to use the main game font as input font through a new
     option found in the configuration dialog.
 
+  - The file I/O safety level feature of the VM is now configurable through the
+    configuration dialog.
+
 
 2.1.0 - 2011/02/01
 ==================

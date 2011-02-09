@@ -106,6 +106,10 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 	event( QEvent* );
 #endif
 
+	// appctx callback for getting the current I/O safety level.
+	static int
+	fCtxGetIOSafetyLevel( void* );
+
   signals:
 	// Emitted just prior to starting a game.  The game has not started yet
 	// when this is emitted.
