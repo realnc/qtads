@@ -707,31 +707,6 @@ os_paramfile( char* /*buf*/ )
 }
 
 
-/* Initialize the OS layer and check OS-specific command-line
- * arguments.
- *
- * Not really needed by the Tads 2 portable layer, but we might to use it for
- * something in the future.
- */
-int
-os_init( int* /*argc*/, char* /*argv*/[], const char* /*prompt*/, char* /*buf*/, int /*bufsiz*/ )
-{
-	return 0;
-}
-
-
-/* Reverse the effect of any changes made in os_init().
- *
- * Not really needed by the Tads 2 portable layer, but we might use it at some
- * point.
- */
-void
-os_uninit( void )
-{
-	// I can't think of anything to do here.
-}
-
-
 /* Terminate the program and exit with the given exit status.
  */
 void
