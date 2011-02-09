@@ -833,9 +833,13 @@ os_get_sysinfo( int code, void* /*param*/, long* result )
 	  case SYSINFO_MNG_ALPHA:
 	  case SYSINFO_TEXT_HILITE:
 	  case SYSINFO_BANNERS:
+		*result = 1;
+		break;
+
 	  case SYSINFO_AUDIO_FADE:
 	  case SYSINFO_AUDIO_CROSSFADE:
-		*result = 1;
+		// We support fades and crossfades for everything except MIDI.
+		*result = SYSINFO_AUDIOFADE_MPEG | SYSINFO_AUDIOFADE_OGG | SYSINFO_AUDIOFADE_WAV;
 		break;
 
 	  case SYSINFO_PREF_IMAGES:
