@@ -18,6 +18,7 @@
 #define SYSSOUNDMPEG_H
 
 #include "qtadssound.h"
+#include "htmlsys.h"
 
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -27,6 +28,8 @@
  * about this class.
  */
 class CHtmlSysSoundMpegQt: public QTadsSound, public CHtmlSysSoundMpeg {
+	Q_OBJECT
+
   public:
 	CHtmlSysSoundMpegQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
 	: QTadsSound(parent, chunk, type)

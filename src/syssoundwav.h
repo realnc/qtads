@@ -18,6 +18,7 @@
 #define SYSSOUNDWAV_H
 
 #include "qtadssound.h"
+#include "htmlsys.h"
 
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -27,6 +28,8 @@
  * about this class.
  */
 class CHtmlSysSoundWavQt: public QTadsSound, public CHtmlSysSoundWav {
+	Q_OBJECT
+
   public:
 	CHtmlSysSoundWavQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
 	: QTadsSound(parent, chunk, type)

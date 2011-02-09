@@ -25,6 +25,8 @@
  * handles mouse events.
  */
 class DisplayWidget: public QWidget {
+	Q_OBJECT
+
   private:
 	// We track the current link the mouse is currently hovering over and the
 	// link over which the mouse button has been pressed but not released yet.

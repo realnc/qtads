@@ -24,6 +24,20 @@
 #include "htmlsys.h"
 
 
+class QTadsFrame: public QFrame {
+	Q_OBJECT
+
+  protected:
+	virtual void
+	resizeEvent( QResizeEvent* e );
+
+  public:
+	QTadsFrame( QWidget* parent )
+	: QFrame(parent)
+	{ }
+};
+
+
 /* Tads HTML layer class whose interface needs to be implemented by the
  * interpreter.
  *
@@ -34,17 +48,6 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 	Q_OBJECT
 
   private:
-	class QTadsFrame: public QFrame {
-	  protected:
-		virtual void
-		resizeEvent( QResizeEvent* e );
-
-	  public:
-		QTadsFrame( QWidget* parent )
-		: QFrame(parent)
-		{ }
-	};
-
 	class ConfDialog* fConfDialog;
 	class GameInfoDialog* fGameInfoDialog;
 	QTadsFrame* fFrame;

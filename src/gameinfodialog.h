@@ -7,9 +7,10 @@ namespace Ui {
     class GameInfoDialog;
 }
 
-class GameInfoDialog : public QDialog
-{
-public:
+class GameInfoDialog: public QDialog {
+	Q_OBJECT
+
+  public:
 	explicit GameInfoDialog( const QByteArray& fname, QWidget* parent = 0 );
     ~GameInfoDialog();
 
@@ -17,7 +18,7 @@ public:
 	static bool
 	gameHasMetaInfo( const QByteArray& fname );
 
-private:
+  private:
     Ui::GameInfoDialog *ui;
 };
 

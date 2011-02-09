@@ -34,7 +34,7 @@
 
 
 void
-CHtmlSysWinGroupQt::QTadsFrame::resizeEvent( QResizeEvent* e )
+QTadsFrame::resizeEvent( QResizeEvent* e )
 {
 	qFrame->reformatBanners(true, true, false);
 }

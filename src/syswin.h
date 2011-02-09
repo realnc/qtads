@@ -34,6 +34,8 @@
  * about this class.
  */
 class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
+	Q_OBJECT
+
   private:
 	// If we're a banner, what is our HTML_BannerWin_Pos_t, placement and
 	// style flags.
