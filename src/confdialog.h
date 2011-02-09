@@ -44,9 +44,6 @@ class ConfDialog: public QDialog {
 
   private slots:
 	void
-	fUseMainFontForInput( bool f );
-
-	void
 	fApplySettings();
 };
 

@@ -234,15 +234,6 @@ ConfDialog::fMakeInstantApply()
 	connect(ui->askForGameFileCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 }
 
-#include <QDebug>
-void
-ConfDialog::fUseMainFontForInput( bool f )
-{
-	if (f) {
-		//ui->inputFontBox->setE
-	}
-}
-
 
 void
 ConfDialog::fApplySettings()
