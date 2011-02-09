@@ -52,6 +52,7 @@ class Settings {
 	CHtmlSysFontQt scriptFont;
 	CHtmlSysFontQt writerFont;
 	CHtmlSysFontQt inputFont;
+	bool useMainFontForInput;
 
 	QByteArray tads2Encoding;
 	bool askForGameFile;

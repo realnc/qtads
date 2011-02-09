@@ -72,7 +72,12 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
 	ui->sansFontSizeSpinBox->setValue(sett->sansFont.pointSize());
 	ui->scriptFontSizeSpinBox->setValue(sett->scriptFont.pointSize());
 	ui->writerFontSizeSpinBox->setValue(sett->writerFont.pointSize());
-	ui->inputFontSizeSpinBox->setValue(sett->inputFont.pointSize());
+	if (sett->useMainFontForInput) {
+		ui->inputFontSizeSpinBox->setValue(sett->mainFont.pointSize());
+		ui->inputFontSizeSpinBox->setEnabled(false);
+	} else {
+		ui->inputFontSizeSpinBox->setValue(sett->inputFont.pointSize());
+	}
 
 	ui->mainFontBox->setCurrentFont(sett->mainFont);
 	ui->fixedFontBox->setCurrentFont(sett->fixedFont);
@@ -80,7 +85,15 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
 	ui->sansFontBox->setCurrentFont(sett->sansFont);
 	ui->scriptFontBox->setCurrentFont(sett->scriptFont);
 	ui->writerFontBox->setCurrentFont(sett->writerFont);
-	ui->inputFontBox->setCurrentFont(sett->inputFont);
+	if (sett->useMainFontForInput) {
+		ui->inputFontBox->setCurrentFont(sett->mainFont);
+		ui->inputFontBox->setEnabled(false);
+	} else {
+		ui->inputFontBox->setCurrentFont(sett->inputFont);
+	}
+	ui->useMainFontCheckBox->setChecked(sett->useMainFontForInput);
+	connect(ui->useMainFontCheckBox, SIGNAL(toggled(bool)), ui->inputFontBox, SLOT(setDisabled(bool)));
+	connect(ui->useMainFontCheckBox, SIGNAL(toggled(bool)), ui->inputFontSizeSpinBox, SLOT(setDisabled(bool)));
 	ui->inputFontItalicCheckBox->setChecked(sett->inputFont.italic());
 	ui->inputFontBoldCheckBox->setChecked(sett->inputFont.bold());
 
@@ -169,6 +182,7 @@ ConfDialog::fMakeInstantApply()
 	connect(ui->scriptFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
 	connect(ui->writerFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
 	connect(ui->inputFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
+	connect(ui->useMainFontCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 
 	connect(ui->mainFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
 	connect(ui->fixedFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
@@ -200,10 +214,24 @@ ConfDialog::fMakeInstantApply()
 	connect(ui->askForGameFileCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 }
 
+#include <QDebug>
+void
+ConfDialog::fUseMainFontForInput( bool f )
+{
+	if (f) {
+		//ui->inputFontBox->setE
+	}
+}
+
 
 void
 ConfDialog::fApplySettings()
 {
+	if (ui->useMainFontCheckBox->isChecked()) {
+		ui->inputFontBox->setCurrentFont(ui->mainFontBox->currentFont());
+		ui->inputFontSizeSpinBox->setValue(ui->mainFontSizeSpinBox->value());
+	}
+
 	Settings* sett = qFrame->settings();
 
 	sett->enableGraphics = ui->allowGraphicsCheckBox->isChecked();

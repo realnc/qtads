@@ -75,6 +75,7 @@ Settings::loadFromDisk()
 	this->scriptFont.fromString(sett.value(QString::fromAscii("script"), DEFAULT_SCRIPT).toString());
 	this->writerFont.fromString(sett.value(QString::fromAscii("typewriter"), DEFAULT_MONO).toString());
 	this->inputFont.fromString(sett.value(QString::fromAscii("input"), DEFAULT_SERIF).toString());
+	this->useMainFontForInput = sett.value(QString::fromAscii("useMainFontForInput"), true).toBool();
 	sett.endGroup();
 
 	sett.beginGroup(QString::fromAscii("misc"));
@@ -133,6 +134,7 @@ Settings::saveToDisk()
 	sett.setValue(QString::fromAscii("script"), this->scriptFont.toString());
 	sett.setValue(QString::fromAscii("typewriter"), this->writerFont.toString());
 	sett.setValue(QString::fromAscii("input"), this->inputFont.toString());
+	sett.setValue(QString::fromAscii("useMainFontForInput"), this->useMainFontForInput);
 	sett.endGroup();
 
 	sett.beginGroup(QString::fromAscii("misc"));

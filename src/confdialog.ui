@@ -250,7 +250,14 @@
          <property name="title">
           <string>Input Font</string>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="QCheckBox" name="useMainFontCheckBox">
+            <property name="text">
+             <string>Use Main Game Font for Input</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
@@ -276,25 +283,23 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QCheckBox" name="inputFontItalicCheckBox">
+              <property name="text">
+               <string>&amp;Italic</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="inputFontBoldCheckBox">
+              <property name="text">
+               <string>&amp;Bold</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
-          <item>
-           <widget class="QCheckBox" name="inputFontItalicCheckBox">
-            <property name="text">
-             <string>&amp;Italic</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="inputFontBoldCheckBox">
-            <property name="text">
-             <string>&amp;Bold</string>
-            </property>
-           </widget>
-          </item>
          </layout>
-         <zorder>inputFontBoldCheckBox</zorder>
-         <zorder>inputFontItalicCheckBox</zorder>
         </widget>
        </item>
       </layout>
