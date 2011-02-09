@@ -816,10 +816,6 @@ os_get_sysinfo( int code, void* /*param*/, long* result )
 	  case SYSINFO_MIDI:
 	  case SYSINFO_WAV_MIDI_OVL:
 	  case SYSINFO_WAV_OVL:
-	  case SYSINFO_PREF_IMAGES:
-	  case SYSINFO_PREF_SOUNDS:
-	  case SYSINFO_PREF_MUSIC:
-	  case SYSINFO_PREF_LINKS:
 	  case SYSINFO_MPEG:
 	  case SYSINFO_MPEG1:
 	  case SYSINFO_MPEG2:
@@ -840,6 +836,38 @@ os_get_sysinfo( int code, void* /*param*/, long* result )
 	  case SYSINFO_AUDIO_FADE:
 	  case SYSINFO_AUDIO_CROSSFADE:
 		*result = 1;
+		break;
+
+	  case SYSINFO_PREF_IMAGES:
+		if (qFrame->settings()->enableGraphics) {
+			*result = 1;
+		} else {
+			*result = 0;
+		}
+		break;
+
+	  case SYSINFO_PREF_SOUNDS:
+		if (qFrame->settings()->enableSoundEffects) {
+			*result = 1;
+		} else {
+			*result = 0;
+		}
+		break;
+
+	  case SYSINFO_PREF_MUSIC:
+		if (qFrame->settings()->enableMusic) {
+			*result = 1;
+		} else {
+			*result = 0;
+		}
+		break;
+
+	  case SYSINFO_PREF_LINKS:
+		if (qFrame->settings()->enableLinks) {
+			*result = 1;
+		} else {
+			*result = 0;
+		}
 		break;
 
 	  case SYSINFO_TEXT_COLORS:
