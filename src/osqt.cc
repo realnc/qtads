@@ -446,11 +446,9 @@ os_rand( long* val )
 
 /* Set busy cursor.
  *
- * The implementation provided here assumes that this function is never
- * called twice in succession with the same argument.
- *
- * TODO: It sometimes doesn't reset the cursor back to normal, so I
- * disabled it completely.
+ * This made sense with a 386 back in the day, where loading a T2 game needed
+ * some time.  On today's computers this takes milliseconds, so it doesn't make
+ * sense to provide a "busy cursor".
  */
 void
 os_csr_busy( int /*flag*/ )
