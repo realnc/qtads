@@ -403,8 +403,8 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 				base_point_size = this->fSettings->fixedFont.pointSize();
 				matchFound = true;
 			} else {
-				newFont.setFamily(s.toLower());
-				if (newFont.exactMatch()) {
+				newFont.setFamily(s);
+				if (newFont.family().toLower() == s) {
 					matchFound = true;
 					strcpy(newFontDesc.face, s.toLatin1().constData());
 				}
