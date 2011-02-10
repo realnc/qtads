@@ -7,6 +7,16 @@
   - The file I/O safety level feature of the VM is now configurable through the
     configuration dialog.
 
+  - The interpreter now correctly responds to game queries about whether
+    graphics, audio and hyperlinks are currently enabled or disabled.
+    Previously, the interpreter would always report that these features are
+    enabled, making it impossible for games to adapt their behavior (for
+    example "Six Stories".)
+
+  - Fades and crossfades are now correctly advertised as being supported.
+    Previously, the interpreter wrongly responded with "not supported" when a
+    game was querying about it.
+
 
 2.1.0 - 2011/02/01
 ==================
