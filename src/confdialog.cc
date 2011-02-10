@@ -279,6 +279,7 @@ ConfDialog::fApplySettings()
 	sett->scriptFont.setPointSize(ui->scriptFontSizeSpinBox->value());
 	sett->writerFont.setPointSize(ui->writerFontSizeSpinBox->value());
 	sett->inputFont.setPointSize(ui->inputFontSizeSpinBox->value());
+	sett->useMainFontForInput = ui->useMainFontCheckBox->isChecked();
 
 	if (ui->safety0RadioButton->isChecked()) {
 		sett->ioSafetyLevel = 0;
