@@ -356,6 +356,9 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 	// font size for guidance.
 	int base_point_size = this->fSettings->mainFont.pointSize();
 
+	// System font name that is to be used.
+	QString fontName;
+
 	// If a face name is listed, try to find the given face in the system.
 	// Note that we wait until after setting all of the basic attributes (in
 	// particular, weight, color, and styles) before dealing with the face
@@ -371,23 +374,23 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 		for (int i = 0; i < strList.size() and not matchFound; ++i) {
 			const QString& s = strList.at(i).simplified().toLower();
 			if (s == QString::fromAscii(HTMLFONT_TADS_SERIF).toLower()) {
-				strcpy(newFontDesc.face, this->fSettings->serifFont.family().toLatin1().constData());
+				fontName = this->fSettings->serifFont.family();
 				base_point_size = this->fSettings->serifFont.pointSize();
 				matchFound = true;
 			} else if (s == QString::fromAscii(HTMLFONT_TADS_SANS).toLower()) {
-				strcpy(newFontDesc.face, this->fSettings->sansFont.family().toLatin1().constData());
+				fontName = this->fSettings->sansFont.family();
 				base_point_size = this->fSettings->sansFont.pointSize();
 				matchFound = true;
 			} else if (s == QString::fromAscii(HTMLFONT_TADS_SCRIPT).toLower()) {
-				strcpy(newFontDesc.face, this->fSettings->scriptFont.family().toLatin1().constData());
+				fontName = this->fSettings->scriptFont.family();
 				base_point_size = this->fSettings->scriptFont.pointSize();
 				matchFound = true;
 			} else if (s == QString::fromAscii(HTMLFONT_TADS_TYPEWRITER).toLower()) {
-				strcpy(newFontDesc.face, this->fSettings->writerFont.family().toLatin1().constData());
+				fontName = this->fSettings->writerFont.family();
 				base_point_size = this->fSettings->writerFont.pointSize();
 				matchFound = true;
 			} else if (s == QString::fromAscii(HTMLFONT_TADS_INPUT).toLower()) {
-				strcpy(newFontDesc.face, this->fSettings->inputFont.family().toLatin1().constData());
+				fontName = this->fSettings->inputFont.family();
 				base_point_size = this->fSettings->inputFont.pointSize();
 				newFont.setBold(this->fSettings->inputFont.bold());
 				newFont.setItalic(this->fSettings->inputFont.italic());
@@ -399,38 +402,38 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 			} else if (s == QString::fromAscii("qtads-grid")) {
 				// "qtads-grid" is an internal face name; it means we should
 				// return a font suitable for a text grid banner.
-				strcpy(newFontDesc.face, this->fSettings->fixedFont.family().toLatin1().constData());
+				fontName = this->fSettings->fixedFont.family();
 				base_point_size = this->fSettings->fixedFont.pointSize();
 				matchFound = true;
 			} else {
 				newFont.setFamily(s);
 				if (newFont.family().toLower() == s) {
 					matchFound = true;
-					strcpy(newFontDesc.face, s.toLatin1().constData());
+					fontName = s;
 				}
 			}
 		}
 		// If we didn't find a match, use the main game font as set by
 		// the user.
 		if (not matchFound) {
-			strcpy(newFontDesc.face, this->fSettings->mainFont.family().toLatin1().constData());
+			fontName = this->fSettings->mainFont.family();
 		}
 	// Apply characteristics only if the face wasn't specified.
 	} else {
 		// See if fixed-pitch is desired.
 		if (newFontDesc.fixed_pitch) {
 			// Use prefered monospaced font.
-			strcpy(newFontDesc.face, this->fSettings->fixedFont.family().toLatin1().constData());
+			fontName = this->fSettings->fixedFont.family();
 			base_point_size = this->fSettings->fixedFont.pointSize();
 		} else {
 			// Use prefered proportional font.
-			strcpy(newFontDesc.face, this->fSettings->mainFont.family().toLatin1().constData());
+			fontName = this->fSettings->mainFont.family();
 			base_point_size = this->fSettings->mainFont.pointSize();
 		}
 
 		// See if serifs are desired for a variable-pitch font.
 		if (not newFontDesc.serif and not newFontDesc.fixed_pitch) {
-			strcpy(newFontDesc.face, this->fSettings->serifFont.family().toLatin1().constData());
+			fontName = this->fSettings->serifFont.family();
 			base_point_size = this->fSettings->serifFont.pointSize();
 		}
 
@@ -462,7 +465,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 			if (newFontDesc.pe_kbd) {
 				newFont.setWeight(QFont::Bold);
 			}
-			strcpy(newFontDesc.face, this->fSettings->fixedFont.family().toLatin1().constData());
+			fontName = this->fSettings->fixedFont.family();
 			base_point_size = this->fSettings->fixedFont.pointSize();
 		}
 
@@ -472,7 +475,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 		}
 	}
 
-	newFont.setFamily(QString::fromAscii(newFontDesc.face).toLower());
+	newFont.setFamily(fontName);
 
 	// Note the HTML SIZE parameter requested - if this is zero, it indicates
 	// that we want to use a specific point size instead.
@@ -486,9 +489,9 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 		// An HTML size is specified -- if a BIG or SMALL attribute is present,
 		// bump the HTML size by 1 in the appropriate direction, if we're not
 		// already at a limit.
-		if (font_desc->pe_big and htmlsize < 7) {
+		if (newFontDesc.pe_big and htmlsize < 7) {
 			++htmlsize;
-		} else if (font_desc->pe_small && htmlsize > 1) {
+		} else if (newFontDesc.pe_small && htmlsize > 1) {
 			--htmlsize;
 		}
 
@@ -500,7 +503,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 		pointsize = ((base_point_size * size_pct[htmlsize - 1]) + 50) / 100;
 	} else {
 		// There's no HTML size - use the explicit point size provided.
-		pointsize = font_desc->pointsize;
+		pointsize = newFontDesc.pointsize;
 	}
 
 	newFont.setPointSize(pointsize > 0 ? pointsize : base_point_size);

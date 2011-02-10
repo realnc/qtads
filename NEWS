@@ -1,6 +1,10 @@
 2.1.1 - 2011/??/??
 ==================
 
+  - Fixed a bug that resulted in games using the wrong font in some places.
+    "Six Stories" is one example; it would previously use a wrong font for
+    input, titles and statusbar.
+
   - It is now possible to use the main game font as input font through a new
     option found in the configuration dialog.
 
@@ -11,7 +15,8 @@
     graphics, audio and hyperlinks are currently enabled or disabled.
     Previously, the interpreter would always report that these features are
     enabled, making it impossible for games to adapt their behavior (for
-    example "Six Stories".)
+    example "Six Stories" alters its behavior according to whether graphics and
+    sound are enabled in the interpreter preferences.)
 
   - Fades and crossfades are now correctly advertised as being supported.
     Previously, the interpreter wrongly responded with "not supported" when a
