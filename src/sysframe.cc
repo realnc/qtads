@@ -392,9 +392,12 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 			} else if (s == QString::fromAscii(HTMLFONT_TADS_INPUT).toLower()) {
 				fontName = this->fSettings->inputFont.family();
 				base_point_size = this->fSettings->inputFont.pointSize();
-				newFont.setBold(this->fSettings->inputFont.bold());
-				newFont.setItalic(this->fSettings->inputFont.italic());
-				if (newFontDesc.default_color) {
+				if (newFontDesc.face_set_explicitly) {
+					newFont.setBold(this->fSettings->inputFont.bold());
+					newFont.setItalic(this->fSettings->inputFont.italic());
+					newFontDesc.color = HTML_COLOR_INPUT;
+					newFont.color(HTML_COLOR_INPUT);
+				} else if (newFontDesc.default_color) {
 					newFontDesc.color = HTML_COLOR_INPUT;
 					newFont.color(HTML_COLOR_INPUT);
 				}
