@@ -11,31 +11,15 @@ static char RCSid[] =
  */
 /*
 Name
-  vmbifreg.cpp - built-in function set registry
+  vmbifregx.cpp - built-in function set registry, with tads-io-ext
 Function
   Defines the built-in functions that are linked in to this implementation
-  of the VM.
-
-  This file is dependent on the host application environment configuration.
-  This particular file includes a table for the base set of T3 VM
-  built-in functions.  Some host application environments may provide
-  additional function sets; if you're building a host system with its own
-  extra function sets, do the following:
-
-  1.  Make a copy of this file (DO NOT MODIFY THE ORIGINAL).
-
-  2.  Remove this file (and/or derived files, such as object files) from
-      your makefile, and add your modified version instead.
-
-  3.  In the table below, add an entry for each of your extra function
-      sets.  (Of course, for each of your added function sets, you must
-      implement the function set and link the implementation into your
-      host application executable.)
-
+  of the VM.  This version of the registry includes tads-io-ext, the extended
+  I/O function set.
 Notes
   
 Modified
-  12/05/98 MJRoberts  - Creation
+  03/02/2005 MJRoberts  - Creation
 */
 
 #include "vmbifreg.h"
@@ -51,6 +35,7 @@ Modified
 #include "vmbiftad.h"
 #include "vmbiftio.h"
 #include "vmbift3.h"
+#include "vmbiftix.h"
 
 // !!! INCLUDE HOST-SPECIFIC FUNCTION SET HEADERS HERE ("vmbifxxx.h")
 
@@ -80,6 +65,9 @@ vm_bif_entry_t G_bif_reg_table[] =
     /* TADS input/output functions */
     MAKE_ENTRY("tads-io/030007", G_bif_tadsio),
 
+    /* TADS extended input/output functions (if the platform supports them) */
+    MAKE_ENTRY("tads-io-ext/030000", G_bif_tadsio_ext),
+    
     // !!! ADD ANY HOST-SPECIFIC FUNCTION SETS HERE
 
     /* end of table marker */

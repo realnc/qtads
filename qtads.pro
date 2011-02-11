@@ -260,10 +260,11 @@ SOURCES += \
 	$$T3DIR/vmanonfn.cpp \
 	$$T3DIR/vmbif.cpp \
 	$$T3DIR/vmbifl.cpp \
-	$$T3DIR/vmbifreg.cpp \
+	$$T3DIR/vmbifregx.cpp \
 	$$T3DIR/vmbift3.cpp \
 	$$T3DIR/vmbiftad.cpp \
 	$$T3DIR/vmbiftio.cpp \
+	$$T3DIR/vmbiftix.cpp \
 	$$T3DIR/vmbignum.cpp \
 	$$T3DIR/vmbt3_nd.cpp \
 	$$T3DIR/vmbytarr.cpp \

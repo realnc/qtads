@@ -39,6 +39,7 @@
 #include <ctime>
 
 #include "os.h"
+#include "osifcext.h"
 #include "globals.h"
 #include "settings.h"
 #include "sysframe.h"
@@ -889,4 +890,29 @@ os_get_sysinfo( int code, void* /*param*/, long* result )
 	}
 	// We recognized the code.
 	return true;
+}
+
+
+/* --------------------------------------------------------------------
+ */
+
+/* Open a popup menu window.
+ */
+// FIXME: Just a dummy implementation for now.
+int
+os_show_popup_menu( int default_pos, int x, int y, const char* txt, size_t txtlen, union os_event_info_t* evt )
+{
+	if (qFrame->gameRunning()) {
+		return OSPOP_FAIL;
+	}
+	return OSPOP_EOF;
+}
+
+
+/* Enable/disable a System Menu Command event in os_get_event().
+ */
+// FIXME: Just a dummy implementation for now.
+void
+os_enable_cmd_event( int id, unsigned int status )
+{
 }
