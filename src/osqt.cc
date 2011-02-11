@@ -656,7 +656,6 @@ os_get_sys_clock_ms( void )
 		// Note that the code *will* break if we're running for more than
 		// 11.767.033 years, 251 days, 20 hours and 24 minutes.  :P
 		++wraps;
-		zeroPoint.start();
 	}
 
 	lastRet = ret;
