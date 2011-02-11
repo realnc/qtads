@@ -992,7 +992,9 @@ size_t CCharmapToLocalUTF8::map_utf8(char *dest, size_t dest_len,
      */
     if (dest == 0)
     {
-        *src_bytes_used = 0;
+        if (src_bytes_used != 0)
+            *src_bytes_used = 0;
+
         return src_byte_len;
     }
 
