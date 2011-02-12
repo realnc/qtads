@@ -88,7 +88,7 @@ typedef unsigned int oshtml_charset_id_t;
  *   an ordinary type-cast if they really want to remove the const-ness.)
  */
 textchar_t*
-os_next_char( oshtml_charset_id_t id, const textchar_t* p, size_t /*len*/ );
+os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/ );
 
 
 /*
@@ -107,7 +107,7 @@ os_next_char( oshtml_charset_id_t id, const textchar_t* p, size_t /*len*/ );
  *   character OR at the byte just after the end of the string...
  */
 textchar_t*
-os_prev_char( oshtml_charset_id_t id, const textchar_t* p, const textchar_t* pstart );
+os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart );
 
 
 /* ------------------------------------------------------------------------ */
