@@ -7,6 +7,11 @@
     configuration dialog provides an option to disable filtering, since it also
     makes scaled images appear less sharp.
 
+  - The "Game Information" metadata viewer now supports and displays cover art
+    images (as specified by the Treaty of Babel.)  Also, the list of recognized
+    names and values (like "Genre", "Headline", "Forgiveness", etc) should now
+    be complete.
+
   - Fixed a bug that resulted in games using the wrong font in some places.
     "Six Stories" is one example; it would previously use a wrong font for
     input, titles and statusbar.
