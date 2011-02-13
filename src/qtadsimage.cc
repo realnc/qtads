@@ -19,6 +19,7 @@
 
 #include "syswin.h"
 #include "qtadsimage.h"
+#include "settings.h"
 
 
 void
@@ -45,12 +46,15 @@ QTadsImage::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, ht
 	}
 
 	if (mode == HTMLIMG_DRAW_STRETCH) {
-		// If the image doesn't fit exactly, scale it using the "smooth"
-		// transformation mode, which uses a bilinear filter.
+		// If the image doesn't fit exactly, scale it. Use the "smooth"
+		// transformation mode (which uses a bilinear filter) if enabled in
+		// the settings.
+		Qt::TransformationMode mode = qFrame->settings()->useSmoothScaling ?
+									  Qt::SmoothTransformation : Qt::FastTransformation;
 		if (this->width() != pos->right - pos->left or this->height() != pos->bottom - pos->top) {
 			painter.drawImage(QPoint(pos->left, pos->top),
 							  this->scaled(pos->right - pos->left, pos->bottom - pos->top,
-										   Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+										   Qt::IgnoreAspectRatio, mode));
 		} else {
 			painter.drawImage(QPoint(pos->left, pos->top), *this);
 		}

@@ -32,6 +32,7 @@ class Settings {
 	bool enableSoundEffects;
 	bool enableMusic;
 	bool enableLinks;
+	bool useSmoothScaling;
 
 	QColor mainTextColor;
 	QColor mainBgColor;

@@ -595,6 +595,20 @@
        <item>
         <widget class="QWidget" name="widget_3" native="true"/>
        </item>
+       <item>
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="smoothScalingCheckBox">
+         <property name="text">
+          <string>Use Smooth Image Scaling</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_5">

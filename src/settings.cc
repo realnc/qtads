@@ -34,6 +34,7 @@ Settings::loadFromDisk()
 	this->enableSoundEffects = sett.value(QString::fromAscii("sounds"), true).toBool();
 	this->enableMusic = sett.value(QString::fromAscii("music"), true).toBool();
 	this->enableLinks = sett.value(QString::fromAscii("links"), true).toBool();
+	this->useSmoothScaling = sett.value(QString::fromAscii("smoothImageScaling"), true).toBool();
 	sett.endGroup();
 
 	sett.beginGroup(QString::fromAscii("colors"));
@@ -112,6 +113,7 @@ Settings::saveToDisk()
 	sett.setValue(QString::fromAscii("sounds"), this->enableSoundEffects);
 	sett.setValue(QString::fromAscii("music"), this->enableMusic);
 	sett.setValue(QString::fromAscii("links"), this->enableLinks);
+	sett.setValue(QString::fromAscii("smoothImageScaling"), this->useSmoothScaling);
 	sett.endGroup();
 
 	sett.beginGroup(QString::fromAscii("colors"));
