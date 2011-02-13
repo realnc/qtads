@@ -20,6 +20,7 @@
 #include "syswin.h"
 #include "qtadsimage.h"
 
+
 void
 QTadsImage::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, htmlimg_draw_mode_t mode )
 {
@@ -44,8 +45,15 @@ QTadsImage::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, ht
 	}
 
 	if (mode == HTMLIMG_DRAW_STRETCH) {
-		// QPainter will scale it by default.
-		painter.drawImage(QRect(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top), *this);
+		// If the image doesn't fit exactly, scale it using the "smooth"
+		// transformation mode, which uses a bilinear filter.
+		if (this->width() != pos->right - pos->left or this->height() != pos->bottom - pos->top) {
+			painter.drawImage(QPoint(pos->left, pos->top),
+							  this->scaled(pos->right - pos->left, pos->bottom - pos->top,
+										   Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+		} else {
+			painter.drawImage(QPoint(pos->left, pos->top), *this);
+		}
 		return;
 	}
 
