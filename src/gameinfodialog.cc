@@ -14,15 +14,20 @@ class QTadsGameInfoEnum: public CTadsGameInfo_enum
 {
   public:
 	QString gameName;
+	QString headline;
 	QString byLine;
 	QString htmlByLine;
 	QString email;
 	QString desc;
 	QString htmlDesc;
 	QString version;
-	QString date;
 	QString published;
+	QString date;
 	QString lang;
+	QString series;
+	QString seriesNumber;
+	QString genre;
+	QString forgiveness;
 	QString license;
 	QString copyRules;
 	QString ifid;
@@ -35,6 +40,9 @@ class QTadsGameInfoEnum: public CTadsGameInfo_enum
 		if (nameStr == QString::fromAscii("name")) {
 			this->gameName = QString::fromAscii("<b><center><font size=\"+1\">") + Qt::escape(valStr)
 							 + QString::fromAscii("</font></center></b>");
+		} else if (nameStr == QString::fromAscii("headline")) {
+			this->headline = QString::fromAscii("<center>") + Qt::escape(valStr)
+							 + QString::fromAscii("</center><p>");
 		} else if (nameStr == QString::fromAscii("byline")) {
 			this->byLine = QString::fromAscii("<i><center>") + Qt::escape(valStr)
 						   + QString::fromAscii("</center></i>");
@@ -48,16 +56,24 @@ class QTadsGameInfoEnum: public CTadsGameInfo_enum
 			this->htmlDesc = valStr;
 		} else if (nameStr == QString::fromAscii("version")) {
 			this->version = valStr;
+		} else if (nameStr == QString::fromAscii("firstpublished")) {
+			this->published = valStr;
 		} else if (nameStr == QString::fromAscii("releasedate")) {
 			this->date = valStr;
 		} else if (nameStr == QString::fromAscii("language")) {
 			this->lang = valStr;
+		} else if (nameStr == QString::fromAscii("series")) {
+			this->series = valStr;
+		} else if (nameStr == QString::fromAscii("seriesnumber")) {
+			this->seriesNumber = valStr;
+		} else if (nameStr == QString::fromAscii("genre")) {
+			this->genre = valStr;
+		} else if (nameStr == QString::fromAscii("forgiveness")) {
+			this->forgiveness = valStr;
 		} else if (nameStr == QString::fromAscii("licensetype")) {
 			this->license = valStr;
 		} else if (nameStr == QString::fromAscii("copyingrules")) {
 			this->copyRules = valStr;
-		} else if (nameStr == QString::fromAscii("firstpublished")) {
-			this->published = valStr;
 		} else if (nameStr == QString::fromAscii("ifid")) {
 			this->ifid = valStr;
 		}
@@ -91,14 +107,31 @@ GameInfoDialog::GameInfoDialog( const QByteArray& fname, QWidget* parent )
 
 	// Fill out the description.
 	QString tmp(cb.gameName + QString::fromAscii("<p>")
+				+ cb.headline
 				+ (cb.htmlByLine.isEmpty() ? cb.byLine : cb.htmlByLine) + QString::fromAscii("<p>"));
 	tmp += cb.htmlDesc.isEmpty() ? cb.desc : cb.htmlDesc;
 	ui->description->setHtml(tmp);
 
 	// Fill out the table.
 	ui->table->setColumnCount(2);
+	if (not cb.genre.isEmpty()) {
+		insertTableRow(ui->table, tr("Genre"), cb.genre);
+	}
+
 	if (not cb.version.isEmpty()) {
 		insertTableRow(ui->table, tr("Version"), cb.version);
+	}
+
+	if (not cb.forgiveness.isEmpty()) {
+		insertTableRow(ui->table, tr("Forgiveness"), cb.forgiveness);
+	}
+
+	if (not cb.series.isEmpty()) {
+		insertTableRow(ui->table, tr("Series"), cb.series);
+	}
+
+	if (not cb.seriesNumber.isEmpty()) {
+		insertTableRow(ui->table, tr("Series Number"), cb.seriesNumber);
 	}
 
 	if (not cb.date.isEmpty()) {
