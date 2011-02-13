@@ -282,17 +282,30 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
 		this->formatter_->extract_text(&buf, startOfs, endOfs);
 		QApplication::clipboard()->setText(QString::fromUtf8(buf.get(), len));
 		return;
-	} else if (e->matches(QKeySequence::Paste)) {
-		const QString& clipStr = QApplication::clipboard()->text();
-		this->fTadsBuffer->add_string(clipStr.toUtf8().constData(), clipStr.toUtf8().size(), true);
 	} else if (e->key() == Qt::Key_Backspace) {
 		this->fTadsBuffer->backspace();
 	} else {
-		if (e->text().isEmpty() or not e->text().at(0).isPrint()) {
+		QString strToAdd = e->text();
+		if (e->matches(QKeySequence::Paste)) {
+			strToAdd = QApplication::clipboard()->text();
+		} else if (strToAdd.isEmpty() or not strToAdd.at(0).isPrint()) {
 			QScrollArea::keyPressEvent(e);
 			return;
 		}
-		this->fTadsBuffer->add_string(e->text().toUtf8().constData(), e->text().toUtf8().length(), true);
+		const QByteArray& utfTxt = strToAdd.toUtf8();
+		// Try to add it to the input buffer. Do not allow truncation; it
+		// won't work with UTF-8 strings and we'll crash if it doesn't fit.
+		if (not this->fTadsBuffer->add_string(utfTxt.constData(), utfTxt.length(), false)) {
+			// It didn't fit.  Try to add the largest part of it that fits.
+			int i = strToAdd.length();
+			QString subStr;
+			QByteArray subUtf;
+			do {
+				--i;
+				subStr = strToAdd.left(i);
+				subUtf = subStr.toUtf8();
+			} while (not this->fTadsBuffer->add_string(subUtf.constData(), subUtf.length(), false) and i > 1);
+		}
 	}
 
 	this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
