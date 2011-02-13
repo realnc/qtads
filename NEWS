@@ -1,6 +1,12 @@
 2.1.1 - 2011/??/??
 ==================
 
+  - When the interpreter needs to scale an image, it can now use bilinear
+    filtering.  This results in smoother images (without filtering, scaled
+    images can appear pixelated or have other scaling artifacts).  However, the
+    configuration dialog provides an option to disable filtering, since it also
+    makes scaled images appear less sharp.
+
   - Fixed a bug that resulted in games using the wrong font in some places.
     "Six Stories" is one example; it would previously use a wrong font for
     input, titles and statusbar.
