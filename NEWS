@@ -12,6 +12,11 @@
     names and values (like "Genre", "Headline", "Forgiveness", etc) should now
     be complete.
 
+  - The list of recently played games now behaves a bit smarter; it will use
+    the actual name from the game's meta data (if available) rather than the
+    path/filename, and will also try to avoid duplicate entries (which can
+    happen when symbolic links are used in the path and/or filename.)
+
   - Fixed a bug that resulted in games using the wrong font in some places.
     "Six Stories" is one example; it would previously use a wrong font for
     input, titles and statusbar.
