@@ -465,7 +465,7 @@ CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 	if (not this->fAskQuitGameDialog()) {
 		return;
 	}
-	qFrame->setNextGame(action->text().replace(QString::fromAscii("&&"), QString::fromAscii("&")));
+	qFrame->setNextGame(action->statusTip());
 }
 
 
@@ -618,10 +618,15 @@ CHtmlSysWinGroupQt::updateRecentGames()
 	}
 
 	// Populate it.
-	for (int i = 0; i < qFrame->settings()->recentGamesList.size(); ++i) {
-		this->fRecentGamesMenu->addAction(QString(qFrame->settings()
-												  ->recentGamesList.at(i))
-												  .replace(QString::fromAscii("&"), QString::fromAscii("&&")));
+	const QStringList& list = qFrame->settings()->recentGamesList;
+	for (int i = 0; i < list.size(); ++i) {
+		QAction* act;
+		QString gameName = GameInfoDialog::getMetaInfo(list.at(i).toLocal8Bit()).plainGameName;
+		if (gameName.isEmpty()) {
+			gameName = QFileInfo(list.at(i)).fileName();
+		}
+		act = this->fRecentGamesMenu->addAction(gameName.replace(QString::fromAscii("&"), QString::fromAscii("&&")));
+		act->setStatusTip(QString(list.at(i)));
 	}
 }
 

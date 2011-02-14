@@ -5,7 +5,6 @@
 #include <QMessageBox>
 #include <QFileInfo>
 
-#include "gameinfo.h"
 #include "globals.h"
 #include "settings.h"
 #include "sysframe.h"
@@ -14,78 +13,53 @@
 #include "htmlfmt.h"
 
 
-/* Implementation of the game information enumerator callback interface.
- * See tads3/gameinfo.h for details.
- */
-class QTadsGameInfoEnum: public CTadsGameInfo_enum
+void
+QTadsGameInfoEnum::tads_enum_game_info( const char* name, const char* val )
 {
-  public:
-	QString gameName;
-	QString headline;
-	QString byLine;
-	QString htmlByLine;
-	QString email;
-	QString desc;
-	QString htmlDesc;
-	QString version;
-	QString published;
-	QString date;
-	QString lang;
-	QString series;
-	QString seriesNumber;
-	QString genre;
-	QString forgiveness;
-	QString license;
-	QString copyRules;
-	QString ifid;
-
-	virtual void
-	tads_enum_game_info( const char* name, const char* val )
-	{
-		const QString& valStr = QString::fromUtf8(val);
-		const QString& nameStr = QString::fromUtf8(name).toLower();
-		if (nameStr == QString::fromAscii("name")) {
-			this->gameName = QString::fromAscii("<b><center><font size=\"+1\">") + Qt::escape(valStr)
-							 + QString::fromAscii("</font></center></b><p>");
-		} else if (nameStr == QString::fromAscii("headline")) {
-			this->headline = QString::fromAscii("<center>") + Qt::escape(valStr)
-							 + QString::fromAscii("</center><p>");
-		} else if (nameStr == QString::fromAscii("byline")) {
-			this->byLine = QString::fromAscii("<i><center>") + Qt::escape(valStr)
-						   + QString::fromAscii("</center></i><p>");
-		} else if (nameStr == QString::fromAscii("htmlbyline")) {
-			this->htmlByLine = QString::fromAscii("<i><center>") + valStr + QString::fromAscii("</center></i><p>");
-		} else if (nameStr == QString::fromAscii("authoremail")) {
-			this->email = valStr;
-		} else if (nameStr == QString::fromAscii("desc")) {
-			this->desc = Qt::escape(valStr).replace(QString::fromAscii("\\n"), QString::fromAscii("<p>"));
-		} else if (nameStr == QString::fromAscii("htmldesc")) {
-			this->htmlDesc = valStr;
-		} else if (nameStr == QString::fromAscii("version")) {
-			this->version = valStr;
-		} else if (nameStr == QString::fromAscii("firstpublished")) {
-			this->published = valStr;
-		} else if (nameStr == QString::fromAscii("releasedate")) {
-			this->date = valStr;
-		} else if (nameStr == QString::fromAscii("language")) {
-			this->lang = valStr;
-		} else if (nameStr == QString::fromAscii("series")) {
-			this->series = valStr;
-		} else if (nameStr == QString::fromAscii("seriesnumber")) {
-			this->seriesNumber = valStr;
-		} else if (nameStr == QString::fromAscii("genre")) {
-			this->genre = valStr;
-		} else if (nameStr == QString::fromAscii("forgiveness")) {
-			this->forgiveness = valStr;
-		} else if (nameStr == QString::fromAscii("licensetype")) {
-			this->license = valStr;
-		} else if (nameStr == QString::fromAscii("copyingrules")) {
-			this->copyRules = valStr;
-		} else if (nameStr == QString::fromAscii("ifid")) {
-			this->ifid = valStr;
-		}
+	const QString& valStr = QString::fromUtf8(val);
+	const QString& nameStr = QString::fromUtf8(name).toLower();
+	if (nameStr == QString::fromAscii("name")) {
+		this->gameName = QString::fromAscii("<b><center><font size=\"+1\">") + Qt::escape(valStr)
+						 + QString::fromAscii("</font></center></b><p>");
+		this->plainGameName = valStr;
+	} else if (nameStr == QString::fromAscii("headline")) {
+		this->headline = QString::fromAscii("<center>") + Qt::escape(valStr)
+						 + QString::fromAscii("</center><p>");
+	} else if (nameStr == QString::fromAscii("byline")) {
+		this->byLine = QString::fromAscii("<i><center>") + Qt::escape(valStr)
+					   + QString::fromAscii("</center></i><p>");
+	} else if (nameStr == QString::fromAscii("htmlbyline")) {
+		this->htmlByLine = QString::fromAscii("<i><center>") + valStr + QString::fromAscii("</center></i><p>");
+	} else if (nameStr == QString::fromAscii("authoremail")) {
+		this->email = valStr;
+	} else if (nameStr == QString::fromAscii("desc")) {
+		this->desc = Qt::escape(valStr).replace(QString::fromAscii("\\n"), QString::fromAscii("<p>"));
+	} else if (nameStr == QString::fromAscii("htmldesc")) {
+		this->htmlDesc = valStr;
+	} else if (nameStr == QString::fromAscii("version")) {
+		this->version = valStr;
+	} else if (nameStr == QString::fromAscii("firstpublished")) {
+		this->published = valStr;
+	} else if (nameStr == QString::fromAscii("releasedate")) {
+		this->date = valStr;
+	} else if (nameStr == QString::fromAscii("language")) {
+		this->lang = valStr;
+	} else if (nameStr == QString::fromAscii("series")) {
+		this->series = valStr;
+	} else if (nameStr == QString::fromAscii("seriesnumber")) {
+		this->seriesNumber = valStr;
+	} else if (nameStr == QString::fromAscii("genre")) {
+		this->genre = valStr;
+	} else if (nameStr == QString::fromAscii("forgiveness")) {
+		this->forgiveness = valStr;
+	} else if (nameStr == QString::fromAscii("licensetype")) {
+		this->license = valStr;
+	} else if (nameStr == QString::fromAscii("copyingrules")) {
+		this->copyRules = valStr;
+	} else if (nameStr == QString::fromAscii("ifid")) {
+		this->ifid = valStr;
 	}
-};
+}
 
 
 static void
@@ -289,4 +263,15 @@ GameInfoDialog::gameHasMetaInfo( const QByteArray& fname )
 {
 	CTadsGameInfo info;
 	return info.read_from_file(fname.constData());
+}
+
+
+QTadsGameInfoEnum
+GameInfoDialog::getMetaInfo( const QByteArray& fname )
+{
+	CTadsGameInfo info;
+	QTadsGameInfoEnum cb;
+	info.read_from_file(fname.constData());
+	info.enum_values(&cb);
+	return cb;
 }
