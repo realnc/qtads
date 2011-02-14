@@ -268,6 +268,11 @@ GameInfoDialog::GameInfoDialog( const QByteArray& fname, QWidget* parent )
 		// Only add the margins to the maximum height if we're going to show
 		// the table at all.
 		maxHeight += topMargin + bottomMargin;
+		if (maxHeight < ui->table->minimumSizeHint().height()) {
+			// Do not make it smaller than the minimum size hint, otherwise we'll
+			// have a messed-up scrollbar.
+			maxHeight = ui->table->minimumSizeHint().height();
+		}
 	}
 	ui->table->setMaximumHeight(maxHeight);
 }
