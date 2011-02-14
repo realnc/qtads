@@ -211,18 +211,35 @@ CHtmlSysFrameQt::fRunGame()
 #endif
 
 			// Add the game file to our "recent games" list.
-			int recentIdx = this->fSettings->recentGamesList.indexOf(finfo.absoluteFilePath());
+			QStringList& gamesList = this->fSettings->recentGamesList;
+			int recentIdx = gamesList.indexOf(finfo.absoluteFilePath());
 			if (recentIdx > 0) {
 				// It's already in the list and it's not the first item.  Make
 				// it the first item so that it becomes the most recent entry.
-				this->fSettings->recentGamesList.move(recentIdx, 0);
+				gamesList.move(recentIdx, 0);
 			} else if (recentIdx < 0) {
-				// It's not in the list.  Prepend it as the most recent item
-				// and, if the list is full, delete the oldest one.
-				if (this->fSettings->recentGamesList.size() >= this->fSettings->recentGamesCapacity) {
-					this->fSettings->recentGamesList.removeLast();
+				// We didn't find it in the list by absoluteFilePath(). Try to
+				// find it by canonicalFilePath() instead. This way, we avoid
+				// listing the same game twice if the user opened it through a
+				// different path (through a symlink that leads to the same
+				// file, for instance.)
+				bool found = false;
+				const QString& canonPath = finfo.canonicalFilePath();
+				for (recentIdx = 0; recentIdx < gamesList.size() and not found; ++recentIdx) {
+					if (QFileInfo(gamesList.at(recentIdx)).canonicalFilePath() == canonPath) {
+						found = true;
+					}
 				}
-				this->fSettings->recentGamesList.prepend(finfo.absoluteFilePath());
+				if (found) {
+					gamesList.move(recentIdx - 1, 0);
+				} else {
+					// It's not in the list.  Prepend it as the most recent item
+					// and, if the list is full, delete the oldest one.
+					if (gamesList.size() >= this->fSettings->recentGamesCapacity) {
+						gamesList.removeLast();
+					}
+					gamesList.prepend(finfo.absoluteFilePath());
+				}
 			}
 			this->fMainWin->updateRecentGames();
 			this->fSettings->saveToDisk();
