@@ -620,12 +620,14 @@ CHtmlSysWinGroupQt::updateRecentGames()
 	// Populate it.
 	const QStringList& list = qFrame->settings()->recentGamesList;
 	for (int i = 0; i < list.size(); ++i) {
-		QAction* act;
 		QString gameName = GameInfoDialog::getMetaInfo(list.at(i).toLocal8Bit()).plainGameName;
 		if (gameName.isEmpty()) {
 			gameName = QFileInfo(list.at(i)).fileName();
 		}
-		act = this->fRecentGamesMenu->addAction(gameName.replace(QString::fromAscii("&"), QString::fromAscii("&&")));
+		gameName = gameName.replace(QString::fromAscii("&"), QString::fromAscii("&&"));
+		QAction* act = this->fRecentGamesMenu->addAction(gameName);
+		// Elide the text in case it's too long.
+		act->setText(QFontMetrics(act->font()).elidedText(gameName, Qt::ElideRight, 300));
 		act->setStatusTip(QString(list.at(i)));
 	}
 }
