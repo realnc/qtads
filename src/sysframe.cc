@@ -26,6 +26,7 @@
 #include "settings.h"
 #include "syswinaboutbox.h"
 #include "syswininput.h"
+#include "gameinfodialog.h"
 
 #include "htmlprs.h"
 #include "htmlfmt.h"
@@ -200,15 +201,22 @@ CHtmlSysFrameQt::fRunGame()
 			this->fGameWin->show();
 			this->fGameWin->setFocus();
 
-			// Set the application's window title to contain the filename of the game
-			// we're running.  The game is free to change that later on.
+			// Set the application's window title to contain the filename of
+			// the game we're running or the game's name as at appears in the
+			// gameinfo. The game is free to change that later on.
+			const QString& titleStr = GameInfoDialog::getMetaInfo(finfo.absoluteFilePath().toLocal8Bit()).plainGameName;
+			if (titleStr.simplified().isEmpty()) {
+				// The game doesn't provide a game name.  Just use the filename.
 #ifdef Q_WS_MAC
-			// Just use the filename on OS X.  Seems to be the norm there.
-			qWinGroup->setWindowTitle(finfo.fileName());
+				// Just use the filename on OS X.  Seems to be the norm there.
+				qWinGroup->setWindowTitle(finfo.fileName());
 #else
-			// On all other systems, also append the application name.
-			qWinGroup->setWindowTitle(finfo.fileName() + QString::fromAscii(" - ") + qFrame->applicationName());
+				// On all other systems, also append the application name.
+				qWinGroup->setWindowTitle(finfo.fileName() + QString::fromAscii(" - ") + qFrame->applicationName());
 #endif
+			} else {
+				qWinGroup->setWindowTitle(titleStr.trimmed());
+			}
 
 			// Add the game file to our "recent games" list.
 			QStringList& gamesList = this->fSettings->recentGamesList;
