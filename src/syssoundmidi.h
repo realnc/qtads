@@ -29,6 +29,7 @@
  * about this class.
  */
 class CHtmlSysSoundMidiQt: public CHtmlSysSoundMidi {
+#ifndef Q_WS_ANDROID
   private:
 	struct SDL_RWops* fRWops;
 	Mix_Music* fMusic;
@@ -49,14 +50,17 @@ class CHtmlSysSoundMidiQt: public CHtmlSysSoundMidi {
 
 	// Currently playing MIDI object.  The callback needs this.
 	static CHtmlSysSoundMidiQt* fActiveMidi;
+#endif
 
   public:
+#ifndef Q_WS_ANDROID
 	CHtmlSysSoundMidiQt( struct SDL_RWops* music );
 
 	virtual ~CHtmlSysSoundMidiQt();
 
 	// SDL_Mixer callback.
 	static void callback();
+#endif
 
 	//
 	// CHtmlSysSoundMidi interface implementation.

@@ -33,6 +33,7 @@ class QTadsSound: public QObject {
 	enum SoundType { WAV, OGG, MPEG };
 
   private:
+#ifndef Q_WS_ANDROID
 	struct Mix_Chunk* fChunk;
 	int fChannel;
 	SoundType fType;
@@ -101,6 +102,7 @@ class QTadsSound: public QObject {
 
 	virtual
 	~QTadsSound();
+#endif
 
 	// The SDL_Mixer callback for when a sound finished playing.
 	static void callback( int channel );

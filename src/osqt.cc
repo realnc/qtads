@@ -812,14 +812,6 @@ os_get_sysinfo( int code, void* /*param*/, long* result )
 	  case SYSINFO_HTML:
 	  case SYSINFO_JPEG:
 	  case SYSINFO_PNG:
-	  case SYSINFO_WAV:
-	  case SYSINFO_MIDI:
-	  case SYSINFO_WAV_MIDI_OVL:
-	  case SYSINFO_WAV_OVL:
-	  case SYSINFO_MPEG:
-	  case SYSINFO_MPEG1:
-	  case SYSINFO_MPEG2:
-	  case SYSINFO_MPEG3:
 	  case SYSINFO_LINKS_HTTP:
 	  case SYSINFO_LINKS_FTP:
 	  case SYSINFO_LINKS_NEWS:
@@ -834,6 +826,21 @@ os_get_sysinfo( int code, void* /*param*/, long* result )
 	  case SYSINFO_TEXT_HILITE:
 	  case SYSINFO_BANNERS:
 		*result = 1;
+		break;
+
+	  case SYSINFO_WAV:
+	  case SYSINFO_MIDI:
+	  case SYSINFO_WAV_MIDI_OVL:
+	  case SYSINFO_WAV_OVL:
+	  case SYSINFO_MPEG:
+	  case SYSINFO_MPEG1:
+	  case SYSINFO_MPEG2:
+	  case SYSINFO_MPEG3:
+#ifndef Q_WS_ANDROID
+		*result = 1;
+#else
+		*result = 0;
+#endif
 		break;
 
 	  case SYSINFO_AUDIO_FADE:
