@@ -1,7 +1,7 @@
 TEMPLATE = app
 CONFIG += qt silent warn_off
 QT += network
-VERSION = 2.1.0.99
+VERSION = 2.1.1
 macx {
 	QMAKE_INFO_PLIST = Info.plist
 	QMAKE_LFLAGS += -F./Frameworks
