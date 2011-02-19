@@ -279,6 +279,10 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
 		while (reply->canReadLine() and text.length() < 2500) {
 			text.append(QString::fromUtf8(reply->readLine(100)));
 		}
+		// Remove that last newline.
+		if (text.endsWith(QString::fromAscii("\n"))) {
+			text.truncate(text.length() - 1);
+		}
 		if (text.length() > 2) {
 			msgBox->setDetailedText(text);
 		}
