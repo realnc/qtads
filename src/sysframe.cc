@@ -21,6 +21,7 @@
 #include <QStatusBar>
 #include <QDir>
 #include <QTextCodec>
+#include <QMessageBox>
 
 #include "qtadshostifc.h"
 #include "settings.h"
@@ -277,7 +278,7 @@ CHtmlSysFrameQt::fRunGame()
 			this->display_output(endMsg.toUtf8().constData(), endMsg.length());
 			this->flush_txtbuf(true, false);
 		} else {
-			qWarning() << finfo.fileName() << "is not a TADS game file.";
+			QMessageBox::critical(this->fMainWin, tr("Open Game"), finfo.fileName() + tr(" is not a TADS game file."));
 		}
 	}
 
