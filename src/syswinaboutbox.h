@@ -23,39 +23,39 @@
 /* We need special handling for the "About this game" box.
  */
 class CHtmlSysWinAboutBoxQt: public CHtmlSysWinQt {
-	Q_OBJECT
+    Q_OBJECT
 
   protected:
-	virtual void
-	keyPressEvent( QKeyEvent* e )
-	// It shouldn't be possible to do game input from the about box, so we
-	// bypass the inherited input handling and revert to the default.
-	{ QScrollArea::keyPressEvent(e); }
+    virtual void
+    keyPressEvent( QKeyEvent* e )
+    // It shouldn't be possible to do game input from the about box, so we
+    // bypass the inherited input handling and revert to the default.
+    { QScrollArea::keyPressEvent(e); }
 
-	virtual void
-	resizeEvent( QResizeEvent* e );
+    virtual void
+    resizeEvent( QResizeEvent* e );
 
-	virtual QSize
-	sizeHint() const;
+    virtual QSize
+    sizeHint() const;
 
   public:
-	CHtmlSysWinAboutBoxQt( class CHtmlFormatter* formatter, QWidget* parent );
+    CHtmlSysWinAboutBoxQt( class CHtmlFormatter* formatter, QWidget* parent );
 
-	// We have scrollbars always disabled, so we can report our own
-	// width/height rather than our viewport's.  We need to do that because
-	// the formatter needs to know our size before we become visible, and our
-	// viewport only reports a valid size after show() is called.
-	virtual long
-	get_disp_width()
-	{ return this->width(); }
+    // We have scrollbars always disabled, so we can report our own
+    // width/height rather than our viewport's.  We need to do that because
+    // the formatter needs to know our size before we become visible, and our
+    // viewport only reports a valid size after show() is called.
+    virtual long
+    get_disp_width()
+    { return this->width(); }
 
-	virtual long
-	get_disp_height()
-	{ return this->height(); }
+    virtual long
+    get_disp_height()
+    { return this->height(); }
 
-	virtual void
-	set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,
-					 long height, HTML_BannerWin_Units_t height_units, int use_height );
+    virtual void
+    set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,
+                     long height, HTML_BannerWin_Units_t height_units, int use_height );
 };
 
 

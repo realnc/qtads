@@ -22,49 +22,49 @@
 
 class Settings {
   public:
-	void
-	loadFromDisk();
+    void
+    loadFromDisk();
 
-	void
-	saveToDisk();
+    void
+    saveToDisk();
 
-	bool enableGraphics;
-	bool enableSoundEffects;
-	bool enableMusic;
-	bool enableLinks;
-	bool useSmoothScaling;
+    bool enableGraphics;
+    bool enableSoundEffects;
+    bool enableMusic;
+    bool enableLinks;
+    bool useSmoothScaling;
 
-	QColor mainTextColor;
-	QColor mainBgColor;
-	QColor bannerTextColor;
-	QColor bannerBgColor;
-	QColor inputColor;
+    QColor mainTextColor;
+    QColor mainBgColor;
+    QColor bannerTextColor;
+    QColor bannerBgColor;
+    QColor inputColor;
 
-	bool underlineLinks;
-	bool highlightLinks;
-	QColor unvisitedLinkColor;
-	QColor hoveringLinkColor;
-	QColor clickedLinkColor;
+    bool underlineLinks;
+    bool highlightLinks;
+    QColor unvisitedLinkColor;
+    QColor hoveringLinkColor;
+    QColor clickedLinkColor;
 
-	CHtmlSysFontQt mainFont;
-	CHtmlSysFontQt fixedFont;
-	CHtmlSysFontQt serifFont;
-	CHtmlSysFontQt sansFont;
-	CHtmlSysFontQt scriptFont;
-	CHtmlSysFontQt writerFont;
-	CHtmlSysFontQt inputFont;
-	bool useMainFontForInput;
+    CHtmlSysFontQt mainFont;
+    CHtmlSysFontQt fixedFont;
+    CHtmlSysFontQt serifFont;
+    CHtmlSysFontQt sansFont;
+    CHtmlSysFontQt scriptFont;
+    CHtmlSysFontQt writerFont;
+    CHtmlSysFontQt inputFont;
+    bool useMainFontForInput;
 
-	int ioSafetyLevel;
+    int ioSafetyLevel;
 
-	QByteArray tads2Encoding;
-	bool askForGameFile;
-	QString lastFileOpenDir;
+    QByteArray tads2Encoding;
+    bool askForGameFile;
+    QString lastFileOpenDir;
 
-	QStringList recentGamesList;
-	static const int recentGamesCapacity = 10;
+    QStringList recentGamesList;
+    static const int recentGamesCapacity = 10;
 
-	QSize appSize;
+    QSize appSize;
 };
 
 

@@ -27,99 +27,99 @@
  * Ogg Vorbis and MP3).
  */
 class QTadsSound: public QObject {
-	Q_OBJECT
+    Q_OBJECT
 
   public:
-	enum SoundType { WAV, OGG, MPEG };
+    enum SoundType { WAV, OGG, MPEG };
 
   private:
 #ifndef Q_WS_ANDROID
-	struct Mix_Chunk* fChunk;
-	int fChannel;
-	SoundType fType;
-	bool fPlaying;
-	int fFadeOut;
-	bool fCrossFade;
-	class QTimer* fFadeOutTimer;
-	QTime fTimePos;
+    struct Mix_Chunk* fChunk;
+    int fChannel;
+    SoundType fType;
+    bool fPlaying;
+    int fFadeOut;
+    bool fCrossFade;
+    class QTimer* fFadeOutTimer;
+    QTime fTimePos;
 
-	// TADS callback to invoke on stop.
-	void (*fDone_func)(void*, int repeat_count);
+    // TADS callback to invoke on stop.
+    void (*fDone_func)(void*, int repeat_count);
 
-	// CTX to pass to the TADS callback.
-	void* fDone_func_ctx;
+    // CTX to pass to the TADS callback.
+    void* fDone_func_ctx;
 
-	// How many times we repeated the sound.
-	int fRepeats;
+    // How many times we repeated the sound.
+    int fRepeats;
 
-	// How many times should we repeat the sound.
-	// 0 means repeat forever.
-	int fRepeatsWanted;
+    // How many times should we repeat the sound.
+    // 0 means repeat forever.
+    int fRepeatsWanted;
 
-	// Total length of the sound in milliseconds.
-	unsigned fLength;
+    // Total length of the sound in milliseconds.
+    unsigned fLength;
 
-	// All QTadsMediaObjects that currently exist.  We need this in order to
-	// implement the SDL_Mixer callback (which in turn needs to call the TADS
-	// callback) that is invoked after a channel has stopped playing.  That
-	// callback has to be a static member (C++ methods can't be C callbacks),
-	// and since there's no 'this' pointer in static member functions, it needs
-	// to invoke the TADS callback based on the channel number.
-	static QList<QTadsSound*> fObjList;
+    // All QTadsMediaObjects that currently exist.  We need this in order to
+    // implement the SDL_Mixer callback (which in turn needs to call the TADS
+    // callback) that is invoked after a channel has stopped playing.  That
+    // callback has to be a static member (C++ methods can't be C callbacks),
+    // and since there's no 'this' pointer in static member functions, it needs
+    // to invoke the TADS callback based on the channel number.
+    static QList<QTadsSound*> fObjList;
 
-	// We can't call SDL_mixer functions from inside an SDL_mixer callback, so
-	// we use the following method: when the sound stops and the callback gets
-	// called, we don't play it again (if it's looped) from inside the callback
-	// but emit a signal which connects to a slot which plays the sound one
-	// more time.
-	void
-	emitReadyToLoop()
-	{ emit readyToLoop(); }
+    // We can't call SDL_mixer functions from inside an SDL_mixer callback, so
+    // we use the following method: when the sound stops and the callback gets
+    // called, we don't play it again (if it's looped) from inside the callback
+    // but emit a signal which connects to a slot which plays the sound one
+    // more time.
+    void
+    emitReadyToLoop()
+    { emit readyToLoop(); }
 
-	void
-	emitReadyToFadeOut()
-	{ emit readyToFadeOut(); }
+    void
+    emitReadyToFadeOut()
+    { emit readyToFadeOut(); }
 
   private slots:
-	void
-	fDoFadeOut();
+    void
+    fDoFadeOut();
 
-	void
-	fDoLoop();
+    void
+    fDoLoop();
 
-	void
-	fPrepareFadeOut();
+    void
+    fPrepareFadeOut();
 
-	void
-	fDeleteTimer();
+    void
+    fDeleteTimer();
 
   signals:
-	void readyToLoop();
-	void readyToFadeOut();
+    void readyToLoop();
+    void readyToFadeOut();
 
   public:
-	QTadsSound( QObject* parent, struct Mix_Chunk* chunk, SoundType type );
+    QTadsSound( QObject* parent, struct Mix_Chunk* chunk, SoundType type );
 
-	virtual
-	~QTadsSound();
+    virtual
+    ~QTadsSound();
 #endif
 
-	// The SDL_Mixer callback for when a sound finished playing.
-	static void callback( int channel );
+    // The SDL_Mixer callback for when a sound finished playing.
+    static void callback( int channel );
 
-	int
-	startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
-				  int fadeIn, int fadeOut, bool crossFade );
+    int
+    startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
+                  int fadeIn, int fadeOut, bool crossFade );
 
-	void
-	cancelPlaying( bool sync, int fadeOut, bool fadeOutInBg );
+    void
+    cancelPlaying( bool sync, int fadeOut, bool fadeOutInBg );
 
-	void
-	addCrossFade( int ms );
+    void
+    addCrossFade( int ms );
 
-	static class CHtmlSysSound*
-	createSound( const class CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-				 unsigned long filesize, class CHtmlSysWin* win, SoundType type );
+    static class CHtmlSysSound*
+    createSound( const class CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
+                 unsigned long filesize, class CHtmlSysWin* win, SoundType type );
 };
 
 

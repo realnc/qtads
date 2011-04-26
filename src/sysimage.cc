@@ -31,96 +31,96 @@
  */
 static CHtmlSysResource*
 createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-					 unsigned long filesize, CHtmlSysWin* win, const QString& imageType )
+                     unsigned long filesize, CHtmlSysWin* win, const QString& imageType )
 {
-	//qDebug() << "Loading" << imageType << "image from" << filename << "at offset" << seekpos
-	//		<< "with size" << filesize << "url:" << url->get_url();
+    //qDebug() << "Loading" << imageType << "image from" << filename << "at offset" << seekpos
+    //      << "with size" << filesize << "url:" << url->get_url();
 
-	// Check if the file exists and is readable.
-	QFileInfo inf(QString::fromLocal8Bit(filename));
-	if (not inf.exists() or not inf.isReadable()) {
-		qWarning() << "ERROR:" << inf.filePath() << "doesn't exist or is unreadable";
-		return 0;
-	}
+    // Check if the file exists and is readable.
+    QFileInfo inf(QString::fromLocal8Bit(filename));
+    if (not inf.exists() or not inf.isReadable()) {
+        qWarning() << "ERROR:" << inf.filePath() << "doesn't exist or is unreadable";
+        return 0;
+    }
 
-	// Open the file and seek to the specified position.
-	QFile file(inf.filePath());
-	if (not file.open(QIODevice::ReadOnly)) {
-		qWarning() << "ERROR: Can't open file" << inf.filePath();
-		return 0;
-	}
-	if (not file.seek(seekpos)) {
-		qWarning() << "ERROR: Can't seek in file" << inf.filePath();
-		file.close();
-		return 0;
-	}
+    // Open the file and seek to the specified position.
+    QFile file(inf.filePath());
+    if (not file.open(QIODevice::ReadOnly)) {
+        qWarning() << "ERROR: Can't open file" << inf.filePath();
+        return 0;
+    }
+    if (not file.seek(seekpos)) {
+        qWarning() << "ERROR: Can't seek in file" << inf.filePath();
+        file.close();
+        return 0;
+    }
 
-	CHtmlSysResource* image;
-	// Better get an error at compile-time using static_cast rather than an
-	// abort at runtime using dynamic_cast.
-	QTadsImage* cast;
-	CHtmlSysImageMngQt* mngCast;
+    CHtmlSysResource* image;
+    // Better get an error at compile-time using static_cast rather than an
+    // abort at runtime using dynamic_cast.
+    QTadsImage* cast;
+    CHtmlSysImageMngQt* mngCast;
 
-	// Create an object of the appropriate class for the specified image type.
-	// Also cast the object to a QTadsImage so we can loadFromData() later on.
-	if (imageType == QString::fromAscii("JPG") or imageType == QString::fromAscii("JPEG")) {
-		image = new CHtmlSysImageJpegQt;
-		cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImageJpegQt*>(image));
-	} else if (imageType == QString::fromAscii("PNG")) {
-		image = new CHtmlSysImagePngQt;
-		cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImagePngQt*>(image));
-	} else if (imageType == QString::fromAscii("MNG")) {
-		image = new CHtmlSysImageMngQt;
-		mngCast = static_cast<CHtmlSysImageMngQt*>(image);
-	} else {
-		// TODO: Don't just abort but be graceful.
-		qFatal(Q_FUNC_INFO, "unknown image type.");
-	}
+    // Create an object of the appropriate class for the specified image type.
+    // Also cast the object to a QTadsImage so we can loadFromData() later on.
+    if (imageType == QString::fromAscii("JPG") or imageType == QString::fromAscii("JPEG")) {
+        image = new CHtmlSysImageJpegQt;
+        cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImageJpegQt*>(image));
+    } else if (imageType == QString::fromAscii("PNG")) {
+        image = new CHtmlSysImagePngQt;
+        cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImagePngQt*>(image));
+    } else if (imageType == QString::fromAscii("MNG")) {
+        image = new CHtmlSysImageMngQt;
+        mngCast = static_cast<CHtmlSysImageMngQt*>(image);
+    } else {
+        // TODO: Don't just abort but be graceful.
+        qFatal(Q_FUNC_INFO, "unknown image type.");
+    }
 
-	// Load the image data.
-	const QByteArray& data(file.read(filesize));
-	file.close();
-	if (data.isEmpty() or static_cast<unsigned long>(data.size()) < filesize) {
-		qWarning() << "ERROR: Could not read" << filesize << "bytes from file" << inf.filePath();
-		delete image;
-		return 0;
-	}
+    // Load the image data.
+    const QByteArray& data(file.read(filesize));
+    file.close();
+    if (data.isEmpty() or static_cast<unsigned long>(data.size()) < filesize) {
+        qWarning() << "ERROR: Could not read" << filesize << "bytes from file" << inf.filePath();
+        delete image;
+        return 0;
+    }
 
-	if (imageType == QString::fromAscii("MNG")) {
-		QBuffer* buf = new QBuffer(mngCast);
-		buf->setData(data);
-		buf->open(QBuffer::ReadOnly);
-		mngCast->setFormat("MNG");
-		mngCast->setDevice(buf);
-		mngCast->start();
-	} else if (not cast->loadFromData(data, imageType.toAscii())) {
-		qWarning() << "ERROR: Could not parse image data";
-		delete image;
-		return 0;
-	}
-	return image;
+    if (imageType == QString::fromAscii("MNG")) {
+        QBuffer* buf = new QBuffer(mngCast);
+        buf->setData(data);
+        buf->open(QBuffer::ReadOnly);
+        mngCast->setFormat("MNG");
+        mngCast->setDevice(buf);
+        mngCast->start();
+    } else if (not cast->loadFromData(data, imageType.toAscii())) {
+        qWarning() << "ERROR: Could not parse image data";
+        delete image;
+        return 0;
+    }
+    return image;
 }
 
 
 CHtmlSysResource*
 CHtmlSysImageJpeg::create_jpeg( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-								unsigned long filesize, CHtmlSysWin* win )
+                                unsigned long filesize, CHtmlSysWin* win )
 {
-	return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("JPG"));
+    return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("JPG"));
 }
 
 
 CHtmlSysResource*
 CHtmlSysImagePng::create_png( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-							  unsigned long filesize, CHtmlSysWin* win )
+                              unsigned long filesize, CHtmlSysWin* win )
 {
-	return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("PNG"));
+    return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("PNG"));
 }
 
 
 CHtmlSysResource*
 CHtmlSysImageMng::create_mng( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-							  unsigned long filesize, CHtmlSysWin* win )
+                              unsigned long filesize, CHtmlSysWin* win )
 {
-	return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("MNG"));
+    return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("MNG"));
 }

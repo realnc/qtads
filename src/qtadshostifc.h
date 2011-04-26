@@ -30,168 +30,168 @@
  */
 class QTadsHostIfc: public CVmHostIfc {
   private:
-	appctxdef* fAppctx;
-	int fIoSafety;
-	CResLoader* fCmapResLoader;
+    appctxdef* fAppctx;
+    int fIoSafety;
+    CResLoader* fCmapResLoader;
 
   public:
-	QTadsHostIfc( struct appctxdef* appctx )
-	: fAppctx(appctx), fIoSafety(VM_IO_SAFETY_READWRITE_CUR)
-	{
-		// TODO: Use the directory where charmap files are stored.
-		this->fCmapResLoader = new CResLoader("./");
-	}
+    QTadsHostIfc( struct appctxdef* appctx )
+    : fAppctx(appctx), fIoSafety(VM_IO_SAFETY_READWRITE_CUR)
+    {
+        // TODO: Use the directory where charmap files are stored.
+        this->fCmapResLoader = new CResLoader("./");
+    }
 
-	~QTadsHostIfc()
-	{
-		delete this->fCmapResLoader;
-	}
+    ~QTadsHostIfc()
+    {
+        delete this->fCmapResLoader;
+    }
 
-	//
-	// CVmHostIfc interface implementation.
-	//
-	virtual int
-	get_io_safety()
-	{
-		if (this->fAppctx != 0 and this->fAppctx->get_io_safety_level != 0) {
-			// Ask the app context to handle it.
-			return (*this->fAppctx->get_io_safety_level)(this->fAppctx->io_safety_level_ctx);
-		} else {
-			// The app context doesn't care - use our own level memory */
-			return this->fIoSafety;
-		}
-	}
+    //
+    // CVmHostIfc interface implementation.
+    //
+    virtual int
+    get_io_safety()
+    {
+        if (this->fAppctx != 0 and this->fAppctx->get_io_safety_level != 0) {
+            // Ask the app context to handle it.
+            return (*this->fAppctx->get_io_safety_level)(this->fAppctx->io_safety_level_ctx);
+        } else {
+            // The app context doesn't care - use our own level memory */
+            return this->fIoSafety;
+        }
+    }
 
-	virtual void
-	set_io_safety( int level )
-	{
-		if (this->fAppctx != 0 and this->fAppctx->set_io_safety_level != 0) {
-			// Let the app context handle it.
-			(*this->fAppctx->set_io_safety_level)(this->fAppctx->io_safety_level_ctx, level);
-		} else {
-			// The app doesn't care - set our own level memory.
-			this->fIoSafety = level;
-		}
-	}
+    virtual void
+    set_io_safety( int level )
+    {
+        if (this->fAppctx != 0 and this->fAppctx->set_io_safety_level != 0) {
+            // Let the app context handle it.
+            (*this->fAppctx->set_io_safety_level)(this->fAppctx->io_safety_level_ctx, level);
+        } else {
+            // The app doesn't care - set our own level memory.
+            this->fIoSafety = level;
+        }
+    }
 
-	virtual class CResLoader*
-	get_cmap_res_loader()
-	{ return this->fCmapResLoader; }
+    virtual class CResLoader*
+    get_cmap_res_loader()
+    { return this->fCmapResLoader; }
 
-	void
-	set_image_name( const char* fname )
-	{
-		// Pass it through the app context if possible.
-		if (this->fAppctx != 0 and this->fAppctx->set_game_name != 0) {
-			(*this->fAppctx->set_game_name)(this->fAppctx->set_game_name_ctx, fname);
-		}
-	}
+    void
+    set_image_name( const char* fname )
+    {
+        // Pass it through the app context if possible.
+        if (this->fAppctx != 0 and this->fAppctx->set_game_name != 0) {
+            (*this->fAppctx->set_game_name)(this->fAppctx->set_game_name_ctx, fname);
+        }
+    }
 
-	virtual void
-	set_res_dir( const char* fname )
-	{
-		// Pass it through the app context if possible.
-		if (this->fAppctx != 0 and this->fAppctx->set_res_dir != 0) {
-			(*this->fAppctx->set_res_dir)(this->fAppctx->set_res_dir_ctx, fname);
-		}
-	}
+    virtual void
+    set_res_dir( const char* fname )
+    {
+        // Pass it through the app context if possible.
+        if (this->fAppctx != 0 and this->fAppctx->set_res_dir != 0) {
+            (*this->fAppctx->set_res_dir)(this->fAppctx->set_res_dir_ctx, fname);
+        }
+    }
 
-	virtual int
-	add_resfile( const char* fname )
-	{
-		// Pass it through the app context if possible.
-		if (this->fAppctx != 0 and this->fAppctx->add_resfile != 0) {
-			return (*this->fAppctx->add_resfile)(this->fAppctx->add_resfile_ctx, fname);
-		} else {
-			return 0;
-		}
-	}
+    virtual int
+    add_resfile( const char* fname )
+    {
+        // Pass it through the app context if possible.
+        if (this->fAppctx != 0 and this->fAppctx->add_resfile != 0) {
+            return (*this->fAppctx->add_resfile)(this->fAppctx->add_resfile_ctx, fname);
+        } else {
+            return 0;
+        }
+    }
 
-	// We suport add_resfile() if the application context does.
-	virtual int
-	can_add_resfiles()
-	{
-		// If the add_resfile function is defined in the application context,
-		// we support adding resource files.
-		return (this->fAppctx != 0 and this->fAppctx->add_resfile != 0);
-	}
+    // We suport add_resfile() if the application context does.
+    virtual int
+    can_add_resfiles()
+    {
+        // If the add_resfile function is defined in the application context,
+        // we support adding resource files.
+        return (this->fAppctx != 0 and this->fAppctx->add_resfile != 0);
+    }
 
-	virtual void
-	add_resource( unsigned long ofs, unsigned long siz, const char* res_name, size_t res_name_len, int fileno )
-	{
-		// Pass it through the app context if possible.
-		if (this->fAppctx != 0 and this->fAppctx->add_resource != 0) {
-			(*this->fAppctx->add_resource)(this->fAppctx->add_resource_ctx, ofs, siz, res_name, res_name_len, fileno);
-		}
-	}
+    virtual void
+    add_resource( unsigned long ofs, unsigned long siz, const char* res_name, size_t res_name_len, int fileno )
+    {
+        // Pass it through the app context if possible.
+        if (this->fAppctx != 0 and this->fAppctx->add_resource != 0) {
+            (*this->fAppctx->add_resource)(this->fAppctx->add_resource_ctx, ofs, siz, res_name, res_name_len, fileno);
+        }
+    }
 
-	virtual void
-	add_resource( const char* fname, size_t fname_len, const char* res_name, size_t res_name_len)
-	{
-		// Pass it through the app context if possible.
-		if (this->fAppctx != 0 and this->fAppctx->add_resource_link != 0) {
-			(*this->fAppctx->add_resource_link)
-					(this->fAppctx->add_resource_link_ctx, fname, fname_len, res_name, res_name_len);
-		}
-	}
+    virtual void
+    add_resource( const char* fname, size_t fname_len, const char* res_name, size_t res_name_len)
+    {
+        // Pass it through the app context if possible.
+        if (this->fAppctx != 0 and this->fAppctx->add_resource_link != 0) {
+            (*this->fAppctx->add_resource_link)
+                    (this->fAppctx->add_resource_link_ctx, fname, fname_len, res_name, res_name_len);
+        }
+    }
 
-	virtual const char*
-	get_res_path()
-	{
-		// Get the path from the app context if possible.
-		return (this->fAppctx != 0 ? this->fAppctx->ext_res_path : 0);
-	}
+    virtual const char*
+    get_res_path()
+    {
+        // Get the path from the app context if possible.
+        return (this->fAppctx != 0 ? this->fAppctx->ext_res_path : 0);
+    }
 
-	// Determine if a resource exists.
-	virtual int
-	resfile_exists( const char* res_name, size_t res_name_len )
-	{
-		// Let the application context handle it if possible; if not, just
-		// return false, since we can't otherwise provide resource operations.
-		if (this->fAppctx != 0 and this->fAppctx->resfile_exists != 0) {
-			return (*this->fAppctx->resfile_exists)(this->fAppctx->resfile_exists_ctx, res_name, res_name_len);
-		} else {
-			return false;
-		}
-	}
+    // Determine if a resource exists.
+    virtual int
+    resfile_exists( const char* res_name, size_t res_name_len )
+    {
+        // Let the application context handle it if possible; if not, just
+        // return false, since we can't otherwise provide resource operations.
+        if (this->fAppctx != 0 and this->fAppctx->resfile_exists != 0) {
+            return (*this->fAppctx->resfile_exists)(this->fAppctx->resfile_exists_ctx, res_name, res_name_len);
+        } else {
+            return false;
+        }
+    }
 
-	virtual osfildef*
-	find_resource( const char* res_name, size_t res_name_len, unsigned long* res_size )
-	{
-		// Let the application context handle it; if we don't have an
-		// application context, we don't provide resource operation, so simply
-		// return failure.
-		if (this->fAppctx != 0 and this->fAppctx->find_resource != 0) {
-			return (*this->fAppctx->find_resource)(this->fAppctx->find_resource_ctx, res_name, res_name_len, res_size);
-		} else {
-			return 0;
-		}
-	}
+    virtual osfildef*
+    find_resource( const char* res_name, size_t res_name_len, unsigned long* res_size )
+    {
+        // Let the application context handle it; if we don't have an
+        // application context, we don't provide resource operation, so simply
+        // return failure.
+        if (this->fAppctx != 0 and this->fAppctx->find_resource != 0) {
+            return (*this->fAppctx->find_resource)(this->fAppctx->find_resource_ctx, res_name, res_name_len, res_size);
+        } else {
+            return 0;
+        }
+    }
 
-	virtual vmhost_gin_t
-	get_image_name( char* buf, size_t buflen )
-	{
-		// Let the application context handle it if possible; otherwise, return
-		// false, since we can't otherwise ask for an image name.
-		if (this->fAppctx != 0 and this->fAppctx->get_game_name != 0) {
-			// Ask the host system to get a name.
-			int ret = (*this->fAppctx->get_game_name)(this->fAppctx->get_game_name_ctx, buf, buflen);
+    virtual vmhost_gin_t
+    get_image_name( char* buf, size_t buflen )
+    {
+        // Let the application context handle it if possible; otherwise, return
+        // false, since we can't otherwise ask for an image name.
+        if (this->fAppctx != 0 and this->fAppctx->get_game_name != 0) {
+            // Ask the host system to get a name.
+            int ret = (*this->fAppctx->get_game_name)(this->fAppctx->get_game_name_ctx, buf, buflen);
 
-			// If that failed, the user must have chosen to cancel; otherwise,
-			// we were successful.
-			return (ret ? VMHOST_GIN_SUCCESS : VMHOST_GIN_CANCEL);
-		} else {
-			// We can't ask for a name.
-			return VMHOST_GIN_IGNORED;
-		}
-	}
+            // If that failed, the user must have chosen to cancel; otherwise,
+            // we were successful.
+            return (ret ? VMHOST_GIN_SUCCESS : VMHOST_GIN_CANCEL);
+        } else {
+            // We can't ask for a name.
+            return VMHOST_GIN_IGNORED;
+        }
+    }
 
-	// Get a special file system path.
-	virtual void
-	get_special_file_path( char* buf, size_t buflen, int id )
-	{
-		return os_get_special_path(buf, buflen, 0, id);
-	}
+    // Get a special file system path.
+    virtual void
+    get_special_file_path( char* buf, size_t buflen, int id )
+    {
+        return os_get_special_path(buf, buflen, 0, id);
+    }
 };
 
 

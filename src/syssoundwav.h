@@ -28,36 +28,36 @@
  * about this class.
  */
 class CHtmlSysSoundWavQt: public QTadsSound, public CHtmlSysSoundWav {
-	Q_OBJECT
+    Q_OBJECT
 
   public:
 #ifndef Q_WS_ANDROID
-	CHtmlSysSoundWavQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
-	: QTadsSound(parent, chunk, type)
-	{ }
+    CHtmlSysSoundWavQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
+    : QTadsSound(parent, chunk, type)
+    { }
 #endif
 
-	//
-	// CHtmlSysSoundWav interface implementation.
-	//
-	virtual int
-	play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
-				const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade );
+    //
+    // CHtmlSysSoundWav interface implementation.
+    //
+    virtual int
+    play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+                const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade );
 
-	virtual void
-	add_crossfade( CHtmlSysWin* win, long ms );
+    virtual void
+    add_crossfade( CHtmlSysWin* win, long ms );
 
-	virtual void
-	cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg );
+    virtual void
+    cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg );
 
-	virtual int
-	maybe_suspend( CHtmlSysSound* )
-	// We always return false since we have no limitation regarding the amount
-	// of sounds we can play simultaneously.
-	{ return false; }
+    virtual int
+    maybe_suspend( CHtmlSysSound* )
+    // We always return false since we have no limitation regarding the amount
+    // of sounds we can play simultaneously.
+    { return false; }
 
-	virtual void
-	resume();
+    virtual void
+    resume();
 };
 
 

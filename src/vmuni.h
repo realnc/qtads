@@ -41,38 +41,38 @@
 inline unsigned char
 t3_get_chartype( wchar_t ch )
 {
-	const QChar c(ch);
+    const QChar c(ch);
 
-	switch(c.category()) {
-	  case QChar::Number_DecimalDigit:
-		return T3_CTYPE_DIGIT;
+    switch(c.category()) {
+      case QChar::Number_DecimalDigit:
+        return T3_CTYPE_DIGIT;
 
-	  case QChar::Separator_Space:
-		return T3_CTYPE_SPACE;
+      case QChar::Separator_Space:
+        return T3_CTYPE_SPACE;
 
-	  case QChar::Letter_Uppercase:
-		return T3_CTYPE_UPPER;
+      case QChar::Letter_Uppercase:
+        return T3_CTYPE_UPPER;
 
-	  case QChar::Letter_Lowercase:
-		return T3_CTYPE_LOWER;
+      case QChar::Letter_Lowercase:
+        return T3_CTYPE_LOWER;
 
-	  case QChar::Letter_Titlecase:
-	  case QChar::Letter_Modifier:
-	  case QChar::Letter_Other:
-		return T3_CTYPE_ALPHA;
+      case QChar::Letter_Titlecase:
+      case QChar::Letter_Modifier:
+      case QChar::Letter_Other:
+        return T3_CTYPE_ALPHA;
 
-	  case QChar::Punctuation_Connector:
-	  case QChar::Punctuation_Dash:
-	  case QChar::Punctuation_Open:
-	  case QChar::Punctuation_Close:
-	  case QChar::Punctuation_InitialQuote:
-	  case QChar::Punctuation_FinalQuote:
-	  case QChar::Punctuation_Other:
-		return T3_CTYPE_PUNCT;
+      case QChar::Punctuation_Connector:
+      case QChar::Punctuation_Dash:
+      case QChar::Punctuation_Open:
+      case QChar::Punctuation_Close:
+      case QChar::Punctuation_InitialQuote:
+      case QChar::Punctuation_FinalQuote:
+      case QChar::Punctuation_Other:
+        return T3_CTYPE_PUNCT;
 
-	  default:
-		return T3_CTYPE_NONE;
-	}
+      default:
+        return T3_CTYPE_NONE;
+    }
 }
 
 /* Alphabetic?
@@ -80,7 +80,7 @@ t3_get_chartype( wchar_t ch )
 inline int
 t3_is_alpha( wchar_t ch )
 {
-	return QChar(ch).isLetter();
+    return QChar(ch).isLetter();
 }
 
 /* Uppercase?
@@ -88,7 +88,7 @@ t3_is_alpha( wchar_t ch )
 inline int
 t3_is_upper( wchar_t ch )
 {
-	return QChar(ch).category() == QChar::Letter_Uppercase;
+    return QChar(ch).category() == QChar::Letter_Uppercase;
 }
 
 /* Lowercase?
@@ -96,7 +96,7 @@ t3_is_upper( wchar_t ch )
 inline int
 t3_is_lower( wchar_t ch )
 {
-	return QChar(ch).category() == QChar::Letter_Lowercase;
+    return QChar(ch).category() == QChar::Letter_Lowercase;
 }
 
 /* Digit?
@@ -104,7 +104,7 @@ t3_is_lower( wchar_t ch )
 inline int
 t3_is_digit( wchar_t ch )
 {
-	return QChar(ch).isDigit();
+    return QChar(ch).isDigit();
 }
 
 /* Whitespace?
@@ -112,8 +112,8 @@ t3_is_digit( wchar_t ch )
 inline int
 t3_is_space( wchar_t ch )
 {
-	// *Not* QChar.isSpace(), as it includes vertical space.
-	return QChar(ch).category() == QChar::Separator_Space;
+    // *Not* QChar.isSpace(), as it includes vertical space.
+    return QChar(ch).category() == QChar::Separator_Space;
 }
 
 /* Punctuation?
@@ -121,7 +121,7 @@ t3_is_space( wchar_t ch )
 inline int
 t3_is_punct( wchar_t ch )
 {
-	return QChar(ch).isPunct();
+    return QChar(ch).isPunct();
 }
 
 /* Convert to upper case.
@@ -129,7 +129,7 @@ t3_is_punct( wchar_t ch )
 inline wchar_t
 t3_to_upper( wchar_t ch )
 {
-	return QChar::toUpper(sizeof(ch) > 2 ? static_cast<uint>(ch) : static_cast<ushort>(ch));
+    return QChar::toUpper(sizeof(ch) > 2 ? static_cast<uint>(ch) : static_cast<ushort>(ch));
 }
 
 /* Convert to lower case.
@@ -137,7 +137,7 @@ t3_to_upper( wchar_t ch )
 inline wchar_t
 t3_to_lower( wchar_t ch )
 {
-	return QChar::toLower(sizeof(ch) > 2 ? static_cast<uint>(ch) : static_cast<ushort>(ch));
+    return QChar::toLower(sizeof(ch) > 2 ? static_cast<uint>(ch) : static_cast<ushort>(ch));
 }
 
 #endif // VMUNI_H

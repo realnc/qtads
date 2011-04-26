@@ -29,307 +29,307 @@
  * about this class.
  */
 class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
-	Q_OBJECT
+    Q_OBJECT
 
   private:
-	// Preferences (fonts, colors, etc.)
-	class Settings* fSettings;
+    // Preferences (fonts, colors, etc.)
+    class Settings* fSettings;
 
-	// Tads2 application container context.
-	appctxdef fAppctx;
+    // Tads2 application container context.
+    appctxdef fAppctx;
 
-	// Tads3 host and client services interfaces.
-	class CVmHostIfc* fHostifc;
-	class CVmMainClientConsole* fClientifc;
+    // Tads3 host and client services interfaces.
+    class CVmHostIfc* fHostifc;
+    class CVmMainClientConsole* fClientifc;
 
-	class CHtmlTextBuffer fBuffer;
+    class CHtmlTextBuffer fBuffer;
 
-	// Main window.
-	class CHtmlSysWinGroupQt* fMainWin;
+    // Main window.
+    class CHtmlSysWinGroupQt* fMainWin;
 
-	// Main HTML window.
-	class CHtmlSysWinInputQt* fGameWin;
+    // Main HTML window.
+    class CHtmlSysWinInputQt* fGameWin;
 
-	// Tads HTML parser.
-	class CHtmlParser* fParser;
+    // Tads HTML parser.
+    class CHtmlParser* fParser;
 
-	// Tads HTML formatter for the main game window.
-	class CHtmlFormatterInput* fFormatter;
+    // Tads HTML formatter for the main game window.
+    class CHtmlFormatterInput* fFormatter;
 
-	// List of banners.
-	QList<class CHtmlSysWinQt*> fBannerList;
+    // List of banners.
+    QList<class CHtmlSysWinQt*> fBannerList;
 
-	// List of orphaned banners.
-	QList<class CHtmlFormatterBannerExt*> fOrhpanBannerList;
+    // List of orphaned banners.
+    QList<class CHtmlFormatterBannerExt*> fOrhpanBannerList;
 
-	// Fonts we created. We keep a list of every font we created since we're
-	// responsible for deleting them when they're no longer needed.
-	QList<class CHtmlSysFontQt*> fFontList;
+    // Fonts we created. We keep a list of every font we created since we're
+    // responsible for deleting them when they're no longer needed.
+    QList<class CHtmlSysFontQt*> fFontList;
 
-	// Are we currently executing a game?
-	bool fGameRunning;
+    // Are we currently executing a game?
+    bool fGameRunning;
 
-	// Filename of the game we're currently executing.
-	QString fGameFile;
+    // Filename of the game we're currently executing.
+    QString fGameFile;
 
-	// Is the game we're currently running (if we're running one) a Tads 3
-	// game?
-	bool fTads3;
+    // Is the game we're currently running (if we're running one) a Tads 3
+    // game?
+    bool fTads3;
 
-	// The game we should try to run after the current one ends.
-	QString fNextGame;
+    // The game we should try to run after the current one ends.
+    QString fNextGame;
 
-	// Is there a reformat pending?
-	bool fReformatPending;
+    // Is there a reformat pending?
+    bool fReformatPending;
 
-	// Current input font color.
-	HTML_color_t fInputColor;
+    // Current input font color.
+    HTML_color_t fInputColor;
 
-	// Are we in non-stop mode?
-	bool fNonStopMode;
+    // Are we in non-stop mode?
+    bool fNonStopMode;
 
-	// Run the game file contained in fNextGame.
-	void
-	fRunGame();
+    // Run the game file contained in fNextGame.
+    void
+    fRunGame();
 
-	void
-	fRunT2Game( const QString& fname );
+    void
+    fRunT2Game( const QString& fname );
 
-	void
-	fRunT3Game( const QString& fname );
+    void
+    fRunT3Game( const QString& fname );
 
 #ifdef Q_WS_MAC
   protected:
-	// On the Mac, dropping a file on our application icon will generate a
-	// FileOpen event, so we override this to be able to handle it.
-	virtual bool
-	event( QEvent* );
+    // On the Mac, dropping a file on our application icon will generate a
+    // FileOpen event, so we override this to be able to handle it.
+    virtual bool
+    event( QEvent* );
 #endif
 
-	// appctx callback for getting the current I/O safety level.
-	static int
-	fCtxGetIOSafetyLevel( void* );
+    // appctx callback for getting the current I/O safety level.
+    static int
+    fCtxGetIOSafetyLevel( void* );
 
   signals:
-	// Emitted just prior to starting a game.  The game has not started yet
-	// when this is emitted.
-	void gameStarting();
+    // Emitted just prior to starting a game.  The game has not started yet
+    // when this is emitted.
+    void gameStarting();
 
-	// Emitted prior to quitting a game.  The game has not quit yet when this
-	// is emitted.
-	void gameQuitting();
+    // Emitted prior to quitting a game.  The game has not quit yet when this
+    // is emitted.
+    void gameQuitting();
 
-	// Emitted after quiting a game.  The game has already quit when this is
-	// emitted.
-	void gameHasQuit();
+    // Emitted after quiting a game.  The game has already quit when this is
+    // emitted.
+    void gameHasQuit();
 
   public slots:
-	// Replacement for main().  We need this so that we can start the Tads VM
-	// after the QApplication main event loop has started.
-	void
-	main( QString gameFileName );
+    // Replacement for main().  We need this so that we can start the Tads VM
+    // after the QApplication main event loop has started.
+    void
+    main( QString gameFileName );
 
   public:
-	CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
-					 const char* orgDomain );
+    CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
+                     const char* orgDomain );
 
-	virtual
-	~CHtmlSysFrameQt();
+    virtual
+    ~CHtmlSysFrameQt();
 
-	class Settings*
-	settings()
-	{ return this->fSettings; }
+    class Settings*
+    settings()
+    { return this->fSettings; }
 
-	class CHtmlSysWinInputQt*
-	gameWindow()
-	{ return this->fGameWin; }
+    class CHtmlSysWinInputQt*
+    gameWindow()
+    { return this->fGameWin; }
 
-	const QList<class CHtmlSysWinQt*>&
-	bannerList()
-	{ return this->fBannerList; }
+    const QList<class CHtmlSysWinQt*>&
+    bannerList()
+    { return this->fBannerList; }
 
-	HTML_color_t
-	inputColor()
-	{ return this->fInputColor; }
+    HTML_color_t
+    inputColor()
+    { return this->fInputColor; }
 
-	void
-	inputColor( HTML_color_t color )
-	{ this->fInputColor = color; }
+    void
+    inputColor( HTML_color_t color )
+    { this->fInputColor = color; }
 
-	CHtmlSysFontQt*
-	createFont( const CHtmlFontDesc* font_desc );
+    CHtmlSysFontQt*
+    createFont( const CHtmlFontDesc* font_desc );
 
-	bool
-	gameRunning()
-	{ return this->fGameRunning; }
+    bool
+    gameRunning()
+    { return this->fGameRunning; }
 
-	const QString&
-	gameFile()
-	{ return this->fGameFile; }
+    const QString&
+    gameFile()
+    { return this->fGameFile; }
 
-	void
-	setGameRunning( bool f )
-	{
-		this->fGameRunning = f;
-		if (f == false) {
-			emit gameQuitting();
-		}
-	}
+    void
+    setGameRunning( bool f )
+    {
+        this->fGameRunning = f;
+        if (f == false) {
+            emit gameQuitting();
+        }
+    }
 
-	void
-	setNextGame( const QString& fname )
-	{
-		this->fNextGame = fname;
-		// If no game is currently executing, run it now. Otherwise, end the
-		// current game.
-		if (not this->fGameRunning) {
-			this->fRunGame();
-		} else {
-			this->setGameRunning(false);
-		}
-	}
+    void
+    setNextGame( const QString& fname )
+    {
+        this->fNextGame = fname;
+        // If no game is currently executing, run it now. Otherwise, end the
+        // current game.
+        if (not this->fGameRunning) {
+            this->fRunGame();
+        } else {
+            this->setGameRunning(false);
+        }
+    }
 
-	bool
-	tads3()
-	{ return this->fTads3; }
+    bool
+    tads3()
+    { return this->fTads3; }
 
-	bool
-	nonStopMode()
-	{ return this->fNonStopMode; }
+    bool
+    nonStopMode()
+    { return this->fNonStopMode; }
 
-	// Recalculate and adjust the sizes of all HTML banners.
-	void
-	adjustBannerSizes();
+    // Recalculate and adjust the sizes of all HTML banners.
+    void
+    adjustBannerSizes();
 
-	// Reformat all HTML banners.
-	void
-	reformatBanners( bool showStatus, bool freezeDisplay, bool resetSounds );
+    // Reformat all HTML banners.
+    void
+    reformatBanners( bool showStatus, bool freezeDisplay, bool resetSounds );
 
-	// Schedule a reformat.
-	void
-	scheduleReformat()
-	{ this->fReformatPending = true; }
+    // Schedule a reformat.
+    void
+    scheduleReformat()
+    { this->fReformatPending = true; }
 
-	// Prune the main window's parse tree, if we're using too much memory.
-	// This should be called before getting user input; we'll check to see how
-	// much memory the parse tree is taking up, and cut it down a bit if it's
-	// too big.
-	// TODO: Implement configurable max memory size.
-	void
-	pruneParseTree();
+    // Prune the main window's parse tree, if we're using too much memory.
+    // This should be called before getting user input; we'll check to see how
+    // much memory the parse tree is taking up, and cut it down a bit if it's
+    // too big.
+    // TODO: Implement configurable max memory size.
+    void
+    pruneParseTree();
 
-	// Notify the application that preferences have changed.
-	void
-	notifyPreferencesChange( const class Settings* sett );
+    // Notify the application that preferences have changed.
+    void
+    notifyPreferencesChange( const class Settings* sett );
 
-	// Advance the event loop.
-	void
-	advanceEventLoop( QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents )
-	{
-		// Guard against re-entrancy.
-		static bool working = false;
-		if (working) {
-			return;
-		}
-		working = true;
+    // Advance the event loop.
+    void
+    advanceEventLoop( QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents )
+    {
+        // Guard against re-entrancy.
+        static bool working = false;
+        if (working) {
+            return;
+        }
+        working = true;
 
-		// DeferredDelete events need to be dispatched manually, since we don't
-		// return to the main event loop while a game is running.
+        // DeferredDelete events need to be dispatched manually, since we don't
+        // return to the main event loop while a game is running.
 #ifndef Q_WS_MAC
-		// On OS X, this causes CPU utilization to go through the roof.  Not
-		// sure why.  Disable this for now on OS X until further information
-		// is available on this.
-		this->sendPostedEvents(0, QEvent::DeferredDelete);
+        // On OS X, this causes CPU utilization to go through the roof.  Not
+        // sure why.  Disable this for now on OS X until further information
+        // is available on this.
+        this->sendPostedEvents(0, QEvent::DeferredDelete);
 #endif
-		this->sendPostedEvents();
-		this->processEvents(flags);
-		this->sendPostedEvents();
-		working = false;
-	}
+        this->sendPostedEvents();
+        this->processEvents(flags);
+        this->sendPostedEvents();
+        working = false;
+    }
 
-	// Advance the event loop with a timeout.
-	void
-	advanceEventLoop( QEventLoop::ProcessEventsFlags flags, int maxtime )
-	{
-		// Guard against re-entrancy.
-		static bool working = false;
-		if (working) {
-			return;
-		}
-		working = true;
+    // Advance the event loop with a timeout.
+    void
+    advanceEventLoop( QEventLoop::ProcessEventsFlags flags, int maxtime )
+    {
+        // Guard against re-entrancy.
+        static bool working = false;
+        if (working) {
+            return;
+        }
+        working = true;
 
 #ifndef Q_WS_MAC
-		this->sendPostedEvents(0, QEvent::DeferredDelete);
+        this->sendPostedEvents(0, QEvent::DeferredDelete);
 #endif
-		this->sendPostedEvents();
-		this->processEvents(flags, maxtime);
-		this->sendPostedEvents();
-		working = false;
-	}
+        this->sendPostedEvents();
+        this->processEvents(flags, maxtime);
+        this->sendPostedEvents();
+        working = false;
+    }
 
-	//
-	// CHtmlSysFrame interface implementation.
-	//
-	virtual void
-	flush_txtbuf( int fmt, int immediate_redraw );
+    //
+    // CHtmlSysFrame interface implementation.
+    //
+    virtual void
+    flush_txtbuf( int fmt, int immediate_redraw );
 
-	virtual class CHtmlParser*
-	get_parser()
-	{ return this->fParser; }
+    virtual class CHtmlParser*
+    get_parser()
+    { return this->fParser; }
 
-	virtual void
-	start_new_page();
+    virtual void
+    start_new_page();
 
-	virtual void
-	set_nonstop_mode( int flag );
+    virtual void
+    set_nonstop_mode( int flag );
 
-	virtual void
-	display_output( const textchar_t* buf, size_t len );
+    virtual void
+    display_output( const textchar_t* buf, size_t len );
 
-	virtual int
-	check_break_key();
+    virtual int
+    check_break_key();
 
-	virtual int
-	get_input( textchar_t* buf, size_t bufsiz );
+    virtual int
+    get_input( textchar_t* buf, size_t bufsiz );
 
-	virtual int
-	get_input_timeout( textchar_t* buf, size_t buflen, unsigned long timeout, int use_timeout );
+    virtual int
+    get_input_timeout( textchar_t* buf, size_t buflen, unsigned long timeout, int use_timeout );
 
-	virtual void
-	get_input_cancel( int reset );
+    virtual void
+    get_input_cancel( int reset );
 
-	virtual int
-	get_input_event( unsigned long ms, int use_timeout, os_event_info_t* info );
+    virtual int
+    get_input_event( unsigned long ms, int use_timeout, os_event_info_t* info );
 
-	virtual textchar_t
-	wait_for_keystroke( int pause_only );
+    virtual textchar_t
+    wait_for_keystroke( int pause_only );
 
-	virtual void
-	pause_for_exit();
+    virtual void
+    pause_for_exit();
 
-	virtual void
-	pause_for_more();
+    virtual void
+    pause_for_more();
 
-	virtual void
-	dbg_print( const char* msg );
+    virtual void
+    dbg_print( const char* msg );
 
-	virtual class CHtmlSysWin*
-	create_banner_window( class CHtmlSysWin* parent, HTML_BannerWin_Type_t window_type,
-						  class CHtmlFormatter* formatter, int where, class CHtmlSysWin* other,
-						  HTML_BannerWin_Pos_t pos, unsigned long style );
+    virtual class CHtmlSysWin*
+    create_banner_window( class CHtmlSysWin* parent, HTML_BannerWin_Type_t window_type,
+                          class CHtmlFormatter* formatter, int where, class CHtmlSysWin* other,
+                          HTML_BannerWin_Pos_t pos, unsigned long style );
 
-	virtual void
-	orphan_banner_window( class CHtmlFormatterBannerExt* banner );
+    virtual void
+    orphan_banner_window( class CHtmlFormatterBannerExt* banner );
 
-	virtual CHtmlSysWin*
-	create_aboutbox_window( class CHtmlFormatter* formatter );
+    virtual CHtmlSysWin*
+    create_aboutbox_window( class CHtmlFormatter* formatter );
 
-	virtual void
-	remove_banner_window( CHtmlSysWin* win );
+    virtual void
+    remove_banner_window( CHtmlSysWin* win );
 
-	virtual int
-	get_exe_resource( const textchar_t* resname, size_t resnamelen, textchar_t* fname_buf, size_t fname_buf_len,
-					  unsigned long* seek_pos, unsigned long* siz );
+    virtual int
+    get_exe_resource( const textchar_t* resname, size_t resnamelen, textchar_t* fname_buf, size_t fname_buf_len,
+                      unsigned long* seek_pos, unsigned long* siz );
 };
 
 

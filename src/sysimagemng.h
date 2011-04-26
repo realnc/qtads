@@ -30,67 +30,67 @@
  * about this class.
  */
 class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
-	Q_OBJECT
+    Q_OBJECT
 
   private:
-	CHtmlSysImageDisplaySite* fDispSite;
+    CHtmlSysImageDisplaySite* fDispSite;
 
   private slots:
-	void
-	updateDisplay( const QRect& rect )
-	{
-		if (this->fDispSite != 0) {
-			this->fDispSite->dispsite_inval(rect.x(), rect.y(), rect.width(), rect.height());
-		}
-	}
+    void
+    updateDisplay( const QRect& rect )
+    {
+        if (this->fDispSite != 0) {
+            this->fDispSite->dispsite_inval(rect.x(), rect.y(), rect.width(), rect.height());
+        }
+    }
 
   public:
-	CHtmlSysImageMngQt()
-	: fDispSite(0)
-	{ connect(this, SIGNAL(updated(QRect)), this, SLOT(updateDisplay(QRect))); }
+    CHtmlSysImageMngQt()
+    : fDispSite(0)
+    { connect(this, SIGNAL(updated(QRect)), this, SLOT(updateDisplay(QRect))); }
 
-	//
-	// CHtmlSysImageMng interface implementation.
-	//
-	virtual void
-	set_display_site ( CHtmlSysImageDisplaySite* dispSite )
-	{ this->fDispSite = dispSite; }
+    //
+    // CHtmlSysImageMng interface implementation.
+    //
+    virtual void
+    set_display_site ( CHtmlSysImageDisplaySite* dispSite )
+    { this->fDispSite = dispSite; }
 
-	virtual void
-	cancel_playback()
-	{ this->stop(); }
+    virtual void
+    cancel_playback()
+    { this->stop(); }
 
-	virtual void
-	pause_playback()
-	{ this->setPaused(true); }
+    virtual void
+    pause_playback()
+    { this->setPaused(true); }
 
-	virtual void
-	resume_playback()
-	{ this->setPaused(false); }
+    virtual void
+    resume_playback()
+    { this->setPaused(false); }
 
-	virtual void
-	draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
-	{ QTadsImage(this->currentImage()).drawFromPaintEvent(win, pos, mode); }
+    virtual void
+    draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
+    { QTadsImage(this->currentImage()).drawFromPaintEvent(win, pos, mode); }
 
-	virtual unsigned long
-	get_width() const
-	{ return this->frameRect().width(); }
+    virtual unsigned long
+    get_width() const
+    { return this->frameRect().width(); }
 
-	virtual unsigned long
-	get_height() const
-	{ return this->frameRect().height(); }
+    virtual unsigned long
+    get_height() const
+    { return this->frameRect().height(); }
 
-	virtual int
-	map_palette( CHtmlSysWin* win, int foreground )
-	{ return false; }
+    virtual int
+    map_palette( CHtmlSysWin* win, int foreground )
+    { return false; }
 
-	virtual void
-	notify_timer()
-	{ qDebug() << Q_FUNC_INFO; }
+    virtual void
+    notify_timer()
+    { qDebug() << Q_FUNC_INFO; }
 
-	virtual void
-	notify_image_change( int x, int y, int wid, int ht )
-	{ qDebug() << Q_FUNC_INFO; }
+    virtual void
+    notify_image_change( int x, int y, int wid, int ht )
+    { qDebug() << Q_FUNC_INFO; }
 };
 
 

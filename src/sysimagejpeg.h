@@ -28,24 +28,24 @@
  */
 class CHtmlSysImageJpegQt: public QTadsImage, public CHtmlSysImageJpeg {
   public:
-	//
-	// CHtmlSysImageJpeg interface implementation.
-	//
-	virtual void
-	draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
-	{ QTadsImage::drawFromPaintEvent(win, pos, mode); }
+    //
+    // CHtmlSysImageJpeg interface implementation.
+    //
+    virtual void
+    draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
+    { QTadsImage::drawFromPaintEvent(win, pos, mode); }
 
-	virtual unsigned long
-	get_width() const
-	{ return QTadsImage::width(); }
+    virtual unsigned long
+    get_width() const
+    { return QTadsImage::width(); }
 
-	virtual unsigned long
-	get_height() const
-	{ return QTadsImage::height(); }
+    virtual unsigned long
+    get_height() const
+    { return QTadsImage::height(); }
 
-	virtual int
-	map_palette( CHtmlSysWin* win, int foreground )
-	{ return false; }
+    virtual int
+    map_palette( CHtmlSysWin* win, int foreground )
+    { return false; }
 };
 
 

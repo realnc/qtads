@@ -152,7 +152,7 @@ QSize KColorButton::sizeHint() const
     QStyleOptionButton opt;
     d->initStyleOption(&opt);
     return style()->sizeFromContents(QStyle::CT_PushButton, &opt, QSize(40, 15), this).
-	  	expandedTo(QApplication::globalStrut());
+        expandedTo(QApplication::globalStrut());
 }
 
 QSize KColorButton::minimumSizeHint() const
@@ -160,7 +160,7 @@ QSize KColorButton::minimumSizeHint() const
     QStyleOptionButton opt;
     d->initStyleOption(&opt);
     return style()->sizeFromContents(QStyle::CT_PushButton, &opt, QSize(3, 3), this).
-	  	expandedTo(QApplication::globalStrut());
+        expandedTo(QApplication::globalStrut());
 }
 
 void KColorButton::dragEnterEvent( QDragEnterEvent *event)
@@ -180,12 +180,12 @@ void KColorButton::keyPressEvent( QKeyEvent *e )
 {
   if (e->matches(QKeySequence::Copy)) {
     QMimeData *mime=new QMimeData;
-	mime->setColorData(color());
+    mime->setColorData(color());
     QApplication::clipboard()->setMimeData( mime, QClipboard::Clipboard );
   }
   else if (e->matches(QKeySequence::Paste)) {
-	  const QColor& color =
-			  qvariant_cast<QColor>(QApplication::clipboard()->mimeData(QClipboard::Clipboard)->colorData());
+      const QColor& color =
+              qvariant_cast<QColor>(QApplication::clipboard()->mimeData(QClipboard::Clipboard)->colorData());
     setColor( color );
   }
   else
@@ -200,15 +200,15 @@ void KColorButton::mousePressEvent( QMouseEvent *e)
 
 void KColorButton::mouseMoveEvent( QMouseEvent *e)
 {
-	QPushButton::mouseMoveEvent(e);
+    QPushButton::mouseMoveEvent(e);
   if( (e->buttons() & Qt::LeftButton) &&
-	  (e->pos()-d->mPos).manhattanLength() > QApplication::startDragDistance() )
+      (e->pos()-d->mPos).manhattanLength() > QApplication::startDragDistance() )
   {
-	QDrag* drag = new QDrag(this);
-	QMimeData* mime = new QMimeData;
-	mime->setColorData(color());
-	drag->setMimeData(mime);
-	drag->exec(Qt::CopyAction);
+    QDrag* drag = new QDrag(this);
+    QMimeData* mime = new QMimeData;
+    mime->setColorData(color());
+    drag->setMimeData(mime);
+    drag->exec(Qt::CopyAction);
     setDown(false);
   }
 }
@@ -218,17 +218,17 @@ void KColorButton::KColorButtonPrivate::_k_chooseColor()
   QColor c = q->color();
   if ( m_bdefaultColor )
   {
-	  c = QColorDialog::getColor(m_defaultColor, q);
-	  if( c.isValid() ) {
-		  q->setColor( c );
-	  } else {
-		  q->setColor( m_defaultColor );
+      c = QColorDialog::getColor(m_defaultColor, q);
+      if( c.isValid() ) {
+          q->setColor( c );
+      } else {
+          q->setColor( m_defaultColor );
       }
   }
   else
   {
-	  c = QColorDialog::getColor(c, q);
-	  if(c.isValid()) {
+      c = QColorDialog::getColor(c, q);
+      if(c.isValid()) {
           q->setColor( c );
       }
   }

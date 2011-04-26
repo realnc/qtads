@@ -25,60 +25,60 @@
  * handles mouse events.
  */
 class DisplayWidget: public QWidget {
-	Q_OBJECT
+    Q_OBJECT
 
   private:
-	// We track the current link the mouse is currently hovering over and the
-	// link over which the mouse button has been pressed but not released yet.
-	class CHtmlDispLink* fHoverLink;
-	class CHtmlDispLink* fClickedLink;
+    // We track the current link the mouse is currently hovering over and the
+    // link over which the mouse button has been pressed but not released yet.
+    class CHtmlDispLink* fHoverLink;
+    class CHtmlDispLink* fClickedLink;
 
-	// Stop tracking links.
-	void
-	fInvalidateLinkTracking();
+    // Stop tracking links.
+    void
+    fInvalidateLinkTracking();
 
   protected:
-	// The window we're embeded in.
-	class CHtmlSysWinQt* parentSysWin;
+    // The window we're embeded in.
+    class CHtmlSysWinQt* parentSysWin;
 
-	// Our parent's formatter, for easy access.
-	class CHtmlFormatter* formatter;
+    // Our parent's formatter, for easy access.
+    class CHtmlFormatter* formatter;
 
-	virtual void
-	paintEvent( QPaintEvent* e );
+    virtual void
+    paintEvent( QPaintEvent* e );
 
-	virtual void
-	mouseMoveEvent( QMouseEvent* e );
+    virtual void
+    mouseMoveEvent( QMouseEvent* e );
 
-	virtual void
-	leaveEvent( QEvent* e );
+    virtual void
+    leaveEvent( QEvent* e );
 
-	virtual void
-	mousePressEvent( QMouseEvent* e );
+    virtual void
+    mousePressEvent( QMouseEvent* e );
 
-	virtual void
-	mouseReleaseEvent( QMouseEvent* e );
+    virtual void
+    mouseReleaseEvent( QMouseEvent* e );
 
   public:
-	DisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
+    DisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
 
-	// When our parent's notify_clear_contents() is called, we need to know
-	// about it so we can perform link tracking invalidation.
-	void
-	notifyClearContents()
-	{
-		// When clearing contents, the display items are already gone. Set them
-		// Null so we won't try to access them.
-		this->fClickedLink = this->fHoverLink = 0;
-		this->fInvalidateLinkTracking();
-	}
+    // When our parent's notify_clear_contents() is called, we need to know
+    // about it so we can perform link tracking invalidation.
+    void
+    notifyClearContents()
+    {
+        // When clearing contents, the display items are already gone. Set them
+        // Null so we won't try to access them.
+        this->fClickedLink = this->fHoverLink = 0;
+        this->fInvalidateLinkTracking();
+    }
 
-	// Update link tracking for specified mouse position.  If the specified
-	// position isNull(), it will be autodetected.
-	//
-	// TODO: What happens with multi-pointer systems?
-	void
-	updateLinkTracking( const QPoint& pos );
+    // Update link tracking for specified mouse position.  If the specified
+    // position isNull(), it will be autodetected.
+    //
+    // TODO: What happens with multi-pointer systems?
+    void
+    updateLinkTracking( const QPoint& pos );
 };
 
 

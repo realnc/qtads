@@ -78,7 +78,7 @@ public:
     void setDefaultColor( const QColor &c );
 
     QSize sizeHint() const;
-	QSize minimumSizeHint() const;
+    QSize minimumSizeHint() const;
 
 Q_SIGNALS:
     /**
@@ -96,25 +96,25 @@ protected:
     virtual void keyPressEvent( QKeyEvent *e );
 
 private:
-	class KColorButtonPrivate
-	{
-	public:
-		KColorButtonPrivate(KColorButton *q): q(q) {}
+    class KColorButtonPrivate
+    {
+    public:
+        KColorButtonPrivate(KColorButton *q): q(q) {}
 
-		void _k_chooseColor();
+        void _k_chooseColor();
 
-		KColorButton *q;
-		QColor m_defaultColor;
-		bool m_bdefaultColor : 1;
+        KColorButton *q;
+        QColor m_defaultColor;
+        bool m_bdefaultColor : 1;
 
-		bool dragFlag : 1;
-		QColor col;
-		QPoint mPos;
+        bool dragFlag : 1;
+        QColor col;
+        QPoint mPos;
 
-		void initStyleOption(QStyleOptionButton* opt) const;
-	};
+        void initStyleOption(QStyleOptionButton* opt) const;
+    };
 
-	KColorButtonPrivate * const d;
+    KColorButtonPrivate * const d;
 
     Q_PRIVATE_SLOT( d, void _k_chooseColor() )
 };

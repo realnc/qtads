@@ -27,19 +27,19 @@
  */
 class QTadsImage: public QImage {
   public:
-	QTadsImage()
-	{ }
+    QTadsImage()
+    { }
 
-	QTadsImage( const QImage& qImg )
-	: QImage(qImg)
-	{ }
+    QTadsImage( const QImage& qImg )
+    : QImage(qImg)
+    { }
 
-	// A call to this method is only allowed to happen from inside
-	// QTadsDisplayWidget::paintEvent().  This always happens indirectly
-	// through CHtmlFormatter::draw(), which QTadsDisplayWidget::painEvent() is
-	// using to repaint the window.
-	void
-	drawFromPaintEvent( CHtmlSysWin* win, class CHtmlRect* pos, htmlimg_draw_mode_t mode );
+    // A call to this method is only allowed to happen from inside
+    // QTadsDisplayWidget::paintEvent().  This always happens indirectly
+    // through CHtmlFormatter::draw(), which QTadsDisplayWidget::painEvent() is
+    // using to repaint the window.
+    void
+    drawFromPaintEvent( CHtmlSysWin* win, class CHtmlRect* pos, htmlimg_draw_mode_t mode );
 };
 
 

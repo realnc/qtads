@@ -25,16 +25,16 @@
 
 
 class QTadsFrame: public QFrame {
-	Q_OBJECT
+    Q_OBJECT
 
   protected:
-	virtual void
-	resizeEvent( QResizeEvent* e );
+    virtual void
+    resizeEvent( QResizeEvent* e );
 
   public:
-	QTadsFrame( QWidget* parent )
-	: QFrame(parent)
-	{ }
+    QTadsFrame( QWidget* parent )
+    : QFrame(parent)
+    { }
 };
 
 
@@ -45,130 +45,130 @@ class QTadsFrame: public QFrame {
  * about this class.
  */
 class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
-	Q_OBJECT
+    Q_OBJECT
 
   private:
-	class ConfDialog* fConfDialog;
-	class GameInfoDialog* fGameInfoDialog;
-	QTadsFrame* fFrame;
-	class QDialog* fAboutBoxDialog;
-	class CHtmlSysWinAboutBoxQt* fAboutBox;
-	class AboutQtadsDialog* fAboutQtadsDialog;
-	class QMenu* fRecentGamesMenu;
-	class QAction* fAboutGameAction;
-	class QAction* fEndCurrentGameAction;
-	class QAction* fRestartCurrentGameAction;
-	class QAction* fGameInfoAction;
-	class QAction* fAboutQtadsAction;
-	class QNetworkAccessManager* fNetManager;
-	class QNetworkReply* fReply;
-	QString fGameFileFromDropEvent;
+    class ConfDialog* fConfDialog;
+    class GameInfoDialog* fGameInfoDialog;
+    QTadsFrame* fFrame;
+    class QDialog* fAboutBoxDialog;
+    class CHtmlSysWinAboutBoxQt* fAboutBox;
+    class AboutQtadsDialog* fAboutQtadsDialog;
+    class QMenu* fRecentGamesMenu;
+    class QAction* fAboutGameAction;
+    class QAction* fEndCurrentGameAction;
+    class QAction* fRestartCurrentGameAction;
+    class QAction* fGameInfoAction;
+    class QAction* fAboutQtadsAction;
+    class QNetworkAccessManager* fNetManager;
+    class QNetworkReply* fReply;
+    QString fGameFileFromDropEvent;
 
-	bool
-	fAskQuitGameDialog();
+    bool
+    fAskQuitGameDialog();
 
-	bool
-	fAskRestartGameDialog();
+    bool
+    fAskRestartGameDialog();
 
   private slots:
-	void
-	fCheckForUpdates();
+    void
+    fCheckForUpdates();
 
-	void
-	fReplyFinished( QNetworkReply* reply );
+    void
+    fReplyFinished( QNetworkReply* reply );
 
-	void
-	fErrorOccurred( QNetworkReply::NetworkError code );
+    void
+    fErrorOccurred( QNetworkReply::NetworkError code );
 
-	void
-	fShowGameInfoDialog();
+    void
+    fShowGameInfoDialog();
 
-	void
-	fHideGameInfoDialog();
+    void
+    fHideGameInfoDialog();
 
-	void
-	fShowConfDialog();
+    void
+    fShowConfDialog();
 
-	void
-	fHideConfDialog();
+    void
+    fHideConfDialog();
 
-	void
-	fShowAboutGame();
+    void
+    fShowAboutGame();
 
-	void
-	fHideAboutGame();
+    void
+    fHideAboutGame();
 
-	void
-	fShowAboutQtads();
+    void
+    fShowAboutQtads();
 
-	void
-	fHideAboutQtads();
+    void
+    fHideAboutQtads();
 
-	void
-	fOpenNewGame();
+    void
+    fOpenNewGame();
 
-	void
-	fRecentGameTriggered( QAction* action );
+    void
+    fRecentGameTriggered( QAction* action );
 
-	void
-	fEndCurrentGame();
+    void
+    fEndCurrentGame();
 
-	void
-	fRestartCurrentGame();
+    void
+    fRestartCurrentGame();
 
-	void
-	fNotifyGameQuitting();
+    void
+    fNotifyGameQuitting();
 
-	void
-	fNotifyGameStarting();
+    void
+    fNotifyGameStarting();
 
-	void
-	fRunDropEventFile();
+    void
+    fRunDropEventFile();
 
   protected:
-	virtual void
-	closeEvent( QCloseEvent* e );
+    virtual void
+    closeEvent( QCloseEvent* e );
 
-	virtual void
-	dragEnterEvent( QDragEnterEvent* e );
+    virtual void
+    dragEnterEvent( QDragEnterEvent* e );
 
-	virtual void
-	dropEvent( QDropEvent* e );
+    virtual void
+    dropEvent( QDropEvent* e );
 
   public:
-	CHtmlSysWinGroupQt();
+    CHtmlSysWinGroupQt();
 
-	virtual
-	~CHtmlSysWinGroupQt();
+    virtual
+    ~CHtmlSysWinGroupQt();
 
-	CHtmlSysWinAboutBoxQt*
-	createAboutBox( class CHtmlFormatter* formatter );
+    CHtmlSysWinAboutBoxQt*
+    createAboutBox( class CHtmlFormatter* formatter );
 
-	void
-	deleteAboutBox();
+    void
+    deleteAboutBox();
 
-	CHtmlSysWinAboutBoxQt*
-	aboutBox()
-	{ return this->fAboutBox; }
+    CHtmlSysWinAboutBoxQt*
+    aboutBox()
+    { return this->fAboutBox; }
 
-	void
-	updateRecentGames();
+    void
+    updateRecentGames();
 
 #ifdef Q_WS_MAC
-	// Handler for FileOpen events.  They only occur in OS X.
-	bool
-	handleFileOpenEvent( class QFileOpenEvent* e );
+    // Handler for FileOpen events.  They only occur in OS X.
+    bool
+    handleFileOpenEvent( class QFileOpenEvent* e );
 #endif
 
-	//
-	// CHtmlSysWinGroup interface implementation.
-	//
-	virtual oshtml_charset_id_t
-	get_default_win_charset() const;
+    //
+    // CHtmlSysWinGroup interface implementation.
+    //
+    virtual oshtml_charset_id_t
+    get_default_win_charset() const;
 
-	virtual size_t
-	xlat_html4_entity( textchar_t* result, size_t result_size, unsigned int charval, oshtml_charset_id_t* charset,
-					   int* changed_charset );
+    virtual size_t
+    xlat_html4_entity( textchar_t* result, size_t result_size, unsigned int charval, oshtml_charset_id_t* charset,
+                       int* changed_charset );
 };
 
 

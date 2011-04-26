@@ -8,14 +8,14 @@ namespace Ui {
 }
 
 class AboutQtadsDialog: public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 
   public:
-	explicit AboutQtadsDialog(QWidget *parent = 0);
-	~AboutQtadsDialog();
+    explicit AboutQtadsDialog(QWidget *parent = 0);
+    ~AboutQtadsDialog();
 
   private:
-	Ui::AboutQtadsDialog *ui;
+    Ui::AboutQtadsDialog *ui;
 };
 
 #endif // ABOUTQTADSDIALOG_H

@@ -32,71 +32,71 @@
  */
 class CHtmlSysFontQt: public QFont, public CHtmlSysFont {
   private:
-	QColor fColor;
-	QColor fBgColor;
+    QColor fColor;
+    QColor fBgColor;
 
   public:
-	// When color() is a valid color (QColor::isValid()) it should be used as
-	// the foreground color when drawing text in this font.
-	const QColor&
-	color() const
-	{ return this->fColor; }
+    // When color() is a valid color (QColor::isValid()) it should be used as
+    // the foreground color when drawing text in this font.
+    const QColor&
+    color() const
+    { return this->fColor; }
 
-	HTML_color_t
-	htmlColor() const
-	{ return HTML_make_color(this->fColor.red(), this->fColor.green(), this->fColor.blue()); }
+    HTML_color_t
+    htmlColor() const
+    { return HTML_make_color(this->fColor.red(), this->fColor.green(), this->fColor.blue()); }
 
-	void
-	color( HTML_color_t color )
-	{ this->fColor = QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)); }
+    void
+    color( HTML_color_t color )
+    { this->fColor = QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)); }
 
-	// When bgColor() is a valid color (QColor::isValid()) it should be used as
-	// the background color when drawing text in this font.
-	const QColor&
-	bgColor() const
-	{ return this->fBgColor; }
+    // When bgColor() is a valid color (QColor::isValid()) it should be used as
+    // the background color when drawing text in this font.
+    const QColor&
+    bgColor() const
+    { return this->fBgColor; }
 
-	HTML_color_t
-	htmlBgColor() const
-	{ return HTML_make_color(this->fBgColor.red(), this->fBgColor.green(), this->fBgColor.blue()); }
+    HTML_color_t
+    htmlBgColor() const
+    { return HTML_make_color(this->fBgColor.red(), this->fBgColor.green(), this->fBgColor.blue()); }
 
-	void
-	bgColor( HTML_color_t color )
-	{ this->fBgColor = QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)); }
+    void
+    bgColor( HTML_color_t color )
+    { this->fBgColor = QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)); }
 
-	bool
-	operator ==( const CHtmlSysFontQt& f ) const
-	{ return QFont::operator ==(f) and this->fColor == f.fColor and this->fBgColor == f.fBgColor; }
+    bool
+    operator ==( const CHtmlSysFontQt& f ) const
+    { return QFont::operator ==(f) and this->fColor == f.fColor and this->fBgColor == f.fBgColor; }
 
-	CHtmlSysFontQt&
-	operator =( const QFont& f )
-	{
-		QFont::operator =(f);
-		return *this;
-	}
+    CHtmlSysFontQt&
+    operator =( const QFont& f )
+    {
+        QFont::operator =(f);
+        return *this;
+    }
 
-	//
-	// CHtmlSysFont interface implementation.
-	//
-	virtual void
-	get_font_metrics( CHtmlFontMetrics* m )
-	{
-		//qDebug() << Q_FUNC_INFO << "called";
+    //
+    // CHtmlSysFont interface implementation.
+    //
+    virtual void
+    get_font_metrics( CHtmlFontMetrics* m )
+    {
+        //qDebug() << Q_FUNC_INFO << "called";
 
-		QFontMetrics tmp(*this);
+        QFontMetrics tmp(*this);
 
-		m->ascender_height = tmp.ascent();
-		m->descender_height = tmp.descent();
-		m->total_height = tmp.height();
-	}
+        m->ascender_height = tmp.ascent();
+        m->descender_height = tmp.descent();
+        m->total_height = tmp.height();
+    }
 
-	virtual int
-	is_fixed_pitch()
-	{ return QFontInfo(*this).fixedPitch(); }
+    virtual int
+    is_fixed_pitch()
+    { return QFontInfo(*this).fixedPitch(); }
 
-	virtual int
-	get_em_size()
-	{ return QFontInfo(*this).pixelSize(); }
+    virtual int
+    get_em_size()
+    { return QFontInfo(*this).pixelSize(); }
 };
 
 

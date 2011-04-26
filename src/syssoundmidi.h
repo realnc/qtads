@@ -31,71 +31,71 @@
 class CHtmlSysSoundMidiQt: public CHtmlSysSoundMidi {
 #ifndef Q_WS_ANDROID
   private:
-	struct SDL_RWops* fRWops;
-	Mix_Music* fMusic;
-	bool fPlaying;
+    struct SDL_RWops* fRWops;
+    Mix_Music* fMusic;
+    bool fPlaying;
 
-	// TADS callback to invoke on stop.
-	void (*fDone_func)(void*, int repeat_count);
+    // TADS callback to invoke on stop.
+    void (*fDone_func)(void*, int repeat_count);
 
-	// CTX to pass to the TADS callback.
-	void* fDone_func_ctx;
+    // CTX to pass to the TADS callback.
+    void* fDone_func_ctx;
 
-	// How many times we repeated the sound.
-	int fRepeats;
+    // How many times we repeated the sound.
+    int fRepeats;
 
-	// How many times should we repeat the sound.
-	// 0 means repeat forever.
-	int fRepeatsWanted;
+    // How many times should we repeat the sound.
+    // 0 means repeat forever.
+    int fRepeatsWanted;
 
-	// Currently playing MIDI object.  The callback needs this.
-	static CHtmlSysSoundMidiQt* fActiveMidi;
+    // Currently playing MIDI object.  The callback needs this.
+    static CHtmlSysSoundMidiQt* fActiveMidi;
 #endif
 
   public:
 #ifndef Q_WS_ANDROID
-	CHtmlSysSoundMidiQt( struct SDL_RWops* music );
+    CHtmlSysSoundMidiQt( struct SDL_RWops* music );
 
-	virtual ~CHtmlSysSoundMidiQt();
+    virtual ~CHtmlSysSoundMidiQt();
 
-	// SDL_Mixer callback.
-	static void callback();
+    // SDL_Mixer callback.
+    static void callback();
 #endif
 
-	//
-	// CHtmlSysSoundMidi interface implementation.
-	//
-	virtual int
-	play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
-				const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade );
+    //
+    // CHtmlSysSoundMidi interface implementation.
+    //
+    virtual int
+    play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+                const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade );
 
-	virtual void
-	add_crossfade( CHtmlSysWin* win, long ms )
-	{ qDebug() << Q_FUNC_INFO; }
+    virtual void
+    add_crossfade( CHtmlSysWin* win, long ms )
+    { qDebug() << Q_FUNC_INFO; }
 
-	virtual void
-	cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg );
+    virtual void
+    cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg );
 
-	virtual int
-	maybe_suspend( CHtmlSysSound* )
-	// MIDI is exclusive - we can only play one MIDI sound at a time.  However,
-	// the current HTML TADS model only allows MIDI to play in one layer (the
-	// background layer) anyway, so we should never find ourselves wanting to
-	// play a MIDI sound while another MIDI sound is already active.  So, we'll
-	// just ignore this request entirely; the result will be that the new
-	// foreground sound will be unable to play.
-	//
-	// If at some point in the future the HTML TADS model changes to allow
-	// multiple layers of MIDI sounds, this part of this routine will have to
-	// have a real implementation.
-	{ return false; }
+    virtual int
+    maybe_suspend( CHtmlSysSound* )
+    // MIDI is exclusive - we can only play one MIDI sound at a time.  However,
+    // the current HTML TADS model only allows MIDI to play in one layer (the
+    // background layer) anyway, so we should never find ourselves wanting to
+    // play a MIDI sound while another MIDI sound is already active.  So, we'll
+    // just ignore this request entirely; the result will be that the new
+    // foreground sound will be unable to play.
+    //
+    // If at some point in the future the HTML TADS model changes to allow
+    // multiple layers of MIDI sounds, this part of this routine will have to
+    // have a real implementation.
+    { return false; }
 
-	virtual void
-	resume()
-	// We never suspend MIDI, so there's nothing to do.  (See the notes in
-	// maybe_suspend() - if the model changes to require that MIDI suspension
-	// be implemented, we would have to provide a real implementation here.)
-	{ }
+    virtual void
+    resume()
+    // We never suspend MIDI, so there's nothing to do.  (See the notes in
+    // maybe_suspend() - if the model changes to require that MIDI suspension
+    // be implemented, we would have to provide a real implementation here.)
+    { }
 };
 
 

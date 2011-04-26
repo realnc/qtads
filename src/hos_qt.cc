@@ -23,7 +23,7 @@
 void
 os_dbg_sys_msg( const textchar_t* msg )
 {
-	qDebug() << msg;
+    qDebug() << msg;
 }
 #endif
 
@@ -33,16 +33,16 @@ os_dbg_sys_msg( const textchar_t* msg )
 textchar_t*
 os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/ )
 {
-	// We always use UTF-8, so we only need to figure out how many bytes to
-	// skip by looking at the first byte. We don't need to actually iterate
-	// over them.
-	switch (0xF0 & *p) {
-	  case 0xF0: p += 4; break;
-	  case 0xE0: p += 3; break;
-	  case 0xC0: p += 2; break;
-	  default:   p += 1; break;
-	}
-	return const_cast<textchar_t*>(p);
+    // We always use UTF-8, so we only need to figure out how many bytes to
+    // skip by looking at the first byte. We don't need to actually iterate
+    // over them.
+    switch (0xF0 & *p) {
+      case 0xF0: p += 4; break;
+      case 0xE0: p += 3; break;
+      case 0xC0: p += 2; break;
+      default:   p += 1; break;
+    }
+    return const_cast<textchar_t*>(p);
 }
 
 
@@ -51,16 +51,16 @@ os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/ )
 textchar_t*
 os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart )
 {
-	// Move back one byte.
-	--p;
+    // Move back one byte.
+    --p;
 
-	// Skip continuation bytes. Make sure we don't go past the beginning.
-	// We need to iterate over every byte since it's not possible to determine
-	// the length of the character without actually looking at the first byte.
-	while (p != pstart and (*p & 0xC0) == 0x80) {
-		--p;
-	}
-	return const_cast<textchar_t*>(p);
+    // Skip continuation bytes. Make sure we don't go past the beginning.
+    // We need to iterate over every byte since it's not possible to determine
+    // the length of the character without actually looking at the first byte.
+    while (p != pstart and (*p & 0xC0) == 0x80) {
+        --p;
+    }
+    return const_cast<textchar_t*>(p);
 }
 
 
@@ -69,5 +69,5 @@ os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t*
 os_timer_t
 os_get_time()
 {
-	return os_get_sys_clock_ms();
+    return os_get_sys_clock_ms();
 }

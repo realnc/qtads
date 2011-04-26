@@ -21,30 +21,30 @@
 
 
 namespace Ui {
-	class ConfDialog;
+    class ConfDialog;
 }
 
 class ConfDialog: public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 
   public:
-	ConfDialog( class CHtmlSysWinGroupQt* parent = 0 );
-	~ConfDialog();
+    ConfDialog( class CHtmlSysWinGroupQt* parent = 0 );
+    ~ConfDialog();
 
   protected:
-	void
-	changeEvent( QEvent* e );
+    void
+    changeEvent( QEvent* e );
 
   private:
-	Ui::ConfDialog* ui;
+    Ui::ConfDialog* ui;
 
-	// Makes the dialog's controls apply instantly when they change.
-	void
-	fMakeInstantApply();
+    // Makes the dialog's controls apply instantly when they change.
+    void
+    fMakeInstantApply();
 
   private slots:
-	void
-	fApplySettings();
+    void
+    fApplySettings();
 };
 
 

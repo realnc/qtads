@@ -21,91 +21,73 @@
 
 
 class DisplayWidgetInput: public DisplayWidget {
-	Q_OBJECT
+    Q_OBJECT
 
   private:
-	// Position of the text cursor.
-	QPoint fCursorPos;
+    // Position of the text cursor.
+    QPoint fCursorPos;
 
-	// Height of the text cursor in pixels.
-	unsigned fHeight;
+    // Height of the text cursor in pixels.
+    unsigned fHeight;
 
-	// Last position of the text cursor.
-	QPoint fLastCursorPos;
+    // Last position of the text cursor.
+    QPoint fLastCursorPos;
 
-	// Is the text cursor visible?
-	bool fCursorVisible;
+    // Is the text cursor visible?
+    bool fCursorVisible;
 
-	// Text cursor blink visibility.  Changed by a timer to show/hide the
-	// cursor at specific intervals if fCursorVisible is true.
-	bool fBlinkVisible;
+    // Text cursor blink visibility.  Changed by a timer to show/hide the
+    // cursor at specific intervals if fCursorVisible is true.
+    bool fBlinkVisible;
 
-	// Text cursor blink timer.
-	class QTimer* fBlinkTimer;
+    // Text cursor blink timer.
+    class QTimer* fBlinkTimer;
 
   private slots:
-	// Called by the timer to blink the text cursor.
-	void
-	fBlinkCursor();
+    // Called by the timer to blink the text cursor.
+    void
+    fBlinkCursor();
 
-	// We need to know when the application loses focus entirely so that we
-	// can disable keyboard cursor blinking when we lose focus.
-	void
-	fHandleFocusChange( QWidget* old, QWidget* now );
+    // We need to know when the application loses focus entirely so that we
+    // can disable keyboard cursor blinking when we lose focus.
+    void
+    fHandleFocusChange( QWidget* old, QWidget* now );
 
   protected:
-	virtual void
-	paintEvent( QPaintEvent* e );
+    virtual void
+    paintEvent( QPaintEvent* e );
 
   public:
-	DisplayWidgetInput( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
+    DisplayWidgetInput( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
 
-	// Change the text cursor position.
-	void
-	moveCursorPos( const QPoint& pos )
-	{ this->fCursorPos = pos; }
+    // Change the text cursor position.
+    void
+    moveCursorPos( const QPoint& pos )
+    { this->fCursorPos = pos; }
 
-	// Set the height of the text cursor in pixels.
-	void
-	setCursorHeight( unsigned height )
-	{ this->fHeight = height; }
+    // Set the height of the text cursor in pixels.
+    void
+    setCursorHeight( unsigned height )
+    { this->fHeight = height; }
 
-	// Show/hide the text cursor.
-	void
-	setCursorVisible( bool visible )
-	{ this->fCursorVisible = visible; }
+    // Show/hide the text cursor.
+    void
+    setCursorVisible( bool visible )
+    { this->fCursorVisible = visible; }
 
-	bool
-	isCursorVisible()
-	{ return this->fCursorVisible; }
+    bool
+    isCursorVisible()
+    { return this->fCursorVisible; }
 
-	void
-	updateCursorPos( class CHtmlFormatter* formatter, class CHtmlInputBuf* tadsBuffer,
-					 class CHtmlTagTextInput* tag );
+    void
+    updateCursorPos( class CHtmlFormatter* formatter, class CHtmlInputBuf* tadsBuffer,
+                     class CHtmlTagTextInput* tag );
 
-	// Reset cursor blink timer.  This will read the blinking rate from the
-	// desktop environment and ajust the blink timer as needed.
-	void
-	resetCursorBlinking();
+    // Reset cursor blink timer.  This will read the blinking rate from the
+    // desktop environment and ajust the blink timer as needed.
+    void
+    resetCursorBlinking();
 };
 
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

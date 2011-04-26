@@ -29,29 +29,29 @@
  * about this class.
  */
 class QTadsTimer: public QTimer, public CHtmlSysTimer {
-	Q_OBJECT
+    Q_OBJECT
 
   public slots:
-	// We connect the timeout() signal to this slot.
-	void
-	trigger()
-	{
-		// If we have a callback, call it.
-		if (this->func_ != 0) {
-			this->invoke_callback();
-		}
-	}
+    // We connect the timeout() signal to this slot.
+    void
+    trigger()
+    {
+        // If we have a callback, call it.
+        if (this->func_ != 0) {
+            this->invoke_callback();
+        }
+    }
 
   public:
-	QTadsTimer( void (*func)(void*), void* ctx, QObject* parent = 0 )
-	: QTimer(parent), CHtmlSysTimer(func, ctx)
-	{
-		connect(this, SIGNAL(timeout()), this, SLOT(trigger()));
-	}
+    QTadsTimer( void (*func)(void*), void* ctx, QObject* parent = 0 )
+    : QTimer(parent), CHtmlSysTimer(func, ctx)
+    {
+        connect(this, SIGNAL(timeout()), this, SLOT(trigger()));
+    }
 
-	// We bring this into public scope since we need to evaluate the callback
-	// pointer in order to unregister the timer.
-	using CHtmlSysTimer::func_;
+    // We bring this into public scope since we need to evaluate the callback
+    // pointer in order to unregister the timer.
+    using CHtmlSysTimer::func_;
 };
 
 
