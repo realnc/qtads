@@ -1,6 +1,14 @@
 2.?.? - 2011/??/??
 ==================
 
+  - An error dialog is now displayed when trying to open a file that is not a
+    Tads game.  Previously, the error message was displayed on stdout.
+
+  - When running in KDE, it is not possible anymore to move the interpreter
+    window by simply clicking somewhere inside the game window where no text
+    has been printed yet.  The game window is never really "empty", so this
+    kind of "window grabbing" should have not been allowed to begin with.
+
 
 2.1.1 - 2011/02/18
 ==================
