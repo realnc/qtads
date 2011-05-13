@@ -111,6 +111,9 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
     virtual void
     resizeEvent( QResizeEvent* e );
 
+    virtual void
+    mousePressEvent( QMouseEvent* e );
+
   public:
     CHtmlSysWinQt( class CHtmlFormatter* formatter, class DisplayWidget* dispWidget, QWidget* parent );
 

@@ -175,6 +175,19 @@ CHtmlSysWinQt::resizeEvent( QResizeEvent* e )
 
 
 void
+CHtmlSysWinQt::mousePressEvent( QMouseEvent* e )
+{
+    // This is a work-around for KDE's Oxygen style window grabbing. Oxygen
+    // allows window grabbing by clicking on any "empty" area of an
+    // application. An area is considered empty, if mouse press events reach
+    // QMainWindow. We don't want our game window to have draggable areas
+    // just because we don't handle mouse press events. So we accept the event
+    // here so that KDE knows not to allow window dragging.
+    e->accept();
+}
+
+
+void
 CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 {
     //qDebug() << Q_FUNC_INFO;
