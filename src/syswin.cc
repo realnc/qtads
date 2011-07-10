@@ -1172,7 +1172,7 @@ CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
         return;
       default:
         qWarning() << Q_FUNC_INFO << "Unknown resource type";
-        castImg = dynamic_cast<QTadsImage*>(image->get_image());
+        castImg = reinterpret_cast<QTadsImage*>(image->get_image());
     }
 
     QPalette p(this->palette());
