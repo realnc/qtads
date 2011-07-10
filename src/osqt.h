@@ -236,6 +236,7 @@ osfoprwb( const char* fname, os_filetype_t typ );
 /* Get a character from a file. */
 #define osfgetc fgetc
 
+/* Allocating sprintf and vsprintf. */
 #define os_asprintf asprintf
 #define os_vasprintf vasprintf
 
