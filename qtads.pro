@@ -29,6 +29,20 @@ macx {
     LIBS += -lSDL_mixer -lSDL_sound
 }
 win32 {
+    *-g++* {
+        QMAKE_CFLAGS += -march=i686 -mtune=generic
+        QMAKE_CXXFLAGS += -march=i686 -mtune=generic
+
+        # Dead code stripping (requires patched binutils).
+        QMAKE_CFLAGS += -fdata-sections -ffunction-sections
+        QMAKE_CXXFLAGS += -fdata-sections -ffunction-sections
+        QMAKE_LFLAGS += -Wl,--gc-sections
+
+        # Don't dead-strip the resource section (it contains the icon,
+        # version strings, etc.)  We use a linker script to do that.
+        QMAKE_LFLAGS += $$PWD/w32_linkscript
+    }
+
     LIBS += -lvorbisfile -lvorbis -logg
 }
 
