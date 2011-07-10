@@ -14,23 +14,16 @@
  * this program; see the file COPYING.  If not, write to the Free Software
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#include "qtadscharmap.h"
 #include <QByteArray>
 
-size_t
-QTadsCharmapToUni::read_file( osfildef* fp, char* buf, size_t bufl, unsigned long read_limit )
-{
-    Q_ASSERT(bufl >= 3); // Required by the specs.
-    Q_ASSERT(buf != 0);
+#include "qtadscharmap.h"
+#include "vmdatasrc.h"
 
-    // Find out the maximum number of bytes to read.
-    if (read_limit == 0) {
-        // No limit specified; use the file's size as limit.
-        long tmp = osfpos(fp);
-        osfseek(fp, 0, OSFSK_END);
-        read_limit = osfpos(fp) + 1;
-        osfseek(fp, tmp, OSFSK_SET);
-    }
+size_t
+QTadsCharmapToUni::read_file( class CVmDataSource* fp, char* buf, size_t bufl )
+{
+    Q_ASSERT(bufl >= 3); // Must be at least able to hold one UTF8 character.
+    Q_ASSERT(buf != 0);
 
     // We read only one byte at a time.
     char c;
@@ -54,17 +47,13 @@ QTadsCharmapToUni::read_file( osfildef* fp, char* buf, size_t bufl, unsigned lon
     // Are we done translating?
     bool done = false;
 
-    // Amount of bytes read from the file.
-    unsigned long count = 0;
-
-    while (not eof and not done and count < read_limit) {
+    while (not done and not eof) {
         // Read one byte.
-        if (osfrb(fp, &c, 1) != 0) {
-            // Failed; must be EOF.  We don't care if it's really EOF or not;
-            // if we can't read, we can't read, no matter why.
+        if (fp->read(&c, 1) != 0) {
+            // Failed.  We don't care if it's really EOF or not; if we can't
+            // read, then we can't read, the reason doesn't matter.
             eof = true;
         } else {
-            ++count;
             // Accumulate the read byte.
             Q_ASSERT(accInd < 4);
             acc[accInd++] = c;
@@ -77,7 +66,7 @@ QTadsCharmapToUni::read_file( osfildef* fp, char* buf, size_t bufl, unsigned lon
                     // It would overflow.  Set the file's seek location back,
                     // so that our caller won't lose the accumulated bytes;
                     // we'll read them again in our next call.
-                    osfseek(fp, -accInd, OSFSK_CUR);
+                    fp->seek(-accInd, OSFSK_CUR);
                     // We can't proceed, so we're done.
                     done = true;
                 } else {

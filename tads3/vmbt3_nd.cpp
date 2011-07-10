@@ -25,6 +25,8 @@ Modified
 #include "vmbif.h"
 #include "vmbift3.h"
 #include "vmstack.h"
+#include "vmrun.h"
+
 
 /*
  *   Debug Trace 

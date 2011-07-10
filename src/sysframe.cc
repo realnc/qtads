@@ -36,11 +36,17 @@
 #include "vmmaincn.h"
 
 
-int
-CHtmlSysFrameQt::fCtxGetIOSafetyLevel( void* )
+void
+CHtmlSysFrameQt::fCtxGetIOSafetyLevel( void*, int* read, int* write )
 {
     Q_ASSERT(qFrame != 0);
-    return qFrame->fSettings->ioSafetyLevel;
+    // FIXME: Split read/write.
+    if (read != 0) {
+        *read = qFrame->fSettings->ioSafetyLevel;
+    }
+    if (write != 0) {
+        *write = qFrame->fSettings->ioSafetyLevel;
+    }
 }
 
 
@@ -314,7 +320,7 @@ CHtmlSysFrameQt::fRunT3Game( const QString& fname )
 {
     this->fTads3 = true;
     vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0, 0, false, 0, 0, false,
-                 false, 0, 0, 0, 0);
+                 false, false, 0, 0, 0, 0, 0);
 }
 
 

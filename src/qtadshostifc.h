@@ -50,28 +50,63 @@ class QTadsHostIfc: public CVmHostIfc {
     //
     // CVmHostIfc interface implementation.
     //
+    // FIXME: Split read/write.
     virtual int
-    get_io_safety()
+    get_io_safety_read()
     {
         if (this->fAppctx != 0 and this->fAppctx->get_io_safety_level != 0) {
             // Ask the app context to handle it.
-            return (*this->fAppctx->get_io_safety_level)(this->fAppctx->io_safety_level_ctx);
+            int read;
+            (*this->fAppctx->get_io_safety_level)(this->fAppctx->io_safety_level_ctx, &read, 0);
+            return read;
         } else {
             // The app context doesn't care - use our own level memory */
             return this->fIoSafety;
         }
     }
 
+    // FIXME: Split read/write.
+    virtual int
+    get_io_safety_write()
+    {
+        if (this->fAppctx != 0 and this->fAppctx->get_io_safety_level != 0) {
+            // Ask the app context to handle it.
+            int write;
+            (*this->fAppctx->get_io_safety_level)(this->fAppctx->io_safety_level_ctx, 0, &write);
+            return write;
+        } else {
+            // The app context doesn't care - use our own level memory */
+            return this->fIoSafety;
+        }
+    }
+
+    // FIXME: Split read/write.
     virtual void
-    set_io_safety( int level )
+    set_io_safety( int read, int write )
     {
         if (this->fAppctx != 0 and this->fAppctx->set_io_safety_level != 0) {
             // Let the app context handle it.
-            (*this->fAppctx->set_io_safety_level)(this->fAppctx->io_safety_level_ctx, level);
+            (*this->fAppctx->set_io_safety_level)(this->fAppctx->io_safety_level_ctx, read, write);
         } else {
             // The app doesn't care - set our own level memory.
-            this->fIoSafety = level;
+            this->fIoSafety = read;
         }
+    }
+
+    // FIXME: Implement
+    virtual void
+    get_net_safety( int* client_level, int* server_level )
+    {
+        if (client_level != 0)
+            *client_level = 0;
+        if (server_level != 0)
+            *server_level = 0;
+    }
+
+    // FIXME: Implement
+    virtual void
+    set_net_safety( int client_level, int server_level )
+    {
     }
 
     virtual class CResLoader*

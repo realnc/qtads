@@ -439,7 +439,7 @@ static void runputbuf(uchar *dstp, runsdef *val)
         break;
         
     case DAT_NUMBER:
-        oswp4(dstp, val->runsv.runsvnum);
+        oswp4s(dstp, val->runsv.runsvnum);
         break;
         
     case DAT_PROPNUM:
@@ -461,7 +461,7 @@ void runpbuf(runcxdef *ctx, int typ, void *valp)
     switch(typ)
     {
     case DAT_NUMBER:
-        val.runsv.runsvnum = osrp4(valp);
+        val.runsv.runsvnum = osrp4s(valp);
         break;
         
     case DAT_OBJECT:
@@ -599,7 +599,7 @@ uchar *runfind(uchar *lst, runsdef *item)
                     return(lst);
                 break;
             case DAT_NUMBER:
-                if (osrp4(lst+1) == item->runsv.runsvnum)
+                if (osrp4s(lst+1) == item->runsv.runsvnum)
                     return(lst);
                 break;
 
@@ -1153,7 +1153,7 @@ resume_from_error:
         switch(opc)
         {
         case OPCPUSHNUM:
-            val.runsv.runsvnum = osrp4(p);
+            val.runsv.runsvnum = osrp4s(p);
             runpush(ctx, DAT_NUMBER, &val);
             p += 4;
             break;
@@ -1482,7 +1482,7 @@ resume_from_error:
                 {
                 case OPCPUSHNUM:
                     match = (typmatch
-                             && val.runsv.runsvnum == osrp4(p));
+                             && val.runsv.runsvnum == osrp4s(p));
                     p += 4;
                     break;
                         
@@ -2233,7 +2233,7 @@ resume_from_error:
                             
                         case DAT_NUMBER:
                             valbuf = outbuf;
-                            oswp4(outbuf, valp->runsv.runsvnum);
+                            oswp4s(outbuf, valp->runsv.runsvnum);
                             break;
                             
                         case DAT_OBJECT:

@@ -61,3 +61,45 @@ void CVmFile::open_write(const char *fname, os_filetype_t typ)
         err_throw(VMERR_CREATE_FILE);
 }
 
+/* ------------------------------------------------------------------------ */
+/*
+ *   Read a line into an allocated buffer 
+ */
+char *CVmStream::read_line_alo()
+{
+    char *ret = 0;
+    size_t retlen = 0;
+    
+    /* keep going until we satisfy the request */
+    for (;;)
+    {
+        /* read a chunk; if at EOF, we're done */
+        char buf[1024];
+        if (read_line(buf, sizeof(buf)) == 0)
+            break;
+
+        /* get the length of this chunk */
+        size_t len = strlen(buf);
+
+        /* allocate or expand the result buffer to accommodate the new text */
+        if (ret == 0)
+            ret = (char *)t3malloc(len + 1);
+        else
+            ret = (char *)t3realloc(ret, retlen + len + 1);
+
+        /* fail if out of memory */
+        if (ret == 0)
+            return 0;
+
+        /* add the new chunk to the result (including the null) */
+        memcpy(ret + retlen, buf, len + 1);
+        retlen += len;
+
+        /* if the buffer ends with a newline, we're done */
+        if (retlen != 0 && ret[retlen-1] == '\n')
+            break;
+    }
+
+    /* return our buffer */
+    return ret;
+}

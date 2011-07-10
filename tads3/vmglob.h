@@ -84,6 +84,7 @@ Modified
 
 #include <stddef.h>
 
+#include "t3std.h"
 #include "vmpoolsl.h"
 
 
@@ -299,6 +300,7 @@ inline void vmglob_delete(vm_globals *) { }
 #define VMG0_
 #define vmg_
 #define vmg0_
+#define Pvmg0_P             /* "vmg0_" in parens, for constructor arguments */
 
 /* 
  *   get the address of the globals - this doesn't do anything in this
@@ -348,6 +350,7 @@ inline void vmglob_delete(vm_globals *) { }
 #define VMG0_
 #define vmg_
 #define vmg0_
+#define Pvmg0_P
 
 /* get the address of the globals */
 #define VMGLOB_ADDR   (&G_vmglobals)
@@ -394,6 +397,7 @@ inline void vmglob_delete(vm_globals *glob) { delete glob; }
 #define VMG0_
 #define vmg_
 #define vmg0_
+#define Pvmg0_P
 
 /* get the address of the globals */
 #define VMGLOB_ADDR   G_vmglobals
@@ -432,6 +436,7 @@ inline void vmglob_delete(vm_globals *glob) { delete glob; }
 /* parameter reference for passing to a function */
 #define vmg_   vmg__,
 #define vmg0_  vmg__
+#define Pvmg0_P  (vmg__)
 
 /* get the address of the globals */
 #define VMGLOB_ADDR   vmg__
@@ -483,14 +488,21 @@ inline void vmglob_delete(vm_globals *glob) { delete glob; }
 #define G_srcf_table  VMGLOB_ACCESS(srcf_table)
 #define G_dbg_lclsym_hdr_size VMGLOB_ACCESS(dbg_lclsym_hdr_size)
 #define G_dbg_fmt_vsn VMGLOB_ACCESS(dbg_fmt_vsn)
+#define G_dbg_frame_size VMGLOB_ACCESS(dbg_frame_size)
 #define G_bignum_cache VMGLOB_ACCESS(bignum_cache)
-#define G_tadsobj_queue VMGLOB_ACCESS(tadsobj_queue)
+#define G_dyncomp     VMGLOB_ACCESS(dyncomp)
+#define G_net_queue   VMGLOB_ACCESS(net_queue)
+#define G_net_config  VMGLOB_ACCESS(net_config)
+#define G_iter_get_next  VMGLOB_ACCESS(iter_get_next)
+#define G_iter_next_avail  VMGLOB_ACCESS(iter_next_avail)
+#define G_tadsobj_queue  VMGLOB_PREACCESS(tadsobj_queue)
 #define G_predef      VMGLOB_PREACCESS(predef)
-#define G_stk         VMGLOB_PREACCESS(stk)
+#define G_stk         G_interpreter
 #define G_interpreter VMGLOB_PREACCESS(interpreter)
 #define G_const_pool  VMGLOB_PREACCESS(const_pool)
 #define G_code_pool   VMGLOB_PREACCESS(code_pool)
 #define G_obj_table   VMGLOB_PREACCESS(obj_table)
+
 
 #endif /* VMGLOB_H */
 

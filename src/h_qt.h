@@ -35,12 +35,17 @@ extern "C" {
 
 /* write int to unaligned portable 2-byte value */
 #define oswp2(p, i) (*(quint16 *)(p)=(quint16)(i))
+#define oswp2s(p, i) oswp2(p, i)
 
 /* read unaligned portable 4-byte value, returning long */
-#define osrp4(p) (*(qint32 *)(p))
+#define osrp4(p) (*(quint32 *)(p))
+
+/* read unaligned portable 4-byte value, returning signed long */
+#define osrp4s(p) (*(qint32 *)(p))
 
 /* write long to unaligned portable 4-byte value */
 #define oswp4(p, l) (*(qint32 *)(p)=(l))
+#define oswp4s(p, l) oswp4(p, l)
 
 #endif
 

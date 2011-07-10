@@ -109,6 +109,9 @@ class QTadsCharmapToUni: public CCharmapToUni
     virtual int
     is_complete_char( const char* p, size_t len ) const;
 
+    virtual int
+    mapchar( wchar_t& ch, const char* &p, size_t& len );
+
     // Convert a string from the local character set to Unicode (UTF-8).
     virtual size_t
     map( char** output_ptr, size_t* output_buf_len, const char* input_ptr, size_t input_len ) const;
@@ -122,7 +125,7 @@ class QTadsCharmapToUni: public CCharmapToUni
     // Read characters from a file into a buffer, translating the characters to
     // UTF-8.
     virtual size_t
-    read_file( osfildef* fp, char* buf, size_t bufl, unsigned long read_limit );
+    read_file( class CVmDataSource* fp, char* buf, size_t bufl );
 
     // Only defined here because the linker barks.
     virtual void
@@ -136,6 +139,7 @@ class QTadsCharmapToUni: public CCharmapToUni
 /* --------------------------------------------------------------------
  * QTadsCharmapToLocal inline implementations.
  */
+
 inline size_t
 QTadsCharmapToLocal::map( wchar_t unicode_char, char** output_ptr, size_t* output_buf_len ) const
 {
@@ -170,6 +174,7 @@ QTadsCharmapToLocal::is_mappable( wchar_t unicode_char ) const
 /* --------------------------------------------------------------------
  * QTadsCharmapToUni inline implementations.
  */
+
 inline int
 QTadsCharmapToUni::is_complete_char( const char* p, size_t len ) const
 {
@@ -185,6 +190,33 @@ QTadsCharmapToUni::is_complete_char( const char* p, size_t len ) const
         return false;
     }
     delete decoder;
+    return true;
+}
+
+/*
+ *   Map one character.  Advances the input pointer and length past the
+ *   character.  If there's a complete character at 'p', maps the
+ *   character and returns true; if additional bytes are needed to form a
+ *   complete character, leaves 'p' unchanged and returns false.
+ */
+inline int
+QTadsCharmapToUni::mapchar( wchar_t& ch, const char* &p, size_t& len )
+{
+    // Try to find how many bytes it takes to form a complete character.
+    size_t i;
+    for (i = 1; i <= len and this->fLocalCodec->toUnicode(p, i).length() != 1; ++i)
+        ;
+    if (i > len) {
+        // We couldn't map.
+        return false;
+    }
+
+    // Since we got here, the first 'i' bytes form the first character.
+    ch = this->fLocalCodec->toUnicode(p, i)[0].unicode();
+
+    // Advance the input pointers and indicate success.
+    p += i;
+    len -= i;
     return true;
 }
 

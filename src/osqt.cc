@@ -32,6 +32,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QTemporaryFile>
 #include <QDebug>
 #include <cstdio>
 #include <cstdlib>
@@ -294,6 +295,29 @@ osfdel_temp( const char* fname )
 }
 
 
+/* Generate a name for a temporary file.
+ */
+int
+os_gen_temp_filename( char* buf, size_t buflen )
+{
+    QTemporaryFile tmpfile(QDir::tempPath() + QString::fromAscii("/qtads_XXXXXX"));
+    // Don't automatically delete the file from disk. This is safer,
+    // since another process could create a file with the same name
+    // before our caller gets the chance to re-create the file.
+    tmpfile.setAutoRemove(false);
+    tmpfile.open();
+    const QByteArray& data = tmpfile.fileName().toLocal8Bit();
+    tmpfile.close();
+    if (data.length() >= buflen) {
+        // 'buf' isn't big enough to hold the result, including the
+        // terminating '\0'.
+        return false;
+    }
+    qstrcpy(buf, data.constData());
+    return true;
+}
+
+
 /* --------------------------------------------------------------------
  * Filename manipulation routines.
  */
@@ -349,17 +373,17 @@ os_remext( char* fn )
  * what OS we're running.
  */
 char*
-os_get_root_name( char* buf )
+os_get_root_name( const char* buf )
 {
     Q_ASSERT(buf != 0);
 
-    char* p = buf;
+    const char* p = buf;
     for (p += std::strlen(buf) - 1; p > buf and *p != '/'; --p)
         ;
     if (p != buf) {
         ++p;
     }
-    return p;
+    return const_cast<char*>(p);
 }
 
 
@@ -412,6 +436,33 @@ os_is_file_absolute( const char* fname )
 }
 
 
+/* Get the absolute, fully qualified filename for a file.
+ */
+int
+os_get_abs_filename( char* result_buf, size_t result_buf_size, const char* filename )
+{
+    Q_ASSERT(result_buf != 0);
+    const QByteArray& data = QFileInfo(QString::fromLocal8Bit(filename)).absoluteFilePath().toLocal8Bit();
+    if (data.length() >= result_buf_size) {
+        // Result won't fit in 'result_buf'.
+        qstrcpy(result_buf, filename);
+        return false;
+    }
+    qstrcpy(result_buf, data.constData());
+    return true;
+}
+
+
+/* Determine if the given file is in the given directory.
+ */
+// FIXME: Implement this.
+int
+os_is_file_in_dir( const char* filename, const char* path, int include_subdirs )
+{
+    return false;
+}
+
+
 // --------------------------------------------------------------------
 
 /* Get a suitable seed for a random number generator.
@@ -440,6 +491,30 @@ os_rand( long* val )
     // systems the low-order bits aren't very random.
     *val = 1 + static_cast<long>(static_cast<long double>(65535) * std::rand() / (RAND_MAX + 1.0));
 }
+
+
+/* Generate random bytes for use in seeding a PRNG (pseudo-random number
+ * generator).
+ */
+// FIXME: Implement this.
+void
+os_gen_rand_bytes( unsigned char *buf, size_t len )
+{
+}
+
+
+/* --------------------------------------------------------------------
+ * Allocating sprintf and vsprintf.
+ */
+// FIXME: Implement this.
+//int
+//os_asprintf( char** bufptr, const char* fmt, ... )
+//{}
+
+// FIXME: Implement this.
+//int
+//os_vasprintf( char** bufptr, const char* fmt, va_list ap )
+//{}
 
 
 /* --------------------------------------------------------------------
@@ -921,5 +996,11 @@ os_show_popup_menu( int default_pos, int x, int y, const char* txt, size_t txtle
 // FIXME: Just a dummy implementation for now.
 void
 os_enable_cmd_event( int id, unsigned int status )
+{
+}
+
+
+void
+os_init_ui_after_load( class CVmBifTable* bif_table, class CVmMetaTable* meta_table)
 {
 }

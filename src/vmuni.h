@@ -28,13 +28,15 @@
 /* Character types.  Types are mutually exclusive, so a character has
  * exactly one type.
  */
-#define T3_CTYPE_NONE   0  // Character doesn't fit any other category.
-#define T3_CTYPE_ALPHA  1  // Alphabetic, with no case information.
-#define T3_CTYPE_UPPER  2  // Upper-case alphabetic.
-#define T3_CTYPE_LOWER  3  // Lower-case alphabetic.
-#define T3_CTYPE_DIGIT  4  // Digit.
-#define T3_CTYPE_SPACE  5  // Horizontal whitespace.
-#define T3_CTYPE_PUNCT  6  // Punctuation.
+#define T3_CTYPE_UNDEF  0                        /* character isn't defined */
+#define T3_CTYPE_ALPHA  1           /* alphabetic, with no case information */
+#define T3_CTYPE_UPPER  2                          /* upper-case alphabetic */
+#define T3_CTYPE_LOWER  3                          /* lower-case alphabetic */
+#define T3_CTYPE_DIGIT  4                                          /* digit */
+#define T3_CTYPE_SPACE  5                          /* horizontal whitespace */
+#define T3_CTYPE_PUNCT  6                                    /* punctuation */
+#define T3_CTYPE_VSPACE 7                            /* vertical whitespace */
+#define T3_CTYPE_NONE   8       /* character doesn't fit any other category */
 
 /* Get the character type.
  */
@@ -44,11 +46,13 @@ t3_get_chartype( wchar_t ch )
     const QChar c(ch);
 
     switch(c.category()) {
-      case QChar::Number_DecimalDigit:
-        return T3_CTYPE_DIGIT;
+      case QChar::NoCategory:
+        return T3_CTYPE_UNDEF;
 
-      case QChar::Separator_Space:
-        return T3_CTYPE_SPACE;
+      case QChar::Letter_Titlecase:
+      case QChar::Letter_Modifier:
+      case QChar::Letter_Other:
+        return T3_CTYPE_ALPHA;
 
       case QChar::Letter_Uppercase:
         return T3_CTYPE_UPPER;
@@ -56,10 +60,11 @@ t3_get_chartype( wchar_t ch )
       case QChar::Letter_Lowercase:
         return T3_CTYPE_LOWER;
 
-      case QChar::Letter_Titlecase:
-      case QChar::Letter_Modifier:
-      case QChar::Letter_Other:
-        return T3_CTYPE_ALPHA;
+      case QChar::Number_DecimalDigit:
+        return T3_CTYPE_DIGIT;
+
+      case QChar::Separator_Space:
+        return T3_CTYPE_SPACE;
 
       case QChar::Punctuation_Connector:
       case QChar::Punctuation_Dash:
@@ -69,6 +74,24 @@ t3_get_chartype( wchar_t ch )
       case QChar::Punctuation_FinalQuote:
       case QChar::Punctuation_Other:
         return T3_CTYPE_PUNCT;
+
+      case QChar::Separator_Line:
+      case QChar::Separator_Paragraph:
+        return T3_CTYPE_VSPACE;
+
+      case QChar::Other_Control:
+        if (ch == 0x0B) {
+            /* TADS-specific \b character -> vertical whitespace */
+            return T3_CTYPE_VSPACE;
+        }
+        if (ch == 0x0E || ch == 0x0F) {
+            /* TADS-specific \v and \^ -> device controls */
+            return T3_CTYPE_NONE;
+        }
+        if (ch == 0x15) {
+            /* TADS-specific '\ ' quoted space -> ordinary character */
+            return T3_CTYPE_NONE;
+        }
 
       default:
         return T3_CTYPE_NONE;
@@ -88,7 +111,7 @@ t3_is_alpha( wchar_t ch )
 inline int
 t3_is_upper( wchar_t ch )
 {
-    return QChar(ch).category() == QChar::Letter_Uppercase;
+    return QChar(ch).isUpper();
 }
 
 /* Lowercase?
@@ -96,7 +119,7 @@ t3_is_upper( wchar_t ch )
 inline int
 t3_is_lower( wchar_t ch )
 {
-    return QChar(ch).category() == QChar::Letter_Lowercase;
+    return QChar(ch).isLower();
 }
 
 /* Digit?
@@ -116,12 +139,37 @@ t3_is_space( wchar_t ch )
     return QChar(ch).category() == QChar::Separator_Space;
 }
 
+/* Vertical whitespace?
+ */
+inline int
+t3_is_vspace( wchar_t ch )
+{
+    return t3_get_chartype(ch) == T3_CTYPE_VSPACE;
+}
+
+/* Any whitespace, horizontal or vertical?
+ */
+inline int
+t3_is_whitespace( wchar_t ch )
+{
+    int t = t3_get_chartype(ch);
+    return t == T3_CTYPE_SPACE or t == T3_CTYPE_VSPACE;
+}
+
 /* Punctuation?
  */
 inline int
 t3_is_punct( wchar_t ch )
 {
     return QChar(ch).isPunct();
+}
+
+/* Is it a defined unicode character?
+ */
+inline int
+t3_is_unichar( wchar_t ch )
+{
+    return (t3_get_chartype(ch) != T3_CTYPE_UNDEF);
 }
 
 /* Convert to upper case.

@@ -57,8 +57,8 @@ QMAKE_CFLAGS_WARN_OFF =
 }
 
 # This is just a hack to make code completion work OK in Qt Creator.
-INCLUDEPATH += /usr/include/SDL /usr/include/smpeg
-INCLUDEPATH -= /usr/include/SDL /usr/include/smpeg
+#INCLUDEPATH += /usr/include/SDL /usr/include/smpeg
+#INCLUDEPATH -= /usr/include/SDL /usr/include/smpeg
 
 # Where to find the portable Tads sources.
 T2DIR = tads2
@@ -72,7 +72,8 @@ DEFINES += \
     _M_QT \
     T3_COMPILING_FOR_HTML \
     VM_FLAT_POOL \
-    USE_HTML
+    USE_HTML \
+    TC_TARGET_T3
 
 CONFIG(release, debug|release) {
     DEFINES += VMGLOB_VARS
@@ -259,10 +260,29 @@ SOURCES += \
     $$T3DIR/askf_os3.cpp \
     $$T3DIR/gameinfo.cpp \
     $$T3DIR/indlg_os3.cpp \
+    $$T3DIR/md5.cpp \
     $$T3DIR/resfind.cpp \
-    $$T3DIR/resnoexe.cpp \
     $$T3DIR/resload.cpp \
+    $$T3DIR/resnoexe.cpp \
+    $$T3DIR/sha2.cpp \
     $$T3DIR/std.cpp \
+    $$T3DIR/tcerr.cpp \
+    $$T3DIR/tcerrmsg.cpp \
+    $$T3DIR/tcgen.cpp \
+    $$T3DIR/tcglob.cpp \
+    $$T3DIR/tcmain.cpp \
+    $$T3DIR/tcprs.cpp \
+    $$T3DIR/tcprs_rt.cpp \
+    $$T3DIR/tcprsnf.cpp \
+    $$T3DIR/tcprsnl.cpp \
+    $$T3DIR/tcprsstm.cpp \
+    $$T3DIR/tcsrc.cpp \
+    $$T3DIR/tct3.cpp \
+    $$T3DIR/tct3_d.cpp \
+    $$T3DIR/tct3nl.cpp \
+    $$T3DIR/tct3stm.cpp \
+    $$T3DIR/tct3unas.cpp \
+    $$T3DIR/tctok.cpp \
     $$T3DIR/utf8.cpp \
     $$T3DIR/vmanonfn.cpp \
     $$T3DIR/vmbif.cpp \
@@ -283,27 +303,32 @@ SOURCES += \
     $$T3DIR/vmcrc.cpp \
     $$T3DIR/vmcset.cpp \
     $$T3DIR/vmdict.cpp \
+    $$T3DIR/vmdynfunc.cpp \
     $$T3DIR/vmerr.cpp \
     $$T3DIR/vmerrmsg.cpp \
     $$T3DIR/vmfile.cpp \
     $$T3DIR/vmfilobj.cpp \
+    $$T3DIR/vmfref.cpp \
     $$T3DIR/vmfunc.cpp \
     $$T3DIR/vmglob.cpp \
     $$T3DIR/vmgram.cpp \
     $$T3DIR/vmhash.cpp \
     $$T3DIR/vmimage.cpp \
     $$T3DIR/vmimg_nd.cpp \
+    $$T3DIR/vmini_nd.cpp \
     $$T3DIR/vminit.cpp \
     $$T3DIR/vminitfl.cpp \
-    $$T3DIR/vmini_nd.cpp \
     $$T3DIR/vmintcls.cpp \
+    $$T3DIR/vmisaac.cpp \
     $$T3DIR/vmiter.cpp \
     $$T3DIR/vmlookup.cpp \
     $$T3DIR/vmlst.cpp \
     $$T3DIR/vmmain.cpp \
     $$T3DIR/vmmcreg.cpp \
     $$T3DIR/vmmeta.cpp \
+    $$T3DIR/vmnetfillcl.cpp \
     $$T3DIR/vmobj.cpp \
+    $$T3DIR/vmpack.cpp \
     $$T3DIR/vmpat.cpp \
     $$T3DIR/vmpool.cpp \
     $$T3DIR/vmpoolfl.cpp \
@@ -317,7 +342,9 @@ SOURCES += \
     $$T3DIR/vmsrcf.cpp \
     $$T3DIR/vmstack.cpp \
     $$T3DIR/vmstr.cpp \
+    $$T3DIR/vmstrbuf.cpp \
     $$T3DIR/vmstrcmp.cpp \
+    $$T3DIR/vmtmpfil.cpp \
     $$T3DIR/vmtobj.cpp \
     $$T3DIR/vmtype.cpp \
     $$T3DIR/vmtypedh.cpp \

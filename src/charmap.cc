@@ -33,6 +33,7 @@
 #include "utf8.h"
 #include "resload.h"
 #include "charmap.h"
+#include "vmdatasrc.h"
 
 #include "qtadscharmap.h"
 
@@ -489,7 +490,6 @@ CCharmapToLocalASCII::CCharmapToLocalASCII()
     }
 }
 
-
 /*
  *   create the translator
  */
@@ -913,7 +913,8 @@ void CCharmapToLocal::load_table(osfildef *fp)
 /*
  *   Write to a file
  */
-int CCharmapToLocal::write_file(osfildef *fp, const char *buf, size_t bufl)
+int CCharmapToLocal::write_file(CVmDataSource *fp,
+                                const char *buf, size_t bufl)
 {
     utf8_ptr p;
 
@@ -932,7 +933,7 @@ int CCharmapToLocal::write_file(osfildef *fp, const char *buf, size_t bufl)
                             &used_src_len);
 
         /* write out this chunk */
-        if (osfwb(fp, conv_buf, conv_len))
+        if (fp->write(conv_buf, conv_len))
             return 1;
 
         /* advance past this chunk in the input */
@@ -944,6 +945,11 @@ int CCharmapToLocal::write_file(osfildef *fp, const char *buf, size_t bufl)
     return 0;
 }
 
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   Character mapper - trivial UTF8-to-UTF8 conversion
+ */
 
 /*
  *   map a character
@@ -1063,6 +1069,12 @@ size_t CCharmapToLocalUTF8::map_utf8z(char *dest, size_t dest_len,
      */
     return src_len;
 }
+
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   Character mapper - Unicode to Single-byte
+ */
 
 /*
  *   map a character
@@ -1274,6 +1286,182 @@ size_t CCharmapToUni::map_str(char *outbuf, size_t outbuflen,
     return output_len;
 }
 
+/*
+ *   Validate a buffer of utf-8 characters
+ */
+void CCharmapToUni::validate(char *buf, size_t len)
+{
+    for ( ; len != 0 ; ++buf, --len)
+    {
+        /* check the type of the character */
+        char c = *buf;
+        if ((c & 0x80) == 0)
+        {
+            /* 0..127 are one-byte characters, so this is valid */
+        }
+        else if ((c & 0xC0) == 0x80)
+        {
+            /*
+             *   This byte has the pattern 10xxxxxx, which makes it a
+             *   continuation byte.  Since we didn't just come from a
+             *   multi-byte intro byte, this is invalid.  Change this byte to
+             *   '?'.
+             */
+            *buf = '?';
+        }
+        else if ((c & 0xE0) == 0xC0)
+        {
+            /*
+             *   This byte has the pattern 110xxxxx, which makes it the first
+             *   byte of a two-byte character sequence.  The next byte must
+             *   have the pattern 10xxxxxx - if not, mark the current
+             *   character as invalid, since it's not part of a valid
+             *   sequence, and deal with the next byte separately.
+             */
+            if (len > 1 && (*(buf+1) & 0xC0) == 0x80)
+            {
+                /* we have a valid two-byte sequence - skip it */
+                ++buf;
+                --len;
+            }
+            else
+            {
+                /*
+                 *   the next byte isn't a continuation, so the current byte
+                 *   is invalid
+                 */
+                *buf = '?';
+            }
+        }
+        else
+        {
+            /*
+             *   This byte has the pattern 111xxxxx, which makes it the first
+             *   byte of a three-byte sequence.  The next two bytes must be
+             *   marked as continuation bytes.
+             */
+            if (len > 2
+                && (*(buf+1) & 0xC0) == 0x80
+                && (*(buf+2) & 0xC0) == 0x80)
+            {
+                /* we have a valid three-byte sequence - skip it */
+                buf += 2;
+                len -= 2;
+            }
+            else
+            {
+                /* this is not a valid three-byte sequence */
+                *buf = '?';
+            }
+        }
+    }
+}
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   Basic single-byte character set to UTF-8 mapper
+ */
+
+/*
+ *   read from a single-byte file and translate to UTF-8
+ */
+size_t CCharmapToUniSB_basic::read_file(CVmDataSource *fp,
+                                        char *buf, size_t bufl)
+{
+    size_t inlen;
+
+    /*
+     *   Compute how much to read from the file.  The input file is
+     *   composed of single-byte characters, so only read up to one third
+     *   of the buffer length; this will ensure that we can always fit
+     *   what we read into the caller's buffer.
+     */
+    inlen = bufl / 3;
+
+    /* in any case, we can't read more than our own buffer size */
+    if (inlen > sizeof(inbuf_))
+        inlen = sizeof(inbuf_);
+
+    /* read from the file */
+    inlen = fp->readc(inbuf_, inlen);
+
+    /*
+     *   Map data to the caller's buffer, and return the result.  We're
+     *   certain that the data will fit in the caller's buffer: we're
+     *   mapping only a third as many characters as we have bytes
+     *   available, and each character can take up at most three bytes,
+     *   hence the worst case is that we fill the buffer completely.
+     *
+     *   On the other hand, we may only fill the buffer to a third of its
+     *   capacity, but this is okay too, since we're not required to give
+     *   the caller everything they asked for.
+     */
+    return map(&buf, &bufl, inbuf_, inlen);
+}
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   Plain ASCII local to UTF-8 mapper
+ */
+
+/*
+ *   map a string from the single-byte local character set to UTF-8
+ */
+size_t CCharmapToUniASCII::map(char **outp, size_t *outlen,
+                               const char *inp, size_t inlen) const
+{
+    size_t tot_outlen;
+
+    /* we haven't written any characters to the output buffer yet */
+    tot_outlen = 0;
+
+    /* scan each character (character == byte) in the input string */
+    for ( ; inlen > 0 ; --inlen, ++inp)
+    {
+        wchar_t uni;
+        size_t csiz;
+
+        /*
+         *   map any character outside of the 7-bit range to U+FFFD, the
+         *   Unicode REPLACEMENT CHARACTER, which is the standard way to
+         *   represent characters that can't be mapped from an incoming
+         *   character set
+         */
+        if (((unsigned char)*inp) > 127)
+            uni = 0xfffd;
+        else
+            uni = ((wchar_t)(unsigned char)*inp);
+
+        /* get the size of this character */
+        csiz = utf8_ptr::s_wchar_size(uni);
+
+        /* add it to the total output length */
+        tot_outlen += csiz;
+
+        /* if there's room, add it to our output buffer */
+        if (*outlen >= csiz)
+        {
+            /* write it out */
+            *outp += utf8_ptr::s_putch(*outp, uni);
+
+            /* deduct it from the remaining output length */
+            *outlen -= csiz;
+        }
+        else
+        {
+            /* there's no room - set the remaining output length to zero */
+            *outlen = 0;
+        }
+    }
+
+    /* return the total output length */
+    return tot_outlen;
+}
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   Trivial UTF8-to-UTF8 input mapper
+ */
 
 /*
  *   map a string
@@ -1313,11 +1501,14 @@ size_t CCharmapToUniUTF8::map2(char **outp, size_t *outlen,
         *outlen -= copy_len;
     }
 
-    /* Copy the data, if appropriate.  If 'outp' is 0, the caller is just
-     * trying to figure out the total length needed.
-     */
-    if (outp != 0) {
+    /* copy the data, if we have an output buffer */
+    if (outp != 0)
+    {
+        /* copy the bytes */
         memcpy(*outp, inp, copy_len);
+
+        /* validate that the bytes we copied are well-formed UTF-8 */
+        validate(*outp, copy_len);
 
         /* advance the output pointer past the copied data */
         *outp += copy_len;
@@ -1334,18 +1525,13 @@ size_t CCharmapToUniUTF8::map2(char **outp, size_t *outlen,
 /*
  *   read a file
  */
-size_t CCharmapToUniUTF8::read_file(osfildef *fp,
-                                    char *buf, size_t bufl,
-                                    unsigned long read_limit)
+size_t CCharmapToUniUTF8::read_file(CVmDataSource *fp,
+                                    char *buf, size_t bufl)
 {
     size_t read_len;
     char *last_start;
     size_t last_got_len;
     size_t last_need_len;
-
-    /* make sure we don't read past the read limit, if applicable */
-    if (read_limit != 0 && bufl > read_limit)
-        bufl = (size_t)read_limit;
 
     /*
      *   Read directly from the file, up the buffer size minus two bytes.
@@ -1360,13 +1546,17 @@ size_t CCharmapToUniUTF8::read_file(osfildef *fp,
      *   keep continuation sequences intact.
      */
     if (bufl < 3)
-        return osfrbc(fp, buf, bufl);
+    {
+        read_len = fp->readc(buf, bufl);
+        validate(buf, read_len);
+        return read_len;
+    }
 
     /*
      *   read up to the buffer size, less two bytes for possible
      *   continuation bytes
      */
-    read_len = osfrbc(fp, buf, bufl - 2);
+    read_len = fp->readc(buf, bufl - 2);
 
     /*
      *   if we didn't satisfy the entire request, we're at the end of the
@@ -1374,7 +1564,10 @@ size_t CCharmapToUniUTF8::read_file(osfildef *fp,
      *   continuation sequences - in this case, just return what we have
      */
     if (read_len < bufl - 2)
+    {
+        validate(buf, read_len);
         return read_len;
+    }
 
     /*
      *   Check the last byte we read to see if there's another byte or two
@@ -1394,7 +1587,10 @@ size_t CCharmapToUniUTF8::read_file(osfildef *fp,
          *   read a complete sequence
          */
         if (read_len == 1)
+        {
+            validate(buf, read_len);
             return read_len;
+        }
 
         /* back up to the byte we're continuing from */
         --last_start;
@@ -1406,7 +1602,10 @@ size_t CCharmapToUniUTF8::read_file(osfildef *fp,
          *   we could need to read anything more
          */
         if (utf8_ptr::s_is_continuation(last_start))
+        {
+            validate(buf, read_len);
             return read_len;
+        }
     }
 
     /*
@@ -1422,9 +1621,171 @@ size_t CCharmapToUniUTF8::read_file(osfildef *fp,
          *   we need more than we actually read, so read the remaining
          *   characters
          */
-        read_len += osfrbc(fp, buf + read_len, last_need_len - last_got_len);
+        read_len += fp->readc(buf + read_len, last_need_len - last_got_len);
     }
+
+    /* validate the buffer - ensure that it's well-formed UTF-8 */
+    validate(buf, read_len);
 
     /* return the length we read */
     return read_len;
+}
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   Basic UCS-2 to UTF-8 mapper
+ */
+
+/*
+ *   Read from a file, translating to UTF-8 encoding
+ */
+size_t CCharmapToUniUcs2::read_file(CVmDataSource *fp,
+                                    char *buf, size_t bufl)
+{
+    size_t inlen;
+
+    /*
+     *   Compute how much to read from the file.  The input file is composed
+     *   of two-byte characters, so only read up to two thirds of the buffer
+     *   length; this will ensure that we can always fit what we read into
+     *   the caller's buffer.
+     *
+     *   Note that we divide by three first, then double the result, to
+     *   ensure that we read an even number of bytes.  Each UCS-2 character
+     *   is represented in exactly two bytes, so we must always read pairs of
+     *   bytes to be sure we're reading whole characters.
+     */
+    inlen = bufl / 3;
+    inlen *= 2;
+
+    /* in any case, we can't read more than our own buffer size */
+    if (inlen > sizeof(inbuf_))
+        inlen = sizeof(inbuf_);
+
+    /* read from the file */
+    inlen = fp->readc(inbuf_, inlen);
+
+    /*
+     *   Map data to the caller's buffer, and return the result.  We're
+     *   certain that the data will fit in the caller's buffer: we're
+     *   mapping only a third as many characters as we have bytes
+     *   available, and each character can take up at most three bytes,
+     *   hence the worst case is that we fill the buffer completely.
+     *
+     *   On the other hand, we may only fill the buffer to a third of its
+     *   capacity, but this is okay too, since we're not required to give
+     *   the caller everything they asked for.
+     */
+    return map(&buf, &bufl, inbuf_, inlen);
+}
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   UCS-2 little-endian to UTF-8 mapper
+ */
+
+/*
+ *   map a string
+ */
+size_t CCharmapToUniUcs2Little::map(char **outp, size_t *outlen,
+                                    const char *inp, size_t inlen) const
+{
+    size_t tot_outlen;
+
+    /* we haven't written any characters to the output buffer yet */
+    tot_outlen = 0;
+
+    /* scan each character (character == byte pair) in the input string */
+    for ( ; inlen > 1 ; inlen -= 2, inp += 2)
+    {
+        wchar_t uni;
+        size_t csiz;
+
+        /*
+         *   read the little-endian two-byte value - no mapping is
+         *   required, since UCS-2 uses the same code point assignments as
+         *   UTF-8
+         */
+        uni = ((wchar_t)(unsigned char)*inp)
+              + (((wchar_t)(unsigned char)*(inp + 1)) << 8);
+
+        /* get the size of this character */
+        csiz = utf8_ptr::s_wchar_size(uni);
+
+        /* add it to the total output lenght */
+        tot_outlen += csiz;
+
+        /* if there's room, add it to our output buffer */
+        if (*outlen >= csiz)
+        {
+            /* write it out */
+            *outp += utf8_ptr::s_putch(*outp, uni);
+
+            /* deduct it from the remaining output length */
+            *outlen -= csiz;
+        }
+        else
+        {
+            /* there's no room - set the remaining output length to zero */
+            *outlen = 0;
+        }
+    }
+
+    /* return the total output length */
+    return tot_outlen;
+}
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   UCS-2 big-endian to UTF-8 mapper
+ */
+
+/*
+ *   map a string
+ */
+size_t CCharmapToUniUcs2Big::map(char **outp, size_t *outlen,
+                                 const char *inp, size_t inlen) const
+{
+    size_t tot_outlen;
+
+    /* we haven't written any characters to the output buffer yet */
+    tot_outlen = 0;
+
+    /* scan each character (character == byte pair) in the input string */
+    for ( ; inlen > 1 ; inlen -= 2, inp += 2)
+    {
+        wchar_t uni;
+        size_t csiz;
+
+        /*
+         *   read the big-endian two-byte value - no mapping is required,
+         *   since UCS-2 uses the same code point assignments as UTF-8
+         */
+        uni = (((wchar_t)(unsigned char)*inp) << 8)
+              + ((wchar_t)(unsigned char)*(inp + 1));
+
+        /* get the size of this character */
+        csiz = utf8_ptr::s_wchar_size(uni);
+
+        /* add it to the total output lenght */
+        tot_outlen += csiz;
+
+        /* if there's room, add it to our output buffer */
+        if (*outlen >= csiz)
+        {
+            /* write it out */
+            *outp += utf8_ptr::s_putch(*outp, uni);
+
+            /* deduct it from the remaining output length */
+            *outlen -= csiz;
+        }
+        else
+        {
+            /* there's no room - set the remaining output length to zero */
+            *outlen = 0;
+        }
+    }
+
+    /* return the total output length */
+    return tot_outlen;
 }
