@@ -43,7 +43,7 @@ win32 {
         QMAKE_LFLAGS += $$PWD/w32_linkscript
     }
 
-    LIBS += -lvorbisfile -lvorbis -logg
+    LIBS += -lvorbisfile -lvorbis -logg -liberty
 }
 
 RESOURCES += resources.qrc
