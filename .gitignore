@@ -8,3 +8,4 @@
 /qmake_image_collection.cpp
 /qtads
 /qtads.pro.user*
+/qrc_resources.cpp
