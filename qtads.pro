@@ -2,6 +2,13 @@ TEMPLATE = app
 CONFIG += qt silent warn_off
 QT += network
 VERSION = 2.1.1.99
+
+# On Windows and OS X we build static binaries, so we need to explicitly
+# include the text codec plugins.
+win32|macx {
+    QTPLUGIN += qcncodecs qjpcodecs qtwcodecs qkrcodecs
+}
+
 macx {
     QMAKE_INFO_PLIST = Info.plist
     QMAKE_LFLAGS += -F./Frameworks

@@ -16,6 +16,7 @@
  */
 #include <QMetaType>
 #include <QFileDialog>
+#include <QtPlugin>
 
 #ifndef Q_WS_ANDROID
 #include <SDL.h>
@@ -28,7 +29,6 @@
 #include "qtadssound.h"
 #include "syssoundmidi.h"
 
-
 // On some platforms, SDL redefines main in order to provide a
 // platform-specific main() implementation.  However, Qt handles this too,
 // so things can get weird.  We need to make sure main is not redefined so
@@ -39,6 +39,15 @@
 #ifdef main
 #  undef main
 #endif
+
+// Import the text codecs on OS X and Windows, since we build a static binary.
+#if defined(Q_WS_MAC) || defined(Q_WS_WIN)
+Q_IMPORT_PLUGIN(qcncodecs)
+Q_IMPORT_PLUGIN(qjpcodecs)
+Q_IMPORT_PLUGIN(qtwcodecs)
+Q_IMPORT_PLUGIN(qkrcodecs)
+#endif
+
 
 int main( int argc, char** argv )
 {
