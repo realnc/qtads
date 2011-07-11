@@ -696,7 +696,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>The majority of TADS 2 games don't use Unicode to display characters not covered by the ASCII character set. They also don't tell interpreters what encoding they actually use. Here you can select which encoding QTads should use for TADS 2 games. Note that this setting only takes effect on newly added text; already existing text will not be converted to the new encoding.</string>
+          <string>The majority of TADS 2 games don't use Unicode to display characters not covered by the ASCII character set. They also don't tell interpreters what encoding they actually use. Here you can select the character set that should be used for TADS 2 games. Note that this setting only takes effect on newly added text; already existing text will not be converted.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
