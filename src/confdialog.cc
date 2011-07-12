@@ -136,6 +136,7 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
     }
     ui->encodingComboBox->setCurrentIndex(ui->encodingComboBox->findText(QString::fromAscii(sett->tads2Encoding)));
 
+    ui->softScrollCheckBox->setChecked(sett->softScrolling);
     ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
 
 #ifdef Q_WS_MAC
@@ -233,6 +234,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->safety4RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
 
     connect(ui->encodingComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(fApplySettings()));
+    connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->askForGameFileCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 }
 
@@ -296,6 +298,7 @@ ConfDialog::fApplySettings()
         sett->ioSafetyLevel = 4;
     }
     sett->tads2Encoding = ui->encodingComboBox->currentText().toAscii();
+    sett->softScrolling = ui->softScrollCheckBox->isChecked();
     sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
 
     // Notify the application that preferences have changed.

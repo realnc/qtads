@@ -454,14 +454,18 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int
     }
 }
 
+extern void
+os_sleep_ms( long ms );
 
 void
 CHtmlSysWinQt::scrollDown( bool force, bool justOneLine )
 {
+    QScrollBar* bar = this->verticalScrollBar();
+
     // If we're very small, or shouldn't scroll, or there's nothing to scroll,
     // ignore the call.
     if (this->width() < 10 or this->height() < 10 or not this->fBannerStyleAutoVScroll
-        or this->verticalScrollBar()->maximum() == this->verticalScrollBar()->minimum())
+        or bar->maximum() == bar->minimum())
     {
         return;
     }
@@ -469,7 +473,14 @@ CHtmlSysWinQt::scrollDown( bool force, bool justOneLine )
     // Simply scroll directly to the bottom if more-mode is disabled for this
     // banner or the game is in non-stop mode.
     if (not this->fBannerStyleModeMode or qFrame->nonStopMode()) {
-        this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+        if (qFrame->settings()->softScrolling) {
+            while (bar->value() < bar->maximum()) {
+                bar->setValue(bar->value() + bar->singleStep());
+                os_sleep_ms(5);
+            }
+        } else {
+            bar->triggerAction(QAbstractSlider::SliderToMaximum);
+        }
         return;
     }
 
@@ -477,13 +488,22 @@ CHtmlSysWinQt::scrollDown( bool force, bool justOneLine )
         return;
     }
 
-    QScrollBar* bar = this->verticalScrollBar();
-
     if (this->fInPagePauseMode) {
         if (justOneLine) {
             bar->triggerAction(QAbstractSlider::SliderSingleStepAdd);
+        } else if (qFrame->settings()->softScrolling) {
+            int target = bar->value() + bar->pageStep() - bar->singleStep() * 2;
+            while (bar->value() < target and bar->value() < bar->maximum()) {
+                bar->setValue(bar->value() + bar->singleStep());
+                os_sleep_ms(5);
+            }
         } else {
             bar->setValue(bar->value() + bar->pageStep() - bar->singleStep() * 2);
+        }
+    } else if (qFrame->settings()->softScrolling) {
+        while (bar->value() < this->lastInputHeight and bar->value() < bar->maximum()) {
+            bar->setValue(bar->value() + bar->singleStep());
+            os_sleep_ms(5);
         }
     } else {
         bar->setValue(this->lastInputHeight);
@@ -495,7 +515,7 @@ CHtmlSysWinQt::scrollDown( bool force, bool justOneLine )
         this->fInPagePauseMode = true;
         // Note our new position.  Make sure that next time, we scroll down by
         // *almost* a page; we leave two lines of context.
-        this->lastInputHeight += this->verticalScrollBar()->pageStep() - this->verticalScrollBar()->singleStep() * 2;
+        this->lastInputHeight += bar->pageStep() - bar->singleStep() * 2;
         return;
     }
     this->fInPagePauseMode = false;

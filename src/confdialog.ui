@@ -728,6 +728,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="softScrollCheckBox">
+         <property name="text">
+          <string>Soft Scrolling</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="askForGameFileCheckBox">
          <property name="text">
           <string>Ask for a game file at startup</string>

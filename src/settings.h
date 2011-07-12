@@ -58,6 +58,7 @@ class Settings {
     int ioSafetyLevel;
 
     QByteArray tads2Encoding;
+    bool softScrolling;
     bool askForGameFile;
     QString lastFileOpenDir;
 
