@@ -461,24 +461,16 @@ os_is_file_in_dir( const char* filename, const char* path, int include_subdirs )
 {
     Q_ASSERT(filename != 0);
     Q_ASSERT(path != 0);
+    Q_ASSERT(filename[qstrlen(filename) - 1] != '/');
 
     QFileInfo inf(QString::fromLocal8Bit(filename));
 
-    // If the filename is absolute and the file exists, indicate that we
-    // found it. Otherwise, report failure.
-    if (inf.isAbsolute()) {
-        if (inf.exists()) {
-            return true;
-        }
-        return false;
-    }
-
     // Look in 'path' first, before recursing its subdirectories.
-    bool found = QDir(QString::fromLocal8Bit(path)).exists(inf.filePath());
+    bool found = QDir(QString::fromLocal8Bit(path)).exists(inf.fileName());
 
-    // If we have already found the file in 'path', or we're not searching
-    // in subdirectories, report the result now; in both cases, we don't
-    // need to recurse subdirectories.
+    // If we already found the file in 'path', or we're not searching in
+    // subdirectories, report the result now; in both cases, we don't need
+    // to recurse subdirectories.
     if (found or not include_subdirs) {
         return found;
     }
@@ -491,8 +483,7 @@ os_is_file_in_dir( const char* filename, const char* path, int include_subdirs )
     QDirIterator it(QString::fromLocal8Bit(path), QDir::Dirs | QDir::NoDotAndDotDot,
                     QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
     while (it.hasNext() and not found) {
-        const QString& curPath = it.next();
-        if (QDir(curPath).exists(inf.filePath())) {
+        if (QDir(it.next()).exists(inf.fileName())) {
             found = true;
         }
     }
