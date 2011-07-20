@@ -11,7 +11,6 @@ win32|macx {
 
 macx {
     QMAKE_INFO_PLIST = Info.plist
-    QMAKE_LFLAGS += -F./Frameworks
     LIBS += -framework SDL_mixer -framework SDL_sound -framework SDL
     INCLUDEPATH += \
         ./Frameworks/SDL.framework/Headers \
@@ -20,6 +19,9 @@ macx {
         ./Frameworks/SDL_sound.framework/Headers
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
     QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.5.sdk
+    QMAKE_CFLAGS += -fvisibility=hidden -fomit-frame-pointer
+    QMAKE_CXXFLAGS += -fvisibility=hidden -fomit-frame-pointer
+    QMAKE_LFLAGS += -F./Frameworks -dead_strip
 } else {
     CONFIG += link_pkgconfig
     PKGCONFIG += sdl
