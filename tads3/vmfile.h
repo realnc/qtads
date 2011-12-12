@@ -266,7 +266,7 @@ public:
      */
     char *read_line_alo();
 
-    /* write byte */
+    /* write bytes */
     virtual void write_bytes(const char *buf, size_t len) = 0;
 
     /* get the current seek offset */
@@ -520,6 +520,29 @@ protected:
 };
 
 /*
+ *   Memory stream, using a private allocated buffer
+ */
+class CVmPrivateMemoryStream: public CVmMemoryStream
+{
+public:
+    CVmPrivateMemoryStream(size_t len)
+        : CVmMemoryStream(lib_alloc_str(len), len)
+    {
+    }
+
+    CVmPrivateMemoryStream(const char *str, size_t len)
+        : CVmMemoryStream(lib_copy_str(str), len)
+    {
+    }
+
+    ~CVmPrivateMemoryStream()
+    {
+        /* free our private buffer */
+        lib_free_str(buf_);
+    }
+};
+
+/*
  *   Read-only memory stream 
  */
 class CVmReadOnlyMemoryStream: public CVmMemoryStream
@@ -622,16 +645,17 @@ public:
                 buf += cur;
             }
 
-            /* 
-             *   if this is the last block, and there's more to read, we
-             *   can't satisfy the request 
-             */
-            if (cur_block_->nxt == 0 && len != 0)
-                err_throw(VMERR_READ_FILE);
+            /* if there's more to read, advance to the next block */
+            if (len != 0)
+            {
+                /* if this is the last block, we can't satisfy the request */
+                if (cur_block_->nxt == 0)
+                    err_throw(VMERR_READ_FILE);
 
-            /* advance to the start of the next block */
-            cur_block_ = cur_block_->nxt;
-            cur_block_ofs_ = 0;
+                /* advance to the start of the next block */
+                cur_block_ = cur_block_->nxt;
+                cur_block_ofs_ = 0;
+            }
         }
     }
 
@@ -718,20 +742,21 @@ public:
                 buf += cur;
             }
 
-            /* 
-             *   if this the last block, and there's more to write, add
-             *   another block 
-             */
-            if (cur_block_->nxt == 0 && len != 0)
+            /* if there's more to write, advance to the next block */
+            if (len != 0)
             {
-                add_block();
+                /* if this is the last block, add a new one */
                 if (cur_block_->nxt == 0)
-                    err_throw(VMERR_WRITE_FILE);
-            }
+                {
+                    add_block();
+                    if (cur_block_->nxt == 0)
+                        err_throw(VMERR_WRITE_FILE);
+                }
 
-            /* advance to the start of the next block */
-            cur_block_ = cur_block_->nxt;
-            cur_block_ofs_ = 0;
+                /* advance to the next block */
+                cur_block_ = cur_block_->nxt;
+                cur_block_ofs_ = 0;
+            }
         }
 
         /* 

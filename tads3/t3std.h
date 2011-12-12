@@ -197,7 +197,9 @@ typedef unsigned long  ulong;
 #define SCHARMINVAL   (-(0x7f)-1)
 
 /* sizeof() extension macros */
+#ifndef countof
 #define countof(array) (sizeof(array)/sizeof((array)[0]))
+#endif
 #define sizeof_field(struct_name, field) sizeof(((struct_name *)0)->field)
 
 

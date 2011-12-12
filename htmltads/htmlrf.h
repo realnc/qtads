@@ -53,6 +53,12 @@ public:
      */
     void init_appctx(appctxdef *appctx)
     {
+        /* 
+         *   hang on to a reference to the context - we need it to get the
+         *   current file safety level when searching for unbundled resources
+         */
+        appctx_ = appctx;
+
         /* load up the callback functions to point to my callbacks */
         appctx->set_game_name = &cb_set_game_name;
         appctx->set_game_name_ctx = this;
@@ -178,6 +184,9 @@ private:
     /* head and tail of stand-alone resource file search path */
     class CHtmlResFinderPathEntry *search_path_head_;
     class CHtmlResFinderPathEntry *search_path_tail_;
+
+    /* the host application context object */
+    appctxdef *appctx_;
 };
 
 /*

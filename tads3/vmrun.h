@@ -422,6 +422,14 @@ public:
                           const vm_rcdesc *rc);
 
     /*
+     *   Simplified get_prop, for cases where the caller just wants to
+     *   evaluate a property of a value (with recursive VM entry).
+     */
+    void get_prop(VMG_ vm_val_t *result,
+                  const vm_val_t *obj, vm_prop_id_t prop, uint argc,
+                  const vm_rcdesc *rc);
+
+    /*
      *   Evaluate a property for operator overloading.
      */
     const uchar *op_overload(VMG_ uint caller_ofs, int asi_lcl,

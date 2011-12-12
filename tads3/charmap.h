@@ -425,6 +425,19 @@ public:
                     size_t *src_bytes_used) const;
 
     /*
+     *   Map to utf8, allocating a new buffer.  Fills in 'buf' with a pointer
+     *   to the new buffer, which we allocate via t3malloc() with enough
+     *   space for the mapped string plus a null terminator.  Maps the string
+     *   into the buffer and adds a null byte.  Returns the byte length of
+     *   the mapped string (not including the null byte).
+     *   
+     *   The caller is responsible for freeing the new buffer with t3free()
+     *   when done with it.
+     */
+    size_t map_utf8_alo(char **buf, const char *src, size_t srclen) const;
+    
+
+    /*
      *   Convert a null-terminated UTF-8 string to the local character set.
      *   
      *   Returns the byte length of the result.  If the result is too long

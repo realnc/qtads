@@ -2694,6 +2694,8 @@ struct CVmVarHeapHybrid_hdr
 class CVmVarHeapHybrid_block
 {
 public:
+    virtual ~CVmVarHeapHybrid_block() {}
+
     /* allocate memory */
     virtual struct CVmVarHeapHybrid_hdr *alloc(size_t siz) = 0;
 

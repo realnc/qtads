@@ -692,6 +692,32 @@ size_t CCharmapToLocal::map_utf8z(char *dest, size_t dest_len,
 }
 
 /*
+ *   Map a string, allocating a new buffer if the caller doesn't provide one.
+ */
+size_t CCharmapToLocal::map_utf8_alo(
+    char **buf, const char *src, size_t srclen) const
+{
+    /* figure out how much space we need */
+    size_t buflen = map_utf8(0, 0, src, srclen, 0);
+
+    /* allocate the buffer, adding space for null termination */
+    *buf = (char *)t3malloc(buflen + 1);
+
+    /* if that failed, return null */
+    if (buf == 0)
+        return 0;
+
+    /* do the mapping */
+    buflen = map_utf8(*buf, buflen, src, srclen, 0);
+
+    /* fill in the null terminator */
+    (*buf)[buflen] = '\0';
+
+    /* return the mapped length */
+    return buflen;
+}
+
+/*
  *   Map a null-terminated UTF-8 string to the local character set, escaping
  *   characters that aren't part of the local character set.
  */

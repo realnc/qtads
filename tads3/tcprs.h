@@ -2793,6 +2793,9 @@ public:
     {
         /* the type is unknown */
         typ_ = TC_CVT_UNK;
+
+        /* assume it's a true constant, not just a compile-time constant */
+        ctc_ = FALSE;
     }
 
     /* 
@@ -2975,6 +2978,14 @@ public:
                  || (typ_ == TC_CVT_INT && get_val_int() == 0));
     }
 
+    /*
+     *   Set/get the compile-time constant flag.  A compile-time constant is
+     *   a value that's constant at compile-time, but which can vary from one
+     *   compilation to the next.  The defined() operator has this property.
+     */
+    void set_ctc(int f) { ctc_ = f; }
+    int is_ctc() const { return ctc_; }
+    
 private:
     /* my type */
     tc_constval_type_t typ_;
@@ -3053,6 +3064,26 @@ private:
          */
         class CTPNCodeBody *codebodyval_;
     } val_;
+
+    /*
+     *   Is this a compile-time constant value?  A compile-time constant is a
+     *   value that has a fixed constant value as of compile time, but could
+     *   vary from one compilation to another.  The defined() operator
+     *   produces this type of constant, for example.
+     *   
+     *   The main distinction between a true constant and a compile-time
+     *   constant is that true constants generate warnings when they produce
+     *   invariant code, such as when a true constant is used as the
+     *   condition of an 'if'.  Compile-time constants are specifically for
+     *   producing code that's invariant once compiled, but which can vary
+     *   across compilations, allowing for more sophisticated configuration
+     *   management.  For example, defined() makes it possible to produce
+     *   code that only gets compiled when a particular symbol is included in
+     *   the build, so that code in module A can refer to symbols defined in
+     *   module B when module B is included in the build, but will
+     *   automatically omit the referring code when module B is omitted.
+     */
+    uint ctc_ : 1;
 };
 
 

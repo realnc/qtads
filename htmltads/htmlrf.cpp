@@ -172,7 +172,7 @@ void CHtmlResFinder::delete_data()
     /* delete the list of files */
     for (i = 0 ; i < files_used_ ; ++i)
         delete files_[i];
-	th_free(files_);
+    th_free(files_);
 
     /* delete the external file search path */
     while (search_path_head_ != 0)
@@ -245,7 +245,7 @@ int CHtmlResFinder::resfile_exists(const textchar_t *resname,
 /*
  *   Get the filename and seek offset to use to read a resource.  If we
  *   can find the resource in our .GAM file resource map, we'll return the
- *   GAM filename and the offset of the resource in the GAM file;
+ *   GAM filename and the offset of the resource in the .GAM file;
  *   otherwise, we'll return the name of the resource itself and a seek
  *   offset of zero.  
  */
@@ -359,6 +359,24 @@ int CHtmlResFinder::find_resource(CStringBuf *filenamebuf,
             }
         }
 
+        /*
+         *   It's not a bundled resource in the .gam/.t3 file, and it's not
+         *   an embedded resource in the interpreter executable.  The only
+         *   possibility left is that it's an unbundled resource in an
+         *   external file.  We allow access to external files only if the
+         *   safety level is 3 (local folder read access) or lower.  
+         */
+        int read_safety = 4, write_safety = 4;
+        if (appctx_ != 0 && appctx_->get_io_safety_level != 0)
+            appctx_->get_io_safety_level(appctx_->io_safety_level_ctx,
+                                         &read_safety, &write_safety);
+        if (read_safety > 3)
+        {
+            *fp_ret = 0;
+            *res_size = 0;
+            return FALSE;
+        }
+        
         /* use the resource name as a filename, after URL conversion */
         fname = resname;
         fnamelen = resnamelen;

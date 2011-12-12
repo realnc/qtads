@@ -42,7 +42,7 @@ Modified
 
 /* ------------------------------------------------------------------------ */
 /*
- *   Define some basic types 
+ *   Basic portable types and macros
  */
 
 /*
@@ -52,6 +52,10 @@ Modified
  */
 typedef char textchar_t;
 
+/* number of elements in an array */
+#ifndef countof
+#define countof(x) (sizeof(x)/sizeof((x)[0]))
+#endif
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -80,7 +84,6 @@ void oshtml_dbg_vprintf(const char *fmt, va_list argptr);
 #ifdef TADSHTML_DEBUG
 
 #include <stdarg.h>
-#include <new>
 
 void *th_malloc(size_t siz);
 void *th_realloc(void *oldptr, size_t siz);
@@ -536,7 +539,7 @@ public:
     /* change the length of the buffer */
     void setlen(size_t newlen) { bufend_ = buf_ + newlen; }
 
-private:
+protected:
     /* pointer to the buffer */
     textchar_t *buf_;
 
@@ -555,14 +558,15 @@ private:
 class CStringBuf
 {
 public:
-    CStringBuf() { buf_ = 0; len_ = 0; }
+    CStringBuf() { buf_ = 0; len_ = 0; slen_ = 0; }
     CStringBuf(const textchar_t *str) { init(str, get_strlen(str)); }
     CStringBuf(const textchar_t *str, size_t len) { init(str, len); }
-    CStringBuf(size_t len) { alloc(len); buf_[0] = '\0'; }
+    CStringBuf(size_t len) { alloc(len); buf_[0] = '\0'; slen_ = 0; }
 
     ~CStringBuf()
     {
-        if (buf_) delete [] buf_;
+        if (buf_ != 0)
+            delete [] buf_;
     }
 
     void set(const CStringBuf *str) { set(str->get()); }
@@ -581,12 +585,42 @@ public:
 
     textchar_t *get() const { return buf_; }
 
+    size_t getlen() const { return slen_; }
+    void setlen(size_t len) { slen_ = len; }
+
+    /* 
+     *   get a newly allocated copy of the string (the caller must delete
+     *   this with th_free()) 
+     */
+    textchar_t *get_copy() const
+    {
+        /* if there's a string, allocate a copy */
+        if (buf_ != 0)
+        {
+            /* allocate a new buffer */
+            textchar_t *s = (textchar_t *)th_malloc(get_strlen(buf_) + 1);
+
+            /* copy the string into the new buffer */
+            strcpy(s, buf_);
+
+            /* return the new buffer */
+            return s;
+        }
+        else
+        {
+            /* no string; return an empty buffer */
+            textchar_t *s = (textchar_t *)th_malloc(1);
+            s[0] = '\0';
+            return s;
+        }
+    }
+
     void append(CStringBuf *str) { append(str->get()); }
     void append(const textchar_t *str) { append(str, get_strlen(str)); }
     void append(const textchar_t *str, size_t len)
     {
         size_t newlen;
-        size_t oldlen = (buf_ == 0 ? 0 : get_strlen(buf_));
+        size_t oldlen = slen_;
 
         newlen = oldlen + len + 1;
         if (len_ < newlen)
@@ -625,7 +659,7 @@ public:
     void append_inc(const textchar_t *str, size_t len, size_t alloc_inc)
     {
         size_t newlen;
-        size_t oldlen = (buf_ == 0 ? 0 : get_strlen(buf_));
+        size_t oldlen = slen_;
 
         /* determine the amount of space we need to add the new string */
         newlen = oldlen + len + 1;
@@ -646,12 +680,13 @@ public:
         store(str, len, oldlen);
     }
 
+    /* prepend */
     void prepend(CStringBuf *str) { prepend(str->get()); }
     void prepend(const textchar_t *str) { prepend(str, get_strlen(str)); }
     void prepend(const textchar_t *str, size_t len)
     {
         size_t newlen;
-        size_t oldlen = (buf_ == 0 ? 0 : get_strlen(buf_));
+        size_t oldlen = slen_;
 
         /* ensure we have space for the added text */
         newlen = oldlen + len + 1;
@@ -659,10 +694,13 @@ public:
             realloc(newlen);
 
         /* move the existing text over to make room */
-        memmove(buf_ + len, buf_, (get_strlen(buf_) + 1)*sizeof(textchar_t));
+        memmove(buf_ + len, buf_, (slen_ + 1)*sizeof(textchar_t));
 
         /* copy in the new text */
         memcpy(buf_, str, len*sizeof(textchar_t));
+
+        /* adjust the length */
+        slen_ += len;
     }
 
     void prepend_inc(CStringBuf *str, size_t alloc_inc)
@@ -672,7 +710,7 @@ public:
     void prepend_inc(const textchar_t *str, size_t len, size_t alloc_inc)
     {
         size_t newlen;
-        size_t oldlen = (buf_ == 0 ? 0 : get_strlen(buf_));
+        size_t oldlen = slen_;
 
         /* determine the amount of space we need to add the new string */
         newlen = oldlen + len + 1;
@@ -699,6 +737,7 @@ public:
         if (buf_ != 0)
             delete [] buf_;
         buf_ = 0;
+        slen_ = 0;
     }
 
     /* ensure that our buffer is at least as large as requested */
@@ -709,7 +748,113 @@ public:
             realloc(min_len + 1);
     }
 
-private:
+    /* ensure that we can add the given size */
+    void ensure_added_size(size_t added, size_t inc)
+    {
+        /* make sure we have space for the current plus new contents */
+        size_t cur = slen_;
+        if (cur + added + 1 > len_)
+        {
+            /* add at least 'inc', up to 'added' */
+            size_t newlen = cur + (inc > added ? inc : added);
+
+            /* realloc */
+            ensure_size(newlen);
+        }
+    }
+
+    /* 
+     *   copy a string into the buffer (replacing the current contents),
+     *   quoting any XML markup characters 
+     */
+    char *xmlify(const textchar_t *str)
+    {
+        return xmlify(str, str != 0 ? get_strlen(str) : 0);
+    }
+    char *xmlify(const textchar_t *str, size_t len)
+    {
+        const textchar_t *src;
+        textchar_t *dst;
+        size_t dstlen, rem;
+
+        /* count the length with markup expansion */
+        for (src = str, rem = len, dstlen = 0 ; rem != 0 ; ++src, --rem)
+        {
+            /* if it's a markup character, count its expanded length */
+            switch (*src)
+            {
+            case '&':
+                /* &amp; */
+                dstlen += 5;
+                break;
+
+            case '>':
+            case '<':
+                /* &lt; &gt; */
+                dstlen += 4;
+                break;
+
+            case '"':
+            case '\'':
+                /* &#34; &#39; */
+                dstlen +=5;
+                break;
+
+            default:
+                /* anything else is copied verbatim */
+                dstlen += 1;
+            }
+        }
+
+        /* allocate space */
+        ensure_size(dstlen);
+
+        /* copy and quote */
+        for (src = str, dst = buf_, rem = len ; rem != 0 ; ++src, --rem)
+        {
+            /* if it's a markup character, count its expanded length */
+            switch (*src)
+            {
+            case '&':
+                do_strcpy(dst, "&amp;");
+                dst += 5;
+                break;
+
+            case '>':
+                do_strcpy(dst, "&gt;");
+                dst += 3;
+                break;
+                
+            case '<':
+                do_strcpy(dst, "&lt;");
+                dst += 3;
+                break;
+
+            case '"':
+                do_strcpy(dst, "&#34;");
+                dst += 5;
+                break;
+
+            case '\'':
+                do_strcpy(dst, "&#39;");
+                dst +=5;
+                break;
+
+            default:
+                *dst++ = *src;
+                break;
+            }
+        }
+
+        /* null-terminate it */
+        *dst = '\0';
+        slen_ = dst - buf_;
+        
+        /* return the buffer pointer */
+        return buf_;
+    }
+
+protected:
     void init(const textchar_t *str, size_t len)
     {
         alloc(len + 1);
@@ -751,10 +896,17 @@ private:
     {
         memcpy(buf_ + offset, str, len * sizeof(textchar_t));
         buf_[offset + len] = 0;
+        slen_ = offset + len;
     }
 
+    /* the string buffer */
     textchar_t *buf_;
+
+    /* allocated length of the string buffer */
     size_t len_;
+
+    /* stored length of the string in the buffer */
+    size_t slen_;
 };
 
 

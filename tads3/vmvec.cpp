@@ -44,6 +44,18 @@ Modified
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   The largest number of items we can store is the smaller of the maximum
+ *   value for a UINT2 (unsigned 16-bit integer, so 2^16-1) or the maximum
+ *   allocation size (OSMALMAX) divided by the element size (DATAHOLDER)
+ *   divided minus overhead. 
+ */
+const int32 VEC_MAX_BY_ALO = (int32)(OSMALMAX/(VMB_DATAHOLDER + 1.0/8)) - 4;
+const int32 VEC_MAX_ELEMENTS = (VEC_MAX_BY_ALO < 0xFFFF
+                                ? VEC_MAX_BY_ALO : 0xFFFF);
+
+
+/* ------------------------------------------------------------------------ */
+/*
  *   statics 
  */
 
@@ -2394,8 +2406,8 @@ int CVmObjVector::getp_set_length(VMG_ vm_obj_id_t self, vm_val_t *retval,
                                   uint *argc)
 {
     size_t old_len;
-    size_t new_len;
-    size_t idx;
+    int32 new_len;
+    int32 idx;
     vm_val_t nil_val;
     static CVmNativeCodeDesc desc(1);
     
@@ -2410,14 +2422,14 @@ int CVmObjVector::getp_set_length(VMG_ vm_obj_id_t self, vm_val_t *retval,
     old_len = get_element_count();
 
     /* get the new length */
-    new_len = (size_t)CVmBif::pop_int_val(vmg0_);
+    new_len = CVmBif::pop_long_val(vmg0_);
 
     /* can't go less than zero */
-    if (new_len < 0)
+    if (new_len < 0 || new_len >= VEC_MAX_ELEMENTS)
         err_throw(VMERR_BAD_VAL_BIF);
 
     /* set the vector to its new size */
-    set_element_count_undo(vmg_ self, new_len);
+    set_element_count_undo(vmg_ self, (size_t)new_len);
 
     /* 
      *   Set each newly added element to nil.  Note that we don't bother
@@ -2427,7 +2439,7 @@ int CVmObjVector::getp_set_length(VMG_ vm_obj_id_t self, vm_val_t *retval,
      */
     nil_val.set_nil();
     for (idx = old_len ; idx < new_len ; ++idx)
-        set_element(idx, &nil_val);
+        set_element((size_t)idx, &nil_val);
 
     /* handled */
     return TRUE;

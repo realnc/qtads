@@ -1382,6 +1382,11 @@ resume_from_error:
             break;
 
         case OPCGETDBLCL:
+#ifdef DBG_OFF
+            /* non-debug mode - this will always throw an error */
+            dbgfrfind(ctx->runcxdbg, 0, 0);
+#else
+            /* debug mode - look up the local in the stack frame */
             {
                 objnum   frobj;
                 uint     frofs;
@@ -1394,6 +1399,7 @@ resume_from_error:
                 p += 6;
             }
             break;
+#endif
 
         case OPCGETLCL:
             runrepush(ctx, ctx->runcxbp + runrp2s(p) - 1);

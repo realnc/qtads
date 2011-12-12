@@ -186,7 +186,11 @@ VM_IMPORT_OBJ("TadsNet.NetSafetyException", net_safety_exception)
 VM_IMPORT_OBJ("TadsNet.NetEvent", net_event)
 VM_IMPORT_OBJ("TadsNet.NetRequestEvent", net_request_event)
 VM_IMPORT_OBJ("TadsNet.NetTimeoutEvent", net_timeout_event)
+VM_IMPORT_OBJ("TadsNet.NetReplyEvent", net_reply_event)
 VM_IMPORT_OBJ("TadsNet.FileUpload", file_upload_cl)
+VM_IMPORT_PROP("TadsNet.FileUpload.file", file_upload_fileObj)
+VM_IMPORT_PROP("TadsNet.FileUpload.contentType", file_upload_contentType)
+VM_IMPORT_PROP("TadsNet.FileUpload.filename", file_upload_filename)
 
 
 /*

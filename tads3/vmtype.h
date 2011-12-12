@@ -299,6 +299,9 @@ struct vm_val_t
     /* get an object, or a null pointer if it's not an object */
     vm_obj_id_t get_as_obj() const { return typ == VM_OBJ ? val.obj : 0; }
 
+    /* is this an object of the given class? */
+    int is_instance_of(VMG_ vm_obj_id_t cls) const;
+
     /* set to an integer giving the datatype of the given value */
     void set_datatype(VMG_ const vm_val_t *val);
 

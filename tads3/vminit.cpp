@@ -107,6 +107,12 @@ void vm_init_base(vm_globals **vmg, const vm_init_options *opts)
     /* remember the host interface */
     G_host_ifc = opts->hostifc;
 
+    /* initialize the system debug log file name */
+    char path[OSFNMAX];
+    opts->hostifc->get_special_file_path(path, sizeof(path), OS_GSP_LOGFILE);
+    os_build_full_path(G_syslogfile, sizeof(G_syslogfile),
+                       path, "tadslog.txt");
+
     /* we don't have a resource loader for program resources yet */
     G_res_loader = 0;
 

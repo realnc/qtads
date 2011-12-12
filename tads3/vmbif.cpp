@@ -578,17 +578,26 @@ const char *CVmBif::pop_list_val(VMG0_)
  */
 void CVmBif::pop_str_val_buf(VMG_ char *buf, size_t buflen)
 {
-    const char *strp;
-    size_t copy_len;
+    /* pop the top value from the stack and copy its string value */
+    vm_val_t val;
+    G_stk->pop(&val);
+    get_str_val_buf(vmg_ buf, buflen, &val);
+}
 
+/*
+ *   Get a string value into a buffer, null-terminating the result 
+ */
+void CVmBif::get_str_val_buf(VMG_ char *buf, size_t buflen,
+                             const vm_val_t *val)
+{
     /* pop the string value */
-    strp = pop_str_val(vmg0_);
+    const char *strp = get_str_val(vmg_ val);
 
     /* 
      *   get the length, but limit it to our buffer size, less one byte
      *   for null termination 
      */
-    copy_len = vmb_get_len(strp);
+    size_t copy_len = vmb_get_len(strp);
     if (copy_len > buflen - 1)
         copy_len = utf8_ptr::s_trunc(strp + VMB_LEN, buflen - 1);
 
@@ -638,42 +647,28 @@ void CVmBif::get_str_val_fname(VMG_ char *buf, size_t buflen, const char *str)
  */
 char *CVmBif::pop_str_val_ui(VMG_ char *buf, size_t buflen)
 {
-    const char *strp;
-    size_t copy_len;
-
     /* pop the string value */
-    strp = pop_str_val(vmg0_);
+    const char *strp = pop_str_val(vmg0_);
 
-    /* get the length */
-    copy_len = vmb_get_len(strp);
+    /* decode and skip the length prefix */
+    size_t copy_len = vmb_get_len(strp);
+    strp += VMB_LEN;
 
     /* 
      *   if they didn't allocate any space for the buffer, allocate one on
-     *   the caller's behalf 
+     *   the caller's behalf; otherwise map the string into the caller's
+     *   buffer
      */
     if (buflen == 0)
     {
-        /* figure out how much space we need */
-        buflen = G_cmap_to_ui->map_utf8(0, 0, strp + VMB_LEN, copy_len, 0);
-
-        /* add space for null termination */
-        buflen += 1;
-
-        /* allocate the buffer */
-        buf = (char *)t3malloc(buflen);
-
-        /* if that failed, return null */
-        if (buf == 0)
-            return 0;
+        /* the caller didn't provide a buffer, so allocate one */
+        copy_len = G_cmap_to_ui->map_utf8_alo(&buf, strp, copy_len);
     }
-
-    /* 
-     *   map it into the local UI character set and store the result in
-     *   the output buffer - reserve one byte for the null termination
-     *   byte 
-     */
-    copy_len = G_cmap_to_ui->map_utf8(buf, buflen - 1,
-                                      strp + VMB_LEN, copy_len, 0);
+    else
+    {
+        /* the caller provided a buffer, so use it for the mapping result */
+        copy_len = G_cmap_to_ui->map_utf8(buf, buflen - 1, strp, copy_len, 0);
+    }
 
     /* null-terminate the result */
     buf[copy_len] = '\0';
@@ -688,9 +683,8 @@ char *CVmBif::pop_str_val_ui(VMG_ char *buf, size_t buflen)
  */
 int CVmBif::pop_int_val(VMG0_)
 {
-    vm_val_t val;
-
     /* pop a number */
+    vm_val_t val;
     G_interpreter->pop_int(vmg_ &val);
 
     /* return the value */
@@ -718,9 +712,8 @@ int CVmBif::pop_int_or_nil(VMG_ int defval)
  */
 int32 CVmBif::pop_long_val(VMG0_)
 {
-    vm_val_t val;
-
     /* pop a number */
+    vm_val_t val;
     G_interpreter->pop_int(vmg_ &val);
 
     /* return the value */
@@ -732,9 +725,8 @@ int32 CVmBif::pop_long_val(VMG0_)
  */
 int CVmBif::pop_bool_val(VMG0_)
 {
-    vm_val_t val;
-
     /* pop a value */
+    vm_val_t val;
     G_stk->pop(&val);
 
     /* check the type */
@@ -770,9 +762,8 @@ int CVmBif::pop_bool_val(VMG0_)
  */
 vm_obj_id_t CVmBif::pop_obj_val(VMG0_)
 {
-    vm_val_t val;
-
     /* pop an object reference */
+    vm_val_t val;
     G_interpreter->pop_obj(vmg_ &val);
 
     /* return the value */
@@ -784,9 +775,8 @@ vm_obj_id_t CVmBif::pop_obj_val(VMG0_)
  */
 vm_prop_id_t CVmBif::pop_propid_val(VMG0_)
 {
-    vm_val_t val;
-
     /* pop a property ID */
+    vm_val_t val;
     G_interpreter->pop_prop(vmg_ &val);
 
     /* return the value */

@@ -2513,7 +2513,7 @@ resume_execution:
                  *   otherwise, discard the value and proceed 
                  */
                 if (valp->typ == VM_NIL
-                    || valp->typ == VM_INT && valp->num_is_zero())
+                    || (valp->typ == VM_INT && valp->num_is_zero()))
                 {
                     /* it's nil or zero - save it and jump */
                     p += osrp2s(p);
@@ -4906,6 +4906,27 @@ const uchar *CVmRun::get_prop(VMG_ uint caller_ofs,
     /* evaluate whatever we found or didn't find */
     return eval_prop_val(vmg_ found, caller_ofs, &val, self->val.obj,
                          target_prop, target_obj, srcobj, argc, rc);
+}
+
+/*
+ *   Simplified property evaluator 
+ */
+void CVmRun::get_prop(VMG_ vm_val_t *result,
+                      const vm_val_t *obj, vm_prop_id_t prop, uint argc,
+                      const vm_rcdesc *rc)
+{
+    /* use nil as the default in case we don't find a value */
+    result->set_nil();
+
+    /* if the property is invalid, we definitely can't evaluate it */
+    if (prop == VM_INVALID_PROP)
+        return;
+
+    /* evaluate the property into R0 */
+    get_prop(vmg_ 0, obj, prop, obj, argc, rc);
+
+    /* copy the result to the caller's parameter */
+    *result = r0_;
 }
 
 /*

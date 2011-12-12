@@ -188,6 +188,7 @@ struct CVmPackType
         count = ITER_NONE;
         count_as_type = 0;
         count_in_bytes = FALSE;
+        up_to_count = FALSE;
         bang = FALSE;
         tilde = FALSE;
         pct = FALSE;
@@ -227,6 +228,13 @@ struct CVmPackType
      *   information about the source of the size.  
      */
     wchar_t count_as_type;
+
+    /* 
+     *   Should we treat the count as an upper bound?  This is set if we
+     *   combine '*' with a number, as in "H30*" - this means pack/unpack up
+     *   to 30 items, but stop if we run out of source material first. 
+     */
+    int up_to_count;
 
     /* is there a '!' qualifier? */
     int bang;
@@ -275,6 +283,7 @@ struct CVmPackGroup
         stream_ofs = ds->get_pos();
         cur_iter = 1;
         num_iters = 1;
+        up_to_iters = FALSE;
         close_paren = 0;
     }
 
@@ -290,6 +299,7 @@ struct CVmPackGroup
         tilde = t->tilde;
         pct = t->pct;
         num_iters = t->count;
+        up_to_iters = t->up_to_count;
         close_paren = (open_paren == '(' ? ')' :
                        open_paren == '[' ? ']' :
                        open_paren == '{' ? '}' : 0);
@@ -347,6 +357,9 @@ struct CVmPackGroup
     
     /* total number of iterations for this group */
     int num_iters;
+
+    /* is this an "up to" iteration count (e.g., 30*)? */
+    int up_to_iters;
 };
 
 
@@ -641,9 +654,6 @@ void CVmPack::pack_subgroup(VMG_ CVmPackPos *p, CVmPackArgs *args,
     /* get the output stream */
     CVmDataSource *dst = group->ds;
     
-    /* remember where the paren is, for error reporting */
-    int paren_idx = p->index();
-
     /* parse the group modifiers */
     CVmPackType gt(group);
     parse_group_mods(p, &gt);
@@ -888,6 +898,8 @@ static void reverse_bytes(char *buf, size_t len)
 class CharFieldSource
 {
 public:
+    virtual ~CharFieldSource() { }
+
     /* create a concrete CharFieldSource for a value */
     static CharFieldSource *create(VMG_ const vm_val_t *val, vm_val_t *newval);
 
@@ -1691,9 +1703,6 @@ static int32 decode_ber(const char *buf, size_t len)
 void CVmPack::pack_item(VMG_ CVmPackGroup *group, CVmPackArgs *args,
                         CVmPackType *t, CVmPackType *prefix_count)
 {
-    /* get the data stream */
-    CVmDataSource *dst = group->ds;
-        
     /* 
      *   Retrieve the current argument, to test if it's a list.  Note that if
      *   we're out of arguments, it's no problem - get() will fill in val
@@ -2282,9 +2291,6 @@ void CVmPack::pack_one_item(VMG_ CVmPackGroup *group, CVmPackArgs *args,
 void CVmPack::unpack(VMG_ vm_val_t *retval, const char *fmt, size_t fmtlen,
                      CVmDataSource *src)
 {
-    /* remember the starting location in the data source */
-    long start_pos = src->get_pos();
-
     /* 
      *   Set up a list for the return value.  We don't know how many elements
      *   we'll need, so allocate an initial chunk now and expand later as
@@ -2334,6 +2340,22 @@ void CVmPack::unpack_group(VMG_ CVmPackPos *p,
     /* get the data source */
     CVmDataSource *src = group->ds;
 
+    /* 
+     *   If the group has an "up to" count (e.g., "30*"), check to see if
+     *   we're already at EOF, and if so don't unpack anything - an iteration
+     *   count of zero is valid for an up-to count. 
+     */
+    if ((group->num_iters == ITER_STAR || group->up_to_iters)
+        && src->get_pos() >= src->get_size())
+    {
+        /* skip the group in the source */
+        p->set(&group->start);
+        skip_group(p, group->close_paren);
+
+        /* we're done */
+        return;
+    }
+
     /* run through the format list */
     while (p->more())
     {
@@ -2358,6 +2380,13 @@ void CVmPack::unpack_group(VMG_ CVmPackPos *p,
             if (group->num_iters == ITER_STAR
                 ? src->get_pos() >= src->get_size()
                 : group->cur_iter > group->num_iters)
+                return;
+
+            /* 
+             *   if we have an 'up to' iteration count, stop if we're at EOF
+             *   even if we haven't exhausted the numeric iteration count 
+             */
+            if (group->up_to_iters && src->get_pos() >= src->get_size())
                 return;
 
             /* return to the start of the group template for the next round */
@@ -2590,6 +2619,16 @@ void CVmPack::unpack_iter_item(VMG_ CVmPackPos *p,
         while (src->get_pos() < src_size)
             unpack_into_list(vmg_ retlst, retcnt, src, &t, group);
     }
+    else if (t.up_to_count)
+    {
+        /* 
+         *   unpack this item the number of times given by the repeat count,
+         *   but stop if we reach EOF first
+         */
+        long src_size = src->get_size();
+        for (int i = 0 ; i < t.get_count() && src->get_pos() < src_size ; ++i)
+            unpack_into_list(vmg_ retlst, retcnt, src, &t, group);
+    }
     else
     {
         /* unpack this item the number of times given by the repeat count */
@@ -2643,12 +2682,6 @@ void CVmPack::unpack_item(VMG_ vm_val_t *val,
                           CVmDataSource *src, const CVmPackType *t,
                           const CVmPackGroup *group)
 {
-    char buf[256];
-    int count;
-
-    /* note if it's upper or lower case */
-    int lc = is_lower(t->type_code);
-
     /* check for a character conversion */
     CharConv *cvtchar = CharConv::conv_for_type(t);
     if (cvtchar != 0 && t->null_term && t->count <= 0)
@@ -2665,9 +2698,9 @@ void CVmPack::unpack_item(VMG_ vm_val_t *val,
     if (cvtchar != 0)
     {
         /* character string - the repeat count is the length */
-        count = t->get_count();
+        int count = t->get_count();
 
-        /* if the count is in bytes, conver it */
+        /* if the count is in bytes, convert it */
         if (t->count_in_bytes)
             count = cvtchar->bytes_to_count(count);
 
@@ -2679,7 +2712,7 @@ void CVmPack::unpack_item(VMG_ vm_val_t *val,
         }
 
         /* if it's '*', we read the rest of the data source */
-        if (t->count == ITER_STAR)
+        if (t->count == ITER_STAR || t->up_to_count)
         {
             /* 
              *   get the remaining length, and convert it to a repeat count
@@ -2687,13 +2720,27 @@ void CVmPack::unpack_item(VMG_ vm_val_t *val,
              */
             long l = cvtchar->bytes_to_count(src->get_size() - src->get_pos());
 
-            /* 
-             *   that gave us a long, so cast this to int, making sure we
-             *   don't overflow 
-             */
-            count = (int)l;
-            if (l > INT_MAX)
-                err_throw(VMERR_NUM_OVERFLOW);
+            /* use 'l' as a maximum for 'n*', or the actual count for '*' */
+            if (t->count == ITER_STAR)
+            {
+                /* 
+                 *   '*' means read the whole rest of the file - that's a
+                 *   long value, so cast it to int, making sure we don't
+                 *   overflow 
+                 */
+                count = (int)l;
+                if (l > INT_MAX)
+                    err_throw(VMERR_NUM_OVERFLOW);
+            }
+            else
+            {
+                /* 
+                 *   'n*' means read up to n, stopping at EOF, so stop at 'l'
+                 *   if it's less than the specified count 
+                 */
+                if (l < count)
+                    count = (int)l;
+            }
         }
 
         /* figure the padding type */
@@ -2730,6 +2777,7 @@ void CVmPack::unpack_item(VMG_ vm_val_t *val,
     }
 
     /* it's not a string; check the numeric types */
+    char buf[256];
     switch (t->type_code)
     {
     case '@':
@@ -3000,25 +3048,56 @@ void CVmPack::parse_type(CVmPackPos *p, CVmPackType *info,
 
 /*
  *   Parse group modifiers.  Call this at the open parenthesis of a group to
- *   find the matching close paren and parse the suffix qualifiers. 
+ *   find the matching close paren and parse the suffix qualifiers.  
  */
 void CVmPack::parse_group_mods(const CVmPackPos *p, CVmPackType *gt)
 {
-    /* set up a private copy of the position for scanning ahead */
+    /* set up a copy of the pointer, so we don't alter the original */
     CVmPackPos p2(p);
 
+    /* parse and skip the group and modifiers */
+    skip_group_mods(&p2, gt);
+}
+
+/*
+ *   Parse and skip a group and its modifiers.  Call this at the open paren
+ *   of a group to find the matching close paren and parse past the suffix
+ *   qualifiers.  This leaves 'p' positioned after the group's qualifiers.
+ */
+void CVmPack::skip_group_mods(CVmPackPos *p, CVmPackType *gt)
+{
     /* note the close paren type we're looking for */
-    wchar_t c = p2.getch();
+    wchar_t c = p->getch();
     wchar_t close_paren = (c == '(' ? ')' :
                            c == '[' ? ']' :
-                           c == '{' ? '}' : 0);
+                           c == '{' ? '}' :
+                           0);
 
+    /* skip to the close paren */
+    p->inc();
+    skip_group(p, close_paren);
+
+    /* skip the close paren */
+    p->inc();
+
+    /* parse the group modifiers */
+    parse_mods(p, gt);
+}
+
+/*
+ *   Skip to the close paren of a group.  Call this at the character after
+ *   the open paren; we'll read ahead until we find the close paren, and
+ *   return positioned at the paren. 
+ */
+void CVmPack::skip_group(CVmPackPos *p, wchar_t close_paren)
+{
     /* scan ahead to the matching close paren */
     int depth = 1;
-    for (p2.inc() ; p2.more() ; p2.inc())
+    for (p->inc() ; p->more() ; p->inc())
     {
         /* note any further nesting */
-        switch (c = p2.getch())
+        wchar_t c = p->getch();
+        switch (c)
         {
         case '(':
         case '[':
@@ -3042,14 +3121,8 @@ void CVmPack::parse_group_mods(const CVmPackPos *p, CVmPackType *gt)
     }
 
     /* make sure we found the matching close paren */
-    if (!p2.more())
-        err_throw_a(VMERR_PACK_PARSE, 1, ERR_TYPE_INT, p2.index());
-
-    /* skip the close paren */
-    p2.inc();
-
-    /* parse the group modifiers */
-    parse_mods(&p2, gt);
+    if (!p->more())
+        err_throw_a(VMERR_PACK_PARSE, 1, ERR_TYPE_INT, p->index());
 }
 
 /*
@@ -3105,6 +3178,13 @@ void CVmPack::parse_mods(CVmPackPos *p, CVmPackType *t)
         }
         else if (is_digit(c))
         {
+            /* 
+             *   if we already have a '*', the combination of a numeric count
+             *   and a '*' makes it an up-to count 
+             */
+            if (t->count == ITER_STAR)
+                t->up_to_count = TRUE;
+
             /* it's a digit, so this is a simple numeric repeat count */
             int count_idx = p->index();
             t->count = p->parse_int();
@@ -3174,8 +3254,23 @@ void CVmPack::parse_mods(CVmPackPos *p, CVmPackType *t)
         }
         else if (c == '*')
         {
-            t->count = star_to_count(t->type_code);
-            t->count_as_type = 0;
+            /* 
+             *   if we already have a numeric count, this makes it an up-to
+             *   count 
+             */
+            if (t->count >= 0)
+            {
+                /* mark it as an up-to count, but leave the count intact */
+                t->up_to_count = TRUE;
+            }
+            else
+            {
+                /* there's no count yet, so it's an indefinite counter type */
+                t->count = star_to_count(t->type_code);
+                t->count_as_type = 0;
+            }
+
+            /* skip the '*' */
             p->inc();
         }
         else if (c == '!')

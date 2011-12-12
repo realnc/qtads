@@ -584,7 +584,7 @@ void CTcT3Unasm::disasm_instr(CTcUnasSrc *src, CTcUnasOut *out, char ch_op)
                                -(int)acc, src->get_ofs() - 2 + acc);
                 else
                     out->print("+0x%04x (0x%08lx)",
-                               acc, src->get_ofs() - 2 + acc);
+                               (int)acc, src->get_ofs() - 2 + acc);
                 break;
 
             case T3OP_TYPE_OBJ:

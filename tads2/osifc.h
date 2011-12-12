@@ -53,6 +53,7 @@ Modified
 #define OSIFC_H
 
 #include <stdlib.h>
+#include <stdarg.h>
 #include "appctx.h"
 
 #ifdef __cplusplus
@@ -1001,9 +1002,9 @@ int os_get_exe_filename(char *buf, size_t buflen, const char *argv0);
  *   is out of date with respect to the calling code.
  *   
  *   This routine can be implemented using one of the strategies below, or a
- *   combination of these.  These are merely suggestions, though, and
- *   systems are free to ignore these and implement this routine using
- *   whatever scheme is the best fit to local conventions.
+ *   combination of these.  These are merely suggestions, though, and systems
+ *   are free to ignore these and implement this routine using whatever
+ *   scheme is the best fit to local conventions.
  *   
  *   - Relative to argv[0].  Some systems use this approach because it keeps
  *   all of the TADS files together in a single install directory tree, and
@@ -1020,13 +1021,14 @@ int os_get_exe_filename(char *buf, size_t buflen, const char *argv0);
  *   
  *   - Hard-coded paths.  Some systems have universal conventions for the
  *   installation configuration of compiler-like tools, so the paths to our
- *   component files can be hard-coded based on these conventions.  Note
- *   that it is common on some systems to use hard-coded paths by default
- *   but allow these to be overridden using environment variables or the
- *   like - this is often a good option because it makes life easy for most
- *   users, who use the default install configuration and thus do not need
- *   to set any environment variables, while still allowing for special
- *   cases where users cannot use the default configuration for some reason.
+ *   component files can be hard-coded based on these conventions.
+ *   
+ *   - Hard-coded default paths with environment variable overrides.  Let the
+ *   user set environment variables if they want, but use the standard system
+ *   paths as hard-coded defaults if the variables aren't set.  This is often
+ *   the best choice; users who expect the standard system conventions won't
+ *   have to fuss with any manual settings or even be aware of them, while
+ *   users who need custom settings aren't stuck with the defaults.
  */
 void os_get_special_path(char *buf, size_t buflen,
                          const char *argv0, int id);
@@ -1081,6 +1083,15 @@ void os_get_special_path(char *buf, size_t buflen,
  *   binary.  
  */
 #define OS_GSP_T3_SYSCONFIG  6
+
+/*
+ *   System log files.  This is the directory for system-level status, debug,
+ *   and error logging files.  (Note that we're NOT talking about in-game
+ *   transcript logging per the SCRIPT command.  SCRIPT logs are usually sent
+ *   to files selected by the user via a save-file dialog, so these don't
+ *   need a special location.)
+ */
+#define OS_GSP_LOGFILE  7
 
 
 /* 
@@ -1511,7 +1522,19 @@ int os_get_abs_filename(char *result_buf, size_t result_buf_size,
  *   of a file might not be possible to determine based on its name alone.
  *   For example, there could be symbolic links in the 'filename' directory
  *   path that end up pointing to a directory whose name isn't actually
- *   mentioned anywhere in the file path.  
+ *   mentioned anywhere in the file path.
+ *   
+ *   SECURITY NOTE: If possible, implementations should fully resolve all
+ *   symbolic links, relative paths (e.g., Unix ".."), etc, before rendering
+ *   judgment.  One important application for this routine is to determine if
+ *   a file is in a sandbox directory, to enforce security restrictions that
+ *   prevent a program from accessing files outside of a designated folder.
+ *   If the implementation fails to resolve symbolic links or relative paths,
+ *   a malicious program or user could bypass the security restriction by,
+ *   for example, creating a symbolic link within the sandbox directory that
+ *   points to the root folder.  Implementations can avoid this loophole by
+ *   converting the file and directory names to absolute paths and resolving
+ *   all symbolic links and relative notation before comparing the paths.
  */
 int os_is_file_in_dir(const char *filename, const char *path,
                       int include_subdirs);
@@ -1655,6 +1678,22 @@ void os_gen_rand_bytes(unsigned char *buf, size_t len);
  */
 void os_printz(const char *str);
 void os_print(const char *str, size_t len);
+
+/*
+ *   Print to the debugger console.  These routines are for interactive
+ *   debugger builds only: they display the given text to a separate window
+ *   within the debugger UI (separate from the main game command window)
+ *   where the debugger displays status information specific to the debugging
+ *   session (such as compiler/build output, breakpoint status messages,
+ *   etc).  For example, TADS Workbench on Windows displays these messages in
+ *   its "Debug Log" window.
+ *   
+ *   These routines only need to be implemented for interactive debugger
+ *   builds, such as TADS Workbench on Windows.  These can be omitted for
+ *   regular interpreter builds.  
+ */
+void os_dbg_printf(const char *fmt, ...);
+void os_dbg_vprintf(const char *fmt, va_list args);
 
 /*
  *   Allocating sprintf and vsprintf.  These work like the regular C library

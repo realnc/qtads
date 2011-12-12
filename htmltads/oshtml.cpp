@@ -638,6 +638,24 @@ void os_expause()
 }
 
 /*
+ *   printf to debug log window - map the osifc versions to our internal
+ *   versions 
+ */
+void os_dbg_printf(const char *fmt, ...)
+{
+    va_list argptr;
+
+    va_start(argptr, fmt);
+    oshtml_dbg_vprintf(fmt, argptr);
+    va_end(argptr);
+}
+
+void os_dbg_vprintf(const char *fmt, va_list argptr)
+{
+    oshtml_dbg_vprintf(fmt, argptr);
+}
+
+/*
  *   printf to debug log window
  */
 void oshtml_dbg_printf(const char *fmt, ...)

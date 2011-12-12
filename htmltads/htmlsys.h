@@ -262,8 +262,32 @@ public:
  *   System font object.  This is an abstract interface; each system must
  *   have its own implementation of the interface.
  *   
- *   Note that instances of (concrete subclasses of) CHtmlSysFont are
- *   created by the system window code.  Refer to CHtmlSysWin::get_font().
+ *   Note that instances of (concrete subclasses of) CHtmlSysFont are created
+ *   by the system window code.  Refer to CHtmlSysWin::get_font().
+ *   
+ *   A note on memory management: The portable code never deletes font
+ *   objects.  Instead, the system code is expected to keep a list of all of
+ *   the font objects ever created.  Each time a caller asks to create a new
+ *   font via CHtmlSysWin::get_font(), the system code first scans the list
+ *   to see if the same font (with the identical descriptor) has been
+ *   allocated already; if so, it simply returns the existing CHtmlSysFont
+ *   instance.  If not, it creates a new CHtmlSysFont instance, adds it to
+ *   the list, and returns the new instance.
+ *   
+ *   So, even though the portable code never deletes font objects, it won't
+ *   leak memory as long as the system code uses this cache list approach.
+ *   Font memory will never shrink, but it will only grow up to a fixed upper
+ *   limit - specifically, the maximum font memory will be the amount needed
+ *   to hold one instance of each distinct font used in the game.
+ *   
+ *   The reasoning behind this approach is that (a) a given game has a
+ *   relatively small number of distinct fonts it uses, (b) each font tends
+ *   to be used over and over many times, and (c) on many systems it's a
+ *   relatively heavy operation to create a system font resource.  So it's
+ *   more efficient to use this cache approach than to create and destroy
+ *   font objects on each use.  Fonts objects would also be fairly complex to
+ *   account for, so this scheme avoids the need for reference counting or
+ *   other means to avoid font memory leaks.  
  */
 class CHtmlSysFont
 {
@@ -298,21 +322,16 @@ public:
      */
     virtual int get_em_size() = 0;
 
-    /* get/set the description that was used to create the font */
+    /* 
+     *   Get the description of the font (or a pointer to it).  This is the
+     *   concrete description, which isn't necessarily identical to the
+     *   descriptor that was used to create the font, since the font creation
+     *   process might have resolved parameterized font names (TADS-Input,
+     *   TADS-Sans, etc) and filled in concrete values for defaults.  
+     */
     void get_font_desc(class CHtmlFontDesc *dst) const
         { dst->copy_from(&desc_); }
     const CHtmlFontDesc *get_font_desc_ref() const { return &desc_; }
-    void set_font_desc(const class CHtmlFontDesc *src)
-    {
-        /* copy the descriptor */
-        desc_.copy_from(src);
-
-        /* 
-         *   clear the explicit-face-name flag, since this is important only
-         *   when looking up a font 
-         */
-        desc_.face_set_explicitly = FALSE;
-    }
 
     /*
      *   Get the color, and whether this color should be used (if not, an
@@ -334,7 +353,7 @@ public:
     HTML_color_t get_font_bgcolor() const { return desc_.bgcolor; }
     int use_font_bgcolor() const { return !desc_.default_bgcolor; }
 
-private:
+protected:
     /* 
      *   the font descriptor - the system must set this to the font
      *   descriptor when the font is created 
@@ -1006,6 +1025,30 @@ public:
      *   the portion of the height above the text baseline (i.e., the
      *   ascender size for the font).
      *   
+     *   The width returned should indicate the *positioning* width of the
+     *   text, which might not necessarily be the same as the bounding box of
+     *   the glyphs contained in the text.  The difference is that the
+     *   positioning width tells us where the next piece of text will go if
+     *   we're drawing a string piecewise.  For example, suppose we have a
+     *   string "ABCDEF", and we call draw_text() to render it at position
+     *   (0,0).  Now suppose we have to redraw a portion of the string, say
+     *   the "CDE" part, to adjust the display for a visual change that
+     *   doesn't affect character positioning - the user selected the text
+     *   with the mouse, say.  In this case, the portable code would call
+     *   measure_text() on the part *up to* the part we're redrawing - "AB" -
+     *   to figure out where to position the part we *are* redrawing - "CDE".
+     *   It would add the width returned from measure_text("AB") to the
+     *   original position (0,0) to figure out where to draw "CDE".  So, it's
+     *   important that the width returned from measure_text("AB") properly
+     *   reflects the character positioning distance.  On most modern systems
+     *   with proportional typefaces, the positioning width of a character
+     *   often differs from its rendering width, because a glyph can overhang
+     *   its positioning area and overlap the previous and next glyph areas.
+     *   System APIs usually therefore offer separate measurement functions
+     *   for the bounding box (the overall area occupied by all pixels in a
+     *   string) and the positioning box (the area used to calculate where
+     *   adjacent glyphs should be drawn).
+     *   
      *   Note that the heights returned - both the returned y value giving
      *   the overall box height, as well as the ascent height - must be the
      *   DESIGN HEIGHTS for the font, NOT the actual height of the specific
@@ -1231,22 +1274,29 @@ public:
      *.  TADS-typewriter - a typewriter-style font, usually fixed-width
      *.  TADS-input - the font to use for player commands
      *   
-     *   When possible, the player should be able to select the
-     *   parameterized fonts in a "preferences" dialog or similar mechanism.
-     *   The purpose of the parameterized fonts is to allow the game to
-     *   specify the style to use, while letting the player specify the
-     *   exact details of the presentation.
+     *   When possible, the player should be able to select the parameterized
+     *   fonts in a "preferences" dialog or similar mechanism.  The purpose
+     *   of the parameterized fonts is to allow the game to specify the style
+     *   to use, while letting the player specify the exact details of the
+     *   presentation.
      *   
      *   Note that, on some systems, parameterized fonts might let the user
      *   specify attributes in addition to the font face.  For example, on
-     *   the Windows interpreter, "TADS-Input" lets the user specify the
-     *   text color and set boldface and italics.  When these additional
+     *   the Windows interpreter, "TADS-Input" lets the user specify the text
+     *   color and set boldface and italics.  When these additional
      *   attributes are part of a parameterized font name, they should be
-     *   applied ONLY when the 'face_set_explicitly' flag in the font_desc
-     *   is set to TRUE - this ensures that the attributes can be overridden
-     *   by nesting other attribute tags (<font color=red> or <i>, for
-     *   example) within the <font> tag that explicitly selects the font
-     *   face.  
+     *   applied ONLY when the 'face_set_explicitly' flag in the font_desc is
+     *   set to TRUE - this ensures that the attributes can be overridden by
+     *   nesting other attribute tags (<font color=red> or <i>, for example)
+     *   within the <font> tag that explicitly selects the font face.
+     *   
+     *   Note on memory management: the portable code never deletes a font
+     *   object obtained from this routine.  Instead, this routine is
+     *   expected to keep a list of font objects previously allocated, and to
+     *   reuse an existing object if there's one in the list that matches the
+     *   descriptor.  This ensures that the lack of deletion won't leak
+     *   memory: a given font object is never deleted, but only one font
+     *   object will ever be created for a given descriptor.  
      */
     virtual class CHtmlSysFont
         *get_font(const class CHtmlFontDesc *font_desc) = 0;
@@ -2116,7 +2166,9 @@ public:
      *   all iterations have been performed, and will indicate the number of
      *   iterations completed.  If the repeat count is ignored, the callback
      *   will be invoked after the single iteration we'll perform and will
-     *   indicate that only one iteration has been played.
+     *   indicate that only one iteration has been played.  In this case,
+     *   caller can simply requeue the sound (if still desired) with the next
+     *   lower repeat count.
      *   
      *   'vol' is the base playback volume for the track, in the range
      *   0..100, where 0 is silence and 100 is unattenuated (i.e., play the
@@ -2162,6 +2214,11 @@ public:
      *   fade-in is controlled by the *outgoing* track - it's up to the
      *   previous track to determine when to call the 'done' callback to
      *   enable to next queued track to begin playing.
+     *   
+     *   When the repeat count is 0 or >1, the fade-in should be applied only
+     *   to the first iteration, and the fade-out should be applied only to
+     *   the last iteration.  There should be no fade between repeated
+     *   iterations of the same track.
      *   
      *   Returns zero on success, non-zero on error.  If a non-zero value is
      *   returned, the callback is NOT invoked.

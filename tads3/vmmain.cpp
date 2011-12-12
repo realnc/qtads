@@ -261,6 +261,49 @@ static char *get_opt_arg(int argc, char **argv, int *curarg, int optlen)
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   Create the network configuration object, if we haven't already.
+ */
+#ifdef TADSNET
+static void create_netconfig(
+    CVmMainClientIfc *clientifc, TadsNetConfig *&netconfig, char **argv)
+{
+    if (netconfig == 0)
+    {
+        /* create the object */
+        netconfig = new TadsNetConfig();
+
+        /* build the path to the web config file */
+        char confname[OSFNMAX], confpath[OSFNMAX];
+        os_get_special_path(confpath, sizeof(confpath), argv[0],
+                            OS_GSP_T3_SYSCONFIG);
+        os_build_full_path(confname, sizeof(confname),
+                           confpath, "tadsweb.config");
+        
+        /* if there's a net configuration file, read it */
+        osfildef *fp = osfoprb(confname, OSFTTEXT);
+        if (fp != 0)
+        {
+            /* read the file into the configuration object */
+            netconfig->read(fp, clientifc);
+            
+            /* done with the file */
+            osfcls(fp);
+        }
+        else
+        {
+            /* warn that the file is missing */
+            char *msg = t3sprintf_alloc(
+                "Warning: -webhost mode specified, but couldn't "
+                "read web configuration file \"%s\"", confname);
+            clientifc->display_error(0, 0, msg, FALSE);
+            t3free(msg);
+        }
+    }
+}
+#endif /* TADSNET */
+
+/* ------------------------------------------------------------------------ */
+/*
  *   Main Entrypoint for command-line invocations.  For simplicity, a
  *   normal C main() or equivalent entrypoint can invoke this routine
  *   directly, using the usual argc/argv conventions.
@@ -293,7 +336,9 @@ int vm_run_image_main(CVmMainClientIfc *clientifc,
     char *saved_state;
     int seed_rand;
     class TadsNetConfig *netconfig = 0;
+#ifdef TADSNET
     char *storage_sid = 0;
+#endif
 
     /* we haven't found an image file yet */
     found_image = FALSE;
@@ -544,42 +589,11 @@ int vm_run_image_main(CVmMainClientIfc *clientifc,
 
 #ifdef TADSNET
         case 'w':
-            /* -webhost, -websid */
+            /* -webhost, -websid, -webimage */
             if (strcmp(argv[curarg], "-webhost") == 0 && curarg+1 < argc)
             {
                 /* if necessary, create the web hosting config object */
-                if (netconfig == 0)
-                {
-                    /* create the object */
-                    netconfig = new TadsNetConfig();
-
-                    /* build the path to the web config file */
-                    char confname[OSFNMAX], confpath[OSFNMAX];
-                    os_get_special_path(confpath, sizeof(confpath), argv[0],
-                                        OS_GSP_T3_SYSCONFIG);
-                    os_build_full_path(confname, sizeof(confname),
-                                       confpath, "tadsweb.config");
-                    
-                    /* if there's a net configuration file, read it */
-                    osfildef *fp = osfoprb(confname, OSFTTEXT);
-                    if (fp != 0)
-                    {
-                        /* read the file into the configuration object */
-                        netconfig->read(fp, clientifc);
-                        
-                        /* done with the file */
-                        osfcls(fp);
-                    }
-                    else
-                    {
-                        /* warn that the file is missing */
-                        char *msg = t3sprintf_alloc(
-                            "Warning: -webhost mode specified, but couldn't "
-                            "read web configuration file \"%s\"", confname);
-                        clientifc->display_error(0, 0, msg, FALSE);
-                        t3free(msg);
-                    }
-                }
+                create_netconfig(clientifc, netconfig, argv);
 
                 /* set the web host name */
                 netconfig->set("hostname", argv[++curarg]);
@@ -590,8 +604,21 @@ int vm_run_image_main(CVmMainClientIfc *clientifc,
                 /* web storage server SID - save it for later */
                 storage_sid = argv[++curarg];
             }
+            else if (strcmp(argv[curarg], "-webimage") == 0
+                     && curarg+1 < argc)
+            {
+                /* 
+                 *   Original URL of image file.  This is provided for
+                 *   logging purposes only; 
+                 */
+                create_netconfig(clientifc, netconfig, argv);
+                netconfig->set("image.url", argv[++curarg]);
+            }
             else
+            {
+                /* invalid option - flag an error */
                 goto opt_error;
+            }
             break;
 #endif /* TADSNET */
 
@@ -1559,3 +1586,5 @@ char *vm_get_ifid(CVmHostIfc *hostifc)
     /* return the IFID, if we found one */
     return ifid;
 }
+
+

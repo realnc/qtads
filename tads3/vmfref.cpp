@@ -70,7 +70,7 @@ CVmObjFrameDesc::CVmObjFrameDesc(VMG_ vm_obj_id_t fref,
 {
     /* allocate our extension */
     ext_ = 0;
-    vm_framedesc_ext *ext = alloc_ext(vmg_ fref, frame_idx, ret_ofs);
+    alloc_ext(vmg_ fref, frame_idx, ret_ofs);
 }
 
 /*
@@ -177,7 +177,7 @@ void CVmObjFrameDesc::load_image_data(VMG_ vm_obj_id_t self,
     uint ret_ofs = osrp2(ptr + VMB_OBJECT_ID + 2);
 
     /* allocate the extension */
-    vm_framedesc_ext *ext = alloc_ext(vmg_ fref, frame_idx, ret_ofs);
+    alloc_ext(vmg_ fref, frame_idx, ret_ofs);
 }
 
 /*
@@ -207,7 +207,7 @@ void CVmObjFrameDesc::restore_from_file(VMG_ vm_obj_id_t self,
     uint ret_ofs = fp->read_uint2();
 
     /* allocate the extension */
-    vm_framedesc_ext *ext = alloc_ext(vmg_ fref, frame_idx, ret_ofs);
+    alloc_ext(vmg_ fref, frame_idx, ret_ofs);
 }
 
 /*

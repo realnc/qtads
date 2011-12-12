@@ -1998,9 +1998,9 @@ CTcPrsNode *CTcPrsOpAnd::eval_constant(CTcPrsNode *left,
         CTcPrsNode *ret;
         
         /*
-         *   The left value is a constant, so the result is always know.
-         *   If the left value is nil, the result is nil; otherwise, it's
-         *   the right half.  
+         *   The left value is a constant, so we can eliminate the &&.  If
+         *   the left value is nil, the result is nil; otherwise, it's the
+         *   right half.  
          */
         if (left->get_const_val()->get_val_bool())
         {
@@ -4842,6 +4842,38 @@ CTcPrsNode *CTcPrsOpUnary::parse_call(CTcPrsNode *lhs)
     if (arglist == 0)
         return 0;
 
+    /* check for the special "defined()" syntax */
+    if (lhs != 0 && lhs->sym_text_matches("defined", 7))
+    {
+        /* make sure we have one argument that's a symbol */
+        CTcPrsNode *arg;
+        if (arglist->get_argc() == 1
+            && (arg = arglist->get_arg_list_head()->get_arg_expr())
+                ->get_sym_text() != 0)
+        {
+            /* look up the symbol */
+            CTcSymbol *sym = G_prs->get_global_symtab()->find(
+                arg->get_sym_text(), arg->get_sym_text_len());
+
+            /* 
+             *   The result is a constant 'true' or 'nil' node, depending on
+             *   whether the symbol is defined.  Note that this is a "compile
+             *   time constant" expression, not a true constant - flag it as
+             *   such so that we don't generate a warning if this value is
+             *   used as the conditional expression of an if, while, or for.
+             */
+            CTcConstVal cval;
+            cval.set_bool(sym != 0 && sym->get_type() != TC_SYM_UNKNOWN);
+            cval.set_ctc(TRUE);
+            return new CTPNConst(&cval);
+        }
+        else
+        {
+            /* invalid syntax */
+            G_tok->log_error(TCERR_DEFINED_SYNTAX);
+        }
+    }
+
     /* build and return the function call node */
     return new CTPNCall(lhs, arglist);
 }
@@ -5707,8 +5739,8 @@ CTcPrsNode *CTcPrsOpUnary::parse_list()
     int at_def_val = FALSE;
 
     /* set up a nil value for adding placeholders (for error recovery) */
-    CTcConstVal nil;
-    nil.set_nil();
+    CTcConstVal nilval;
+    nilval.set_nil();
     
     /* skip the opening '[' */
     G_tok->next();
@@ -5820,7 +5852,7 @@ CTcPrsNode *CTcPrsOpUnary::parse_list()
              *   resynchronize - they must want to add more Key->Value pairs 
              */
             if (G_tok->cur() == TOKT_COMMA)
-                lst->add_element(new CTPNConst(&nil));
+                lst->add_element(new CTPNConst(&nilval));
         }
 
         /* check what follows the element */
@@ -5847,7 +5879,7 @@ CTcPrsNode *CTcPrsOpUnary::parse_list()
                  *   we don't log alternating "expected comma" and "expected
                  *   arrow" messages on every subsequent delimiter.  
                  */
-                lst->add_element(new CTPNConst(&nil));
+                lst->add_element(new CTPNConst(&nilval));
             }
 
             /* if a close bracket follows, we seem to have an extra comma */
@@ -5899,7 +5931,7 @@ CTcPrsNode *CTcPrsOpUnary::parse_list()
                  *   cascade of errors for subsequent delimiters if they did
                  *   just leave out one item. 
                  */
-                lst->add_element(new CTPNConst(&nil));
+                lst->add_element(new CTPNConst(&nilval));
             }
             break;
 

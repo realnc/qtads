@@ -62,6 +62,51 @@ public:
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   Stream source.  This layers a CVmDataSource on top of a CVmStream
+ *   object.  We take ownership of the stream, deleting it when we're
+ *   deleted.
+ */
+class CVmStreamSource: public CVmDataSource
+{
+public:
+    CVmStreamSource(class CVmStream *s)
+    {
+        stream = s;
+    }
+    
+    virtual ~CVmStreamSource();
+
+    /* read bytes - returns 0 on success, non-zero on EOF or error */
+    virtual int read(void *buf, size_t len);
+
+    /* read bytes - returns the number of bytes read; 0 means EOF or error */
+    virtual int readc(void *buf, size_t len);
+
+    /* write bytes - returns 0 on success, non-zero on error */
+    virtual int write(const void *buf, size_t len);
+
+    /* get the length of the file in bytes */
+    virtual long get_size();
+
+    /* get the current seek location */
+    virtual long get_pos();
+
+    /* set the current seek location - 'mode' is an OSFSK_xxx mode */
+    virtual int seek(long ofs, int mode);
+
+    /* flush - returns 0 on success, non-zero on error */
+    virtual int flush();
+
+    /* close the underlying system resource */
+    virtual void close();
+
+protected:
+    /* our underlying stream object */
+    class CVmStream *stream;
+};
+
+/* ------------------------------------------------------------------------ */
+/*
  *   Basic OS file data source.
  */
 class CVmFileSource: public CVmDataSource

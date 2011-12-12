@@ -211,6 +211,15 @@ Modified
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   Network errors 
+ */
+
+/* network safety level error (operation prohibited by safety settings) */
+#define VMERR_NETWORK_SAFETY      400
+
+
+/* ------------------------------------------------------------------------ */
+/*
  *   Property-related errors 
  */
 

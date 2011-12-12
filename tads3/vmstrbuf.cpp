@@ -43,13 +43,10 @@ Modified
 
 /* ------------------------------------------------------------------------ */
 /*
- *   The largest value we can store is what fits in a size_t; we're also
- *   bounded by OSMALMAX. 
+ *   The largest buffer length we can store is the smaller of OSMALMAX or the
+ *   maximum (positive) value for an int32 (2^31-1).
  */
-const size_t STRBUF_SIZET_CAP = ((size_t)(-1) > SLONGMAXVAL
-                                 ? SLONGMAXVAL : (int32)(size_t)(-1));
-const int32 STRBUF_MAX_LEN = (OSMALMAX < STRBUF_SIZET_CAP
-                              ? OSMALMAX : STRBUF_SIZET_CAP);
+const int32 STRBUF_MAX_LEN = (OSMALMAX < 0x7fffffff ? OSMALMAX : 0x7fffffff);
 
 
 /* ------------------------------------------------------------------------ */
@@ -545,9 +542,9 @@ void CVmObjStringBuffer::add_undo_rec(
      *   Add the record to the global undo stream.  (We don't have anything
      *   to store in the 'value' field, so just store nil.) 
      */
-    vm_val_t nil;
-    nil.set_nil();
-    if (!G_undo->add_new_record_ptr_key(vmg_ self, rec, &nil))
+    vm_val_t nilval;
+    nilval.set_nil();
+    if (!G_undo->add_new_record_ptr_key(vmg_ self, rec, &nilval))
     {
         /* 
          *   we didn't add an undo record, so our extra undo information

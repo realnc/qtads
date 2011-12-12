@@ -2695,8 +2695,6 @@ int CVmConsole::read_line_timeout(VMG_ char *buf, size_t buflen,
         }
         else
         {
-            int is_quiet;
-            
             /* 
              *   End of script file - return to reading from the enclosing
              *   level (i.e., the enclosing script, or the keyboard if this
@@ -2709,7 +2707,7 @@ int CVmConsole::read_line_timeout(VMG_ char *buf, size_t buflen,
             S_old_more_mode = close_script_file(vmg0_);
             
             /* note the new 'quiet' mode */
-            is_quiet = (script_sp_ != 0 && script_sp_->quiet);
+            int is_quiet = (script_sp_ != 0 && script_sp_->quiet);
             
             /* 
              *   if we're still reading from a script (which means we closed
@@ -3093,7 +3091,7 @@ int CVmConsole::read_script_event_type(int *evt, unsigned long *attrs)
         /* keep going until we find an input line */
         for (;;)
         {
-            /* read the first charater of the line */
+            /* read the first character of the line */
             int c = osfgetc(fp);
             if (c == '>')
             {

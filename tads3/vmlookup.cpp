@@ -1303,7 +1303,6 @@ int CVmObjLookupTable::getp_remove_entry(VMG_ vm_obj_id_t self,
 int CVmObjLookupTable::getp_apply_all(VMG_ vm_obj_id_t self,
                                       vm_val_t *retval, uint *argc)
 {
-    int orig_argc = (argc != 0 ? *argc : 0);
     vm_val_t *fn;
     vm_lookup_val *entry;
     static CVmNativeCodeDesc desc(1);

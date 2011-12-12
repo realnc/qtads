@@ -498,7 +498,7 @@ size_t t3vsprintf(char *buf, size_t buflen, const char *fmt, va_list args0)
                     case ']':
                     case ' ':
                         /* use % encoding for special characters */
-                        sprintf(buf, "%%%02x", *txt);
+                        sprintf(buf, "%%%02x", (unsigned)(uchar)*txt);
                         need += 3;
                         for (i = 0 ; i < 3 ; ++i)
                         {

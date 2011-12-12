@@ -702,10 +702,6 @@ struct tok_embed_ctx
         this->endtok = TOKT_INVALID;
     }
 
-    wchar_t quotech() const
-    {
-    }
-
     /* are we in an embedded expression? */
     int in_expr;
 

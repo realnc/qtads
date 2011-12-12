@@ -1027,8 +1027,7 @@ void CVmBifTIO::askfile(VMG_ uint argc)
     int evt;
     unsigned long attrs;
     if (G_console->read_event_script(
-        vmg_ &evt, fname, sizeof(fname),
-        filter, sizeof(filter)/sizeof(filter[0]), &attrs))
+        vmg_ &evt, fname, sizeof(fname), filter, countof(filter), &attrs))
     {
         int ok = TRUE;
         

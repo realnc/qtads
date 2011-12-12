@@ -115,6 +115,9 @@ public:
 /* break into the debugger */
 #define T3DBG_BREAK     2
 
+/* write a message to the debug log */
+#define T3DBG_LOG       3
+
 
 
 /* ------------------------------------------------------------------------ */

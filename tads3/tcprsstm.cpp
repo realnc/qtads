@@ -4235,7 +4235,7 @@ unsigned long CTPNStmForBase::get_control_flow(int warn) const
         && !G_prs->get_syntax_only())
     {
         /* log a warning if desired */
-        if (warn)
+        if (warn && !cond_expr_->get_const_val()->is_ctc())
             log_warning(TCERR_FOR_COND_FALSE);
 
         /* this will simply continue to the next statement */
@@ -4419,7 +4419,7 @@ unsigned long CTPNStmWhileBase::get_control_flow(int warn) const
         && G_prs->get_syntax_only())
     {
         /* log a warning if desired */
-        if (warn)
+        if (warn && !cond_expr_->get_const_val()->is_ctc())
             log_warning(TCERR_WHILE_COND_FALSE);
 
         /* this will simply continue to the next statement */

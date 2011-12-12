@@ -191,16 +191,16 @@ int CHtmlHashEntryConfig::write_to_file(osfildef *fp)
         break;
 
     case HTML_DCFG_TYPE_INT:
-        oswp4(buf, val_.int_);
+        oswp4s(buf, val_.int_);
         if (osfwb(fp, buf, 4))
             return 6;
         break;
 
     case HTML_DCFG_TYPE_RECT:
-        oswp4(buf, val_.rect_->left);
-        oswp4(buf + 4, val_.rect_->top);
-        oswp4(buf + 8, val_.rect_->right);
-        oswp4(buf + 12, val_.rect_->bottom);
+        oswp4s(buf, val_.rect_->left);
+        oswp4s(buf + 4, val_.rect_->top);
+        oswp4s(buf + 8, val_.rect_->right);
+        oswp4s(buf + 12, val_.rect_->bottom);
         if (osfwb(fp, buf, 16))
             return 7;
         break;
@@ -280,7 +280,7 @@ int CHtmlHashEntryConfig::read_from_file(osfildef *fp,
         if (osfrb(fp, buf, 4))
             return 3;
         *new_entry = new CHtmlHashEntryConfig(keyname, keylen, TRUE,
-                                              (int)osrp4(buf));
+                                              (int)osrp4s(buf));
         break;
 
     case HTML_DCFG_TYPE_RECT:
@@ -292,7 +292,8 @@ int CHtmlHashEntryConfig::read_from_file(osfildef *fp,
                 return 4;
 
             /* set up the rectangle */
-            rect.set(osrp4(buf), osrp4(buf+4), osrp4(buf+8), osrp4(buf+12));
+            rect.set(osrp4s(buf), osrp4s(buf+4),
+                     osrp4s(buf+8), osrp4s(buf+12));
 
             /* create the entry */
             *new_entry =

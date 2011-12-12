@@ -360,6 +360,14 @@ const err_msg_t vm_messages_english[] =
          "compiler is bundled, check the debugger release notes for "
          "information on which compiler to use. ") },
 
+    { VMERR_NETWORK_SAFETY,
+    "this operation is not allowed by the network safety level settings",
+    VMsg("This operation is not allowed by the current network safety level "
+         "settings. The program is attempting to access network features "
+         "that you have disabled with the network safety level options. "
+         "If you wish to allow this operation, you must restart the "
+         "program with new network safety settings.") },
+
     { VMERR_INVALID_SETPROP,
     "property cannot be set for object",
     VMsg("Invalid property change - this property cannot be set for this "

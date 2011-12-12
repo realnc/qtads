@@ -359,11 +359,13 @@ void CHtmlHashTable::enum_entries(void (*func)(void *, CHtmlHashEntry *),
     /* go through each hash value */
     for (tableptr = table_, i = 0 ; i < table_size_ ; ++i, ++tableptr)
     {
-        CHtmlHashEntry *entry;
-
         /* go through each entry at this hash value */
-        for (entry = *tableptr ; entry ; entry = entry->nxt_)
+        CHtmlHashEntry *entry, *nxt;
+        for (entry = *tableptr ; entry ; entry = nxt)
         {
+            /* remember the next entry in case the callback deletes this one */
+            nxt = entry->nxt_;
+            
             /* invoke the callback on this entry */
             (*func)(ctx, entry);
         }

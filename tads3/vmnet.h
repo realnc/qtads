@@ -63,6 +63,25 @@ public:
         return (val != 0 ? val : defval);
     }
 
+    /* does the given configuration variable equal the given string? */
+    const int match(const char *name, const char *strval)
+    {
+        const char *val = get(name, "");
+        return strcmp(val, strval) == 0;
+    }
+
+    /* 
+     *   Does the given configuration variable equal the given integer?  If
+     *   the configuration variable isn't defined, returns false.  Otherwise,
+     *   converts the configuration string value to an integer with atoi(),
+     *   and compares the result to the given value.
+     */
+    const int match(const char *name, int intval)
+    {
+        const char *val = get(name);
+        return (val != 0 ? atoi(val) == intval : FALSE);
+    }
+
     /* set a variable */
     class TadsNetConfigVar *set(const char *name, const char *val);
 
@@ -846,7 +865,15 @@ public:
     virtual class TadsServerThread *create_server_thread(OS_Socket *s)
         { return new TadsHttpServerThread(this, queue, upload_limit, s); }
 
-    /* get the HTTPServer object that created the listener */
+    /* 
+     *   Get the HTTPServer object that created the listener.
+     *   
+     *   For thread safety, this routine should only be called from the main
+     *   VM thread.  The garbage collector can delete the server object and
+     *   thus invalidate the value returned here.  The GC runs in the main VM
+     *   thread, so it's always safe to interrogate this value from the main
+     *   thread.
+     */
     vm_obj_id_t get_server_obj() const { return srv_obj; }
 
     /* 
@@ -856,7 +883,12 @@ public:
      *   garbage-collected object, so our reference won't keep the HTTPServer
      *   alive.  It can thus be collected while we're still pointing to it.
      *   To deal with this, the HTTPServer lets us know when it's about to be
-     *   deleted, so that we can clear our reference.  
+     *   deleted, so that we can clear our reference.
+     *   
+     *   This routine should only be called from the main VM thread.  This is
+     *   designed to be called from the HTTPServer object's notify_delete()
+     *   method, which is called by the garbage collector, which always runs
+     *   in the main VM thread.
      */
     void detach_server_obj() { srv_obj = VM_INVALID_OBJ; }
 
@@ -1063,8 +1095,8 @@ public:
      *   The caller thus can't access the message after posting it - for
      *   their purposes it's effectively gone after they send it.  If the
      *   caller does want to hang onto its own reference to the message after
-     *   sending it, just use AddRef() on the message (BEFORE posting, in
-     *   keeping with the usual ref-count transaction rules).  
+     *   sending it, just use add_ref() on the message (BEFORE posting, of
+     *   course, in keeping with the usual ref-count transaction rules).  
      */
     void post(TadsMessage *m)
     {

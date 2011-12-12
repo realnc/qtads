@@ -78,6 +78,13 @@ public:
     }
 
     /*
+     *   Get the number of times the playback has been completed.  This
+     *   returns the number of iterations that we've completed, as indicated
+     *   by calls to dec_repeat_count().  
+     */
+    int get_play_count() const { return orig_repeat_count_ - repeat_count_; }
+
+    /*
      *   Exhaust the repeat count in preparation for repeated playback.
      *   This should be called when the sound is scheduled to be played
      *   for its full number of repetitions.  We'll set the repeat count
@@ -139,8 +146,11 @@ protected:
     /* sequencing type */
     HTML_Attrib_id_t seq_;
 
-    /* repeat count */
+    /* repeat count - number of iterations remaining to be played */
     int repeat_count_;
+
+    /* original repeat count */
+    int orig_repeat_count_;
 
     /* random start probability */
     int random_start_;

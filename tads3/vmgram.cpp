@@ -1114,7 +1114,6 @@ void CVmObjGramProd::apply_undo(VMG_ CVmUndoRecord *undo_rec)
 
         /* get our alternative list and count */
         vmgram_alt_info **alts = get_ext()->alts_;
-        size_t altcnt = get_ext()->alt_cnt_;
         
         /* apply undo based on the event type */
         switch (rec->op)

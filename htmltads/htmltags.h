@@ -2276,12 +2276,11 @@ private:
     unsigned long open_ofs_;
     unsigned long close_ofs_;
 
-    /* characters to use for open and close quotes */
+    /* strings to use for open and close quotes */
     textchar_t open_q_[8];
-    textchar_t close_q_[8];
-
-    /* amount of characters the open and close quotes consist of */
     size_t open_q_len_;
+    
+    textchar_t close_q_[8];
     size_t close_q_len_;
 };
 

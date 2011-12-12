@@ -1268,14 +1268,13 @@ int CVmObjString::const_get_prop(VMG_ vm_val_t *retval,
 int CVmObjString::getp_len(VMG_ vm_val_t *retval, const vm_val_t *self_val,
                            const char *str, uint *argc)
 {
-    utf8_ptr p;
-    static CVmNativeCodeDesc desc(0);
-    
     /* check arguments */
+    static CVmNativeCodeDesc desc(0);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
     /* set up a utf-8 pointer to the string's contents */
+    utf8_ptr p;
     p.set((char *)str + VMB_LEN);
 
     /* return the character length of the string */
@@ -1300,10 +1299,10 @@ int CVmObjString::getp_substr(VMG_ vm_val_t *retval, const vm_val_t *self_val,
     size_t start_rem;
     size_t new_len;
     vm_obj_id_t obj;
-    uint argc = (in_argc == 0 ? 0 : *in_argc);
-    static CVmNativeCodeDesc desc(1, 1);
 
     /* check arguments */
+    uint argc = (in_argc == 0 ? 0 : *in_argc);
+    static CVmNativeCodeDesc desc(1, 1);
     if (get_prop_check_argc(retval, in_argc, &desc))
         return TRUE;
 
@@ -1423,9 +1422,9 @@ int CVmObjString::getp_upper(VMG_ vm_val_t *retval, const vm_val_t *self_val,
     utf8_ptr srcp;
     utf8_ptr dstp;
     vm_obj_id_t result_obj;
-    static CVmNativeCodeDesc desc(0);
 
     /* check arguments */
+    static CVmNativeCodeDesc desc(0);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
@@ -1488,9 +1487,9 @@ int CVmObjString::getp_lower(VMG_ vm_val_t *retval, const vm_val_t *self_val,
     utf8_ptr srcp;
     utf8_ptr dstp;
     vm_obj_id_t result_obj;
-    static CVmNativeCodeDesc desc(0);
 
     /* check arguments */
+    static CVmNativeCodeDesc desc(0);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
@@ -1549,11 +1548,11 @@ int CVmObjString::getp_find(VMG_ vm_val_t *retval, const vm_val_t *self_val,
 {
     const char *str2;
     size_t idx;
-    uint orig_argc = (argc != 0 ? *argc : 0);
-    static CVmNativeCodeDesc desc(1, 1);
     int start_idx;
     
     /* check arguments */
+    uint orig_argc = (argc != 0 ? *argc : 0);
+    static CVmNativeCodeDesc desc(1, 1);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
@@ -2355,13 +2354,13 @@ int CVmObjString::getp_to_uni(VMG_ vm_val_t *retval,
                               const vm_val_t *self_val,
                               const char *str, uint *in_argc)
 {
-    uint argc = (in_argc != 0 ? *in_argc : 0);
     size_t bytelen;
     long idx = 1;
     utf8_ptr p;
-    static CVmNativeCodeDesc desc(0, 1);
 
     /* check arguments */
+    uint argc = (in_argc != 0 ? *in_argc : 0);
+    static CVmNativeCodeDesc desc(0, 1);
     if (get_prop_check_argc(retval, in_argc, &desc))
         return TRUE;
 
@@ -2472,7 +2471,6 @@ int CVmObjString::getp_htmlify(VMG_ vm_val_t *retval,
                                const vm_val_t *self_val,
                                const char *str, uint *in_argc)
 {
-    uint argc = (in_argc != 0 ? *in_argc : 0);
     size_t bytelen;
     utf8_ptr p;
     utf8_ptr dstp;
@@ -2481,9 +2479,10 @@ int CVmObjString::getp_htmlify(VMG_ vm_val_t *retval,
     long flags;
     vm_obj_id_t result_obj;
     int prv_was_sp;
-    static CVmNativeCodeDesc desc(0, 1);
 
     /* check arguments */
+    uint argc = (in_argc != 0 ? *in_argc : 0);
+    static CVmNativeCodeDesc desc(0, 1);
     if (get_prop_check_argc(retval, in_argc, &desc))
         return TRUE;
 
@@ -2678,12 +2677,12 @@ int CVmObjString::getp_starts_with(VMG_ vm_val_t *retval,
                                    const vm_val_t *self_val,
                                    const char *str, uint *argc)
 {
-    static CVmNativeCodeDesc desc(1);
     const char *str2;
     size_t len;
     size_t len2;
 
     /* check arguments */
+    static CVmNativeCodeDesc desc(1);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
@@ -2716,12 +2715,12 @@ int CVmObjString::getp_ends_with(VMG_ vm_val_t *retval,
                                  const vm_val_t *self_val,
                                  const char *str, uint *argc)
 {
-    static CVmNativeCodeDesc desc(1);
     const char *str2;
     size_t len;
     size_t len2;
 
     /* check arguments */
+    static CVmNativeCodeDesc desc(1);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
@@ -2790,11 +2789,11 @@ int CVmObjString::getp_splice(VMG_ vm_val_t *retval,
                               const vm_val_t *self_val,
                               const char *str, uint *argc)
 {
-    static CVmNativeCodeDesc desc(2, 1);
-    uint oargc = (argc != 0 ? *argc : 0);
     char ins_buf[128];
 
     /* check arguments */
+    uint oargc = (argc != 0 ? *argc : 0);
+    static CVmNativeCodeDesc desc(2, 1);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
@@ -3235,12 +3234,12 @@ int CVmObjString::specialsTo(VMG_ vm_val_t *retval,
                              const char *str, uint *argc,
                              int html)
 {
-    static CVmNativeCodeDesc desc(0, 1);
-    uint oargc = (argc != 0 ? *argc : 0);
     vm_rcdesc rc;
     vm_prop_id_t flags_prop = VM_INVALID_OBJ, tag_prop = VM_INVALID_OBJ;
 
     /* check arguments */
+    uint oargc = (argc != 0 ? *argc : 0);
+    static CVmNativeCodeDesc desc(0, 1);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
@@ -3863,10 +3862,8 @@ int CVmObjString::getp_urlEncode(VMG_ vm_val_t *retval,
                                  const vm_val_t *self_val,
                                  const char *str, uint *argc)
 {
-    static CVmNativeCodeDesc desc(0);
-    uint oargc = (argc != 0 ? *argc : 0);
-
     /* check arguments */
+    static CVmNativeCodeDesc desc(0);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
@@ -3945,10 +3942,8 @@ int CVmObjString::getp_urlDecode(VMG_ vm_val_t *retval,
                                  const vm_val_t *self_val,
                                  const char *str, uint *argc)
 {
-    static CVmNativeCodeDesc desc(0);
-    uint oargc = (argc != 0 ? *argc : 0);
-
     /* check arguments */
+    static CVmNativeCodeDesc desc(0);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
@@ -4034,10 +4029,8 @@ int CVmObjString::getp_sha256(VMG_ vm_val_t *retval,
                               const vm_val_t *self_val,
                               const char *str, uint *argc)
 {
-    static CVmNativeCodeDesc desc(0);
-    uint oargc = (argc != 0 ? *argc : 0);
-
     /* check arguments */
+    static CVmNativeCodeDesc desc(0);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
@@ -4064,10 +4057,8 @@ int CVmObjString::getp_md5(VMG_ vm_val_t *retval,
                            const vm_val_t *self_val,
                            const char *str, uint *argc)
 {
-    static CVmNativeCodeDesc desc(0);
-    uint oargc = (argc != 0 ? *argc : 0);
-
     /* check arguments */
+    static CVmNativeCodeDesc desc(0);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 
@@ -4092,10 +4083,9 @@ int CVmObjString::getp_md5(VMG_ vm_val_t *retval,
  */
 int CVmObjString::static_getp_packBytes(VMG_ vm_val_t *retval, uint *pargc)
 {
-    static CVmNativeCodeDesc desc(1, 0, TRUE);
-    uint argc = (pargc != 0 ? *pargc : 0);
-
     /* check arguments */
+    uint argc = (pargc != 0 ? *pargc : 0);
+    static CVmNativeCodeDesc desc(1, 0, TRUE);
     if (get_prop_check_argc(retval, pargc, &desc))
         return TRUE;
 

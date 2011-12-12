@@ -114,6 +114,12 @@ protected:
     static void parse_group_mods(const struct CVmPackPos *p,
                                  struct CVmPackType *gt);
 
+    /* find the close parenthesis/bracket of a group */
+    static void skip_group(struct CVmPackPos *p, wchar_t close_paren);
+
+    /* parse and skip a group and its modifiers */
+    static void skip_group_mods(struct CVmPackPos *p, struct CVmPackType *gt);
+
     /* parse suffix modifiers */
     static void parse_mods(struct CVmPackPos *p, struct CVmPackType *t);
 };

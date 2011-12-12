@@ -300,7 +300,7 @@ htmldbg_loadbp_stat CHtmlDebugHelper::
      *   previously loaded, the source ID's can change on a recompile, so
      *   we need to fix up all of the ID's each time we reload.  
      */
-    for (link = first_srcwin_ ; link != 0 ; link = link = link->next_)
+    for (link = first_srcwin_ ; link != 0 ; link = link->next_)
     {
         CHtmlDbg_src *src;
 
@@ -429,6 +429,22 @@ void CHtmlDebugHelper::set_exec_state_go(dbgcxdef *ctx)
     forget_current_line();
 }
 
+/*
+ *   set execution state to BREAK 
+ */
+void CHtmlDebugHelper::set_exec_state_break(dbgcxdef *ctx)
+{
+    /* ignore it if there's no context */
+    if (ctx == 0)
+        return;
+
+    /* set the execution state in the engine */
+    vm_set_exec_state_break(ctx);
+
+    /* remove the old current line pointer while executing */
+    forget_current_line();
+}
+
 /* 
  *   set execution state to STEP OVER - steps without following calls 
  */
@@ -441,7 +457,7 @@ void CHtmlDebugHelper::set_exec_state_step_over(dbgcxdef *ctx)
     /* set the state in the engine */
     vm_set_exec_state_step_over(ctx);
 
-    /* remove the old current line pointer while exeucting */
+    /* remove the old current line pointer while executing */
     forget_current_line();
 }
 
@@ -458,7 +474,7 @@ void CHtmlDebugHelper::set_exec_state_step_out(dbgcxdef *ctx)
     /* set the state in the engine */
     vm_set_exec_state_step_out(ctx);
 
-    /* remove the old current line pointer while exeucting */
+    /* remove the old current line pointer while executing */
     forget_current_line();
 }
 
@@ -474,7 +490,7 @@ void CHtmlDebugHelper::set_exec_state_step_into(dbgcxdef *ctx)
     /* set engine state */
     vm_set_exec_state_step_into(ctx);
     
-    /* remove the old current line pointer while exeucting */
+    /* remove the old current line pointer while executing */
     forget_current_line();
 }
 
@@ -549,7 +565,7 @@ int CHtmlDebugHelper::is_valid_next_statement(dbgcxdef *ctx, IDebugWin *win)
  *   zero on success, non-zero on error.  
  */
 int CHtmlDebugHelper::set_next_statement(dbgcxdef *ctx,
-                                         unsigned int *exec_ofs,
+                                         void *exec_ofs,
                                          IDebugWin *win,
                                          int *need_single_step)
 {
@@ -2100,7 +2116,7 @@ void CHtmlDebugHelper::reload_source_window(CHtmlDebugSysIfc_win *syswinifc,
                 continue;
 
             /* clear the page */
-            link->srcmgr_->clear_document();
+            link->srcmgr_->clear_document_for_reload();
 
             /* load it */
             vm_load_file_into_win(link, path);
@@ -3474,7 +3490,7 @@ int CHtmlDebugSrcMgr::set_tab_size(int n)
 /*
  *   Begin loading from a file 
  */
-void CHtmlDebugSrcMgr::begin_file_load()
+void CHtmlDebugSrcMgr::begin_file_load(void *&)
 {
     /* this is no longer implemented */
     assert(FALSE);
@@ -3492,7 +3508,7 @@ void CHtmlDebugSrcMgr::load_text(const char *buf, size_t len)
 /*
  *   end file loading 
  */
-void CHtmlDebugSrcMgr::end_file_load()
+void CHtmlDebugSrcMgr::end_file_load(void *ctx)
 {
     /* this is no longer implemented */
     assert(FALSE);

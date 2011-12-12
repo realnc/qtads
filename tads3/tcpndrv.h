@@ -1627,7 +1627,13 @@ public:
 };
 
 /*
- *   Metaclass.  
+ *   Metaclass.
+ *   
+ *   Metaclasses must be declared per module.  However, we store "soft"
+ *   references in symbol files, purely so that the defined() operator knows
+ *   whether a metaclass is included in the build.  The soft references don't
+ *   contain any property table information, so we still need a full
+ *   'intrinsic class' definition in each module.
  */
 class CTcSymMetaclassBase: public CTcSymbol
 {
@@ -1652,6 +1658,12 @@ public:
 
         /* we don't have a superclass yet */
         super_meta_ = 0;
+
+        /* assume it's not an external symbol */
+        ext_ = FALSE;
+
+        /* not yet referenced */
+        ref_ = FALSE;
     }
 
     /* this can't be an lvalue */
@@ -1672,8 +1684,11 @@ public:
     int get_meta_idx() const { return meta_idx_; }
     void set_meta_idx(int idx) { meta_idx_ = idx; }
 
-    /* do not write metaclasses to symbol files */
-    virtual int write_to_sym_file(class CVmFile *) { return FALSE; }
+    /* write to a symbol file */
+    virtual int write_to_sym_file(class CVmFile *fp);
+
+    /* read from a symbol file */
+    static class CTcSymbol *read_from_sym_file(class CVmFile *fp);
 
     /* write some additional data to the object file */
     virtual int write_to_obj_file(class CVmFile *fp);
@@ -1693,6 +1708,19 @@ public:
     /* get/set my intrinsic superclass */
     class CTcSymMetaclass *get_super_meta() const { return super_meta_; }
     void set_super_meta(class CTcSymMetaclass *sc) { super_meta_ = sc; }
+
+    /*
+     *   Get/set the external reference status.  An external metaclass is one
+     *   that's defined in another module; we have visibility to it via a
+     *   reference in a symbol file.  This definition isn't sufficient to
+     *   actually use the metaclass; the metaclass must be declared per
+     *   module via an explicitly included 'intrinsic class' statment.  The
+     *   external reference is sufficient for the defined() operator, though,
+     *   so we can test whether a metaclass is part of the build within a
+     *   module that doesn't declare the metaclass.
+     */
+    int is_ext() const { return ext_; }
+    void set_ext(int f) { ext_ = f; }
 
 protected:
     /* our intrinsic superclass */
@@ -1716,6 +1744,12 @@ protected:
 
     /* the object that represents the class */
     tctarg_obj_id_t class_obj_;
+
+    /* is this an external metaclass symbol? */
+    uint ext_ : 1;
+
+    /* has our object been referenced in code generation? */
+    uint ref_ : 1;
 };
 
 /*

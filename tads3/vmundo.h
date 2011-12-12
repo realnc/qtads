@@ -154,11 +154,11 @@ public:
     int add_new_record_ptr_key(VMG_ vm_obj_id_t obj, void *key)
     {
         /* set up a nil value to fill the value slot in the record */
-        vm_val_t nil;
-        nil.set_nil();
+        vm_val_t nilval;
+        nilval.set_nil();
 
         /* save the record */
-        return add_new_record_ptr_key(vmg_ obj, key, &nil);
+        return add_new_record_ptr_key(vmg_ obj, key, &nilval);
     }
 
     /*

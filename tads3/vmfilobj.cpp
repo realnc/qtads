@@ -744,7 +744,7 @@ vm_obj_id_t CVmObjFile::get_charset_arg(VMG_ int argn, int argc)
         os_get_charmap(csname, OS_CHARMAP_FILECONTENTS);
         
         /* create the mapper */
-        obj = CVmObjCharSet::create(vmg_ FALSE, csname, 8);
+        obj = CVmObjCharSet::create(vmg_ FALSE, csname, strlen(csname));
     }
 
     /* return the character set */
@@ -766,9 +766,6 @@ int CVmObjFile::s_getp_open_text(VMG_ vm_val_t *retval, uint *in_argc,
     if (get_prop_check_argc(retval, in_argc,
                             is_resource_file ? &desc_res : &desc_file))
         return TRUE;
-
-    /* initialize the flags to indicate a text-mode file */
-    unsigned int flags = 0;
 
     /* 
      *   retrieve the filename and access mode arguments, and set up network
@@ -973,9 +970,6 @@ int CVmObjFile::open_binary(VMG_ vm_val_t *retval, uint *in_argc, int mode,
     if (get_prop_check_argc(retval, in_argc,
                             is_resource_file ? &res_desc : &file_desc))
         return TRUE;
-
-    /* initialize the flags */
-    unsigned int flags = 0;
 
     /* retrieve the filename and access mode */
     int access = 0;

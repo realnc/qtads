@@ -417,6 +417,16 @@ void CHtmlDebugHelper::vm_set_exec_state_go(dbgcxdef *ctx)
 }
 
 /*
+ *   Set the engine execution state to BREAK 
+ */
+void CHtmlDebugHelper::vm_set_exec_state_break(dbgcxdef *ctx)
+{
+    /* set the stepping flag, but clear the step-over-calls flag */
+    ctx->dbgcxflg |= DBGCXFSS;
+    ctx->dbgcxflg &= ~DBGCXFSO;
+}
+
+/*
  *   Set engine execution state to STEP OVER 
  */
 void CHtmlDebugHelper::vm_set_exec_state_step_over(dbgcxdef *ctx)
@@ -505,7 +515,7 @@ void CHtmlDebugHelper::vm_signal_abort(dbgcxdef *ctx)
  *   the given window.  Returns zero on success, non-zero on failure.  
  */
 int CHtmlDebugHelper::vm_set_next_statement(dbgcxdef *ctx,
-                                            unsigned int *exec_ofs,
+                                            void *exec_ofs,
                                             IDebugWin *win,
                                             unsigned long *linenum,
                                             int *need_single_step)
@@ -520,7 +530,7 @@ int CHtmlDebugHelper::vm_set_next_statement(dbgcxdef *ctx,
         return 2;
 
     /* move the execution point to the new offset */
-    *exec_ofs = line_ofs;
+    *(uint *)exec_ofs = line_ofs;
 
     /* 
      *   TADS 2 requires a single step after changing the execution
@@ -1347,7 +1357,8 @@ int CHtmlDebugHelper::vm_load_file_into_win(CHtmlDbg_win_link *win_link,
     linseek(lin, posbuf);
 
     /* begin the loading process */
-    win_link->srcmgr_->begin_file_load();
+    void *load_ctx = 0;
+    win_link->srcmgr_->begin_file_load(load_ctx);
 
     /* 
      *   read lines from the line source, and add each line to the
@@ -1367,7 +1378,7 @@ int CHtmlDebugHelper::vm_load_file_into_win(CHtmlDbg_win_link *win_link,
     }
 
     /* tell the source manager we're done loading the file */
-    win_link->srcmgr_->end_file_load();
+    win_link->srcmgr_->end_file_load(load_ctx);
 
     /* done with the source file - close it */
     osfcls(fp);

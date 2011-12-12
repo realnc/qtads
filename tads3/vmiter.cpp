@@ -58,8 +58,6 @@ int (CVmObjIter::
     &CVmObjIter::getp_get_cur_val
 };
 
-static vm_prop_id_t get_next, next_avail;
-
 /* 
  *   get a property 
  */

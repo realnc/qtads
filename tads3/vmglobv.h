@@ -167,5 +167,8 @@ VM_GLOBALS_BEGIN
    VM_GLOBAL_VARDEF(uint16, iter_get_next)
    VM_GLOBAL_VARDEF(uint16, iter_next_avail)
 
+   /* system debug log file name */
+   VM_GLOBAL_ARRAYDEF(char, syslogfile, OSFNMAX)
+
 VM_GLOBALS_END
 

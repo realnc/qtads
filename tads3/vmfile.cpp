@@ -23,6 +23,7 @@ Modified
 #include "t3std.h"
 #include "vmfile.h"
 #include "vmerr.h"
+#include "vmdatasrc.h"
 
 
 /*
@@ -102,4 +103,92 @@ char *CVmStream::read_line_alo()
 
     /* return our buffer */
     return ret;
+}
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   Stream Data Source 
+ */
+
+CVmStreamSource::~CVmStreamSource()
+{
+    delete stream;
+}
+
+int CVmStreamSource::read(void *buf, size_t len)
+{
+    return stream->read_nbytes((char *)buf, len) != len;
+}
+
+int CVmStreamSource::readc(void *buf, size_t len)
+{
+    return stream->read_nbytes((char *)buf, len);
+}
+
+int CVmStreamSource::write(const void *buf, size_t len)
+{
+    int err = 0;
+    err_try
+    {
+        stream->write_bytes((char *)buf, len);
+    }
+    err_catch(e)
+    {
+        err = 1;
+    }
+    err_end;
+
+    return err;
+}
+
+long CVmStreamSource::get_size()
+{
+    return stream->get_len();
+}
+
+long CVmStreamSource::get_pos()
+{
+    return stream->get_seek_pos();
+}
+
+int CVmStreamSource::seek(long ofs, int mode)
+{
+    int err = 0;
+    err_try
+    {
+        switch (mode)
+        {
+        case OSFSK_SET:
+            stream->set_seek_pos(ofs);
+            break;
+
+        case OSFSK_CUR:
+            stream->set_seek_pos(stream->get_seek_pos() + ofs);
+            break;
+
+        case OSFSK_END:
+            stream->set_seek_pos(stream->get_len() + ofs);
+            break;
+
+        default:
+            err = 1;
+            break;
+        }
+    }
+    err_catch(e)
+    {
+        err = 1;
+    }
+    err_end;
+
+    return err;
+}
+
+int CVmStreamSource::flush()
+{
+    return 0;
+}
+
+void CVmStreamSource::close()
+{
 }

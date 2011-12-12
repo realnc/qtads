@@ -610,7 +610,7 @@ static void format_message(const char *msg, unsigned long options)
                  *   if we're at the end of the line, or we're over the line
                  *   width and we found a space, break here 
                  */
-                if (*p == '\0' || p - start >= line_wid && sp != 0)
+                if (*p == '\0' || (p - start >= line_wid && sp != 0))
                 {
                     /* if we've reached the end, print the rest */
                     if (*p == '\0')

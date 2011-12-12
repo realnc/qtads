@@ -354,6 +354,8 @@ public:
      *   size. 
      */
     static void pop_str_val_buf(VMG_ char *buf, size_t buflen);
+    static void get_str_val_buf(VMG_ char *buf, size_t buflen,
+                                const vm_val_t *val);
 
     /*
      *   Pop a null-terminated string into the given buffer, converting

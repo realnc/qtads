@@ -126,6 +126,11 @@ int CTcSymPropBase::write_to_sym_file(CVmFile *)
     assert(FALSE);
     return 0;
 }
+int CTcSymMetaclassBase::write_to_sym_file(CVmFile *)
+{
+    assert(FALSE);
+    return 0;
+}
 
 
 /* ------------------------------------------------------------------------ */

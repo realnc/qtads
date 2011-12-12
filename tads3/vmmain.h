@@ -187,6 +187,8 @@ void vm_interface_report(class CVmMainClientIfc *cli, const char *fname);
  */
 char *vm_get_ifid(class CVmHostIfc *hostifc);
 
+
+/* ------------------------------------------------------------------------ */
 /*
  *   VM Main client services interface.  Callers of the vm_run_image
  *   functions must provide an implementation of this interface. 
@@ -312,6 +314,7 @@ public:
                                const char *msg, int add_blank_line) = 0;
 };
 
+/* ------------------------------------------------------------------------ */
 /*
  *   Very basic client interface implementation using stdio 
  */

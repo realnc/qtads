@@ -71,8 +71,12 @@ void CTPNStmIf::gen_code(int, int)
          */
         if (!val)
         {
-            /* it's false - the 'then' part cannot be executed */
-            log_warning(TCERR_IF_ALWAYS_FALSE);
+            /* 
+             *   It's false - the 'then' part cannot be executed.  If this
+             *   isn't a compile-time constant expression, warn about it.
+             */
+            if (!cond_expr_->get_const_val()->is_ctc())
+                log_warning(TCERR_IF_ALWAYS_FALSE);
 
             /* generate the 'else' part if there is one */
             if (else_part_ != 0)
@@ -319,7 +323,7 @@ void CTPNVarIn::gen_iter_init(CTcPrsNode *coll_expr, int iter_local_id,
          */
         if (coll_expr != 0)
             coll_expr->gen_code_member(FALSE, create_iter, FALSE,
-                                       0, FALSE, FALSE);
+                                       0, FALSE, NULL);
 
         /* assign the result to the internal iterator stack local */
         CTcSymLocal::s_gen_code_setlcl_stk(iter_local_id, FALSE);

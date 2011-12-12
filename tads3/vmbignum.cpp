@@ -379,7 +379,7 @@ vm_obj_id_t CVmObjBigNum::create_from_stack(VMG_ const uchar **pc_ptr,
     {
         /* create the value based on the integer value */
         id = vm_new_id(vmg_ FALSE, FALSE, FALSE);
-        new (vmg_ id) CVmObjBigNum(vmg_ val->val.intval, digits);
+        new (vmg_ id) CVmObjBigNum(vmg_ (long)val->val.intval, digits);
     }
 
     /* discard arguments */
@@ -811,7 +811,8 @@ void CVmObjBigNum::cast_to_bignum(VMG_ vm_val_t *bnval,
     if (srcval->typ == VM_INT)
     {
         /* create from the integer value */
-        bnval->set_obj(create(vmg_ FALSE, srcval->val.intval, (size_t)10));
+        bnval->set_obj(create(
+            vmg_ FALSE, (long)srcval->val.intval, (size_t)10));
     }
     else if ((str = srcval->get_as_string(vmg0_)) != 0)
     {
@@ -2491,7 +2492,6 @@ const char *CVmObjBigNum::cvt_to_string_in_radix(
     {
         /* make a temporary copy of the number */
         uint thdl;
-        int prec = get_prec(ext_);
         char *tmp = alloc_temp_reg(vmg_ get_prec(ext_), &thdl);
         err_try
         {
@@ -9742,7 +9742,7 @@ int CVmObjBigNum::cvt_to_bignum(VMG_ vm_obj_id_t self, vm_val_t *val) const
         G_stk->push()->set_obj(self);
         
         /* it's an integer - convert it to a BigNum */
-        val->set_obj(create(vmg_ FALSE, val->val.intval, 32));
+        val->set_obj(create(vmg_ FALSE, (long)val->val.intval, 32));
 
         /* done protecting my object reference */
         G_stk->discard();

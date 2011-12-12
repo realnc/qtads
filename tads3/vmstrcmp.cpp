@@ -371,15 +371,16 @@ vm_obj_id_t CVmObjStrComp::create_from_stack(
     else
     {
         size_t i;
+        int ec;
         
         /* get the list value from the argument */
         lst = G_stk->get(0);
         if (!lst->is_listlike(vmg0_)
-            || (equiv_cnt = lst->ll_length(vmg0_)) < 0)
+            || (ec = lst->ll_length(vmg0_)) < 0)
             err_throw(VMERR_BAD_TYPE_BIF);
 
         /* run through the list and count the value string characters */
-        for (i = 1, total_chars = 0 ; i <= equiv_cnt ; ++i)
+        for (i = 1, total_chars = 0, equiv_cnt = ec ; i <= equiv_cnt ; ++i)
         {
             vm_val_t sublst;
             vm_val_t val;

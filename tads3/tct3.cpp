@@ -1703,7 +1703,7 @@ vm_obj_id_t CTcGenTarg::gen_bignum_obj(const char *txt, size_t len)
     utf8_ptr p;
     size_t rem;
     int dig[2];
-    char dig_idx;
+    int dig_idx;
     int sig;
     size_t tot_digits;
     size_t prec;
@@ -9929,8 +9929,7 @@ void CTcSymExtfn::gen_code_call(int /*discard*/, int /*argc*/, int /*varargs*/,
 void CTcSymLabel::gen_code(int discard)
 {
     /* it's not legal to evaluate a code label; log an error */
-    G_tok->log_error(TCERR_CANNOT_EVAL_LABEL,
-                     (int)get_sym_len(), get_sym());
+    G_tok->log_error(TCERR_CANNOT_EVAL_LABEL, (int)get_sym_len(), get_sym());
 }
 
 /* ------------------------------------------------------------------------ */
@@ -9943,6 +9942,14 @@ void CTcSymLabel::gen_code(int discard)
  */
 void CTcSymMetaclass::gen_code(int discard)
 {
+    /* 
+     *   mark it as referenced - if the metaclass wasn't defined in this file
+     *   but was merely imported from a symbol file, we now need to write it
+     *   to the object file anyway, since its class object ID has been
+     *   referenced 
+     */
+    ref_ = TRUE;
+    
     /* 
      *   the metaclass name refers to the IntrinsicClass instance
      *   associated with the metaclass 
@@ -9961,6 +9968,13 @@ void CTcSymMetaclass::gen_code_new(int discard, int argc,
                                    int varargs, CTcNamedArgs *named_args,
                                    int is_transient)
 {
+    /* if this is an external metaclass, we can't generate code */
+    if (ext_)
+    {
+        G_tok->log_error(TCERR_EXT_METACLASS, (int)get_sym_len(), get_sym());
+        return;
+    }
+
     /* if we have varargs, write the modifier */
     if (varargs)
         G_cg->write_op(OPC_VARARGC);
@@ -10000,6 +10014,13 @@ void CTcSymMetaclass::gen_code_member(int discard, CTcPrsNode *prop_expr,
                                       int argc, int varargs,
                                       CTcNamedArgs *named_args)
 {
+    /* if this is an external metaclass, we can't generate code */
+    if (ext_)
+    {
+        G_tok->log_error(TCERR_EXT_METACLASS, (int)get_sym_len(), get_sym());
+        return;
+    }
+
     /* generate code to push our class object onto the stack */
     gen_code(FALSE);
 
@@ -10017,9 +10038,12 @@ void CTcSymMetaclass::gen_code_member(int discard, CTcPrsNode *prop_expr,
  */
 void CTcSymMetaclass::add_runtime_symbol(CVmRuntimeSymbols *symtab)
 {
-    vm_val_t val;
+    /* don't do this for external metaclasses */
+    if (ext_)
+        return;
 
     /* add our entry */
+    vm_val_t val;
     val.set_obj(get_class_obj());
     symtab->add_sym(get_sym(), get_sym_len(), &val);
 }
@@ -10691,7 +10715,7 @@ void CTPNCodeBody::gen_code(int, int)
 #ifdef T3_DEBUG
     if (G_cg->get_sp_depth() != 0)
     {
-        printf("---> stack depth is %d after block codegen (line %d)!\n",
+        printf("---> stack depth is %d after block codegen (line %ld)!\n",
                G_cg->get_sp_depth(), end_linenum_);
         if (fixup_owner_sym_ != 0)
             printf("---> code block for %.*s\n",

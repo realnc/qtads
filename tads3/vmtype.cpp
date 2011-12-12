@@ -356,7 +356,7 @@ const char *vm_val_t::cast_to_string(VMG_ vm_val_t *new_str) const
         {
             /* format the number into a temporary buffer */
             char buf[20];
-            sprintf(buf, "%ld", val.intval);
+            sprintf(buf, "%ld", (long)val.intval);
 
             /* create a new string object for the number */
             new_str->set_obj(
@@ -518,6 +518,19 @@ void vm_val_t::ll_index(VMG_ vm_val_t *ret, const vm_val_t *idx) const
         ret->set_nil();
     }
 }
+
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   Is this an object of the given class? 
+ */
+int vm_val_t::is_instance_of(VMG_ vm_obj_id_t cls) const
+{
+    return (typ == VM_OBJ
+            && cls != VM_INVALID_OBJ
+            && vm_objp(vmg_ val.obj)->is_instance_of(vmg_ cls));
+}
+
 
 /* ------------------------------------------------------------------------ */
 /*

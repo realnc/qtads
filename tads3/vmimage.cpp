@@ -936,18 +936,25 @@ void CVmImageLoader::run_static_init(VMG0_)
             }
             err_catch(exc)
             {
-                char errbuf[512];
-                const char *obj_name;
-                size_t obj_len;
-                const char *prop_name;
-                size_t prop_len;
+                /* 
+                 *   If the "error" is a debugger terminate, pass it through
+                 *   - this simply means that the user is manually ending the
+                 *   program via the debugger UI.  Likewise for restarts or
+                 *   interrupts.
+                 */
+                if (exc->get_error_code() == VMERR_DBG_HALT
+                    || exc->get_error_code() == VMERR_DBG_RESTART
+                    || exc->get_error_code() == VMERR_DBG_INTERRUPT)
+                    err_rethrow();
                 
                 /* get the message for the exception that occurred */
+                char errbuf[512];
                 CVmRun::get_exc_message(vmg_ exc, errbuf, sizeof(errbuf),
                                         FALSE);
 
                 /* presume we won't find names */
-                obj_name = prop_name = 0;
+                size_t obj_len = 0, prop_len = 0;
+                const char *obj_name = 0, *prop_name = 0;
 
                 /* find the obj and prop names in the global symbols */
                 if (runtime_symtab_ != 0)

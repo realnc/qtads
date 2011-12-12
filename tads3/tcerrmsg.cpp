@@ -2146,6 +2146,11 @@ const err_msg_t tc_messages_english[] =
     "match the template usage. It must be defined as a function taking "
     "%d argument(s) and returning a value." },
 
+    { TCERR_DEFINED_SYNTAX,
+    "invalid syntax for defined() operator - argument must be a symbol name",
+    "The syntax for the defined() operator is invalid. This operator "
+    "requires a single symbol name as the argument, in parentheses." },
+
     { TCERR_CODEGEN_NO_MEM,
     "out of memory for code generation",
     "Out of memory.  The compiler cannot allocate memory to generate "
@@ -2577,6 +2582,14 @@ const err_msg_t tc_messages_english[] =
     "as part of class OneOfIndexGen. This symbol is used as a different "
     "type in the program. Make sure that you're using the current version "
     "of the sy stem library file _main.t" },
+
+    { TCERR_EXT_METACLASS,
+    "intrinsic class '%.*s' is not defined in this module",
+    "The intrinsic class '%.*s' is not defined in this source module. "
+    "To refer to this class within this module, you must declare it. "
+    "The usual way to declare an intrinsic class is simply to #include "
+    "the system header file that defines the class, near the beginning "
+    "of your source file." },
 
     { TCERR_SYMEXP_INV_TYPE,
     "invalid symbol type in symbol file",

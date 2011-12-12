@@ -33,6 +33,7 @@ Modified
 #include <string.h>
 
 /* include the necessary T3 interfaces */
+#include "t3std.h"
 #include "os.h"
 #include "vmglob.h"
 #include "vmtype.h"
@@ -161,7 +162,7 @@ void CVmDebugUI::terminate(VMG0_)
  *   main command loop entrypoint 
  */
 void CVmDebugUI::cmd_loop(VMG_ int bpnum, int err,
-                          unsigned int *exec_ofs)
+                          const uchar **pc)
 {
     dbgcxdef *ctx;
     
@@ -169,7 +170,7 @@ void CVmDebugUI::cmd_loop(VMG_ int bpnum, int err,
     ctx = (dbgcxdef *)G_debugger->get_ui_ctx();
     
     /* invoke the command loop in the UI */
-    html_dbgui_cmd(ctx, ctx->ui_ctx, bpnum, err, exec_ofs);
+    html_dbgui_cmd(ctx, ctx->ui_ctx, bpnum, err, pc);
 }
 
 
@@ -198,17 +199,18 @@ public:
     /* find the code address of the current source window's selection */
     static int srcofs_to_code(CHtmlDebugHelper *helper, dbgcxdef *ctx,
                               IDebugWin *win, ulong *linenum,
-                              CHtmlDbg_win_link **win_link, ulong *code_addr);
+                              CHtmlDbg_win_link **win_link,
+                              void *code_addr);
 
     /* find the code address of a given source file location */
     static int srcofs_to_code(dbgcxdef *ctx,
                               int source_id, ulong *linenum,
-                              ulong *code_addr);
+                              void *code_addr);
 
     /* toggle a breakpoint */
     static int toggle_breakpoint(CHtmlDebugHelper *helper, dbgcxdef *ctx,
                                  int source_id, unsigned long linenum,
-                                 ulong code_addr,
+                                 void *code_addr,
                                  const char *cond, int change,
                                  int set_only, int set_internal_bp,
                                  int *bpnum, int *did_set);
@@ -217,7 +219,7 @@ public:
     static void toggle_bp_disable(CHtmlDebugHelper *helper,
                                   dbgcxdef *ctx,
                                   int source_id, unsigned long linenum,
-                                  unsigned long code_addr);
+                                  void *code_addr);
 };
 
 /*
@@ -226,7 +228,7 @@ public:
 int CHtmlDebugHelperVM::
    srcofs_to_code(CHtmlDebugHelper *helper, dbgcxdef *ctx,
                   IDebugWin *win, ulong *linenum,
-                  CHtmlDbg_win_link **win_link, ulong *code_addr)
+                  CHtmlDbg_win_link **win_link, void *code_addr)
 {
     CHtmlDbg_line_link *line_link;
 
@@ -246,14 +248,14 @@ int CHtmlDebugHelperVM::
  */
 int CHtmlDebugHelperVM::srcofs_to_code(dbgcxdef *ctx,
                                        int source_id, ulong *linenum,
-                                       ulong *code_addr)
+                                       void *code_addr)
 {
     CVmSrcfEntry *entry;
 
     /* if there's no context, we can't do anything */
     if (ctx == 0)
     {
-        *code_addr = 0;
+        *(const uchar **)code_addr = 0;
         return 0;
     }
 
@@ -267,12 +269,15 @@ int CHtmlDebugHelperVM::srcofs_to_code(dbgcxdef *ctx,
     if (entry == 0)
         return 1;
 
-    /* find the line record */
-    *code_addr = entry->find_src_addr(linenum, FALSE);
+    /* find the line record, and get the code pool offset */
+    ulong ofs = entry->find_src_addr(linenum, FALSE);
 
     /* if we didn't find the line, return failure */
-    if (*code_addr == 0)
+    if (ofs == 0)
         return 1;
+
+    /* translate the offset to a code pool address */
+    *(const uchar **)code_addr = (const uchar *)G_code_pool->get_ptr(ofs);
 
     /* success */
     return 0;
@@ -286,7 +291,7 @@ int CHtmlDebugHelperVM::toggle_breakpoint(CHtmlDebugHelper *helper,
                                           dbgcxdef *ctx,
                                           int source_id,
                                           unsigned long linenum,
-                                          ulong code_addr,
+                                          void *code_addr,
                                           const char *cond, int change,
                                           int set_only,
                                           int set_internal_bp,
@@ -306,7 +311,8 @@ int CHtmlDebugHelperVM::toggle_breakpoint(CHtmlDebugHelper *helper,
         VMGLOB_PTR(ctx->vmg);
 
         /* set the breakpoint in the VM */
-        if (G_debugger->toggle_breakpoint(vmg_ code_addr, cond, change,
+        if (G_debugger->toggle_breakpoint(vmg_ (const uchar *)code_addr,
+                                          cond, change,
                                           bpnum, did_set, 0, 0))
             return 3;
     }
@@ -336,7 +342,7 @@ void CHtmlDebugHelperVM::toggle_bp_disable(CHtmlDebugHelper *helper,
                                            dbgcxdef *ctx,
                                            int source_id,
                                            unsigned long linenum,
-                                           unsigned long code_addr)
+                                           void *code_addr)
 {
     /* 
      *   if the engine is running, ask it if there's a breakpoint there -
@@ -478,6 +484,18 @@ void CHtmlDebugHelper::vm_set_exec_state_go(dbgcxdef *ctx)
 }
 
 /*
+ *   Set the engine execution state to BREAK 
+ */
+void CHtmlDebugHelper::vm_set_exec_state_break(dbgcxdef *ctx)
+{
+    /* set up for VM global access */
+    VMGLOB_PTR(ctx->vmg);
+    
+    /* set the execution state in the debugger object */
+    G_debugger->set_break_stop();
+}
+
+/*
  *   Set engine execution state to STEP OVER 
  */
 void CHtmlDebugHelper::vm_set_exec_state_step_over(dbgcxdef *ctx)
@@ -596,7 +614,7 @@ void CHtmlDebugHelper::vm_toggle_breakpoint(dbgcxdef *ctx, IDebugWin *win)
 {
     ulong linenum;
     CHtmlDbg_win_link *win_link;
-    ulong code_addr;
+    void *code_addr;
     int bpnum;
     int did_set;
     
@@ -620,7 +638,7 @@ int CHtmlDebugHelper::vm_set_temp_bp(dbgcxdef *ctx, IDebugWin *win)
 {
     ulong linenum;
     CHtmlDbg_win_link *win_link;
-    ulong code_addr;
+    void *code_addr;
     int did_set;
 
     /* find information on the current line in the window */
@@ -707,7 +725,7 @@ void CHtmlDebugHelper::vm_toggle_bp_disable(dbgcxdef *ctx,
 {
     CHtmlDbg_win_link *win_link;
     unsigned long linenum;
-    unsigned long code_addr;
+    void *code_addr;
 
     /* find information on the current line in the window */
     if (CHtmlDebugHelperVM::srcofs_to_code(this, ctx, win, &linenum,
@@ -827,7 +845,7 @@ int CHtmlDebugHelper::vm_set_loaded_bp(dbgcxdef *dbgctx, int source_id,
                                        const char *cond, int change,
                                        int disabled)
 {
-    ulong code_addr;
+    void *code_addr;
     int bpnum;
     int did_set;
 
@@ -864,14 +882,14 @@ int CHtmlDebugHelper::vm_set_loaded_bp(dbgcxdef *dbgctx, int source_id,
  *   executing function.  
  */
 int CHtmlDebugHelper::vm_set_next_statement(dbgcxdef *ctx,
-                                            unsigned int *exec_ofs,
+                                            void *exec_ofs,
                                             IDebugWin *win,
                                             unsigned long *linenum,
                                             int *need_single_step)
 {
     CHtmlDbg_win_link *win_link;
-    unsigned long code_addr;
-
+    const uchar *code_addr;
+    
     /* we can't do anything if the engine isn't running */
     if (ctx == 0)
         return 1;
@@ -885,7 +903,7 @@ int CHtmlDebugHelper::vm_set_next_statement(dbgcxdef *ctx,
     VMGLOB_PTR(ctx->vmg);
 
     /* ask the VM to make the change */
-    if (G_debugger->set_exec_ofs(exec_ofs, code_addr))
+    if (G_debugger->set_exec_ofs((const uchar **)exec_ofs, code_addr))
         return 3;
 
     /* T3 doesn't require any stepping after a location change */
@@ -939,7 +957,7 @@ int CHtmlDebugHelper::vm_is_in_same_fn(dbgcxdef *ctx,
 {
     CHtmlDbg_win_link *win_link;
     unsigned long linenum;
-    unsigned long code_addr;
+    const uchar *code_addr;
 
     /* we can't do anything if the engine isn't running */
     if (ctx == 0)
@@ -1037,7 +1055,8 @@ int CHtmlDebugHelper::vm_load_file_into_win(CHtmlDbg_win_link *win_link,
         return 1;
 
     /* begin the loading process */
-    win_link->srcmgr_->begin_file_load();
+    void *load_ctx = 0;
+    win_link->srcmgr_->begin_file_load(load_ctx);
 
     /* load text from the source file into the window */
     for (;;)
@@ -1054,7 +1073,7 @@ int CHtmlDebugHelper::vm_load_file_into_win(CHtmlDbg_win_link *win_link,
     }
 
     /* tell the source manager we're done loading the file */
-    win_link->srcmgr_->end_file_load();
+    win_link->srcmgr_->end_file_load(load_ctx);
 
     /* done with the source file - close it */
     osfcls(fp);
@@ -1094,7 +1113,7 @@ void CHtmlDebugHelper::vm_signal_quit(dbgcxdef *ctx)
     VMGLOB_PTR(ctx->vmg);
 
     /* tell the console to stop logging input */
-    G_console->close_command_log();
+    G_console->close_command_log(vmg0_);
 
     /* set the HALT flag in the VM */
     G_interpreter->set_halt_vm(TRUE);
@@ -1109,7 +1128,7 @@ void CHtmlDebugHelper::vm_cancel_script_recording(struct dbgcxdef *ctx)
     VMGLOB_PTR(ctx->vmg);
 
     /* close the command log */
-    G_console->close_command_log();
+    G_console->close_command_log(vmg0_);
 }
 
 /*

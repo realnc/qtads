@@ -452,8 +452,7 @@ vm_obj_id_t CVmObjByteArray::create_from_string(
 
         /* get the to-local mapping from the character set */
         CCharmapToLocal *mapper =
-            ((CVmObjCharSet *)vm_objp(vmg_ mapval->val.obj))
-            ->get_to_local(vmg0_);
+            ((CVmObjCharSet *)vm_objp(vmg_ mapid))->get_to_local(vmg0_);
 
         /* 
          *   first, do a mapping with a null output buffer to determine how

@@ -999,6 +999,9 @@ Modified
  */
 #define TCERR_STRTPL_FUNC_MISMATCH     11232
 
+/* invalid defined() syntax */
+#define TCERR_DEFINED_SYNTAX           11233
+
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -1199,6 +1202,9 @@ Modified
 
 /* <<one of>> requires getNextIndex to be a property name */
 #define TCERR_ONEOF_REQ_GETNXT     11564
+
+/* metaclass %.*s is not defined in this module */
+#define TCERR_EXT_METACLASS        11565
 
 
 

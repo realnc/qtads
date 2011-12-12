@@ -66,7 +66,7 @@ CHtmlSoundQueueEntry::CHtmlSoundQueueEntry(
     /* remember the attributes */
     seq_ = seq;
     random_start_ = random_start;
-    repeat_count_ = repeat_count;
+    repeat_count_ = orig_repeat_count_ = repeat_count;
     fade_in_ = fade_in;
     fade_out_ = fade_out;
     crossfade_in_ = crossfade_in;
@@ -287,11 +287,11 @@ void CHtmlSoundQueue::delete_queue_entry(CHtmlSoundQueueEntry *entry)
         playing_ = 0;
 
     /* 
-     *   if this was the last-played entry, advance the last-played to the
-     *   next entry 
+     *   if this was the last-played entry, back up to the previous surviving
+     *   queue element 
      */
     if (last_played_ == entry)
-        last_played_ = entry->next_;
+        last_played_ = entry->prev_;
 
     /* delete the entry */
     entry->next_ = entry->prev_ = 0;
@@ -330,8 +330,9 @@ void CHtmlSoundQueue::on_timer()
  */
 void CHtmlSoundQueue::maybe_start_sound()
 {
-    CHtmlSoundQueueEntry *nxt;
-    CHtmlSoundQueueEntry *orig_nxt;
+    CHtmlSoundQueueEntry *nxt = 0;
+    CHtmlSoundQueueEntry *orig_nxt = 0;
+    int more_in_loop = FALSE;
     
     /* if anything is playing already, we can't start a new sound */
     if (playing_ != 0)
@@ -344,6 +345,7 @@ void CHtmlSoundQueue::maybe_start_sound()
     {
     case HTML_Attrib_invalid:
     case HTML_Attrib_replace:
+    default:
         /*
          *   Default sequence mode.  Play the next sound in line.  If
          *   last_played_ is not null, it's the next in line, since it's
@@ -366,6 +368,14 @@ void CHtmlSoundQueue::maybe_start_sound()
             nxt = last_played_->next_;
         else
             nxt = first_entry_;
+
+        /* 
+         *   Note if there's more to play in this loop.  There's more to play
+         *   if (a) there's another sound after 'nxt', or (b) we can loop
+         *   back to the beginning and find a distinct entry. 
+         */
+        if (nxt != 0 && (nxt->next_ != 0 || first_entry_ != nxt))
+            more_in_loop = TRUE;
         break;
 
     case HTML_Attrib_random:
@@ -390,16 +400,18 @@ void CHtmlSoundQueue::maybe_start_sound()
             /* find that entry */
             for (nxt = first_entry_ ; nxt != 0 && idx != 0 ;
                  nxt = nxt->next_, --idx) ;
+
+            /*
+             *   Note if there's more to play in this random loop.  There's
+             *   more to play if the number of entries is greater than 1. 
+             */
+            more_in_loop = (cnt > 1);
         }
         else
         {
             /* there are no entries; there's nothing we can randomly start */
             nxt = 0;
         }
-        break;
-
-    default:
-        /* other attributes should never occur; ignore them if they do */
         break;
     }
 
@@ -495,12 +507,12 @@ void CHtmlSoundQueue::maybe_start_sound()
 
         /*
          *   If we're in REPLACE mode, and this sound is repeated and
-         *   non-random, tell the low-level sound player to repeat the
-         *   sound; we can allow this because REPLACE-mode non-random
-         *   sounds always play back their full number of repetitions
-         *   before we can move on to the next sound.  The low-level
-         *   player can be more efficient at looping the sound than we
-         *   can, so let it control the looping.  
+         *   non-random, tell the low-level sound player to repeat the sound;
+         *   we can allow this because REPLACE-mode non-random sounds always
+         *   play back their full number of repetitions before we can move on
+         *   to the next sound.  The low-level system player might be more
+         *   efficient at looping the sound than we can, so let it control
+         *   the looping if it wants to (not all systems implement that).  
          */
         if ((seq_mode_ == HTML_Attrib_invalid
              || seq_mode_ == HTML_Attrib_replace)
@@ -520,12 +532,32 @@ void CHtmlSoundQueue::maybe_start_sound()
             repeat = 1;
         }
 
+        /* 
+         *   Figure the fading parameters.  If this is the first iteration,
+         *   fade in according to the tag parameter; otherwise don't fade in,
+         *   since we don't use fades between repeats.
+         */
+        double fade_in = 0, fade_out = 0;
+        if (nxt->get_play_count() == 0)
+            fade_in = nxt->get_fade_in() * 1000.0;
+
+        /* 
+         *   If we're scheduling all remaining iterations, fade out according
+         *   to the tag parameter; otherwise, don't fade out, since we'll be
+         *   scheduling more iterations later and, again, we don't want to
+         *   fade between iterations.  Similarly, if we're in a looping mode
+         *   (SEQUENCE=LOOP or SEQUENCE=RANDOM), and we found more left in
+         *   the queue after this sound, we have to assume that this isn't
+         *   the last iteration.  
+         */
+        if (repeat == nxt->get_repeat_count() && repeat != 0 && !more_in_loop)
+            fade_out = nxt->get_fade_out() * 1000.0;
+        
         /* start it playing */
         if (snd->play_sound(win_, sound_done_cb, this, repeat,
                             nxt->get_res()->get_url(),
                             nxt->get_volume(),
-                            (int)(nxt->get_fade_in()*1000.0),
-                            (int)(nxt->get_fade_out()*1000.0),
+                            (int)fade_in, (int)fade_out,
                             nxt->get_crossfade_out()))
         {
             /* cancel this sound */

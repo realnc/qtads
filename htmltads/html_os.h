@@ -65,6 +65,11 @@ Modified
 #include "hos_macosx.h"
 #endif
 
+/* ------------------------------------------------------------------------ */
+/*
+ *   Include definitions for QTads
+ */
 #ifdef TROLLTECH_QT
 #include "hos_qt.h"
 #endif
+

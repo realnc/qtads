@@ -1232,7 +1232,7 @@ void RandStrParser::exec(VMG_ vm_val_t *result)
  */
 void CVmBifTADS::rand(VMG_ uint argc)
 {
-    ulong range;
+    int32 range;
     int use_range;
     int choose_an_arg = FALSE;
     int choose_an_ele = FALSE;
@@ -4500,7 +4500,6 @@ static void tsprintf(VMG_ vm_val_t *retval, const char *fmtp, size_t fmtl,
                 (argi <= argc ? G_stk->get(arg0 + argi - 1) : &nil_val);
 
             /* apply the substitution based on the type */
-            int radix = 10;
             switch (type_spec)
             {
             case '%':

@@ -62,7 +62,7 @@ Modified
  *   (see TadsThreadList in vmnet.h), it should create the global list object
  *   here.  
  */
-void os_net_init();
+void os_net_init(class TadsNetConfig *config);
 
 /*
  *   Clean up the networking and threading package.  This must be called once
@@ -522,12 +522,24 @@ public:
  *   Data socket.  This is a subclass of the core socket that's used for
  *   basic data transmission.  A data socket is a full-duplex communication
  *   channel between this process and another process, which might be running
- *   on the same host or on a remote host connected via a network.  
+ *   on the same host or on a remote host connected via a network.
+ *   
+ *   On the server side, sockets are created by OS_Listener::accept().
+ *   
+ *   Currently, there is no interface for creating a client-side socket.
+ *   Instead, we provide a request-level API for initiating HTTP requests
+ *   from the client side (see class OS_HttpRequest).
  */
 #if 0     /* skeleton definition - make a copy for the actual OS definition */
 class OS_Socket: public OS_CoreSocket
 {
 public:
+    /*
+     *   Construction.  Note that callers do not generally create socket
+     *   objects directly; instead, these objects are created by other
+     *   osifcnet system classes and returned to user code to access.  For
+     *   example, server sockets are created by OS_Listener::accept().
+     */
     OS_Socket();
 
     /* 
@@ -710,11 +722,21 @@ public:
      *   Perform an HTTP request on a given resource, returning the resource
      *   contents.
      *   
+     *   'opts' is a combination of OptXxx option flags (see below).
+     *   
      *   'verb' is the HTTP verb to perform; this is usually GET, HEAD, POST,
      *   or PUT.  'resource' is the full URL to the resource to be retrieved.
      *   'portno' is the port number (usually 80).  'ua' is an optional User
      *   Agent string; if this is null, we'll use a default UA string
      *   identifying ourselves as the generic TADS HTTP client.
+     *   
+     *   'send_headers' is an optional string of custom headers to send with
+     *   the request.  The headers are appended to the headers that we
+     *   automatically generate.  The string must be in the standard "Name:
+     *   Value" format, with headers separated by CR-LF sequences.  The
+     *   overall string can end wtih one or more CR-LF sequences but isn't
+     *   required to.  Pass null if no custom headers are to be sent.
+     *   'send_headers_len' is the length in bytes of this string.
      *   
      *   If 'payload' is non-null, it contains the payload data to send with
      *   the request.  This is for use with POST and PUT to specify the data
@@ -724,6 +746,16 @@ public:
      *   send as application/x-www-form-urlencoded.  For any verb other than
      *   POST, the payload (if present at all) is limited to a single file
      *   item.
+     *   
+     *   Special exception: for POST, if the payload consists of a single
+     *   payload item with an empty string ("") as the name, we'll assume
+     *   that the caller did all of the necessary POST encoding already, and
+     *   we'll send that payload item as the entire content body of the
+     *   request WITHOUT any further encoding.  This allows the caller to
+     *   hand-code an x-www-form-urlencoded or multipart/form-data body, or
+     *   to use an entirely different encoding for the body.  In other words,
+     *   we treat a POST payload with a single unnamed payload item exactly
+     *   as we treat a payload for PUT or any other non-POST verb.
      *   
      *   Returns the HTTP status code from the server, or an ErrXxx code
      *   defined below if an error occurred on the client side.  The ErrXxx
@@ -759,11 +791,15 @@ public:
      *   at the redirected location.  Any redirection is thus transparent to
      *   the caller when 'location' is null.  
      */
-    static int request(const char *host, unsigned short portno,
+    static int request(int opts, const char *host, unsigned short portno,
                        const char *verb, const char *resource,
+                       const char *send_headers, size_t send_headers_len,
                        class OS_HttpPayload *payload,
-                       class CVmStream *reply, char **headers,
+                       class CVmStream *reply, char **reply_headers,
                        char **location, const char *ua);
+
+    /* option flags for request() */
+    static const int OptHTTPS = 0x0001;                 /* use https scheme */
 
     /* non-HTTP status codes for request() */
     static const int ErrNoMem = -1;                        /* out of memory */
@@ -773,6 +809,7 @@ public:
     static const int ErrReadFile = -5;  /* can't read payload file contents */
     static const int ErrWriteFile = -6;       /* error writing reply stream */
     static const int ErrGetHdrs = -7;     /* error retrieving reply headers */
+    static const int ErrThread = -8;               /* error starting thread */
     static const int ErrOther = -100;                        /* other error */
 };
 
@@ -782,6 +819,8 @@ class OS_HttpPayloadItem
 public:
     /* create as a name/value pair for a form field for a POST */
     OS_HttpPayloadItem(const char *name, const char *val);
+    OS_HttpPayloadItem(const char *name, size_t name_len,
+                       const char *val, size_t val_len);
 
     /* 
      *   Create as a file upload for PUT or POST.  'filename' is the nominal
@@ -798,6 +837,10 @@ public:
      */
     OS_HttpPayloadItem(const char *name,
                        const char *filename, const char *mime_type,
+                       class CVmStream *contents);
+    OS_HttpPayloadItem(const char *name, size_t name_len,
+                       const char *filename, size_t filename_len,
+                       const char *mime_type, size_t mime_type_len,
                        class CVmStream *contents);
 
     /* delete */
@@ -837,8 +880,15 @@ public:
     /* add a simple name/value form field */
     void add(const char *name, const char *val);
 
+    /* add a simple name/value field, in tads-string (VMB_LEN prefix) format */
+    void add_tstr(const char *name, const char *val);
+
     /* add a simple file upload */
     void add(const char *name, const char *filename, const char *mime_type,
+             class CVmStream *contents);
+    void add(const char *name, size_t name_len,
+             const char *filename, size_t filename_len,
+             const char *mime_type, size_t mime_type_len,
              class CVmStream *contents);
 
     /* add an item */
@@ -885,7 +935,7 @@ class TadsThreadList;
  *   Include the appropriate system-specific header 
  */
 
-#if defined(_WIN32) && !defined(TROLLTECH_QT)
+#if defined(_WIN32)
 #include "osnetwin.h"
 
 #elif defined(UNIX) || defined(FROBTADS)

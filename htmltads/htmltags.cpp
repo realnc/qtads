@@ -4636,7 +4636,6 @@ void CHtmlTagQ::on_parse(CHtmlParser *parser)
     oshtml_charset_id_t charset;
     int charset_changed;
     textchar_t result[10];
-    size_t len;
     
     /* inherit default */
     CHtmlTagContainer::on_parse(parser);
@@ -4665,37 +4664,31 @@ void CHtmlTagQ::on_parse(CHtmlParser *parser)
     }
 
     /* translate the HTML open quote */
-    len = parser->get_sys_frame()->
-          xlat_html4_entity(result, sizeof(result), html_open,
-                            &charset, &charset_changed);
-    if (charset_changed || len > sizeof(open_q_))
+    open_q_len_ = parser->get_sys_frame()->
+                  xlat_html4_entity(result, sizeof(result), html_open,
+                                    &charset, &charset_changed);
+    if (charset_changed || open_q_len_ > sizeof(open_q_))
     {
         open_q_[0] = ascii_quote;
-        len = 1;
+        open_q_len_ = 1;
     }
     else
-        strncpy(open_q_, result, len);
-
-    /* add my open quote */
-    open_ofs_ = parser->get_text_array()->append_text(open_q_, len);
-
-    /* remember the open quote's length */
-    open_q_len_ = len;
+        memcpy(open_q_, result, open_q_len_);
 
     /* translate the HTML close quote */
-    len = parser->get_sys_frame()->
-          xlat_html4_entity(result, sizeof(result), html_close,
-                            &charset, &charset_changed);
-    if (charset_changed || len > sizeof(close_q_))
+    close_q_len_ = parser->get_sys_frame()->
+                   xlat_html4_entity(result, sizeof(result), html_close,
+                                     &charset, &charset_changed);
+    if (charset_changed || close_q_len_ > sizeof(close_q_))
     {
         close_q_[0] = ascii_quote;
-        len = 1;
+        close_q_len_ = 1;
     }
     else
-        strncpy(close_q_, result, len);
+        memcpy(close_q_, result, close_q_len_);
 
-    /* remember the close quote's length */
-    close_q_len_ = len;
+    /* add my open quote */
+    open_ofs_ = parser->get_text_array()->append_text(open_q_, open_q_len_);
 
     /* we effectively insert text, so keep adjacent source whitespace */
     parser->end_skip_sp();
