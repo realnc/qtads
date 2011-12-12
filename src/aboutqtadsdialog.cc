@@ -4,6 +4,7 @@
 #include "globals.h"
 #include "trd.h"
 #include "vmvsn.h"
+#include "htmlver.h"
 
 
 AboutQtadsDialog::AboutQtadsDialog(QWidget *parent)
@@ -24,6 +25,8 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget *parent)
     str += QString::fromAscii("<table border=\"0\" width=\"100%\"><tr><td>");
     str += tr("QTads version:") + QString::fromAscii("</td><td>") + QString::fromAscii(QTADS_VERSION)
            + QString::fromAscii("<br></td></tr><tr><td>")
+           + tr("HTML TADS version:") + QString::fromAscii("</td><td>\t")
+           + QString::fromAscii(HTMLTADS_VERSION) + QString::fromAscii("</td></tr><tr><td>")
            + tr("TADS 2 virtual machine:") + QString::fromAscii("</td><td>\t")
            + QString::fromAscii(TADS_RUNTIME_VERSION) + QString::fromAscii("</td></tr><tr><td>")
            + tr("TADS 3 virtual machine:") + QString::fromAscii("</td><td>\t")
