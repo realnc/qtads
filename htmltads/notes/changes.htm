@@ -1,5 +1,67 @@
 <title>Recent Changes to HTML TADS</title>
 
+<style type="text/css">
+<!--
+body {
+    font: 10pt/14pt Verdana, Arial, Helvetica, Sans-Serif;
+}
+h1 {
+    font: 18pt/24pt Georgia, Times New Roman, New York, Times, Serif;
+    color: #400060;
+}
+h2 {
+    font: 14pt/18pt Georgia, Times New Roman, New York, Times, Serif;
+    color: #600060;
+}
+h3 {
+    background: #f0f0f0;
+    border-top: 1px solid #d8d8d8;
+    margin-top: 2.5em;
+    padding: 1ex 1ex 1ex 1ex;
+    font: 12pt/14pt Georgia, Times New Roman, New York, Times, Serif;
+    color: #600060;
+}
+h4 {
+    font: 12pt/14pt Georgia, Times New Roman, New York, Times, Serif;
+    font-weight: bold;
+}
+ul {
+    margin-left: 1ex;
+}
+li {
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+    padding-bottom: 1em;
+    border-bottom: 1px solid #808080;
+    list-style: none;
+}
+li.last {
+    border-bottom: none;
+}
+ul.toc, li ul {
+    margin-top: 0.75em;
+    margin-left: 3em;
+}
+li li {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    border: none;
+    list-style: disc outside;
+}
+ul.toc li {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border: none;
+    list-style: disc outside;
+}
+li p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+//-->
+</style>
+
 <h1>Recent Changes to HTML TADS</h1>
 
 This file lists the changes that have been made recently to HTML TADS.
@@ -16,7 +78,178 @@ what has changed since the last version you installed.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
+<h3>Changes in Release HT-22 (Windows build Win116; TADS 2.5.15/3.1.0)</h3>
+<i>Released 12/21/2011</i>
+
+<ul>
+
+<li>The Windows interpreters now send transcript output to the disk
+file immediately after each command, rather than buffering the output
+in memory.  This usually isn't noticeable one way or the other, but it
+does matter when using an external tool that reads from the transcript
+file while the game is running.  Some IF mapper tools do this, for
+example, to produce a dynamic visual map of the game while you play.
+The buffering in past versions meant that output text might be delayed
+in reaching the disk file (and thus in reaching any tools monitoring
+the disk file) for several turns.  Output is now written immediately
+to the disk file, so monitoring tools should be able to keep in sync
+with what you see in the game window.
+
+<li>The fading parameters for &lt;SOUND&gt; tags are now handled
+a little differently for repeated tracks.  In the past, fading was
+simply applied to each iteration of a repeated track individually,
+so a track with REPEAT=3 would fade in, play back, fade out, then
+fade in a second time, play back, fade out, and again for a third
+fade in, play back, fade out.  This was probably undesirable for
+most practical purposes, since repeated sounds are most useful for
+constructing continuous ambient background music and effects.
+So the sound player now applies a fade-in only to the first iteration
+of a looped sound, and applies a fade-out only to the last iteration.
+
+<li>The Windows versions of Workbench and HTML TADS for builds Win111
+through Win114 refused to run on older versions of Windows -
+specifically, 95, 98, ME, and NT 4.  This was due to an "upgrade" we
+made to the latest version of the Microsoft C++ compiler (version
+2008), which by design produces EXEs that won't run on those older
+systems.  Starting with this build, we have returned to the older
+version of the Microsoft compiler to prepare the release builds.  This
+should allow the system to run on the older OS versions again.
+(However, note that Windows 95 and 98 users will have to upgrade their
+version of Microsoft Internet Explorer to IE 5 or later in order to
+run Workbench.  This ensures that you have a system DLL that Workbench
+depends on.  This isn't necessary for newer Windows versions, since
+they come with the required DLL.)
+
+<li>In TADS 3 Workbench for Windows, starting in version 3.0.18, the
+Build Web Page command generated an invalid HTML file.  This was
+actually a side effect of a bug in the TADS 3 interpreter (<a
+href="http://bugdb.tads.org/view.php?id=0000065">bugdb.tads.org
+#0000065</a>).  The interpreter bug has been corrected, which fixes
+the Build Web Page problem.  (<a
+href="http://bugdb.tads.org/view.php?id=0000064">bugdb.tads.org
+#0000064</a>)
+
+<li>Workbench for Windows is now a little more consistent about the
+word-wrapping margins when auto-formatting strings and comments (such
+as via the Alt-Q command).  In the past, strings were filled one
+character short of the right margin as set in the options, and
+comments were filled to about three characters short.  (<a
+href="http://bugdb.tads.org/view.php?id=0000058">bugdb.tads.org
+#0000058</a>)
+
+<li>The syntax coloring in the Workbench editor on Windows didn't
+properly handle embedded &lt;&lt; &gt;&gt expressions within HTML
+attribute values in strings, as in <tt>"&lt;img src='foo.jpg'
+width=&lt;&lt;width&gt;&gt; height=&lt;&lt;height&gt;&gt;&gt;"</tt>.
+The syntax colorer incorrectly treated the first &gt;&gt; as the
+end of the tag.  The colorer now handles this case correctly.
+(<a
+href="http://bugdb.tads.org/view.php?id=0000072">bugdb.tads.org
+#0000072</a>)
+
+<li>In Workbench for Windows, some of the tabbed or "wizard"-style
+dialogs were displayed at the wrong size on some systems, which
+could cut off some of the text and/or buttons in the dialogs,
+making them essentially unusable.  The problem was due to an
+outdated font dependency in the dialog definitions; this has
+been corrected to use current Windows standards, so the dialogs
+should display correctly on all systems now.
+(<a
+href="http://bugdb.tads.org/view.php?id=0000087">bugdb.tads.org
+#0000087</a>)
+
+
+<li>In Workbench for Windows, the debugger used to bring the game
+window to the foreground at the start of each new run, even when
+execution immediately stopped in the debugger at a breakpoint or
+single-step trace.  This was slightly annoying because you had to
+manually switch back to the debugger window.  The debugger window now
+stays in the foreground in this case.  The game window still comes to
+the foreground when execution <i>doesn't</i> immediately stop in the
+debugger, of course.
+
+<li>A bug in Workbench for Windows caused a crash if a text file
+was saved with no project (.t3m file) open.  This is now fixed.
+(<a
+href="http://bugdb.tads.org/view.php?id=0000092">bugdb.tads.org
+#0000092</a>)
+
+<li>The output of Workbench's Project Search results (on Windows)
+contained an HTML syntax error if any of the files listed in the
+project window were non-existent.  This didn't affect the appearance
+of the search results themselves, but it did log an error in the
+Debug Log window.  This is now fixed.
+
+(<a
+href="http://bugdb.tads.org/view.php?id=0000097">bugdb.tads.org
+#0000097</a>)
+
+<li>A bug in the TADS 3 coloring mode for Scintilla caused the wrong
+coloring if a "..." token was used within an embedded string expression,
+as in <tt>"&lt;&lt;func(a...)&gt;&gt;"</tt>.  This is fixed.
+
+(<a
+href="http://bugdb.tads.org/view.php?id=0000094">bugdb.tads.org
+#0000094</a>)
+
+<li>In Workbench for Windows, the "new project" command omitted
+<i>all</i> libraries when the "Plain T3" configuration was selected.
+The command now includes the core system library in the new project.
+In most cases, even the most stripped-down build configuration will
+want to include the core system library, since it contains the basic
+program startup code and necessary support classes for the intrinsic
+classes.  You can still manually remove these files from a new project
+after creating it if desired.
+
+<li class=last>If you have a file open in the Workbench text editor,
+and you edit and save the same file with another application,
+Workbench automatically detects the change the next time you bring
+Workbench to the foreground, offering you the option of reloading the
+updated copy of the file from disk.  In the past, if you chose to
+reload the file, the editor reset the cursor and scrolling position
+back to the start of the file, and also cleared any breakpoints and
+bookmarks in the file.  Workbench now scrolls back to the same
+position and selects the same text range, and retains breakpoints and
+bookmarks.
+
+<p>(Of course, if you make extensive changes to the file with another
+other program, the cursor and marker positions might not correspond to
+the same text after reloading.  The editor only keeps track of these
+locations by line and column numbers.  It doesn't attempt to analyze
+the differences in the file to find the same actual text that was
+previously selected.)
+
+<li>The Windows debugger didn't respond properly to the Terminate Program
+command when the game was started via a Step In or Step Over command
+(rather than the Go command).  This has been corrected.
+
+(<a
+href="http://bugdb.tads.org/view.php?id=0000105">bugdb.tads.org
+#0000105</a>)
+
+</ul>
+
+
+<!------------------------------------------------------------------------>
+<p>
+<h3>Changes in Release HT-21 (Windows build Win115; TADS 2.5.14/3.0.18.1)</h3>
+<i>Released 1/29/2010</i>
+
+<ul>
+
+<li>In releases Win113 and Win114, audio playback of compressed sound
+types (MP3, OGG) didn't work for resources embedded in a .t3 or .gam
+file.  The audio generally just didn't play back when embedded, and
+the audio player sometimes showed a spurious error or warning.  This
+has been corrected; an embedded version of an audio stream should once
+again work the same way as the stand-alone file version of the same
+stream.  (bugdb.tads.org #0000080)
+
+</ul>
+
+
+<!------------------------------------------------------------------------>
+<p>
 <h3>Changes in Release HT-21 (Windows build Win114; TADS 2.5.14/3.0.18.1)</h3>
 <i>Released 5/5/2009</i>
 
@@ -27,7 +260,6 @@ components.  See their release notes for details.)
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-21 (Windows build Win113; TADS 2.5.13/3.0.18)</h3>
 <i>Released 4/28/2009</i>
 
@@ -95,7 +327,7 @@ space) characters as potential line-break points when sizing a banner
 according to the width of its contents.  This has been corrected.
 (bugdb.tads.org #000051)
 
-<li>In Workbench for Windows, there was a situation where the program
+<li class=last>In Workbench for Windows, there was a situation where the program
 could get stuck in a loop repeatedly showing the dialog asking you
 whether you want to terminate the running program before recompiling.
 This happened if execution was stopped in the debugger (at a
@@ -107,9 +339,8 @@ commands.  The problem has been fixed.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-20 (Windows build Win112; TADS 2.5.12/3.0.17)</h3>
-<i>Released 9/28/2008</i>
+<i>Released 9/8/2008</i>
 
 <ul>
 
@@ -159,7 +390,7 @@ entire file, but it now checks the current line each time the cursor
 moves to ensure that the scrollbar is wide enough for that line.
 (bugdb.tads.org #0000029)
 
-<li>In TADS 2 Workbench for Windows, in the "Welcome" dialog that's
+<li class=last>In TADS 2 Workbench for Windows, in the "Welcome" dialog that's
 displayed at launch, the "Open a project" button didn't work properly
 if you selected a .t file (rather than a project file - .tdc).  The
 problem was that this skipped the normal source file wizard, which
@@ -174,13 +405,12 @@ the source file wizard when you select a .t file to load at startup.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-20 (Windows build Win111; TADS 2.5.11/3.0.17)</h3>
 <i>Released 8/9/2008</i>
 
 <ul>
 
-<li>In Workbench for Windows, breakpoint indicators (the little red
+<li class=last>In Workbench for Windows, breakpoint indicators (the little red
 circles in the left margin of a source file window) weren't updated
 properly when lines were inserted or deleted in the file above a
 breakpoint line.  In particular, a duplicate breakpoint appeared for
@@ -192,7 +422,6 @@ in the file.  This has been corrected.  (bugdb.tads.org #0000007)
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-19 (TADS 2.5.10/3.0.16)</h3>
 <i>Released 4/10/2008 - Windows build Win110</i>
 
@@ -224,7 +453,7 @@ directory, rather than in a sub-folder.  This happened when the
 folder (i.e., the project didn't include any extension files that were
 in sub-folders of that main folder).  This is now fixed.
 
-<li>The HTML renderer sometimes incorrectly calculated the width of
+<li class=last>The HTML renderer sometimes incorrectly calculated the width of
 tables and banners that contained hyperlinks.  The renderer
 incorrectly treated a hyperlink as implying a possible link-break
 point for the purposes of the width calculation, even though
@@ -239,7 +468,6 @@ contents.  This has been corrected.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-18 (TADS 2.5.10/3.0.15.3)</h3>
 <i>Released 11/2/2007 - Windows build Win109</i>
 
@@ -273,7 +501,7 @@ files (WAV, OGG) encoded with odd (non-even) sampling rates (e.g.,
 files would play back partially correctly, then switch to bursts of
 white noise.  This has been corrected.
 
-<li>Under certain rare conditions, Workbench on Windows failed to
+<li class=last>Under certain rare conditions, Workbench on Windows failed to
 properly restore the docked-window configuration when loading a new
 project while another project was already loaded.  The symptom was
 that one or more docked windows would show up along the wrong edge of
@@ -289,7 +517,6 @@ time.  The problem is now fixed.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-17 (TADS 2.5.10/3.0.15.2)</h3>
 <i>Released 9/13/2007 - Windows build Win108</i>
 
@@ -401,7 +628,7 @@ coloring from that point forward within the string was wrong, because
 the colorer's internal state was out of sync with the contents of the
 string.  This has been corrected.
 
-<li>In the TADS 3 Library Reference Manual, hyperlink references to
+<li class=last>In the TADS 3 Library Reference Manual, hyperlink references to
 the class ExitLister incorrectly pointed to the object exitLister.
 This was due to (a) the LRM generator's use of the symbol name as the
 file name for a given object's reference page, and (b) the Window's
@@ -417,7 +644,6 @@ has a distinct filename on case-insensitive file systems.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-16 (TADS 2.5.10/3.0.15.1)</h3>
 <i>Released 7/19/2007 - Windows build Win107</i>
 
@@ -606,7 +832,7 @@ between the Help window and other document windows sometimes caused
 the Help window's contents to scroll slightly.  This should no longer
 occur.
 
-<li>In Workbench for Windows, docked tool windows were sometimes
+<li class=last>In Workbench for Windows, docked tool windows were sometimes
 rearranged as the debugger opened and closed windows to match
 preference settings when switching between design and debug modes.
 For example, suppose that in design mode, you had the Project window
@@ -624,7 +850,6 @@ the original window order in these situations.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-15 (TADS 2.5.10/3.0.15)</h3>
 <i>Released 3/8/2007 - Windows build Win106</i>
 
@@ -784,7 +1009,7 @@ This has been corrected - whenever you save a .tl file that's part of
 the project, the project window will automatically refresh its list of
 the library's contents.
 
-<li>Due to a bug in Scintilla, the Stuttered Page Down command didn't
+<li class=last>Due to a bug in Scintilla, the Stuttered Page Down command didn't
 work properly if the current page contained wrapped lines.  This has
 been corrected.
 
@@ -793,7 +1018,6 @@ been corrected.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-14 (TADS 2.5.10/3.0.14)</h3>
 <i>Released 2/9/2007 - Windows build Win105</i>
 
@@ -960,7 +1184,7 @@ bug has been fixed, so these problems should no longer occur.
 build correctly, but didn't start the project running after the build
 completed.  This has been corrected.
 
-<li>The regular expression option for the project-wide search command
+<li class=last>The regular expression option for the project-wide search command
 (Find in Project Files) didn't work in the previous release - checking
 the regular expression box always yielded a regular expression syntax
 error.  This has been corrected.
@@ -970,7 +1194,6 @@ error.  This has been corrected.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-13 (TADS 2.5.10/3.0.13)</h3>
 <i>Released (1/19/2007) - Windows build Win103</i>
 
@@ -1526,7 +1749,7 @@ global library path; in these cases, Workbench didn't properly take
 into account the relative path to the library's subfolder when looking
 for the resources.  This has been corrected.
 
-<li>The Windows HTML Interpreter didn't play back Ogg Vorbis sounds
+<li class=last>The Windows HTML Interpreter didn't play back Ogg Vorbis sounds
 properly when they were embedded as resources in the .t3/.gam file.
 This has been corrected.
 
@@ -1535,7 +1758,6 @@ This has been corrected.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-12 (TADS 2.5.10/3.0.12)</h3>
 <i>Released September 15, 2006 - Windows build Win102</i>
 
@@ -1543,7 +1765,7 @@ This has been corrected.
 
 <ul>
 
-<li>Due to a bug in Workbench for Windows, the "Help/User Manuals"
+<li class=last>Due to a bug in Workbench for Windows, the "Help/User Manuals"
 menu command sometimes failed to actually open the manual.  The
 problem occurred when no other browser windows were open; if any
 browser windows were already open, the manual was launched properly.
@@ -1555,7 +1777,6 @@ or not any other browser windows are open.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in Release HT-11 (TADS 2.5.10/3.0.11)</h3>
 <i>Released September 8, 2006 - Windows build Win101</i>
 
@@ -1573,7 +1794,7 @@ can be differentiated.</i>
 
 <ul>
 
-<li>The Windows HTML interpreter failed to match a parameterized font
+<li class=last>The Windows HTML interpreter failed to match a parameterized font
 name when the name was the last of multiple font names in a &lt;FONT
 FACE="x,y,z"&gt; list.  This has been corrected.
 
@@ -1582,7 +1803,6 @@ FACE="x,y,z"&gt; list.  This has been corrected.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in version 2.5.10/3.0.10</h3>
 <i>Released August 17, 2006</i>
 
@@ -1608,7 +1828,7 @@ error messages by default.  You can change this by going to the Build
 menu, selecting Settings, selecting the Diagnostics tab, and
 un-checking the "Verbose error messages" checkbox.
 
-<li>In Workbench for Windows, if the option "Clear Debug Log when
+<li class=last>In Workbench for Windows, if the option "Clear Debug Log when
 starting new build" is selected (on the Messages page of the Debugger
 Options dialog, accessible from the View menu), the debug log will
 <i>not</i> automatically scroll to the bottom as new messages appear.
@@ -1622,7 +1842,6 @@ to tackle first.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in version 2.5.9/3.0.9</h3>
 <i>Released August 29, 2005</i>
 
@@ -1704,7 +1923,7 @@ table's contents.  This is now fixed.
 didn't update the display properly on a click on the image or when the
 mouse hovered over the image.  This has been corrected.
 
-<li>On Windows, the inputDialog() function used a fixed size for the
+<li class=last>On Windows, the inputDialog() function used a fixed size for the
 buttons it displayed, so a long name could overflow the space allowed
 for the button.  This made the dialog confusing, since the label text
 was clipped to the button's display size, hiding part of the label.
@@ -1716,7 +1935,6 @@ buttons wider if necessary to accommodate longer labels.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in version 2.5.9/3.0.8</h3>
 <i>Released September 12, 2004</i>
 
@@ -1778,7 +1996,7 @@ hyperlink prefixes for the &lt;A HREF&gt; tag.  (See the <a
 href='htmltads/deviate.htm#Achanges'>&lt;A HREF&gt; documentation</a>
 for more details.)
 
-<li>In the Windows HTML interpreter's "Customize Theme" dialog, in the
+<li class=last>In the Windows HTML interpreter's "Customize Theme" dialog, in the
 "Colors" page, the Status Line color buttons are now disabled when the
 "Override game colors" option is selected.  When this option is
 selected, the Main Text color settings are used for everything, so the
@@ -1789,7 +2007,6 @@ status line text colors can't be specified separately in this case.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in version 2.5.8/3.0.7</h3>
 <i>Released June 12, 2004</i>
 
@@ -1824,7 +2041,7 @@ accelerator keys, when editing an expression or value in the "Locals"
 or "Watch Expression" windows.  In the past, these commands were
 ignored.
 
-<li>The Windows HTML interpreter now understands Ctrl+Insert to mean
+<li class=last>The Windows HTML interpreter now understands Ctrl+Insert to mean
 "Copy," Shift+Insert to mean "Paste," and Shift+Delete to mean "Cut."
 These accelerator keys were standard in the first few versions of
 Windows, and while they've long since been deleted from the Windows UI
@@ -1838,16 +2055,17 @@ Ctrl+C for Copy, Ctrl+V for Paste, and Ctrl+X for Cut.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in version 2.5.8/3.0.6</h3>
 
 <p><i>Interim build 2.5.8/3.0.6q: 5/9/2004</i>
 
+<ul>
 <li>Due to a bug introduced several releases ago, the Windows HTML
 interpreter didn't obey the Ctrl+Left and Ctrl+Right keys, which
 should move the caret left and right a word at a time while editing a
 command line.  This bug has been fixed, so the word-at-a-time keys now
 work again.
+</ul>
 
 <p><i>Interim build 2.5.8/3.0.6p: 4/25/2004</i>
 
@@ -2670,7 +2888,7 @@ the window usually shows the most recent text, which is the least likely
 to be affected by discarding the oldest text; the interpreter tries to
 take advantage of this to make the layout recalculation invisible.
 
-<li>Fixed a problem that caused output to be hidden when the game
+<li class=last>Fixed a problem that caused output to be hidden when the game
 opened a &lt;TABLE&gt; tag but never got around to closing it before
 reading a command line.  This sort of thing isn't legal, but the
 interpreter didn't recover very gracefully from such input.  The
@@ -2684,7 +2902,6 @@ accidentally omits.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in version 2.5.7</h3>
 <i>Released September 22, 2002</i>
 
@@ -2851,7 +3068,7 @@ the debugger can be configured to flush output on every pause.)
 <li>The Preferences dialog enabled and disabled the Apply button on
 the font selection page incorrectly in some cases.  This is now fixed.
 
-<li>A bug in the HTML renderer caused spurious "MORE" prompts in some
+<li class=last>A bug in the HTML renderer caused spurious "MORE" prompts in some
 cases when the game displayed a table with lots of cells.  This has been
 fixed.
 
@@ -2859,7 +3076,6 @@ fixed.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in version 2.5.6</h3>
 <i>Released June 1, 2002</i>
 <ul>
@@ -3253,7 +3469,7 @@ different character sets of the same typeface are installed, and
 the interpreter should show the correct characters for all
 HTML entities that can be displayed.
 
-<li>Due to a bug in HTML TADS, if the player terminated a game by
+<li class=last>Due to a bug in HTML TADS, if the player terminated a game by
 closing the interpreter window while the game was specifically pausing
 for some amount of time (for example, to allow a sound to finish
 playing), the interpreter did not immediately exit, but continued
@@ -3266,7 +3482,6 @@ unnecessarily consumed system resources.  This has been corrected.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in version 2.5.5</h3>
 <ul>
 
@@ -3282,7 +3497,7 @@ playback of very short MP3 audio files.  In the past, MP3 files under
 about half a second in total duration did not play back.  This has
 been corrected.
 
-<li>Fixed a problem in the HTML interpreter that sometimes caused
+<li class=last>Fixed a problem in the HTML interpreter that sometimes caused
 crashes when certain font-related tags were not properly balanced
 (i.e., begin and end tags were not matched up correctly in the HTML).
 While these sorts of sequences are still invalid HTML and hence might
@@ -3293,7 +3508,6 @@ should no longer cause crashes.
 
 <!------------------------------------------------------------------------>
 <p>
-<hr>
 <h3>Changes in version 2.5.4</h3>
 <ul>
 
@@ -3330,7 +3544,7 @@ channel settings of the interrupted file, resulting in incorrect
 playback.  This has been corrected: all MIDI channels are now reset
 to default conditions at the start of each new playback.
 
-<li>For users running certain early versions of Windows 95, Workbench
+<li class=last>For users running certain early versions of Windows 95, Workbench
 crashed when the "Settings..." item was selected from the "Build"
 menu, due to an incompatibility with a Windows system DLL.  This
 problem apparently only occurred for Windows 95 version 4.00.1111;
@@ -3339,7 +3553,6 @@ the problem has been corrected.
 </ul>
 
 <p>
-<hr>
 <h3>Changes in version 2.5.3</h3>
 <ul>
 
@@ -3381,13 +3594,12 @@ situations where a game used repeated updates to animate a sequence
 of graphics.  This problem affected the title sequence of Neil K. Guy's
 <i>Six Stories</i>, for example.  This has been corrected.
 
-<li>The HTML interpreter for Windows crashed if you closed the application
+<li class=last>The HTML interpreter for Windows crashed if you closed the application
 while a sound was still playing.  This has been corrected.
 
 </ul>
 
 <p>
-<hr>
 <h3>Changes in version 2.5.2</h3>
 
 <ul>
@@ -3531,7 +3743,7 @@ couldn't read the complete filename from the log window, because the
 filename was broken up over two lines.  This has been corrected; each error
 message will now always appear on a single line.
 
-<li>A bug in the Windows interpreter prevented a stand-alone game
+<li class=last>A bug in the Windows interpreter prevented a stand-alone game
 executable from starting properly if the user set the preferences so
 that the interpreter didn't ask for a game at startup ("ask for a
 game to open on starting HTML TADS" on the "Starting" page of the
@@ -3541,7 +3753,6 @@ preferences dialog).  This has been corrected.
 </ul>
 
 <p>
-<hr>
 <h3>Changes in version 2.5.1</h3>
 
 <ul>
@@ -3658,13 +3869,12 @@ text near the error contained a "\)" sequence (to turn off highlighting,
 using the traditional non-HTML formatting codes).  This has been
 corrected.
 
-<li>Fixed another debugger problem that caused a crash when breakpoints
+<li class=last>Fixed another debugger problem that caused a crash when breakpoints
 were set in a source file containing no executable code at all.
 
 </ul>
 
 <p>
-<hr>
 <h3>Changes in version 2.5.0</h3>
 
 <i>Released on July 10, 1999</i>
@@ -3861,7 +4071,7 @@ accelerator keys are active any time the game window is active.)
 
 </ul>
 
-<li>Fixed a bug in the MKSETUP program (which builds an installer for
+<li class=last>Fixed a bug in the MKSETUP program (which builds an installer for
 a game).  If the setup configuration file contained a FILE option (to
 include an extra file in the installation file set), MKSETUP got stuck
 in a loop adding the file over and over.  This has been corrected.
@@ -3869,7 +4079,6 @@ in a loop adding the file over and over.  This has been corrected.
 </ul>
 
 <p>
-<hr>
 <h3>Changes in version 2.4.0</h3>
 
 <ul>
@@ -3918,14 +4127,13 @@ tends to be most of the time during play), and you resize the window,
 the interpreter will keep the window scrolled to the bottom after the
 resize.
 
-<li>A bug caused the interpreter to fail to display any text after a
+<li class=last>A bug caused the interpreter to fail to display any text after a
 game program displayed an empty &lt;TITLE&gt; tag.  This has been
 corrected.
 
 </ul>
 
 <p>
-<hr>
 <h3>Changes in version 2.3.0</h3>
 
 
@@ -4090,7 +4298,7 @@ original banner, the new settings were ignored.  This has been corrected;
 the new banner's settings now replace any settings that were previously
 in effect.
 
-<li>In past versions, alignment settings in &lt;TD&gt; (table cell)
+<li class=last>In past versions, alignment settings in &lt;TD&gt; (table cell)
 tags propagated to the first block within the cell, but not to any
 additional blocks.  So, if you created a table cell which contained
 more than one paragraph, the first paragraph was aligned correctly,
@@ -4101,7 +4309,6 @@ alignment setting now affects every block within the cell.
 </ul>
 
 <p>
-<hr>
 <h3>Changes in version 2.2.6</h3>
 
 <ul>
@@ -4122,13 +4329,12 @@ when long sequences of HTML entities appeared, such as twenty consecutive
 the backslash-space sequence instead of <tt>&amp;nbsp;</tt> produces the
 same result).  This has been corrected.
 
-<li>A bug that occasionally crashed the HTML TADS debugger has been fixed.
+<li class=last>A bug that occasionally crashed the HTML TADS debugger has been fixed.
 The crash sometimes occurred as the debugger attempted to take control
 when a run-time error occurred in the game.
 
 </ul>
 
-<hr>
 <h3>Changes in version 2.2.5</h3>
 
 <ul>
@@ -4196,7 +4402,7 @@ after each turn) contained a link, and the mouse was positioned over the
 link when the user typed "quit" and then left there, a crash sometimes
 occurred.  This has been corrected.
 
-<li>See <a href='../tadsver.htm'>Recent Changes to TADS</a> for
+<li class=last>See <a href='../tadsver.htm'>Recent Changes to TADS</a> for
 information about several generic TADS interpreter improvements and
 corrections that affect the HTML interpreter as well:
 
@@ -4225,14 +4431,13 @@ corrections that affect the HTML interpreter as well:
 
 </ul>
 
-<hr>
 <h3>Changes in version 2.2.4</h3>
 
 <p>
 Here's a quick index to some selected highlights in
 this release:
 
-<ul>
+<ul class=toc>
 <lh><a href="#OfInterestToPlayers">Of interest to players:</a>
 <li><a href="#Installer">Automatic installation</a>
 <li><a href="#AutoRestore">Restoring a saved game from the desktop</a>
@@ -4242,7 +4447,7 @@ this release:
 <li><a href="#DirectX3">DirectX on Windows NT</a>
 </ul>
 
-<ul>
+<ul class=toc>
 <lh><a href="#OfInterestToAuthors">Of interest to game authors:</a>
 <li><a href="#charsets">Using extended characters</a>
 <li><a href="#Banners">Banner enhancements</a>
@@ -4713,7 +4918,7 @@ when playing or distributing a game.
   <li>the debugger page no longer has its last few paragraphs in boldface.
   </ul>
 
-<li>Some cosmetic problems have been fixed:
+<li class=last>Some cosmetic problems have been fixed:
   <ul>
   <li>The HTML TADS interpreter and debugger "About" boxes now display
       the TADS version number

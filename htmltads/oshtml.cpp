@@ -59,6 +59,42 @@ static int gets_in_progress_ = FALSE;
 /* hilite mode - this flags our synthesized hilite attribute */
 static int hilite_mode_ = FALSE;
 
+/* 
+ *   EOF input counter.  EOF means that the user has closed the UI window,
+ *   which leaves the program running without a source of user input.  The
+ *   input request functions (such as keyboard and event input) return an EOF
+ *   status code in this situation, and a well-behaved program will notice
+ *   the EOF and gracefully shut itself down.  Some programs ignore the EOF
+ *   status, though, in which case they'll usually get stuck in an infinite
+ *   loop repeatedly asking for input that can never arrive.  Since we return
+ *   the EOF status from each such input request immediately, this sets up a
+ *   loop at 100% CPU - which is especially pernicious in this situation,
+ *   since the program no longer as a UI window (that's why we're getting at
+ *   EOF the first place) that lets the user see what's wedged and eating all
+ *   that CPU.
+ *   
+ *   To catch such errant programs, we'll count input requests that occur
+ *   after EOF; if the program makes too many such requests, we'll kill it.
+ *   Some programs legitimately continue running after EOF to finish cleanup
+ *   tasks, but a well-behaved program won't poll for input once discovering
+ *   that there's no more to be had, so repeated input calls are a sign that
+ *   the program isn't handling the EOF properly and needs to be externally
+ *   terminated.
+ */
+static int eof_input_count_ = 0;
+
+/*
+ *   Check for an EOF input loop.  Each input request function should call
+ *   this any time it's about to return EOF.  We'll count the request; if too
+ *   many input requests occur after EOF, we'll assume the program is
+ *   ignoring the EOF code and looping on input, so we'll kill it.
+ */
+static void check_eof_loop()
+{
+    if (++eof_input_count_ > 10000)
+        CHtmlSysFrame::kill_process();
+}
+
 
 /*
  *   Buffer containing score information for status line 
@@ -303,8 +339,18 @@ unsigned char *os_gets(unsigned char *buf, size_t bufl)
     /* call the timeout version with no timeout specified */
     evt = os_gets_timeout(buf, bufl, 0, FALSE);
 
-    /* translate the event code for our caller */
-    return (evt == OS_EVT_EOF ? 0 : buf);
+    /* check for EOF */
+    if (evt == OS_EVT_EOF)
+    {
+        /* check for an input loop at EOF */
+        check_eof_loop();
+
+        /* indicate EOF via a null buffer return */
+        return 0;
+    }
+
+    /* return the buffer */
+    return buf;
 }
 
 /*
@@ -335,7 +381,13 @@ int os_gets_timeout(unsigned char *buf, size_t bufl,
     
     /* if app frame, we can't get input */
     if (app_frame == 0)
+    {
+        /* check for an input loop at EOF */
+        check_eof_loop();
+
+        /* indicate EOF to the caller */
         return OS_EVT_EOF;
+    }
 
     /* 
      *   If we're in non-HTML mode, and we don't have a prior input already
@@ -357,7 +409,13 @@ int os_gets_timeout(unsigned char *buf, size_t bufl,
 
     /* if that returned end-of-file, pass that along to our caller */
     if (evt == OS_EVT_EOF)
+    {
+        /* check for an input loop at EOF */
+        check_eof_loop();
+
+        /* reutrn the EOF event */
         return evt;
+    }
 
     /* if we didn't time out, the gets is now completed */
     if (evt != OS_EVT_TIMEOUT)
@@ -393,6 +451,9 @@ int os_getc()
     if (app_frame == 0)
     {
         static int eof_cmd;
+
+        /* check for an input loop on EOF */
+        check_eof_loop();
 
         /* 
          *   return (0 + CMD_EOF) sequences as we're called; alternate
@@ -438,7 +499,13 @@ int os_get_event(unsigned long timeout_in_milliseconds, int use_timeout,
 
     /* if there's no app frame, we can't get an event */
     if (app_frame == 0)
+    {
+        /* check for an input loop at EOF */
+        check_eof_loop();
+
+        /* return the EOF status */
         return OS_EVT_EOF;
+    }
 
     /* ask the app frame for an event and return the result */
     return app_frame->get_input_event(timeout_in_milliseconds, use_timeout,

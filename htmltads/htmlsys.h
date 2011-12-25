@@ -571,6 +571,17 @@ public:
     /* get the app frame object */
     static CHtmlSysFrame *get_frame_obj() { return app_frame_; }
 
+    /*
+     *   Kill the process.  This is a static function that must be
+     *   implemented by the port-specific code.
+     *   
+     *   This is called when the input layer (in oshtml.cpp) finds that the
+     *   program is looping on input after EOF.  This routine should force
+     *   the program to terminate, by explicitly killing the process via the
+     *   OS API if possible.
+     */
+    static void kill_process();
+
     /* 
      *   Flush the text output buffer.
      *   

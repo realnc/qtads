@@ -35,6 +35,11 @@ div.content {
    margin: 0em .5em 0em 2em;
 }
 
+div.indented {
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
 --></style>
 
 <body>
@@ -66,6 +71,37 @@ contact us.
 <!------------------------------------------------------------------------>
 <div class=bar1>
 <div class=heading>
+Workbench on Windows 95/98: "SHELL32.DLL:SHGetFolderPathA" Error
+</div>
+
+<div class=content>
+
+<p>If you're running TADS Workbench on Windows 95 or 98, launching
+Workbench might show the following error messages:
+
+<p>
+
+<div class=indented>
+<pre>
+Error Starting Program
+The HTMLDB3.EXE file is linked to missing export SHELL32.DLL:SHGetFolderPathA.
+</pre>
+</div>
+
+<p>If you get this error, you should be able to fix it by installing
+Microsoft Internet Explorer version 5 or later.  The issue is that
+Workbench depends upon a newer version of a certain Windows system DLL
+than what comes with 95 and 98 by default.  IE 5 and later
+automatically upgrade this DLL as part of their installation process,
+so updating the DLL is simply a matter of updating IE.
+
+</div>
+</div>
+
+
+<!------------------------------------------------------------------------>
+<div class=bar2>
+<div class=heading>
 Crash running HTML TADS
 </div>
 
@@ -78,9 +114,10 @@ COMCTL32.DLL.  If you encounter this problem, you can fix it by
 downloading this file from the Microsoft web site:
 
 <p>
-&nbsp;&nbsp;&nbsp;&nbsp;
+<div class=indented>
 <a href='ftp://ftp.microsoft.com/softlib/mslfiles/com32upd.exe'>
 ftp://ftp.microsoft.com/softlib/mslfiles/com32upd.exe</a>
+</div>
 
 <p> After downloading the file, double-click it to run the
 installation program, which will install the upgraded DLL for you.
@@ -94,7 +131,7 @@ before running HTML TADS.
 </div>
 
 <!------------------------------------------------------------------------>
-<div class=bar2>
+<div class=bar1>
 <div class=heading>
 Crash using Wine (Windows emulator for Linux)
 </div>
@@ -110,14 +147,17 @@ on the version known as WineX.  If you're running on Wine, and the
 interpreter crashes immediately when you run it, try running it
 from the command line like this:
 
-<p><pre>   htmltads -noalphablend
+<p><div class=indented>
+<pre>
+htmltads -noalphablend
 </pre>
+</div>
 
 </div>
 </div>
 
 <!------------------------------------------------------------------------>
-<div class=bar1>
+<div class=bar2>
 <div class=heading>
 Western European characters on localized (Non-English) Windows systems
 </div>
@@ -142,9 +182,12 @@ do properly support localized character sets.
 in your C:\WINDOWS directory).  Look for a line that starts with
 "[fontsubstitutes]", then look for lines like this:
 
+<p>
+<div class=indented>
 <pre>
-   Arial,0=Arial,238
+Arial,0=Arial,238
 </pre>
+</div>
 
 <p>(The second number might be something other than 238.)  If you find
 any lines like this, you might want to try deleting them or commenting
@@ -155,9 +198,12 @@ You might need to reboot your system before your changes take effect.
 specified in the registry rather than in WIN.INI.  Run REGEDIT and
 look for a registry key with this path:
 
-<p><tt>
+<p>
+<div class=indented>
+<pre>
 HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontSubstitutes
-</tt>
+</pre>
+</div>
 <p>
 
 </div>
