@@ -674,6 +674,13 @@ CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
 
 
 void
+CHtmlSysFrame::kill_process()
+{
+    QApplication::exit(0);
+}
+
+
+void
 CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 {
     // Flush and clear the buffer.
