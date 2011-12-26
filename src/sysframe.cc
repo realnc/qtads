@@ -362,7 +362,10 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
     CHtmlSysFontQt newFont;
     newFont.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline
                                                   | QFont::PreferQuality
-                                                  | QFont::ForceIntegerMetrics));
+#if QT_VERSION >= 0x040700
+                                                  | QFont::ForceIntegerMetrics
+#endif
+                                                  ));
 
     // Use the weight they provided (we may change this if a weight modifier is
     // specified).
