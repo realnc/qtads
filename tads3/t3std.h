@@ -269,24 +269,24 @@ typedef unsigned long uint32;
  */
 #if defined(OS_CUSTOM_ASHR) || ((-1 >> 1) != -1)
   /* signed a >> signed b != a ASHR b, so implement with bit masking */
-  inline int32 t3_ashr(int32 a, int32 b) {
-      int32 mask = (~0 << (sizeof(int32)*CHAR_BIT - b));
+  inline hix_int32 t3_ashr(hix_int32 a, hix_int32 b) {
+      hix_int32 mask = (~0 << (sizeof(hix_int32)*CHAR_BIT - b));
       return ((a >> b) | ((a & mask) ? mask : 0));
   };
 #else
   /* signed a >> signed b == a ASHR b, so we can use >> */
-  inline int32 t3_ashr(int32 a, int32 b) { return a >> b; }
+  inline hix_int32 t3_ashr(hix_int32 a, hix_int32 b) { return a >> b; }
 #endif
 
 #if defined(OS_CUSTOM_LSHR) || ((ULONG_MAX >> 1UL) != ULONG_MAX/2)
   /* unsigned a >> unsigned b != a LSHR b, so implement with bit masking */
-  inline int32 t3_lshr(int32 a, int32 b) {
-      return ((a >> b) & ~(~0 << (sizeof(int32)*CHAR_BIT - b)));
+  inline hix_int32 t3_lshr(hix_int32 a, hix_int32 b) {
+      return ((a >> b) & ~(~0 << (sizeof(hix_int32)*CHAR_BIT - b)));
   }
 #else
   /* unsigned a >> unsigned b == a LSHR b, so we can use >> */
-  inline int32 t3_lshr(int32 a, int32 b) {
-      return (int32)((uint32)a >> (uint32)b);
+  inline hix_int32 t3_lshr(hix_int32 a, hix_int32 b) {
+      return (hix_int32)((hix_uint32)a >> (hix_uint32)b);
   }
 #endif
 
