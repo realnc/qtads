@@ -1,5 +1,17 @@
-2.?.? - 2011/??/??
+2.1.2 - 2011/12/26
 ==================
+
+  - The TADS virtual machines have been updated to 2.5.15/3.1.0.
+    Note that QTads cannot run WebUI games (yet) because the "tads-net"
+    function set is not implemented yet.  For the time being you can run
+    WebUI games with FrobTADS.
+
+  - A "soft scrolling" option is now available in the configuration dialog.
+    When enabled, output from the game will scroll-in line by line instead of
+    all at once.
+
+  - On Mac OS X, text positioning could be off by a few pixels in some
+    circumstances.  This should now no longer occur.
 
   - An error dialog is now displayed when trying to open a file that is not a
     Tads game.  Previously, the error message was displayed on stdout.
