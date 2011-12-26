@@ -98,13 +98,17 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
     ui->inputFontItalicCheckBox->setChecked(sett->inputFont.italic());
     ui->inputFontBoldCheckBox->setChecked(sett->inputFont.bold());
 
-    switch (sett->ioSafetyLevel) {
-      case 0: ui->safety0RadioButton->setChecked(true); break;
-      case 1: ui->safety1RadioButton->setChecked(true); break;
-      case 2: ui->safety2RadioButton->setChecked(true); break;
-      case 3: ui->safety3RadioButton->setChecked(true); break;
-      case 4: ui->safety4RadioButton->setChecked(true); break;
-      default: ui->safety2RadioButton->setChecked(true); break;
+    switch (sett->ioSafetyLevelRead) {
+      case 0: ui->safetyRead0RadioButton->setChecked(true); break;
+      case 2: ui->safetyRead2RadioButton->setChecked(true); break;
+      case 4: ui->safetyRead4RadioButton->setChecked(true); break;
+      default: ui->safetyRead2RadioButton->setChecked(true); break;
+    }
+    switch (sett->ioSafetyLevelWrite) {
+      case 0: ui->safetyWrite0RadioButton->setChecked(true); break;
+      case 2: ui->safetyWrite2RadioButton->setChecked(true); break;
+      case 4: ui->safetyWrite4RadioButton->setChecked(true); break;
+      default: ui->safetyWrite2RadioButton->setChecked(true); break;
     }
 
     const QList<QByteArray>& aliases = QTextCodec::availableCodecs();
@@ -227,11 +231,12 @@ ConfDialog::fMakeInstantApply()
     // getting called twice, once for the button that gets unchecked and once
     // for the button that gets checked.  The clicked() signal is only emitted
     // when a button gets checked.
-    connect(ui->safety0RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->safety1RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->safety2RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->safety3RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->safety4RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+    connect(ui->safetyRead0RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+    connect(ui->safetyRead2RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+    connect(ui->safetyRead4RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+    connect(ui->safetyWrite0RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+    connect(ui->safetyWrite2RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+    connect(ui->safetyWrite4RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
 
     connect(ui->encodingComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -286,16 +291,19 @@ ConfDialog::fApplySettings()
     sett->inputFont.setPointSize(ui->inputFontSizeSpinBox->value());
     sett->useMainFontForInput = ui->useMainFontCheckBox->isChecked();
 
-    if (ui->safety0RadioButton->isChecked()) {
-        sett->ioSafetyLevel = 0;
-    } else if (ui->safety1RadioButton->isChecked()) {
-        sett->ioSafetyLevel = 1;
-    } else if (ui->safety2RadioButton->isChecked()) {
-        sett->ioSafetyLevel = 2;
-    } else if (ui->safety3RadioButton->isChecked()) {
-        sett->ioSafetyLevel = 3;
-    } else if (ui->safety4RadioButton->isChecked()) {
-        sett->ioSafetyLevel = 4;
+    if (ui->safetyRead0RadioButton->isChecked()) {
+        sett->ioSafetyLevelRead = 0;
+    } else if (ui->safetyRead2RadioButton->isChecked()) {
+        sett->ioSafetyLevelRead = 2;
+    } else if (ui->safetyRead4RadioButton->isChecked()) {
+        sett->ioSafetyLevelRead = 4;
+    }
+    if (ui->safetyWrite0RadioButton->isChecked()) {
+        sett->ioSafetyLevelWrite = 0;
+    } else if (ui->safetyWrite2RadioButton->isChecked()) {
+        sett->ioSafetyLevelWrite = 2;
+    } else if (ui->safetyWrite4RadioButton->isChecked()) {
+        sett->ioSafetyLevelWrite = 4;
     }
     sett->tads2Encoding = ui->encodingComboBox->currentText().toAscii();
     sett->softScrolling = ui->softScrollCheckBox->isChecked();

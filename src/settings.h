@@ -55,7 +55,8 @@ class Settings {
     CHtmlSysFontQt inputFont;
     bool useMainFontForInput;
 
-    int ioSafetyLevel;
+    int ioSafetyLevelRead;
+    int ioSafetyLevelWrite;
 
     QByteArray tads2Encoding;
     bool softScrolling;

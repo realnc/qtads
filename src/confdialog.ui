@@ -631,49 +631,64 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
-          <widget class="QWidget" name="widget_6" native="true"/>
+          <widget class="QGroupBox" name="groupBox_4">
+           <property name="title">
+            <string>Read Access</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <widget class="QRadioButton" name="safetyRead4RadioButton">
+              <property name="text">
+               <string>No read access</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="safetyRead2RadioButton">
+              <property name="text">
+               <string>Read from game directory</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="safetyRead0RadioButton">
+              <property name="text">
+               <string>Read from anywhere</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_9">
-           <item>
-            <widget class="QRadioButton" name="safety4RadioButton">
-             <property name="text">
-              <string>Maximum Safety - No File Access</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="safety3RadioButton">
-             <property name="text">
-              <string>Read-Only Access in Current Directory</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="safety2RadioButton">
-             <property name="text">
-              <string>Read-Write Access in Current Directory</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="safety1RadioButton">
-             <property name="text">
-              <string>Read in Any Directory, Write in Current Directory</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="safety0RadioButton">
-             <property name="text">
-              <string>Disable Safety - Read-Write in Any Directory</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QWidget" name="widget_5" native="true"/>
+          <widget class="QGroupBox" name="groupBox_5">
+           <property name="title">
+            <string>Write Access</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <item>
+             <widget class="QRadioButton" name="safetyWrite4RadioButton">
+              <property name="text">
+               <string>No write access</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="safetyWrite2RadioButton">
+              <property name="text">
+               <string>Write to game directory</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="safetyWrite0RadioButton">
+              <property name="text">
+               <string>Write to anywhere</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </item>

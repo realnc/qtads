@@ -31,12 +31,15 @@
 class QTadsHostIfc: public CVmHostIfc {
   private:
     appctxdef* fAppctx;
-    int fIoSafety;
+    int fIoSafetyRead;
+    int fIoSafetyWrite;
     CResLoader* fCmapResLoader;
 
   public:
     QTadsHostIfc( struct appctxdef* appctx )
-    : fAppctx(appctx), fIoSafety(VM_IO_SAFETY_READWRITE_CUR)
+    : fAppctx(appctx),
+      fIoSafetyRead(VM_IO_SAFETY_READWRITE_CUR),
+      fIoSafetyWrite(VM_IO_SAFETY_READWRITE_CUR)
     {
         // TODO: Use the directory where charmap files are stored.
         this->fCmapResLoader = new CResLoader("./");
@@ -50,46 +53,45 @@ class QTadsHostIfc: public CVmHostIfc {
     //
     // CVmHostIfc interface implementation.
     //
-    // FIXME: Split read/write.
+
     virtual int
     get_io_safety_read()
     {
         if (this->fAppctx != 0 and this->fAppctx->get_io_safety_level != 0) {
             // Ask the app context to handle it.
-            int read;
-            (*this->fAppctx->get_io_safety_level)(this->fAppctx->io_safety_level_ctx, &read, 0);
-            return read;
+            int readLvl;
+            (*this->fAppctx->get_io_safety_level)(this->fAppctx->io_safety_level_ctx, &readLvl, 0);
+            return readLvl;
         } else {
             // The app context doesn't care - use our own level memory */
-            return this->fIoSafety;
+            return this->fIoSafetyRead;
         }
     }
 
-    // FIXME: Split read/write.
     virtual int
     get_io_safety_write()
     {
         if (this->fAppctx != 0 and this->fAppctx->get_io_safety_level != 0) {
             // Ask the app context to handle it.
-            int write;
-            (*this->fAppctx->get_io_safety_level)(this->fAppctx->io_safety_level_ctx, 0, &write);
-            return write;
+            int writeLvl;
+            (*this->fAppctx->get_io_safety_level)(this->fAppctx->io_safety_level_ctx, 0, &writeLvl);
+            return writeLvl;
         } else {
             // The app context doesn't care - use our own level memory */
-            return this->fIoSafety;
+            return this->fIoSafetyWrite;
         }
     }
 
-    // FIXME: Split read/write.
     virtual void
-    set_io_safety( int read, int write )
+    set_io_safety( int readLvl, int writeLvl )
     {
         if (this->fAppctx != 0 and this->fAppctx->set_io_safety_level != 0) {
             // Let the app context handle it.
-            (*this->fAppctx->set_io_safety_level)(this->fAppctx->io_safety_level_ctx, read, write);
+            (*this->fAppctx->set_io_safety_level)(this->fAppctx->io_safety_level_ctx, readLvl, writeLvl);
         } else {
             // The app doesn't care - set our own level memory.
-            this->fIoSafety = read;
+            this->fIoSafetyRead = readLvl;
+            this->fIoSafetyWrite = writeLvl;
         }
     }
 

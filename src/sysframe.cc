@@ -40,12 +40,11 @@ void
 CHtmlSysFrameQt::fCtxGetIOSafetyLevel( void*, int* read, int* write )
 {
     Q_ASSERT(qFrame != 0);
-    // FIXME: Split read/write.
     if (read != 0) {
-        *read = qFrame->fSettings->ioSafetyLevel;
+        *read = qFrame->fSettings->ioSafetyLevelRead;
     }
     if (write != 0) {
-        *write = qFrame->fSettings->ioSafetyLevel;
+        *write = qFrame->fSettings->ioSafetyLevelWrite;
     }
 }
 
