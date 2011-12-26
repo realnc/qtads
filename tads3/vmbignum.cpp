@@ -8587,7 +8587,7 @@ void CVmObjBigNum::compute_abs_sum_into(char *new_ext,
      *   significant digits from one of the two inputs - we can't be
      *   cutting off both inputs.  
      */
-    int trail_dig, trail_val;
+    int trail_dig = 0, trail_val = 0;
     if (lo3 - 1 >= lo1 && lo3 - 1 <= hi1)
     {
         /* remember the digit */
