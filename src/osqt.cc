@@ -222,6 +222,14 @@ os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
         break;
       }
 
+      case OS_GSP_LOGFILE: {
+        // TODO: We'll just use the temp directory for now.
+        QByteArray res(QDir::tempPath().toLocal8Bit());
+        Q_ASSERT(res.size() < static_cast<int>(buflen));
+        qstrncpy(buf, res.constData(), buflen);
+        break;
+      }
+
       default:
         // We didn't recognize the specified id. That means the base code
         // added a new value for it that we don't know about.
