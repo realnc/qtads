@@ -565,7 +565,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
     // There was no match in our cache. Create a new font and store it in our
     // cache.
     CHtmlSysFontQt* font = new CHtmlSysFontQt(newFont);
-    //font->set_font_desc(&newFontDesc);
+    font->set_font_desc(&newFontDesc);
     this->fFontList.append(font);
     return font;
 }

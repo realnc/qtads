@@ -75,6 +75,16 @@ class CHtmlSysFontQt: public QFont, public CHtmlSysFont {
         return *this;
     }
 
+    // Set the font descriptor.
+    void
+    set_font_desc( const CHtmlFontDesc* src )
+    {
+        desc_.copy_from(src);
+        // Clear the explicit-face-name flag, since this is important only
+        // when looking up a font.
+        desc_.face_set_explicitly = false;
+    }
+
     //
     // CHtmlSysFont interface implementation.
     //
