@@ -756,6 +756,20 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="confirmRestartCheckBox">
+         <property name="text">
+          <string>Ask for confirmation when restarting a game</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="confirmQuitCheckBox">
+         <property name="text">
+          <string>Ask for confirmation when quitting a game</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>

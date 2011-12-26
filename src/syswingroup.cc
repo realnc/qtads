@@ -476,7 +476,7 @@ CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 void
 CHtmlSysWinGroupQt::fEndCurrentGame()
 {
-    if (this->fAskQuitGameDialog()) {
+    if (not qFrame->settings()->confirmQuitGame or this->fAskQuitGameDialog()) {
         qFrame->setGameRunning(false);
     }
 }
@@ -485,7 +485,7 @@ CHtmlSysWinGroupQt::fEndCurrentGame()
 void
 CHtmlSysWinGroupQt::fRestartCurrentGame()
 {
-    if (this->fAskRestartGameDialog()) {
+    if (not qFrame->settings()->confirmRestartGame or this->fAskRestartGameDialog()) {
         qFrame->setNextGame(qFrame->gameFile());
     }
 }
@@ -530,7 +530,7 @@ CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
     msgBox->setWindowModality(Qt::WindowModal);
 #endif
 
-    if (msgBox->exec() == QMessageBox::Yes) {
+    if (not qFrame->settings()->confirmQuitGame or msgBox->exec() == QMessageBox::Yes) {
         qFrame->setGameRunning(false);
         e->accept();
     } else {

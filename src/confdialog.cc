@@ -142,6 +142,8 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
 
     ui->softScrollCheckBox->setChecked(sett->softScrolling);
     ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
+    ui->confirmRestartCheckBox->setChecked(sett->confirmRestartGame);
+    ui->confirmQuitCheckBox->setChecked(sett->confirmQuitGame);
 
 #ifdef Q_WS_MAC
     // On Mac OS X, the dialog should not have any buttons, and settings
@@ -241,6 +243,8 @@ ConfDialog::fMakeInstantApply()
     connect(ui->encodingComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->askForGameFileCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->confirmRestartCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->confirmQuitCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 }
 
 
@@ -308,6 +312,8 @@ ConfDialog::fApplySettings()
     sett->tads2Encoding = ui->encodingComboBox->currentText().toAscii();
     sett->softScrolling = ui->softScrollCheckBox->isChecked();
     sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
+    sett->confirmRestartGame = ui->confirmRestartCheckBox->isChecked();
+    sett->confirmQuitGame = ui->confirmQuitCheckBox->isChecked();
 
     // Notify the application that preferences have changed.
     qFrame->notifyPreferencesChange(sett);

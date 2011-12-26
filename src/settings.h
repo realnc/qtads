@@ -61,6 +61,8 @@ class Settings {
     QByteArray tads2Encoding;
     bool softScrolling;
     bool askForGameFile;
+    bool confirmRestartGame;
+    bool confirmQuitGame;
     QString lastFileOpenDir;
 
     QStringList recentGamesList;

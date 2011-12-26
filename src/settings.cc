@@ -97,6 +97,8 @@ Settings::loadFromDisk()
     this->tads2Encoding = sett.value(QString::fromAscii("tads2encoding"), QByteArray("windows-1252")).toByteArray();
     this->softScrolling = sett.value(QString::fromAscii("softscrolling"), true).toBool();
     this->askForGameFile = sett.value(QString::fromAscii("askforfileatstart"), false).toBool();
+    this->confirmRestartGame = sett.value(QString::fromAscii("confirmrestartgame"), true).toBool();
+    this->confirmQuitGame = sett.value(QString::fromAscii("confirmquitgame"), true).toBool();
     this->lastFileOpenDir = sett.value(QString::fromAscii("lastFileOpenDir"), QString::fromAscii("")).toString();
     sett.endGroup();
 
@@ -160,6 +162,8 @@ Settings::saveToDisk()
     sett.setValue(QString::fromAscii("tads2encoding"), this->tads2Encoding);
     sett.setValue(QString::fromAscii("softscrolling"), this->softScrolling);
     sett.setValue(QString::fromAscii("askforfileatstart"), this->askForGameFile);
+    sett.setValue(QString::fromAscii("confirmrestartgame"), this->confirmRestartGame);
+    sett.setValue(QString::fromAscii("confirmquitgame"), this->confirmQuitGame);
     sett.setValue(QString::fromAscii("lastFileOpenDir"), this->lastFileOpenDir);
     sett.endGroup();
 
