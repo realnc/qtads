@@ -456,17 +456,144 @@ os_get_abs_filename( char* result_buf, size_t result_buf_size, const char* filen
 
 /* Determine if the given file is in the given directory.
  */
+#if 1
+/* TODO: We use the version from the DOS/Windows implementation for now.
+ * I'll do the Qt-specific implementation later.
+ */
+static void
+canonicalize_path( char* path )
+{
+    QByteArray canonPath(QDir(QString::fromLocal8Bit(path)).canonicalPath().toLocal8Bit());
+    qstrncpy(path, canonPath.constData(), OSFNMAX);
+}
+
+int
+os_is_file_in_dir( const char* filename, const char* path, int allow_subdirs )
+{
+    char filename_buf[OSFNMAX], path_buf[OSFNMAX];
+    size_t flen, plen;
+
+    /* absolute-ize the filename, if necessary */
+    if (!os_is_file_absolute(filename))
+    {
+        os_get_abs_filename(filename_buf, sizeof(filename_buf), filename);
+        filename = filename_buf;
+    }
+
+    /* absolute-ize the path, if necessary */
+    if (!os_is_file_absolute(path))
+    {
+        os_get_abs_filename(path_buf, sizeof(path_buf), path);
+        path = path_buf;
+    }
+
+    /*
+     *   canonicalize the paths, to remove .. and . elements - this will make
+     *   it possible to directly compare the path strings
+     */
+    safe_strcpy(filename_buf, sizeof(filename_buf), filename);
+    canonicalize_path(filename_buf);
+    filename = filename_buf;
+
+    safe_strcpy(path_buf, sizeof(path_buf), path);
+    canonicalize_path(path_buf);
+    path = path_buf;
+
+    /* get the length of the filename and the length of the path */
+    flen = strlen(filename);
+    plen = strlen(path);
+
+    /* if the path ends in a separator character, ignore that */
+    if (plen > 0 && (path[plen-1] == '\\' || path[plen-1] == '/'))
+        --plen;
+
+    /*
+     *   Check that the filename has 'path' as its path prefix.  First, check
+     *   that the leading substring of the filename matches 'path', ignoring
+     *   case.  Note that we need the filename to be at least two characters
+     *   longer than the path: it must have a path separator after the path
+     *   name, and at least one character for a filename past that.
+     */
+    if (flen < plen + 2 || memicmp(filename, path, plen) != 0)
+        return FALSE;
+
+    /*
+     *   Okay, 'path' is the leading substring of 'filename'; next make sure
+     *   that this prefix actually ends at a path separator character in the
+     *   filename.  (This is necessary so that we don't confuse "c:\a\b.txt"
+     *   as matching "c:\abc\d.txt" - if we only matched the "c:\a" prefix,
+     *   we'd miss the fact that the file is actually in directory "c:\abc",
+     *   not "c:\a".)
+     */
+    if (filename[plen] != '\\' && filename[plen] != '/')
+        return FALSE;
+
+    /*
+     *   We're good on the path prefix - we definitely have a file that's
+     *   within the 'path' directory or one of its subdirectories.  If we're
+     *   allowed to match on subdirectories, we already have our answer
+     *   (true).  If we're not allowed to match subdirectories, we still have
+     *   one more check, which is that the rest of the filename is free of
+     *   path separator charactres.  If it is, we have a file that's directly
+     *   in the 'path' directory; otherwise it's in a subdirectory of 'path'
+     *   and thus isn't a match.
+     */
+    if (allow_subdirs)
+    {
+        /*
+         *   filename is in the 'path' directory or one of its
+         *   subdirectories, and we're allowed to match on subdirectories, so
+         *   we have a match
+         */
+        return TRUE;
+    }
+    else
+    {
+        const char *p;
+
+        /*
+         *   We're not allowed to match subdirectories, so scan the rest of
+         *   the filename for path separators.  If we find any, the file is
+         *   in a subdirectory of 'path' rather than directly in 'path'
+         *   itself, so it's not a match.  If we don't find any separators,
+         *   we have a file directly in 'path', so it's a match.
+         */
+        for (p = filename + plen + 1 ;
+             *p != '\0' && *p != '/' && *p != '\\' ; ++p) ;
+
+        /*
+         *   if we reached the end of the string without finding a path
+         *   separator character, it's a match
+         */
+        return (*p == '\0');
+    }
+}
+#else
 int
 os_is_file_in_dir( const char* filename, const char* path, int include_subdirs )
 {
     Q_ASSERT(filename != 0);
     Q_ASSERT(path != 0);
+    Q_ASSERT(filename[0] != '\0');
     Q_ASSERT(filename[qstrlen(filename) - 1] != '/');
 
-    QFileInfo inf(QString::fromLocal8Bit(filename));
+    QFileInfo fileInf(QString::fromLocal8Bit(filename));
+    const QString& pathStr = QFileInfo(QString::fromLocal8Bit(path)).canonicalFilePath();
+
+    // If the filename is absolute but the file doesn't exist, we know
+    // that we're not going to find it anywhere, so report failure.
+    if (fileInf.isAbsolute() and not fileInf.exists()) {
+        return false;
+    }
+
+    const QString& fnameStr = fileInf.filePath();
 
     // Look in 'path' first, before recursing its subdirectories.
-    bool found = QDir(QString::fromLocal8Bit(path)).exists(inf.fileName());
+    bool found;
+    if (fnameStr.startsWith(pathStr) and fileInf.exists())
+        found = true;
+    else
+        found = false;
 
     // If we already found the file in 'path', or we're not searching in
     // subdirectories, report the result now; in both cases, we don't need
@@ -480,15 +607,16 @@ os_is_file_in_dir( const char* filename, const char* path, int include_subdirs )
     // only need to iterate directories, not regular files, and we omit the
     // "." and ".." directory entries. We do follow symbolic links; it's OK
     // to do so, since QDirIterator will detect loops.
-    QDirIterator it(QString::fromLocal8Bit(path), QDir::Dirs | QDir::NoDotAndDotDot,
+    QDirIterator it(pathStr, QDir::Dirs | QDir::NoDotAndDotDot,
                     QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
     while (it.hasNext() and not found) {
-        if (QDir(it.next()).exists(inf.fileName())) {
+        if (fnameStr.startsWith(QDir(it.next()).canonicalPath()) and fileInf.exists()) {
             found = true;
         }
     }
     return found;
 }
+#endif
 
 
 // --------------------------------------------------------------------
