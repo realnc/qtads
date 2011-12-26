@@ -21,6 +21,12 @@
     has been printed yet.  The game window is never really "empty", so this
     kind of "window grabbing" should have not been allowed to begin with.
 
+  - The confirmation dialog that appears when trying to restart or quit a game
+    can now be disabled via newly introduced configuration dialog options.
+
+  - File I/O safety levels can now be configured seperately for read and write
+    access.
+
 
 2.1.1 - 2011/02/18
 ==================
