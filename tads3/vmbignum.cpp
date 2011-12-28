@@ -1505,13 +1505,13 @@ ulong CVmObjBigNum::convert_to_int_base(const char *ext, int &ov)
             int dig = get_dig(ext, idx);
 
             /* make sure that shifting the accumulator won't overflow */
-            ov |= (acc > ULONG_MAX/10);
+            ov |= (acc > (ULONG_MAX & 0xFFFFFFFF)/10);
 
             /* shift the accumulator */
             acc *= 10;
             
             /* make sure this digit won't overflow the 32-bit VM int type */
-            ov |= (acc > (ULONG_MAX - dig));
+            ov |= (acc > ((ULONG_MAX & 0xFFFFFFFF) - dig));
 
             /* add the digit */
             acc += dig;
@@ -1519,7 +1519,7 @@ ulong CVmObjBigNum::convert_to_int_base(const char *ext, int &ov)
     }
 
     /* make sure rounding won't overflow */
-    ov |= (acc > ULONG_MAX - round_inc);
+    ov |= (acc > (ULONG_MAX & 0xFFFFFFFF) - round_inc);
 
     /* return the result adjusted for rounding */
     return acc + round_inc;

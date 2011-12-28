@@ -2729,7 +2729,7 @@ void CVmPack::unpack_item(VMG_ vm_val_t *val,
                  *   overflow 
                  */
                 count = (int)l;
-                if (l > INT_MAX)
+                if (l > (INT_MAX & 0xFFFFFFFF))
                     err_throw(VMERR_NUM_OVERFLOW);
             }
             else
