@@ -286,7 +286,7 @@ typedef unsigned long uint32;
 #else
   /* unsigned a >> unsigned b == a LSHR b, so we can use >> */
   inline int32 t3_lshr(int32 a, int32 b) {
-      return (int32)((uint32)(a & 0xFFFFFFFF) >> (uint32)b);
+      return (int32)((uint32)a >> (uint32)b);
   }
 #endif
 
