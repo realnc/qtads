@@ -11,9 +11,6 @@
 extern "C" {
 #endif
 
-typedef qint32 hix_int32;
-typedef quint32 hix_uint32;
-
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
 
 #  include "h_ppc.h"
