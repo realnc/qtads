@@ -37,15 +37,15 @@ Modified
 /* generate the group of numbers */
 void isaac_gen_group(isaacctx *ctx)
 {
-    ulong a;
-    ulong b;
-    ulong x;
-    ulong y;
-    ulong *m;
-    ulong *mm;
-    ulong *m2;
-    ulong *r;
-    ulong *mend;
+    uint32 a;
+    uint32 b;
+    uint32 x;
+    uint32 y;
+    uint32 *m;
+    uint32 *mm;
+    uint32 *m2;
+    uint32 *r;
+    uint32 *mend;
 
     mm = ctx->mem;
     r = ctx->rsl;
@@ -77,16 +77,16 @@ void isaac_gen_group(isaacctx *ctx)
 void isaac_init(isaacctx *ctx, int flag)
 {
     int i;
-    ulong a;
-    ulong b;
-    ulong c;
-    ulong d;
-    ulong e;
-    ulong f;
-    ulong g;
-    ulong h;
-    ulong *m;
-    ulong *r;
+    uint32 a;
+    uint32 b;
+    uint32 c;
+    uint32 d;
+    uint32 e;
+    uint32 f;
+    uint32 g;
+    uint32 h;
+    uint32 *m;
+    uint32 *r;
 
     ctx->a = ctx->b = ctx->c = 0;
     m = ctx->mem;
