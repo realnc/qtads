@@ -17,6 +17,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include <QDate>
 #include "sysfont.h"
 
 
@@ -69,6 +70,10 @@ class Settings {
     static const int recentGamesCapacity = 10;
 
     QSize appSize;
+    QDate lastUpdateDate;
+    enum UpdateFreq {
+        UpdateOnEveryStart, UpdateDaily, UpdateWeekly, UpdateNever
+    } updateFreq;
 };
 
 

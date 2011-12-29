@@ -41,7 +41,13 @@ QTadsFrame::resizeEvent( QResizeEvent* e )
 
 
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
-: fConfDialog(0), fGameInfoDialog(0), fAboutBoxDialog(0), fAboutBox(0), fAboutQtadsDialog(0), fNetManager(0)
+: fConfDialog(0),
+  fGameInfoDialog(0),
+  fAboutBoxDialog(0),
+  fAboutBox(0),
+  fAboutQtadsDialog(0),
+  fNetManager(0),
+  fSilentIfNoUpdates(false)
 {
     //qDebug() << Q_FUNC_INFO << "called";
     Q_ASSERT(qWinGroup == 0);
@@ -295,14 +301,16 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
         if (msgBox->exec() == QMessageBox::Yes) {
             QDesktopServices::openUrl(QUrl(QString::fromAscii("http://qtads.sourceforge.net/downloads.shtml")));
         }
-    } else {
+    } else if (not this->fSilentIfNoUpdates) {
         msgBox->setIcon(QMessageBox::Information);
         msgBox->setText(tr("This version of QTads is up to date."));
         msgBox->exec();
     }
+    this->fSilentIfNoUpdates = false;
     this->fNetManager->deleteLater();
     this->fReply->deleteLater();
     this->fNetManager = 0;
+    qFrame->settings()->lastUpdateDate = QDate::currentDate();
 }
 
 void
@@ -634,6 +642,13 @@ CHtmlSysWinGroupQt::updateRecentGames()
         act->setText(QFontMetrics(act->font()).elidedText(gameName, Qt::ElideRight, 300));
         act->setStatusTip(QString(list.at(i)));
     }
+}
+
+void
+CHtmlSysWinGroupQt::checkForUpdates()
+{
+    this->fSilentIfNoUpdates = true;
+    this->fCheckForUpdates();
 }
 
 

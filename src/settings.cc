@@ -116,6 +116,10 @@ Settings::loadFromDisk()
     sett.endGroup();
 
     this->appSize = sett.value(QString::fromAscii("geometry/size"), QSize(740, 540)).toSize();
+    this->lastUpdateDate = sett.value(QString::fromAscii("update/lastupdatedate"), QDate()).toDate();
+    this->updateFreq = static_cast<UpdateFreq>(
+        sett.value(QString::fromAscii("update/updatefreq"), UpdateDaily).toInt()
+    );
 }
 
 
@@ -172,5 +176,7 @@ Settings::saveToDisk()
     sett.endGroup();
 
     sett.setValue(QString::fromAscii("geometry/size"), qWinGroup->size());
+    sett.setValue(QString::fromAscii("update/lastupdatedate"), this->lastUpdateDate);
+    sett.setValue(QString::fromAscii("update/updatefreq"), this->updateFreq);
     sett.sync();
 }

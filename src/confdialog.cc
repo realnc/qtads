@@ -145,6 +145,13 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
     ui->confirmRestartCheckBox->setChecked(sett->confirmRestartGame);
     ui->confirmQuitCheckBox->setChecked(sett->confirmQuitGame);
 
+    switch (sett->updateFreq) {
+      case Settings::UpdateOnEveryStart: ui->updateOnStartRadioButton->setChecked(true); break;
+      case Settings::UpdateDaily: ui->updateDailyRadioButton->setChecked(true); break;
+      case Settings::UpdateWeekly: ui->updateWeeklyRadioButton->setChecked(true); break;
+      default: ui->updateNeverRadioButton->setChecked(true); break;
+    }
+
 #ifdef Q_WS_MAC
     // On Mac OS X, the dialog should not have any buttons, and settings
     // changes should apply instantly.
@@ -239,6 +246,10 @@ ConfDialog::fMakeInstantApply()
     connect(ui->safetyWrite0RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
     connect(ui->safetyWrite2RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
     connect(ui->safetyWrite4RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+    connect(ui->updateOnStartRadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+    connect(ui->updateDailyRadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+    connect(ui->updateWeeklyRadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+    connect(ui->updateNeverRadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
 
     connect(ui->encodingComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(fApplySettings()));
     connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -314,6 +325,15 @@ ConfDialog::fApplySettings()
     sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
     sett->confirmRestartGame = ui->confirmRestartCheckBox->isChecked();
     sett->confirmQuitGame = ui->confirmQuitCheckBox->isChecked();
+    if (ui->updateOnStartRadioButton->isChecked()) {
+        sett->updateFreq = Settings::UpdateOnEveryStart;
+    } else if (ui->updateDailyRadioButton->isChecked()) {
+        sett->updateFreq = Settings::UpdateDaily;
+    } else if (ui->updateWeeklyRadioButton->isChecked()) {
+        sett->updateFreq = Settings::UpdateWeekly;
+    } else {
+        sett->updateFreq = Settings::UpdateNever;
+    }
 
     // Notify the application that preferences have changed.
     qFrame->notifyPreferencesChange(sett);

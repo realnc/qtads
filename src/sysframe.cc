@@ -344,6 +344,22 @@ CHtmlSysFrameQt::main( QString gameFileName )
     this->fMainWin->resize(this->fSettings->appSize);
     this->fMainWin->show();
 
+    // Do an online update check.
+    int daysRequired = -1;
+    switch (this->fSettings->updateFreq) {
+      case Settings::UpdateOnEveryStart: daysRequired = 0; break;
+      case Settings::UpdateDaily:        daysRequired = 1; break;
+      case Settings::UpdateWeekly:       daysRequired = 7; break;
+    }
+    if (not this->fSettings->lastUpdateDate.isValid()) {
+        // Force update check.
+        daysRequired = 0;
+    }
+    int daysPassed = this->fSettings->lastUpdateDate.daysTo(QDate::currentDate());
+    if (daysPassed >= daysRequired and daysRequired > -1) {
+        this->fMainWin->checkForUpdates();
+    }
+
     // If a game file was specified, try to run it.
     if (not gameFileName.isEmpty()) {
         this->setNextGame(gameFileName);

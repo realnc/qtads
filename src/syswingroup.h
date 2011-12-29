@@ -64,6 +64,10 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     class QNetworkReply* fReply;
     QString fGameFileFromDropEvent;
 
+    // If this is set, we won't bother the user with a dialog if the
+    // update checker finds no available updates.
+    bool fSilentIfNoUpdates;
+
     bool
     fAskQuitGameDialog();
 
@@ -153,6 +157,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
     void
     updateRecentGames();
+
+    void
+    checkForUpdates();
 
 #ifdef Q_WS_MAC
     // Handler for FileOpen events.  They only occur in OS X.

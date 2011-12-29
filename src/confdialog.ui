@@ -697,6 +697,76 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_6">
+      <attribute name="title">
+       <string>Updates</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_12">
+       <item>
+        <widget class="QLabel" name="label_19">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>The online update check will never download or install updates. It will only inform you about available updates. The automatic update check is only performed by the application at startup; no background services of any kind will be installed on your computer.
+
+Choose how often the application should check for available updates:</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QWidget" name="widget_5" native="true"/>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_11">
+           <item>
+            <widget class="QRadioButton" name="updateOnStartRadioButton">
+             <property name="text">
+              <string>On every application start</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="updateDailyRadioButton">
+             <property name="text">
+              <string>Once per day</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="updateWeeklyRadioButton">
+             <property name="text">
+              <string>Once per week</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="updateNeverRadioButton">
+             <property name="text">
+              <string>Never</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget_6" native="true"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_8" native="true"/>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
        <string>Misc</string>
