@@ -474,10 +474,9 @@ CHtmlSysWinGroupQt::fOpenNewGame()
 void
 CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 {
-    if (not this->fAskQuitGameDialog()) {
-        return;
+    if (not qFrame->settings()->confirmQuitGame or this->fAskQuitGameDialog()) {
+        qFrame->setNextGame(action->statusTip());
     }
-    qFrame->setNextGame(action->statusTip());
 }
 
 
