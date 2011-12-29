@@ -1,4 +1,4 @@
-2.1.2 - 2011/12/26
+2.1.2 - 2011/12/29
 ==================
 
   - The TADS virtual machines have been updated to 2.5.15/3.1.0.
@@ -26,6 +26,9 @@
 
   - File I/O safety levels can now be configured seperately for read and write
     access.
+
+  - An online update check is now performed when the application starts.  The
+    behavior is configurable via new configuration dialog options.
 
 
 2.1.1 - 2011/02/18
