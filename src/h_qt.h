@@ -21,18 +21,6 @@ extern "C" {
 
 #else
 
-/* The base code assumes a certain size for the below types. The ones
- * provided by default in tads3/t3std.h (when the corresponding macro is
- * not defined) are not portable to most 64-bit compilers. */
-#define OS_INT16_DEFINED
-typedef qint16 int16;
-#define OS_UINT16_DEFINED
-typedef quint16 uint16;
-#define OS_INT32_DEFINED
-typedef qint32 int32;
-#define OS_UINT32_DEFINED
-typedef quint32 uint32;
-
 /* round a size to worst-case alignment boundary */
 #define osrndsz(s) (((s)+3) & ~3)
 
