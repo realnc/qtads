@@ -1,7 +1,7 @@
 TEMPLATE = app
 CONFIG += qt silent warn_off
 QT += network
-VERSION = 2.1.2
+VERSION = 2.1.2.99
 
 # On Windows and OS X we build static binaries, so we need to explicitly
 # include the text codec plugins.
