@@ -201,7 +201,7 @@ public:
      *   more) due to reaching the end of the file or due to character
      *   conversions.  Returns true on success, false on failure.
      */
-    int read_file(VMG_ char *buf, int32 &len);
+    int read_file(VMG_ char *buf, int32_t &len);
 
 protected:
     /* create with no initial contents */

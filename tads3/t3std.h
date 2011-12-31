@@ -185,48 +185,39 @@ typedef unsigned int   uint;
 typedef unsigned long  ulong;
 #endif
 
-/* maximum/minimum portable values for various types */
-#define ULONGMAXVAL   0xffffffffUL
-#define USHORTMAXVAL  0xffffU
-#define UCHARMAXVAL   0xffU
-#define SLONGMAXVAL   0x7fffffffL
-#define SSHORTMAXVAL  0x7fff
-#define SCHARMAXVAL   0x7f
-#define SLONGMINVAL   (-(0x7fffffff)-1)
-#define SSHORTMINVAL  (-(0x7fff)-1)
-#define SCHARMINVAL   (-(0x7f)-1)
-
 /* sizeof() extension macros */
 #ifndef countof
 #define countof(array) (sizeof(array)/sizeof((array)[0]))
 #endif
 #define sizeof_field(struct_name, field) sizeof(((struct_name *)0)->field)
 
+/*
+ *   The types int16_t, uint16_t, int32_t, and uint32_t are defined by ANSI
+ *   C99 as EXACTLY the specified number of bits (e.g., int16 is a signed
+ *   16-bit integer; uint32 is an unsigned 32-bit integer).
+ *   
+ *   Many modern compilers provide definitions for these types in <stdint.h>.
+ *   When <stdint.h> isn't available, ports must provide suitable typedefs in
+ *   the osxxx.h header - see tads2/osifc.h.
+ *   
+ *   Because these types have exact sizes, their limits are fixed, so we can
+ *   provide portable definitions here.
+ */
+#define INT16MAXVAL    32767
+#define INT16MINVAL    (-32768)
+#define UINT16MAXVAL   65535
+#define INT32MAXVAL    2147483647
+#define INT32MINVAL    (-2147483648)
+#define UINT32MAXVAL   4294967295U
+
 
 /*
- *   Text character 
+ *   Text character.  We use ASCII and UTF-8 for most character string
+ *   representations, so our basic character type is 'char', which is defined
+ *   univerally as one byte.  (UTF-8 uses varying numbers of bytes per
+ *   character, but its basic storage unit is bytes.)
  */
 typedef char textchar_t;
-
-/*
- *   16-bit signed/unsigned integer types 
- */
-#ifndef OS_INT16_DEFINED
-typedef short int16;
-#endif
-#ifndef OS_UINT16_DEFINED
-typedef unsigned short uint16;
-#endif
-
-/*
- *   32-bit signed/unsigned integer types 
- */
-#ifndef OS_INT32_DEFINED
-typedef long int32;
-#endif
-#ifndef OS_UINT32_DEFINED
-typedef unsigned long uint32;
-#endif
 
 
 /* ------------------------------------------------------------------------ */
@@ -269,24 +260,28 @@ typedef unsigned long uint32;
  */
 #if defined(OS_CUSTOM_ASHR) || ((-1 >> 1) != -1)
   /* signed a >> signed b != a ASHR b, so implement with bit masking */
-  inline int32 t3_ashr(int32 a, int32 b) {
-      int32 mask = (~0 << (sizeof(int32)*CHAR_BIT - b));
+  inline int32_t t3_ashr(int32_t a, int32_t b) {
+      int32_t mask = (~0 << (sizeof(int32_t)*CHAR_BIT - b));
       return ((a >> b) | ((a & mask) ? mask : 0));
   };
 #else
   /* signed a >> signed b == a ASHR b, so we can use >> */
-  inline int32 t3_ashr(int32 a, int32 b) { return a >> b; }
+  inline int32_t t3_ashr(int32_t a, int32_t b) { return a >> b; }
 #endif
 
 #if defined(OS_CUSTOM_LSHR) || ((ULONG_MAX >> 1UL) != ULONG_MAX/2)
   /* unsigned a >> unsigned b != a LSHR b, so implement with bit masking */
-  inline int32 t3_lshr(int32 a, int32 b) {
-      return ((a >> b) & ~(~0 << (sizeof(int32)*CHAR_BIT - b)));
+  inline int32_t t3_lshr(int32_t a, int32_t b) {
+      return ((a >> b) & ~(~0 << (sizeof(int32_t)*CHAR_BIT - b)));
   }
 #else
-  /* unsigned a >> unsigned b == a LSHR b, so we can use >> */
-  inline int32 t3_lshr(int32 a, int32 b) {
-      return (int32)((uint32)a >> (uint32)b);
+  /* 
+   *   unsigned a >> unsigned b == a LSHR b, so we can use >>; note that we
+   *   explicit mask the left operand to 32 bits in case we're on a 64-bit or
+   *   larger platform, as the T3 VM itself is defined as a 32-bit machine 
+   */
+  inline int32_t t3_lshr(int32_t a, int32_t b) {
+      return (int32_t)((uint32_t)a >> (uint32_t)b);
   }
 #endif
 

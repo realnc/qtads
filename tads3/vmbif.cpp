@@ -710,7 +710,7 @@ int CVmBif::pop_int_or_nil(VMG_ int defval)
 /*
  *   Pop a long integer value 
  */
-int32 CVmBif::pop_long_val(VMG0_)
+int32_t CVmBif::pop_long_val(VMG0_)
 {
     /* pop a number */
     vm_val_t val;

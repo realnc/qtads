@@ -23,12 +23,12 @@ Modified
 struct isaacctx
 {
     /* RNG context */
-    uint32 cnt;
-    uint32 rsl[ISAAC_RANDSIZ];
-    uint32 mem[ISAAC_RANDSIZ];
-    uint32 a;
-    uint32 b;
-    uint32 c;
+    uint32_t cnt;
+    uint32_t rsl[ISAAC_RANDSIZ];
+    uint32_t mem[ISAAC_RANDSIZ];
+    uint32_t a;
+    uint32_t b;
+    uint32_t c;
 };
 
 #define isaac_rand(r) \

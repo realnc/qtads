@@ -1647,7 +1647,7 @@ static void write_num_bytes(class CVmDataSource *dst,
  *   (0x80) set, to indicate that more bytes follow.  We can store integers
  *   or BigNumber values in this format.  
  */
-static void encode_ber(char *buf, size_t &blen, uint32 l)
+static void encode_ber(char *buf, size_t &blen, uint32_t l)
 {
     /* nothing in the buffer yet */
     blen = 0;
@@ -1679,12 +1679,12 @@ static void encode_ber(char *buf, size_t &blen, uint32 l)
 /*
  *   Decode a BER-encoded integer. 
  */
-static int32 decode_ber(const char *buf, size_t len)
+static int32_t decode_ber(const char *buf, size_t len)
 {
     /* decode the bytes, starting from the least significant */
     size_t i = len;
     int shift = 0;
-    int32 val = 0;
+    int32_t val = 0;
     do
     {
         val += buf[--i] << shift;
@@ -2729,7 +2729,7 @@ void CVmPack::unpack_item(VMG_ vm_val_t *val,
                  *   overflow 
                  */
                 count = (int)l;
-                if (l > (INT_MAX & 0xFFFFFFFF))
+                if (l > INT_MAX)
                     err_throw(VMERR_NUM_OVERFLOW);
             }
             else

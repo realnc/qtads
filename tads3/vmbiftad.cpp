@@ -1232,7 +1232,7 @@ void RandStrParser::exec(VMG_ vm_val_t *result)
  */
 void CVmBifTADS::rand(VMG_ uint argc)
 {
-    int32 range;
+    int32_t range;
     int use_range;
     int choose_an_arg = FALSE;
     int choose_an_ele = FALSE;

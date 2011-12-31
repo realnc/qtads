@@ -1060,7 +1060,7 @@ public:
      *   will be kept with its associated anchor to allow for relocation
      *   of the function during the linking process.  
      */
-    void set_abs_addr(uint32 addr)
+    void set_abs_addr(uint32_t addr)
     {
         /* remember the address */
         abs_addr_ = addr;

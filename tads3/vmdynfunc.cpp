@@ -1333,7 +1333,7 @@ public:
     }
 
     /* validate a constant pool list address */
-    virtual int validate_pool_str(uint32 ofs)
+    virtual int validate_pool_str(uint32_t ofs)
     {
         /* establish globals */
         VMGLOB_PTR(vmg);
@@ -1355,7 +1355,7 @@ public:
     }
 
     /* validate a constant pool string address */
-    virtual int validate_pool_list(uint32 ofs)
+    virtual int validate_pool_list(uint32_t ofs)
     {
         /* establish globals */
         VMGLOB_PTR(vmg);

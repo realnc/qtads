@@ -963,11 +963,11 @@ public:
         { push()->set_stack((void *)stack_ptr); }
 
     /* push an integer value */
-    void push_int(VMG_ int32 intval)
+    void push_int(VMG_ int32_t intval)
         { push()->set_int(intval); }
 
     /* push an enumerator value */
-    void push_enum(VMG_ uint32 intval)
+    void push_enum(VMG_ uint32_t intval)
         { push()->set_enum(intval); }
 
     /* push a C string value */
@@ -1379,33 +1379,33 @@ protected:
      *   get a signed 16-bit byte-code operand, incrementing the
      *   instruction pointer past the operand 
      */
-    int16 get_op_int16(const uchar **p)
+    int16_t get_op_int16(const uchar **p)
     {
-        int16 ret = (int16)osrp2s(*p);
+        int16_t ret = (int16_t)osrp2s(*p);
         *p += 2;
         return ret;
     }
 
     /* get an unsigned 16-bit byte-code operand */
-    uint16 get_op_uint16(const uchar **p)
+    uint16_t get_op_uint16(const uchar **p)
     {
-        uint16 ret = (uint16)osrp2(*p);
+        uint16_t ret = (uint16_t)osrp2(*p);
         *p += 2;
         return ret;
     }
 
     /* get a signed 32-bit byte-code operand */
-    int32 get_op_int32(const uchar **p)
+    int32_t get_op_int32(const uchar **p)
     {
-        int32 ret = (int32)osrp4s(*p);
+        int32_t ret = (int32_t)osrp4s(*p);
         *p += 4;
         return ret;
     }
 
     /* get an unsigned 32-bit byte-code operand */
-    uint32 get_op_uint32(const uchar **p)
+    uint32_t get_op_uint32(const uchar **p)
     {
-        uint32 ret = (uint32)t3rp4u(*p);
+        uint32_t ret = (uint32_t)t3rp4u(*p);
         *p += 4;
         return ret;
     }

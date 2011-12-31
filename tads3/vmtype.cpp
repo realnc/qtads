@@ -218,7 +218,7 @@ int vm_val_t::gen_compare_to(VMG_ const vm_val_t *v) const
 
     case VM_INT:
         {
-            int32 a, b;
+            int32_t a, b;
             
             /* the comparison is legal only for another number */
             if (!v->is_numeric())
@@ -250,7 +250,7 @@ int vm_val_t::gen_compare_to(VMG_ const vm_val_t *v) const
 /*
  *   Cast to integer 
  */
-int32 vm_val_t::cast_to_int(VMG0_) const
+int32_t vm_val_t::cast_to_int(VMG0_) const
 {
     /* check the type */
     switch (typ)

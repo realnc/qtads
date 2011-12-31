@@ -2279,7 +2279,7 @@ void CVmObjTads::change_superclass_list(VMG_ const vm_val_t *lst, int cnt)
     int i;
 
     /* keep the count within range */
-    cnt = (cnt > USHORTMAXVAL ? USHORTMAXVAL : cnt < 0 ? 0 : cnt);
+    cnt = (cnt > UINT16MAXVAL ? UINT16MAXVAL : cnt < 0 ? 0 : cnt);
     
     /* 
      *   if we're increasing the number of superclasses, expand our object

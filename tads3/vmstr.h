@@ -291,7 +291,7 @@ public:
      *   'flags' is a combination of TOSTR_xxx flags (see vmobj.h).  
      */
     static char *cvt_int_to_str(char *buf, size_t buflen,
-                                int32 inval, int radix, int flags);
+                                int32_t inval, int radix, int flags);
 
     /*
      *   Allocate a string buffer large enough to hold a given value.

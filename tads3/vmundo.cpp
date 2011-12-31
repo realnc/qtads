@@ -295,7 +295,7 @@ void CVmUndo::add_new_record_prop_key(VMG_ vm_obj_id_t obj, vm_prop_id_t key,
 /*
  *   Add a new record with an integer key 
  */
-void CVmUndo::add_new_record_int_key(VMG_ vm_obj_id_t obj, uint32 key,
+void CVmUndo::add_new_record_int_key(VMG_ vm_obj_id_t obj, uint32_t key,
                                      const vm_val_t *val)
 {
     CVmUndoRecord *rec;

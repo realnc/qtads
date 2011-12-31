@@ -107,6 +107,31 @@ extern "C" {
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   ANSI C99 exact-size integer types.
+ *   
+ *   C99 defines a set of integer types with exact bit sizes, named intXX_t
+ *   for a signed integer with XX bits, and uintXX_t for unsigned.  XX can be
+ *   8, 16, 32, or 64.  TADS uses the 16- and 32-bit sizes, so each platform
+ *   is responsible for defining the following types:
+ *   
+ *.    int16_t   - a signed integer type storing EXACTLY 16 bits
+ *.    uint16_t  - an unsigned integer type storing EXACTLY 16 bits
+ *.    int32_t   - a signed integer type storing EXACTLY 32 bits
+ *.    uint32_t  - an unsigned integer type storing EXACTLY 32 bits
+ *   
+ *   Many modern compilers provide definitions for these types via the
+ *   standard header stdint.h.  Where stdint.h is provided, the platform code
+ *   can merely #include <stdint.h>.
+ *   
+ *   For compilers where stdint.h isn't available, you must provide suitable
+ *   typedefs.  Note that the types must be defined with the exact bit sizes
+ *   specified; it's not sufficient to use a bigger type, because we depend
+ *   in some cases on overflow and sign extension behavior at the specific
+ *   bit size.
+ */
+
+/* ------------------------------------------------------------------------ */
+/*
  *   Hardware Configuration.  Define the following functions appropriately
  *   for your hardware.  For efficiency, these functions should be defined
  *   as macros if possible.
@@ -1274,7 +1299,19 @@ int os_gen_temp_filename(char *buf, size_t buflen);
 
 /* ------------------------------------------------------------------------ */
 /*
- *   Switch to a new working directory.  
+ *   Basic directory/folder management routines
+ */
+
+/*
+ *   Switch to a new working directory.
+ *   
+ *   This is meant to behave similarly to the Unix concept of a working
+ *   directory, in that it sets the base directory assumed for subsequent
+ *   file operations (e.g., the osfopxx() functions, osfdel(), etc - anything
+ *   that takes a filename or directory name as an argument).  The working
+ *   directory applies to filenames specified with relative paths in the
+ *   local system notation.  File operations on filenames specified with
+ *   absolute paths, of course, ignore the working directory.
  */
 void os_set_pwd(const char *dir);
 
@@ -1285,6 +1322,30 @@ void os_set_pwd(const char *dir);
  *   os_set_pwd() to switch to that directory.  
  */
 void os_set_pwd_file(const char *filename);
+
+/*
+ *   Create a directory.  This creates a new directory/folder with the given
+ *   name, which may be given as a relative or absolute path.  Returns true
+ *   on success, false on failure.
+ *   
+ *   If the directory has mulitiple path elements, this routine should create
+ *   each enclosing parent that doesn't already exist.  For example, if the
+ *   path is specified as "a/b/c", and there exists a folder "a" in the
+ *   working directory, but "a" is empty, this should first create "b" and
+ *   then create "c".  If an error occurs creating any parent, the routine
+ *   should simply stop and return failure.  (Optionally, the routine may
+ *   attempt to behave atomically by undoing any parent folder creations it
+ *   accomplished before failing on a nested folder, but this isn't required.
+ *   To reduce the chances of a failure midway through the operation, the
+ *   routine might want to scan the filename before starting to ensure that
+ *   it contains only valid characters, since an invalid character is the
+ *   most likely reason for a failure part of the way through.)
+ *   
+ *   We recommend making the routine flexible in terms of the notation it
+ *   accepts; e.g., on Unix, "/dir/sub/folder" and "/dir/sub/folder/" should
+ *   be considered equivalent.
+ */
+int os_mkdir(const char *dir);
 
 
 /* ------------------------------------------------------------------------ */

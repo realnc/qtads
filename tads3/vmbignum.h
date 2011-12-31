@@ -694,7 +694,7 @@ public:
      *   BigNumber value 
      */
     static const char *cvt_int_to_string_buf(
-        VMG_ char *buf, size_t buflen, int32 intval,
+        VMG_ char *buf, size_t buflen, int32_t intval,
         int max_digits, int whole_places, int frac_digits, int exp_digits,
         ulong flags);
 
@@ -797,22 +797,22 @@ public:
      *   Convert to an integer value (signed or unsigned).  We set 'ov' to
      *   true if the value overflows the integer type. 
      */
-    long convert_to_int(int &ov) const;
-    ulong convert_to_uint(int &ov) const;
+    int32_t convert_to_int(int &ov) const;
+    uint32_t convert_to_uint(int &ov) const;
 
     /* convert to integer, throwing an error on overflow */
-    long convert_to_int() const
+    int32_t convert_to_int() const
     {
         int ov;
-        long l = convert_to_int(ov);
+        int32_t l = convert_to_int(ov);
         if (ov)
             err_throw(VMERR_NUM_OVERFLOW);
         return l;
     }
-    ulong convert_to_uint() const
+    uint32_t convert_to_uint() const
     {
         int ov;
-        ulong l = convert_to_uint(ov);
+        uint32_t l = convert_to_uint(ov);
         if (ov)
             err_throw(VMERR_NUM_OVERFLOW);
         return l;
@@ -892,7 +892,7 @@ protected:
     int cvt_to_bignum(VMG_ vm_obj_id_t self, vm_val_t *val) const;
 
     /* get the magnitude of the integer conversion, ignoring the sign bit */
-    static ulong convert_to_int_base(const char *ext, int &ov);
+    static uint32_t convert_to_int_base(const char *ext, int &ov);
 
     /* 
      *   general string conversion routine - converts to a string, storing
@@ -1243,7 +1243,7 @@ protected:
                             unsigned long *remp = 0);
 
     /* divide by 2^32 */
-    static void div_by_2e32(char *ext, unsigned long *remainder);
+    static void div_by_2e32(char *ext, uint32_t *remainder);
 
     /* 
      *   store the portable 64-bit integer representation of the absolute

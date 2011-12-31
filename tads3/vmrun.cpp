@@ -3510,7 +3510,7 @@ resume_execution:
 
                     case ERR_TYPE_ULONG:
                         /* push the value */
-                        push_int(vmg_ (int32)err->get_param_ulong(i));
+                        push_int(vmg_ (int32_t)err->get_param_ulong(i));
                         break;
 
                     case ERR_TYPE_TEXTCHAR:
@@ -4234,7 +4234,7 @@ const uchar *CVmRun::do_call_func_nr(VMG_ uint caller_ofs,
     (fp++)->set_codeptr(entry_ptr_native_);
 
     /* push the actual parameter count */
-    (fp++)->set_int((int32)argc);
+    (fp++)->set_int((int32_t)argc);
 
     /* push the current frame pointer */
     (fp++)->set_stack(frame_ptr_);
@@ -4378,7 +4378,7 @@ const uchar *CVmRun::do_call(VMG_ uint caller_ofs,
     (fp++)->set_codeptr(entry_ptr_native_);
 
     /* push the actual parameter count */
-    (fp++)->set_int((int32)argc);
+    (fp++)->set_int((int32_t)argc);
 
     /* push the current frame pointer */
     (fp++)->set_stack(frame_ptr_);

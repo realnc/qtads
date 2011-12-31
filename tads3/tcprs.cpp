@@ -1313,7 +1313,7 @@ void CTcConstVal::set_sstr(const CTcToken *tok)
         set_sstr("", 0);
 }
 
-void CTcConstVal::set_sstr(uint32 ofs)
+void CTcConstVal::set_sstr(uint32_t ofs)
 {
     typ_ = TC_CVT_SSTR;
     val_.strval_.strval_ = 0;
@@ -1336,7 +1336,7 @@ void CTcConstVal::set_list(CTPNList *lst)
     G_cg->note_list(lst->get_count());
 }
 
-void CTcConstVal::set_list(uint32 ofs)
+void CTcConstVal::set_list(uint32_t ofs)
 {
     typ_ = TC_CVT_LIST;
     val_.listval_.l_ = 0;

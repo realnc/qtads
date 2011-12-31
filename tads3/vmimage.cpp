@@ -85,7 +85,7 @@ public:
     }
 
     /* add a resource */
-    void add_resource(uint32 seek_ofs, uint32 siz,
+    void add_resource(uint32_t seek_ofs, uint32_t siz,
                       const char *res_name, size_t res_name_len)
     {
         /* call the host system interface to add the resource */
@@ -1397,8 +1397,8 @@ void CVmImageLoader::load_mres(ulong siz, CVmImageLoaderMres *res_ifc)
     /* read the entries */
     for (i = 0 ; i < entry_cnt ; ++i)
     {
-        uint32 entry_ofs;
-        uint32 entry_size;
+        uint32_t entry_ofs;
+        uint32_t entry_size;
         uint entry_name_len;
         char name_buf[256];
         char *p;

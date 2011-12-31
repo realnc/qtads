@@ -164,8 +164,8 @@ VM_GLOBALS_BEGIN
     *   program so that CVmObject::iter_next() has quick access to these
     *   properties for executing iterator loops.  
     */
-   VM_GLOBAL_VARDEF(uint16, iter_get_next)
-   VM_GLOBAL_VARDEF(uint16, iter_next_avail)
+   VM_GLOBAL_VARDEF(uint16_t, iter_get_next)
+   VM_GLOBAL_VARDEF(uint16_t, iter_next_avail)
 
    /* system debug log file name */
    VM_GLOBAL_ARRAYDEF(char, syslogfile, OSFNMAX)

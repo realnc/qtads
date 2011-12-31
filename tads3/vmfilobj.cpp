@@ -1617,7 +1617,7 @@ io_error:
 /*
  *   Internal read routine 
  */
-int CVmObjFile::read_file(VMG_ char *buf, int32 &len)
+int CVmObjFile::read_file(VMG_ char *buf, int32_t &len)
 {
     /* get the data source */
     CVmDataSource *fp = get_ext()->fp;
@@ -1641,7 +1641,7 @@ int CVmObjFile::read_file(VMG_ char *buf, int32 &len)
                 ->get_to_uni(vmg0_);
 
             /* loop until we satisfy the request */
-            int32 actual;
+            int32_t actual;
             for (actual = 0 ; ; )
             {
                 /* peek at the next character */
@@ -1652,7 +1652,7 @@ int CVmObjFile::read_file(VMG_ char *buf, int32 &len)
 
                 /* make sure it'll fit */
                 size_t csiz = utf8_ptr::s_wchar_size(ch);
-                if (actual + (int32)csiz > len)
+                if (actual + (int32_t)csiz > len)
                     break;
 
                 /* store this character */
@@ -2149,7 +2149,7 @@ int CVmObjFile::getp_write_bytes(VMG_ vm_obj_id_t self, vm_val_t *retval,
         {
             /* read the next chunk of bytes */
             char buf[1024];
-            int32 cur = (len < (int32)sizeof(buf) ? len : sizeof(buf));
+            int32_t cur = (len < (int32_t)sizeof(buf) ? len : sizeof(buf));
             if (!file->read_file(vmg_ buf, cur))
                 G_interpreter->throw_new_class(vmg_ G_predef->file_io_exc,
                                                0, "file I/O error");

@@ -366,7 +366,7 @@ public:
     ulong get_static_cs_ofs() const { return static_cs_ofs_; }
 
     /* get the entrypoint function's code pool offset */
-    uint32 get_entrypt() const { return entrypt_; }
+    uint32_t get_entrypt() const { return entrypt_; }
 
 private:
     /* load external resource files associated with an image file */
@@ -489,7 +489,7 @@ private:
     char timestamp_[24];
 
     /* code pool offset of entrypoint function */
-    uint32 entrypt_;
+    uint32_t entrypt_;
 
     /* pool tracking objects */
     class CVmImagePool *pools_[2];
@@ -621,7 +621,7 @@ public:
     virtual ~CVmImageLoaderMres() { }
 
     /* load a resource */
-    virtual void add_resource(uint32 seek_ofs, uint32 siz,
+    virtual void add_resource(uint32_t seek_ofs, uint32_t siz,
                               const char *res_name, size_t res_name_len) = 0;
 
     /* load a resource link */

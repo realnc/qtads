@@ -291,6 +291,9 @@ Modified
 /* "source-file-name (from library library-name)" */
 #define TCERR_SOURCE_FROM_LIB      10609
 
+/* cannot create directory "%s" */
+#define TCERR_CANNOT_CREATE_DIR    10610
+
 
 /* ------------------------------------------------------------------------ */
 /*

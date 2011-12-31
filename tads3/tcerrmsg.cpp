@@ -536,6 +536,13 @@ const err_msg_t tc_messages_english[] =
     "\"%s\" (from library \"%s\")",
     "\"%s\" (from library \"%s\")" },
 
+    { TCERR_CANNOT_CREATE_DIR,
+    "unable to create directory \"%s\"",
+    "An error occurred creating the directory/folder \"%s\". This might "
+    "mean that the name contains invalid characters, the disk is "
+    "full, or you don't have the necessary permissions or privileges "
+    "to create a new file in the parent folder." },
+
     { TCERR_CONST_DIV_ZERO,
     "divide by zero in constant expression",
     "Division by zero in constant expression.  (The compiler was trying "

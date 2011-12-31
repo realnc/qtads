@@ -33,7 +33,7 @@ Modified
  *   Constant pool/code offset.  This is an address of an object in the
  *   pool.  Pool offsets are 32-bit values.  
  */
-typedef uint32 pool_ofs_t;
+typedef uint32_t pool_ofs_t;
 
 /*
  *   Savepoint ID's are stored in a single byte; since we store many
@@ -51,7 +51,7 @@ const vm_savept_t VM_SAVEPT_MAX = 255;
  *   as an invalid object ID (a null pointer, effectively); no object can
  *   ever have this ID.  
  */
-typedef uint32 vm_obj_id_t;
+typedef uint32_t vm_obj_id_t;
 const vm_obj_id_t VM_INVALID_OBJ = 0;
 
 /*
@@ -59,7 +59,7 @@ const vm_obj_id_t VM_INVALID_OBJ = 0;
  *   distinguished value that serves as an invalid property ID, which can
  *   be used to indicate the absence of a property value.  
  */
-typedef uint16 vm_prop_id_t;
+typedef uint16_t vm_prop_id_t;
 const vm_prop_id_t VM_INVALID_PROP = 0;
 
 /*
@@ -229,10 +229,10 @@ struct vm_val_t
         vm_prop_id_t prop;
 
         /* 32-bit integer */
-        int32 intval;
+        int32_t intval;
 
         /* enumerated constant */
-        uint32 enumval;
+        uint32_t enumval;
 
         /* sstring/dstring/list constant pool offset/pcode pool offset */
         pool_ofs_t ofs;
@@ -256,8 +256,8 @@ struct vm_val_t
     void set_codeptr(const void *ptr) { typ = VM_CODEPTR; val.ptr = ptr; }
     void set_obj(vm_obj_id_t obj) { typ = VM_OBJ; val.obj = obj; }
     void set_propid(vm_prop_id_t prop) { typ = VM_PROP; val.prop = prop; }
-    void set_int(int32 intval) { typ = VM_INT; val.intval = intval; }
-    void set_enum(uint32 enumval) { typ = VM_ENUM; val.enumval = enumval; }
+    void set_int(int32_t intval) { typ = VM_INT; val.intval = intval; }
+    void set_enum(uint32_t enumval) { typ = VM_ENUM; val.enumval = enumval; }
     void set_sstring(pool_ofs_t ofs) { typ = VM_SSTRING; val.ofs = ofs; }
     void set_dstring(pool_ofs_t ofs) { typ = VM_DSTRING; val.ofs = ofs; }
     void set_list(pool_ofs_t ofs) { typ = VM_LIST; val.ofs = ofs; }
@@ -400,7 +400,7 @@ struct vm_val_t
      *   Convert a numeric value to an integer.  If the value is not
      *   numeric, we'll throw an error. 
      */
-    int32 num_to_int() const
+    int32_t num_to_int() const
     {
         /* check the type */
         if (typ == VM_INT)
@@ -424,7 +424,7 @@ struct vm_val_t
     /* 
      *   Cast to an integer value.  
      */
-    int32 cast_to_int(VMG0_) const;
+    int32_t cast_to_int(VMG0_) const;
 
     /*
      *   Cast to a numeric type - integer or BigNumber.  If the value is
@@ -661,22 +661,22 @@ inline size_t vmb_get_len(const char *buf) { return osrp2(buf); }
  *   Portable binary unsigned 2-byte integer 
  */
 const size_t VMB_UINT2 = 2;
-inline void vmb_put_uint2(char *buf, uint16 i) { oswp2(buf, i); }
-inline uint16 vmb_get_uint2(const char *buf) { return osrp2(buf); }
+inline void vmb_put_uint2(char *buf, uint16_t i) { oswp2(buf, i); }
+inline uint16_t vmb_get_uint2(const char *buf) { return osrp2(buf); }
 
 /*
  *   Portable binary unsigned 4-byte integer 
  */
 const size_t VMB_UINT4 = 4;
-inline void vmb_put_uint4(char *buf, uint32 i) { oswp4(buf, i); }
-inline uint32 vmb_get_uint4(const char *buf) { return osrp4(buf); }
+inline void vmb_put_uint4(char *buf, uint32_t i) { oswp4(buf, i); }
+inline uint32_t vmb_get_uint4(const char *buf) { return osrp4(buf); }
 
 /*
  *   Portable binary signed 4-byte integer 
  */
 const size_t VMB_INT4 = 4;
-inline void vmb_put_int4(char *buf, int32 i) { oswp4s(buf, i); }
-inline int32 vmb_get_int4(const char *buf) { return osrp4s(buf); }
+inline void vmb_put_int4(char *buf, int32_t i) { oswp4s(buf, i); }
+inline int32_t vmb_get_int4(const char *buf) { return osrp4s(buf); }
 
 /*
  *   Portable binary object ID. 
@@ -735,8 +735,8 @@ inline vm_obj_id_t vmb_get_dh_obj(const char *buf)
     { return (vm_obj_id_t)t3rp4u(buf+1); }
 
 /* get an integer value from a portable dataholder */
-inline int32 vmb_get_dh_int(const char *buf)
-    { return (int32)osrp4s(buf+1); }
+inline int32_t vmb_get_dh_int(const char *buf)
+    { return (int32_t)osrp4s(buf+1); }
 
 /* get a property ID value from a portable dataholder */
 inline vm_prop_id_t vmb_get_dh_prop(const char *buf)

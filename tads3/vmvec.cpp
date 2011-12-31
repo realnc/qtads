@@ -49,9 +49,10 @@ Modified
  *   allocation size (OSMALMAX) divided by the element size (DATAHOLDER)
  *   divided minus overhead. 
  */
-const int32 VEC_MAX_BY_ALO = (int32)(OSMALMAX/(VMB_DATAHOLDER + 1.0/8)) - 4;
-const int32 VEC_MAX_ELEMENTS = (VEC_MAX_BY_ALO < 0xFFFF
-                                ? VEC_MAX_BY_ALO : 0xFFFF);
+const int32_t VEC_MAX_BY_ALO =
+    (int32_t)(OSMALMAX/(VMB_DATAHOLDER + 1.0/8)) - 4;
+const int32_t VEC_MAX_ELEMENTS =
+    (VEC_MAX_BY_ALO < 0xFFFF ? VEC_MAX_BY_ALO : 0xFFFF);
 
 
 /* ------------------------------------------------------------------------ */
@@ -839,7 +840,7 @@ void CVmObjVector::load_image_data(VMG_ const char *ptr, size_t siz)
 int CVmObjVector::index_val_q(VMG_ vm_val_t *result, vm_obj_id_t,
                               const vm_val_t *index_val)
 {
-    uint32 idx;
+    uint32_t idx;
 
     /* get the index value as an integer */
     idx = index_val->num_to_int();
@@ -867,7 +868,7 @@ int CVmObjVector::set_index_val_q(VMG_ vm_val_t *new_container,
                                   const vm_val_t *index_val,
                                   const vm_val_t *new_val)
 {
-    uint32 idx;
+    uint32_t idx;
 
     /* get the index value as an integer */
     idx = index_val->num_to_int();
@@ -2406,8 +2407,8 @@ int CVmObjVector::getp_set_length(VMG_ vm_obj_id_t self, vm_val_t *retval,
                                   uint *argc)
 {
     size_t old_len;
-    int32 new_len;
-    int32 idx;
+    int32_t new_len;
+    int32_t idx;
     vm_val_t nil_val;
     static CVmNativeCodeDesc desc(1);
     

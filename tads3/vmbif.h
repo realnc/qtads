@@ -320,7 +320,7 @@ public:
 
     /* pop an integer/long value */
     static int pop_int_val(VMG0_);
-    static int32 pop_long_val(VMG0_);
+    static int32_t pop_long_val(VMG0_);
 
     /* pop an integer value, or use a default if the argument is nil */
     static int pop_int_or_nil(VMG_ int defval);

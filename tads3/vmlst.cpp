@@ -723,7 +723,7 @@ int CVmObjList::index_val_q(VMG_ vm_val_t *result, vm_obj_id_t /*self*/,
 void CVmObjList::index_list(VMG_ vm_val_t *result, const char *lst,
                             const vm_val_t *index_val)
 {
-    uint32 idx;
+    uint32_t idx;
     
     /* get the index value as an integer */
     idx = index_val->num_to_int();
@@ -780,7 +780,7 @@ void CVmObjList::set_index_list(VMG_ vm_val_t *result, const char *lst,
                                 const vm_val_t *index_val,
                                 const vm_val_t *new_val)
 {
-    uint32 idx;
+    uint32_t idx;
     CVmObjList *obj;
 
     /* get the index value as an integer */

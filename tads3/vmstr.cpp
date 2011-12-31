@@ -880,10 +880,10 @@ const char *CVmObjString::cvt_to_str(VMG_ vm_val_t *new_str,
  *   at the beginning of the buffer.  
  */
 char *CVmObjString::cvt_int_to_str(char *buf, size_t buflen,
-                                   int32 inval, int radix, int flags)
+                                   int32_t inval, int radix, int flags)
 {
     int neg;
-    uint32 val;
+    uint32_t val;
     char *p;
     size_t len;
 
@@ -906,7 +906,7 @@ char *CVmObjString::cvt_int_to_str(char *buf, size_t buflen,
         neg = FALSE;
 
         /* use the value as-is */
-        val = (uint32)inval;
+        val = (uint32_t)inval;
     }
     else
     {   
@@ -914,7 +914,7 @@ char *CVmObjString::cvt_int_to_str(char *buf, size_t buflen,
         neg = TRUE;
 
         /* use the positive value for the conversion */
-        val = (uint32)(-inval);
+        val = (uint32_t)(-inval);
     }
 
     /* store numerals in reverse order */
@@ -3282,7 +3282,7 @@ int CVmObjString::specialsTo(VMG_ vm_val_t *retval,
                 tag_prop = G_predef->string_sth_tag;
 
                 /* get the flags */
-                int32 flags = 0;
+                int32_t flags = 0;
                 if (flags_prop != VM_INVALID_OBJ)
                 {
                     /* get the property */

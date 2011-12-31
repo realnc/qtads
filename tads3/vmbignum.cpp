@@ -1415,11 +1415,11 @@ void CVmObjBigNum::set_double_val(char *ext, double val)
 /*
  *   Convert to an integer value 
  */
-long CVmObjBigNum::convert_to_int(int &ov) const
+int32_t CVmObjBigNum::convert_to_int(int &ov) const
 {
     /* get the magnitude */
     ov = FALSE;
-    ulong m = convert_to_int_base(ext_, ov);
+    uint32_t m = convert_to_int_base(ext_, ov);
 
     /* apply the sign and check limits */
     if (get_neg(ext_))
@@ -1452,7 +1452,7 @@ long CVmObjBigNum::convert_to_int(int &ov) const
 /*
  *   Convert to unsigned int 
  */
-ulong CVmObjBigNum::convert_to_uint(int &ov) const
+uint32_t CVmObjBigNum::convert_to_uint(int &ov) const
 {
     /* negative numbers can't be converted to unsigned */
     ov = get_neg(ext_);
@@ -1464,7 +1464,7 @@ ulong CVmObjBigNum::convert_to_uint(int &ov) const
 /*
  *   Get the magnitude of an integer value, ignoring the sign
  */
-ulong CVmObjBigNum::convert_to_int_base(const char *ext, int &ov)
+uint32_t CVmObjBigNum::convert_to_int_base(const char *ext, int &ov)
 {
     size_t prec = get_prec(ext);
     int exp = get_exp(ext);
@@ -1473,7 +1473,7 @@ ulong CVmObjBigNum::convert_to_int_base(const char *ext, int &ov)
     int round_inc;
     
     /* start the accumulator at zero */
-    unsigned long acc = 0;
+    uint32_t acc = 0;
 
     /* get the rounding direction for truncating at the decimal point */
     round_inc = get_round_dir(ext, exp);
@@ -1505,13 +1505,13 @@ ulong CVmObjBigNum::convert_to_int_base(const char *ext, int &ov)
             int dig = get_dig(ext, idx);
 
             /* make sure that shifting the accumulator won't overflow */
-            ov |= (acc > (ULONG_MAX & 0xFFFFFFFF)/10);
+            ov |= (acc > UINT32MAXVAL/10);
 
             /* shift the accumulator */
             acc *= 10;
             
             /* make sure this digit won't overflow the 32-bit VM int type */
-            ov |= (acc > ((ULONG_MAX & 0xFFFFFFFF) - dig));
+            ov |= (acc > (UINT32MAXVAL - dig));
 
             /* add the digit */
             acc += dig;
@@ -1519,7 +1519,7 @@ ulong CVmObjBigNum::convert_to_int_base(const char *ext, int &ov)
     }
 
     /* make sure rounding won't overflow */
-    ov |= (acc > (ULONG_MAX & 0xFFFFFFFF) - round_inc);
+    ov |= (acc > UINT32MAXVAL - round_inc);
 
     /* return the result adjusted for rounding */
     return acc + round_inc;
@@ -1596,7 +1596,7 @@ void CVmObjBigNum::wp8abs(char *buf, int &ov) const
      *   halves for us, which are then easy to arrange into the buffer with
      *   integer arithmetic.  
      */
-    ulong lo, hi;
+    uint32_t lo, hi;
     div_by_2e32(tmp, &lo);
     hi = convert_to_int_base(tmp, ov);
 
@@ -2182,10 +2182,15 @@ void CVmObjBigNum::convert_to_ieee754(VMG_ char *buf, int bits, int &ov)
     compute_ln_into(vmg_ t1, t2);
     compute_quotient_into(vmg_ t2, 0, t1, ln2);
 
-    /* get the whole part as an integer - this is the "B" value as above */
+    /* 
+     *   Get the whole part as an integer - this is the "B" value as above.
+     *   Note that this will definitely fit in a 32-bit integer type:
+     *   BigNumber stores absolute values in the range 10^-32768 to 10^32767,
+     *   so log2(self) can range from about -108000 to +108000.
+     */
     copy_val(t1, t2, FALSE);
     compute_whole(t1);
-    int b = convert_to_int_base(t1, ov);
+    int32_t b = convert_to_int_base(t1, ov);
     if (get_neg(t1))
         b = -b;
 
@@ -2612,7 +2617,7 @@ const char *CVmObjBigNum::cvt_to_string_buf(
  *   creating a BigNumber object. 
  */
 const char *CVmObjBigNum::cvt_int_to_string_buf(
-    VMG_ char *buf, size_t buflen, int32 intval,
+    VMG_ char *buf, size_t buflen, int32_t intval,
     int max_digits, int whole_places, int frac_digits, int exp_digits,
     ulong flags)
 {
@@ -3956,7 +3961,7 @@ void CVmObjBigNum::mul_by_long(char *ext, unsigned long val)
  *   of div_by_long() for splitting a number into 32-bit chunks.  Returns
  *   with the quotient in 'ext', and the remainder in 'remp'.  
  */
-void CVmObjBigNum::div_by_2e32(char *ext, unsigned long *remp)
+void CVmObjBigNum::div_by_2e32(char *ext, uint32_t *remp)
 {
     size_t in_idx;
     size_t out_idx;

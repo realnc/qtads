@@ -2843,8 +2843,8 @@ public:
     void set_list(class CTPNList *lst);
 
     /* for the debugger only: set a pre-resolved constant pool value */
-    void set_sstr(uint32 ofs);
-    void set_list(uint32 ofs);
+    void set_sstr(uint32_t ofs);
+    void set_list(uint32_t ofs);
 
     /* set an object reference value */
     void set_obj(ulong obj, enum tc_metaclass_t meta)
@@ -2927,8 +2927,8 @@ public:
      *   for debugger expressions only: the string/list as a pre-resolved
      *   constant pool address 
      */
-    uint32 get_val_str_ofs() const { return val_.strval_.pool_ofs_; }
-    uint32 get_val_list_ofs() const { return val_.listval_.pool_ofs_; }
+    uint32_t get_val_str_ofs() const { return val_.strval_.pool_ofs_; }
+    uint32_t get_val_list_ofs() const { return val_.listval_.pool_ofs_; }
 
     /* get my object reference value (no type checking) */
     ulong get_val_obj() const
@@ -3023,7 +3023,7 @@ private:
              *   data type to string or list, and setting the token value
              *   pointer for that type to null.  
              */
-            uint32 pool_ofs_;
+            uint32_t pool_ofs_;
         }
         strval_;
 
@@ -3033,7 +3033,7 @@ private:
             class CTPNList *l_;
 
             /* for debugger expressions only: the pre-resolved pool address */
-            uint32 pool_ofs_;
+            uint32_t pool_ofs_;
         }
         listval_;
 

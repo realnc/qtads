@@ -1546,7 +1546,7 @@ public:
      *   Set the absolute address.  For debugger expressions, this sets the
      *   code pool address specified in the debugger source expression. 
      */
-    virtual void set_abs_addr(uint32 addr) = 0;
+    virtual void set_abs_addr(uint32_t addr) = 0;
 
 protected:
     /* head of the fixup list for our function's code */

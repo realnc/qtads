@@ -37,15 +37,15 @@ Modified
 /* generate the group of numbers */
 void isaac_gen_group(isaacctx *ctx)
 {
-    uint32 a;
-    uint32 b;
-    uint32 x;
-    uint32 y;
-    uint32 *m;
-    uint32 *mm;
-    uint32 *m2;
-    uint32 *r;
-    uint32 *mend;
+    uint32_t a;
+    uint32_t b;
+    uint32_t x;
+    uint32_t y;
+    uint32_t *m;
+    uint32_t *mm;
+    uint32_t *m2;
+    uint32_t *r;
+    uint32_t *mend;
 
     mm = ctx->mem;
     r = ctx->rsl;
@@ -77,16 +77,16 @@ void isaac_gen_group(isaacctx *ctx)
 void isaac_init(isaacctx *ctx, int flag)
 {
     int i;
-    uint32 a;
-    uint32 b;
-    uint32 c;
-    uint32 d;
-    uint32 e;
-    uint32 f;
-    uint32 g;
-    uint32 h;
-    uint32 *m;
-    uint32 *r;
+    uint32_t a;
+    uint32_t b;
+    uint32_t c;
+    uint32_t d;
+    uint32_t e;
+    uint32_t f;
+    uint32_t g;
+    uint32_t h;
+    uint32_t *m;
+    uint32_t *r;
 
     ctx->a = ctx->b = ctx->c = 0;
     m = ctx->mem;
