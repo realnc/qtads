@@ -471,7 +471,26 @@ os_get_abs_filename( char* result_buf, size_t result_buf_size, const char* filen
 static void
 canonicalize_path( char* path )
 {
-    QByteArray canonPath(QDir(QString::fromLocal8Bit(path)).canonicalPath().toLocal8Bit());
+    // We canonicalize only the path, in case the file doesn't actually exist.
+    // QFileInfo::canonicalFilePath() doesn't work for non-existent files.
+    QFileInfo info(QString::fromLocal8Bit(path));
+    QString cleanPath;
+    if (info.isDir()) {
+        cleanPath = info.filePath();
+    } else {
+        cleanPath = info.path();
+    }
+
+    QByteArray canonPath(QDir(cleanPath).canonicalPath().toLocal8Bit());
+    // Append the filename if we previously stripped it.
+    if (not info.isDir()) {
+        QString cleanFilename(QString::fromLocal8Bit(path));
+        int i = cleanFilename.length();
+        while (cleanFilename[i] != QChar::fromAscii('/') and i > 0) {
+            --i;
+        }
+        canonPath.append(cleanFilename.mid(i).toLocal8Bit());
+    }
     qstrncpy(path, canonPath.constData(), OSFNMAX);
 }
 
