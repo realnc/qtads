@@ -1,3 +1,13 @@
+Current Git
+===========
+
+  - Fixed a bug where games could not create new files and would print a
+    "file operation prohibited by user-specified file safety level" error,
+    even if the file was being created in the game's directory and the
+    write permission setting in the configuration dialog was set to permit
+    that.
+
+
 2.1.2 - 2011/12/29
 ==================
 
