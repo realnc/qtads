@@ -610,8 +610,7 @@ CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const 
 
     QPainter painter(this->dispWidget);
     this->fSetupPainterForFont(painter, hilite, font);
-    painter.drawText(x, y + QFontMetrics(*static_cast<CHtmlSysFontQt*>(font)).ascent(),
-                     QString::fromUtf8(str, len));
+    painter.drawText(x, y + painter.fontMetrics().ascent(), QString::fromUtf8(str, len));
 }
 
 
@@ -623,7 +622,7 @@ CHtmlSysWinQt::draw_text_space( int hilite, long x, long y, CHtmlSysFont* font, 
 
     // Construct a string of spaces that's at least 'width' pixels wide.
     QString str(QChar::fromAscii(' '));
-    QFontMetrics metr(*static_cast<CHtmlSysFontQt*>(font));
+    const QFontMetrics& metr = painter.fontMetrics();
     while (metr.boundingRect(str).width() < wid) {
         str.append(QChar::fromAscii(' '));
     }
