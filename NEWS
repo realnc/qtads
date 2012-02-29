@@ -7,6 +7,9 @@ Current Git
     write permission setting in the configuration dialog was set to permit
     that.
 
+  - Some fonts ("Garamond Premier Pro" for example) could cause the interpreter
+    to crash or fall back to the Helvetica font.  This should no longer occur.
+
 
 2.1.2 - 2011/12/29
 ==================
