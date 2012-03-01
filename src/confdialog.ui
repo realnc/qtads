@@ -711,9 +711,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>The online update check will never download or install updates. It will only inform you about available updates. The automatic update check is only performed by the application at startup; no background services of any kind will be installed on your computer.
-
-Choose how often the application should check for available updates:</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The online update check will never download or install updates. It will only inform you about available updates. The automatic update check is only performed by the application at startup; no background services of any kind will be installed on your computer.&lt;/p&gt;&lt;p&gt;Choose how often the application should check for available updates:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
