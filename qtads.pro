@@ -44,7 +44,9 @@ win32 {
         QMAKE_LFLAGS += $$PWD/w32_linkscript
     }
 
-    LIBS += -lvorbisfile -lvorbis -logg -liberty
+    # We don't really need libmad and libmodplug, but my w32 SDL_mixer
+    # in my mingw-cross-env build environment does.
+    LIBS += -lmad -lmodplug -lvorbisfile -lvorbis -logg -liberty
 }
 
 RESOURCES += resources.qrc
