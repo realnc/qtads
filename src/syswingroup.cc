@@ -175,7 +175,7 @@ CHtmlSysWinGroupQt::~CHtmlSysWinGroupQt()
 bool
 CHtmlSysWinGroupQt::fAskQuitGameDialog()
 {
-    if (not qFrame->gameRunning()) {
+    if (not qFrame->settings()->confirmQuitGame or not qFrame->gameRunning()) {
         return true;
     }
 
@@ -204,7 +204,7 @@ CHtmlSysWinGroupQt::fAskQuitGameDialog()
 bool
 CHtmlSysWinGroupQt::fAskRestartGameDialog()
 {
-    if (not qFrame->gameRunning()) {
+    if (not qFrame->settings()->confirmRestartGame or not qFrame->gameRunning()) {
         return true;
     }
 
@@ -474,7 +474,7 @@ CHtmlSysWinGroupQt::fOpenNewGame()
 void
 CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 {
-    if (not qFrame->settings()->confirmQuitGame or this->fAskQuitGameDialog()) {
+    if (this->fAskQuitGameDialog()) {
         qFrame->setNextGame(action->statusTip());
     }
 }
@@ -483,7 +483,7 @@ CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 void
 CHtmlSysWinGroupQt::fEndCurrentGame()
 {
-    if (not qFrame->settings()->confirmQuitGame or this->fAskQuitGameDialog()) {
+    if (this->fAskQuitGameDialog()) {
         qFrame->setGameRunning(false);
     }
 }
@@ -492,7 +492,7 @@ CHtmlSysWinGroupQt::fEndCurrentGame()
 void
 CHtmlSysWinGroupQt::fRestartCurrentGame()
 {
-    if (not qFrame->settings()->confirmRestartGame or this->fAskRestartGameDialog()) {
+    if (this->fAskRestartGameDialog()) {
         qFrame->setNextGame(qFrame->gameFile());
     }
 }
