@@ -10,23 +10,20 @@ macx {
 
 macx {
     QMAKE_INFO_PLIST = Info.plist
-    LIBS += -framework SDL_mixer -framework SDL_sound -framework SDL
-    INCLUDEPATH += \
-        ./Frameworks/SDL.framework/Headers \
-        ./Frameworks/SDL_mixer.framework/Headers \
-        ./Frameworks/smpeg.framework/Headers \
-        ./Frameworks/SDL_sound.framework/Headers
     exists(/Developer/SDKs/MacOSX10.5.sdk) {
         QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
         QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
     } else {
         warning("OS X 10.5 SDK not found. Will use Qt defaults.")
     }
+    CONFIG += link_pkgconfig
+    PKGCONFIG += SDL_mixer
+    LIBS += -lSDL_sound
     QMAKE_CFLAGS += -fvisibility=hidden
     QMAKE_CXXFLAGS += -fvisibility=hidden
     QMAKE_CFLAGS_RELEASE += -fomit-frame-pointer
     QMAKE_CXXFLAGS_RELEASE += -fomit-frame-pointer
-    QMAKE_LFLAGS += -F./Frameworks -dead_strip
+    QMAKE_LFLAGS += -dead_strip
 } else {
     CONFIG += link_pkgconfig
     PKGCONFIG += sdl
