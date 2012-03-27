@@ -22,8 +22,10 @@ macx {
     } else {
         warning("OS X 10.5 SDK not found. Will use Qt defaults.")
     }
-    QMAKE_CFLAGS += -fvisibility=hidden -fomit-frame-pointer
-    QMAKE_CXXFLAGS += -fvisibility=hidden -fomit-frame-pointer
+    QMAKE_CFLAGS += -fvisibility=hidden
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+    QMAKE_CFLAGS_RELEASE += -fomit-frame-pointer
+    QMAKE_CXXFLAGS_RELEASE += -fomit-frame-pointer
     QMAKE_LFLAGS += -F./Frameworks -dead_strip
 } else {
     CONFIG += link_pkgconfig
@@ -37,6 +39,8 @@ win32 {
     *-g++* {
         QMAKE_CFLAGS += -march=i686 -mtune=generic
         QMAKE_CXXFLAGS += -march=i686 -mtune=generic
+        QMAKE_CFLAGS_RELEASE += -fomit-frame-pointer
+        QMAKE_CXXFLAGS_RELEASE += -fomit-frame-pointer
 
         # Dead code stripping (requires patched binutils).
         QMAKE_CFLAGS += -fdata-sections -ffunction-sections
