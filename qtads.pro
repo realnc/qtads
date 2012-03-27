@@ -338,10 +338,10 @@ SOURCES += \
     $$T3DIR/vmini_nd.cpp \
     $$T3DIR/vminit.cpp \
     $$T3DIR/vminitfl.cpp \
-	$$T3DIR/vmintcls.cpp\
+    $$T3DIR/vmintcls.cpp \
     $$T3DIR/vmisaac.cpp \
     $$T3DIR/vmiter.cpp \
-	$$T3DIR/vmlog.cpp \
+    $$T3DIR/vmlog.cpp \
     $$T3DIR/vmlookup.cpp \
     $$T3DIR/vmlst.cpp \
     $$T3DIR/vmmain.cpp \
