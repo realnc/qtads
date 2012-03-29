@@ -25,5 +25,5 @@ char G_tads_oem_app_name[] = "QTads 2.0";
 char G_tads_oem_dbg_name[] = ""; /* No debugger for Qt (yet). */
 char G_tads_oem_display_mode[] = "multimedia";
 char G_tads_oem_author[] =
-    "QTads copyright (c) 2003, 2010 by Nikos Chantziaras <realnc@gmail.com>\n";
+    "QTads copyright (c) 2003, 2012 by Nikos Chantziaras <realnc@gmail.com>\n";
 int G_tads_oem_copyright_prefix = TRUE;
