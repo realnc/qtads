@@ -4,8 +4,10 @@
 <dict>
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
+    <key>CFBundleShortVersionString</key>
+    <string>2.1.3</string>
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright © 2012, Nikos Chantziaras.</string>
+    <string>Copyright © 2012, Mike Roberts; © 2012, Nikos Chantziaras.</string>
     <key>CFBundleIconFile</key>
     <string>@ICON@</string>
     <key>CFBundlePackageType</key>
@@ -23,257 +25,43 @@
 
     <key>CFBundleDocumentTypes</key>
     <array>
-        <dict>
-            <key>CFBundleTypeIconFile</key>
+    <dict>
+        <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+        <key>CFBundleTypeExtensions</key>
+        <array>
+            <string>gam</string>
+        </array>
+        <key>CFBundleTypeIconFile</key>
             <string></string>
-            <key>CFBundleTypeName</key>
-            <string>TADS Executable</string>
-            <key>CFBundleTypeOSTypes</key>
-            <array>
-                <string>TADG</string>
-                <string>.T3X</string>
-            </array>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>LSItemContentTypes</key>
-            <array>
-                <string>org.tads.tads-game</string>
-            </array>
-            <key>LSTypeIsPackage</key>
-            <false/>
-            <key>NSDocumentClass</key>
-            <string>GameFile</string>
-            <key>NSPersistentStoreTypeKey</key>
-            <string>XML</string>
-        </dict>
-        <dict>
-            <key>CFBundleTypeExtensions</key>
-            <array>
-                <string>gam</string>
-            </array>
-            <key>CFBundleTypeIconFile</key>
-            <string></string>
-            <key>CFBundleTypeName</key>
+        <key>CFBundleTypeMIMETypes</key>
+            <string>application/x-tads</string>
+        <key>CFBundleTypeName</key>
             <string>TADS 2 Game</string>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>LSItemContentTypes</key>
-            <array>
-                <string>org.tads.tads2-game</string>
-            </array>
-            <key>LSTypeIsPackage</key>
-            <false/>
-            <key>NSDocumentClass</key>
-            <string>GameFile</string>
-            <key>NSPersistentStoreTypeKey</key>
-            <string>XML</string>
-        </dict>
-        <dict>
-            <key>CFBundleTypeExtensions</key>
-            <array>
-                <string>t3</string>
-                <string>t3x</string>
-            </array>
-            <key>CFBundleTypeIconFile</key>
+        <key>CFBundleTypeOSTypes</key>
+        <array>
+            <string>****</string>
+        </array>
+    </dict>
+    <dict>
+        <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+        <key>CFBundleTypeExtensions</key>
+        <array>
+            <string>t3</string>
+            <string>t3x</string>
+        </array>
+        <key>CFBundleTypeIconFile</key>
             <string></string>
-            <key>CFBundleTypeName</key>
-            <string>TADS 3 Executable</string>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>LSItemContentTypes</key>
-            <array>
-                <string>org.tads.tads3-game</string>
-            </array>
-            <key>LSTypeIsPackage</key>
-            <false/>
-            <key>NSDocumentClass</key>
-            <string>GameFile</string>
-            <key>NSPersistentStoreTypeKey</key>
-            <string>XML</string>
-        </dict>
-        <dict>
-            <key>CFBundleTypeExtensions</key>
-            <array>
-                <string>t3</string>
-                <string>t3x</string>
-                <string>gam</string>
-            </array>
-            <key>CFBundleTypeIconFile</key>
-            <string></string>
-            <key>CFBundleTypeName</key>
-            <string>TADS Executable with incorrect UTI</string>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>LSTypeIsPackage</key>
-            <false/>
-            <key>NSDocumentClass</key>
-            <string>GameFile</string>
-            <key>NSPersistentStoreTypeKey</key>
-            <string>XML</string>
-        </dict>
-    </array>
-
-    <key>UTImportedTypeDeclarations</key>
-    <array>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>public.data</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>TADS Executable</string>
-            <key>UTTypeIconFile</key>
-            <string></string>
-            <key>UTTypeIdentifier</key>
-            <string>org.tads.tads-game</string>
-            <key>UTTypeReferenceURL</key>
-            <string>http://www.tads.org/howto/mediatypes.htm</string>
-        </dict>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>org.tads.tads-game</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>TADS 2 Game</string>
-            <key>UTTypeIconFile</key>
-            <string></string>
-            <key>UTTypeIdentifier</key>
-            <string>org.tads.tads2-game</string>
-            <key>UTTypeReferenceURL</key>
-            <string>http://www.tads.org/howto/mediatypes.htm</string>
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>com.apple.ostype</key>
-                <string>TADG</string>
-                <key>public.filename-extension</key>
-                <array>
-                    <string>gam</string>
-                </array>
-            </dict>
-        </dict>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>org.tads.tads-game</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>TADS 3 Executable</string>
-            <key>UTTypeIconFile</key>
-            <string></string>
-            <key>UTTypeIdentifier</key>
-            <string>org.tads.tads3-game</string>
-            <key>UTTypeReferenceURL</key>
-            <string>http://www.tads.org/howto/mediatypes.htm</string>
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>com.apple.ostype</key>
-                <string>.T3X</string>
-                <key>public.filename-extension</key>
-                <array>
-                    <string>t3x</string>
-                    <string>t3</string>
-                </array>
-            </dict>
-        </dict>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>public.data</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>TADS Saved Position</string>
-            <key>UTTypeIconFile</key>
-            <string></string>
-            <key>UTTypeIdentifier</key>
-            <string>org.tads.tads-saved-game</string>
-            <key>UTTypeReferenceURL</key>
-            <string>http://www.tads.org/howto/mediatypes.htm</string>
-        </dict>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>org.tads.tads-saved-game</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>TADS 2 Saved Game</string>
-            <key>UTTypeIdentifier</key>
-            <string>org.tads.tads2-saved-game</string>
-            <key>UTTypeReferenceURL</key>
-            <string>http://www.tads.org/howto/mediatypes.htm</string>
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>com.apple.ostype</key>
-                <string>TADS</string>
-                <key>public.filename-extension</key>
-                <array>
-                    <string>sav</string>
-                </array>
-            </dict>
-        </dict>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>org.tads.tads-saved-game</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>TADS 3 Saved Position</string>
-            <key>UTTypeIdentifier</key>
-            <string>org.tads.tads3-saved-game</string>
-            <key>UTTypeReferenceURL</key>
-            <string>http://www.tads.org/howto/mediatypes.htm</string>
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>com.apple.ostype</key>
-                <string>.T3V</string>
-                <key>public.filename-extension</key>
-                <array>
-                    <string>t3v</string>
-                </array>
-            </dict>
-        </dict>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>public.data</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>TADS Resource</string>
-            <key>UTTypeIdentifier</key>
-            <string>org.tads.tads-resource-bundle</string>
-            <key>UTTypeReferenceURL</key>
-            <string>http://www.tads.org/howto/mediatypes.htm</string>
-        </dict>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>org.tads.tads-resource-bundle</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>TADS 2 Resource</string>
-            <key>UTTypeIdentifier</key>
-            <string>org.tads.tads2-resource-bundle</string>
-            <key>UTTypeReferenceURL</key>
-            <string>http://www.tads.org/howto/mediatypes.htm</string>
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>com.apple.ostype</key>
-                <string>.RS*</string>
-                <key>public.filename-extension</key>
-                <array>
-                    <string>rs0</string>
-                    <string>rs1</string>
-                    <string>rs2</string>
-                    <string>rs3</string>
-                    <string>rs4</string>
-                    <string>rs5</string>
-                    <string>rs6</string>
-                    <string>rs7</string>
-                    <string>rs8</string>
-                    <string>rs9</string>
-                </array>
-            </dict>
-        </dict>
+        <key>CFBundleTypeMIMETypes</key>
+            <string>application/x-t3vm-image</string>
+        <key>CFBundleTypeName</key>
+            <string>TADS 3 Game</string>
+        <key>CFBundleTypeOSTypes</key>
+        <array>
+            <string>****</string>
+        </array>
+    </dict>
     </array>
 </dict>
 </plist>
