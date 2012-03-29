@@ -1,5 +1,5 @@
-Current Git
-===========
+2.1.3 - 2012/03/29
+==================
 
   - Fixed a bug where games could not create new files and would print a
     "file operation prohibited by user-specified file safety level" error,
@@ -9,6 +9,17 @@ Current Git
 
   - Some fonts ("Garamond Premier Pro" for example) could cause the interpreter
     to crash or fall back to the Helvetica font.  This should no longer occur.
+
+  - The application should now no longer crash on Windows XP systems.
+
+  - A problem where games were unable to find their data files has been fixed.
+
+  - MIDI music looping should now work on Mac OS.  Previously, MIDI tracks
+    would only play once, even when the game intended them to play forever.
+
+  - Under some circumstances, the application would still prompt for
+    confirmation when quitting or restarting a game even if confirmation
+    was disabled in the preferences.  This has been corrected.
 
 
 2.1.2 - 2011/12/29
