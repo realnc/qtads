@@ -7,6 +7,7 @@
 #define QTADS_VERSION "2.1.3"
 
 
+#ifdef __cplusplus
 /* Works like qApp, but contains the global CHtmlSysFrameQt object instead.  If
  * this variable is 0, it means that no such object has been created yet.
  *
@@ -20,6 +21,7 @@ extern class CHtmlSysFrameQt* qFrame;
  * this is a singleton object and it's handy to have a global pointer to it.
  */
 extern class CHtmlSysWinGroupQt* qWinGroup;
+#endif
 
 
 #endif

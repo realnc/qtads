@@ -20,8 +20,9 @@
  */
 
 #include "std.h"
+#include "globals.h"
 
-char G_tads_oem_app_name[] = "QTads 2.0";
+char G_tads_oem_app_name[] = "QTads "QTADS_VERSION;
 char G_tads_oem_dbg_name[] = ""; /* No debugger for Qt (yet). */
 char G_tads_oem_display_mode[] = "multimedia";
 char G_tads_oem_author[] =
