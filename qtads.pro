@@ -1,7 +1,7 @@
 TEMPLATE = app
 CONFIG += qt silent warn_off
 QT += network
-VERSION = 2.1.2.99
+VERSION = 2.1.3
 
 # Static OS X builds need to explicitly include the text codec plugins.
 macx {
