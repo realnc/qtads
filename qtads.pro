@@ -2,7 +2,7 @@ QT += core gui network
 contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
 CONFIG += silent warn_off
-VERSION = 2.1.3
+VERSION = 2.1.3.99
 
 # Static OS X builds need to explicitly include the text codec plugins.
 macx {

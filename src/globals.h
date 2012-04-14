@@ -4,7 +4,7 @@
 
 /* QTads version string.
  */
-#define QTADS_VERSION "2.1.3"
+#define QTADS_VERSION "2.1.3 git"
 
 
 #ifdef __cplusplus
