@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QUrl>
 #include <QDesktopServices>
+#include <QMimeData>
 
 #include "syswininput.h"
 #include "syswinaboutbox.h"

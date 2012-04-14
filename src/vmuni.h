@@ -46,7 +46,10 @@ t3_get_chartype( wchar_t ch )
     const QChar c(ch);
 
     switch(c.category()) {
+#if QT_VERSION < 0x050000
       case QChar::NoCategory:
+#endif
+      case QChar::Other_NotAssigned:
         return T3_CTYPE_UNDEF;
 
       case QChar::Letter_Titlecase:

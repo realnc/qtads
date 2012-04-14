@@ -18,6 +18,7 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QResizeEvent>
+#include <qdrawutil.h>
 
 #include "dispwidget.h"
 #include "qtadstimer.h"

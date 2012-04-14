@@ -28,6 +28,8 @@
 #include <QMouseEvent>
 #include <QStyleOptionButton>
 #include <QColorDialog>
+#include <QDrag>
+#include <QMimeData>
 
 
 KColorButton::KColorButton( QWidget *parent )
