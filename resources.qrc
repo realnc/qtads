@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>qtads-logo.png</file>
         <file>qtads_48x48.png</file>
+        <file>qtads_72x72.png</file>
     </qresource>
 </RCC>

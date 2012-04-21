@@ -191,6 +191,7 @@ CHtmlSysWinGroupQt::fAskQuitGameDialog()
                                   " support this and can leave a stale process running in the background."
                                   " You should issue an in-game \"quit\" command in such cases."));
 #ifdef Q_WS_MAC
+    msgBox->setIconPixmap(QPixmap(QString::fromAscii(":/qtads_72x72.png")));
     // This presents the dialog as a sheet in OS X.
     msgBox->setWindowModality(Qt::WindowModal);
 #endif
@@ -220,6 +221,7 @@ CHtmlSysWinGroupQt::fAskRestartGameDialog()
                                   " do not properly support this and can leave a stale process running in the"
                                   " background. You should issue an in-game \"restart\" command in such cases."));
 #ifdef Q_WS_MAC
+    msgBox->setIconPixmap(QPixmap(QString::fromAscii(":/qtads_72x72.png")));
     // This presents the dialog as a sheet in OS X.
     msgBox->setWindowModality(Qt::WindowModal);
 #endif
@@ -293,7 +295,11 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
         if (text.length() > 2) {
             msgBox->setDetailedText(text);
         }
+#ifdef Q_WS_MAC
+        msgBox->setIconPixmap(QPixmap(QString::fromAscii(":/qtads_72x72.png")));
+#else
         msgBox->setIcon(QMessageBox::Question);
+#endif
         msgBox->setText(tr("A newer version of QTads is available. Do you want to visit the download page?"));
         msgBox->setInformativeText(tr("Note that this is only a check for new versions. Nothing will be downloaded"
                                       " or installed automatically."));
@@ -303,7 +309,11 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
             QDesktopServices::openUrl(QUrl(QString::fromAscii("http://qtads.sourceforge.net/downloads.shtml")));
         }
     } else if (not this->fSilentIfNoUpdates) {
+#ifdef Q_WS_MAC
+        msgBox->setIconPixmap(QPixmap(QString::fromAscii(":/qtads_72x72.png")));
+#else
         msgBox->setIcon(QMessageBox::Information);
+#endif
         msgBox->setText(tr("This version of QTads is up to date."));
         msgBox->exec();
     }
@@ -534,6 +544,7 @@ CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
                                   " support this and can leave a stale process running in the background."
                                   " You should issue an in-game \"quit\" command first in such cases."));
 #ifdef Q_WS_MAC
+    msgBox->setIconPixmap(QPixmap(QString::fromAscii(":/qtads_72x72.png")));
     // This presents the dialog as a sheet in OS X.
     msgBox->setWindowModality(Qt::WindowModal);
 #endif
