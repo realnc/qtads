@@ -4,6 +4,14 @@ TEMPLATE = app
 CONFIG += silent warn_off
 VERSION = 2.1.3.99
 
+# Mac OS application and file icons.
+macx {
+    ICON = QTads.icns
+    OtherIcons.files = QTadsGameFile.icns
+    OtherIcons.path = Contents/Resources
+    QMAKE_BUNDLE_DATA += OtherIcons
+}
+
 # Static OS X builds need to explicitly include the text codec plugins.
 macx {
     QTPLUGIN += qcncodecs qjpcodecs qtwcodecs qkrcodecs

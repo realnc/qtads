@@ -33,7 +33,7 @@
             <string>gam</string>
         </array>
         <key>CFBundleTypeIconFile</key>
-            <string></string>
+            <string>QTadsGameFile.icns</string>
         <key>CFBundleTypeMIMETypes</key>
             <string>application/x-tads</string>
         <key>CFBundleTypeName</key>
@@ -52,7 +52,7 @@
             <string>t3x</string>
         </array>
         <key>CFBundleTypeIconFile</key>
-            <string></string>
+            <string>QTadsGameFile.icns</string>
         <key>CFBundleTypeMIMETypes</key>
             <string>application/x-t3vm-image</string>
         <key>CFBundleTypeName</key>
