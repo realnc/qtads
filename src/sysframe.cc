@@ -94,6 +94,12 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 
     // We're the main HTML TADS frame object.
     CHtmlSysFrame::set_frame_obj(this);
+
+    // Set application window icon, unless we're on OS X where the bundle
+    // icon is used.
+#ifndef Q_WS_MAC
+    this->setWindowIcon(QIcon(QString::fromAscii(":/qtads_48x48.png")));
+#endif
 }
 
 
