@@ -12,6 +12,11 @@ macx {
     QMAKE_BUNDLE_DATA += OtherIcons
 }
 
+# MS Windows executable resource.
+win32 {
+    RC_FILE += qtads.rc
+}
+
 # Static OS X builds need to explicitly include the text codec plugins.
 macx {
     QTPLUGIN += qcncodecs qjpcodecs qtwcodecs qkrcodecs
