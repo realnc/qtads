@@ -870,7 +870,7 @@ os_input_dialog( int icon_id, const char* prompt, int standard_button_set, const
     } else for (int i = 0; i < button_count; ++i) {
         Q_ASSERT(buttons[i] != 0);
         const QString& buttonText = qFrame->tads3() ? QString::fromUtf8(buttons[i]) : t2Codec->toUnicode(buttons[i]);
-        buttonList.append(dialog.addButton(buttonText, QMessageBox::InvalidRole));
+        buttonList.append(dialog.addButton(buttonText, QMessageBox::AcceptRole));
     }
 
     if (default_index != 0) {
