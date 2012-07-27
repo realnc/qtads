@@ -35,7 +35,7 @@ Modified
 #include <sys/stat.h>
 
 #ifdef __WIN32__
-#include <Windows.h>
+#include <windows.h>
 #include <direct.h>
 #endif
 

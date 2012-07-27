@@ -23,6 +23,7 @@
  * prototypes in "osifc.h".  The only exception are static helper functions
  * that are clearly marked as such.
  */
+
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDir>
@@ -39,6 +40,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+
+// So that we can use _stat64() when building on Windows.
+#ifdef Q_OS_WIN32
+    #undef __MSVCRT_VERSION__
+    #define __MSVCRT_VERSION__  0x0601
+#endif
 
 #include "os.h"
 #include "osifcext.h"
@@ -122,7 +129,11 @@ osfdup( osfildef* orig, const char* mode )
     *p = '\0';
 
     /* duplicate the handle in the given mode */
+#ifdef Q_OS_WIN32
+    return _fdopen(_dup(_fileno(orig)), mode);
+#else
     return fdopen(dup(fileno(orig)), mode);
+#endif
 }
 
 
