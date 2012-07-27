@@ -157,6 +157,9 @@ void CHtmlResFinder::init_data()
 
     /* we have no external resource file search path directories yet */
     search_path_head_ = search_path_tail_ = 0;
+
+    /* assume we're running as a normal interpreter (not a debugger) */
+    debugger_mode_ = FALSE;
 }
 
 /*
@@ -206,24 +209,23 @@ void CHtmlResFinder::reset()
 int CHtmlResFinder::resfile_exists(const textchar_t *resname,
                                    size_t resnamelen)
 {
-    CHtmlHashEntryFileres *entry;
     char cvtbuf[OSFNMAX];
 
     /* 
      *   see if we can find an entry in the resource map - if so, it
      *   definitely exists 
      */
-    entry = (CHtmlHashEntryFileres *)restab_->find(resname, resnamelen);
+    CHtmlHashEntryFileres *entry =
+        (CHtmlHashEntryFileres *)restab_->find(resname, resnamelen);
     if (entry != 0)
         return TRUE;
 
     /* check with the local system to see if it's an embedded resource */
     if (CHtmlSysFrame::get_frame_obj() != 0)
     {
+        /* ask the system for the resource */
         unsigned long pos;
         unsigned long siz;
-
-        /* ask the system for the resource */
         if (CHtmlSysFrame::get_frame_obj()->get_exe_resource(
             resname, resnamelen, cvtbuf, sizeof(cvtbuf), &pos, &siz))
             return TRUE;
@@ -231,9 +233,12 @@ int CHtmlResFinder::resfile_exists(const textchar_t *resname,
 
     /*
      *   There's no entry in the resource map matching this name - map the
-     *   resource name to a stand-alone external filename.  
+     *   resource name to a stand-alone external filename.  If that fails,
+     *   return failure.
      */
-    resname_to_filename(cvtbuf, sizeof(cvtbuf), resname, resnamelen, TRUE);
+    if (!resname_to_filename(
+        cvtbuf, sizeof(cvtbuf), resname, resnamelen, TRUE))
+        return FALSE;
 
     /* 
      *   if the file exists, the resource exists - so, if we don't get an
@@ -282,15 +287,14 @@ int CHtmlResFinder::find_resource(CStringBuf *filenamebuf,
                                   unsigned long *res_size,
                                   osfildef **fp_ret)
 {
-    CHtmlHashEntryFileres *entry;
     char cvtbuf[OSFNMAX];
-    osfildef *fp;
     const char *fname;
     size_t fnamelen;
     int is_url;
 
     /* see if we can find an entry in the resource map */
-    entry = (CHtmlHashEntryFileres *)restab_->find(resname, resnamelen);
+    CHtmlHashEntryFileres *entry =
+        (CHtmlHashEntryFileres *)restab_->find(resname, resnamelen);
     if (entry != 0 && entry->link_.get() == 0)
     {
         /* 
@@ -331,7 +335,11 @@ int CHtmlResFinder::find_resource(CStringBuf *filenamebuf,
     }
     else
     {
-        /* check with the local system to see if it's an embedded resource */
+        /* 
+         *   check with the local system to see if it's a native embedded
+         *   resource (that is, embedded in the application executable, such
+         *   as a Mac resource fork item or a Windows .EXE resource)
+         */
         if (CHtmlSysFrame::get_frame_obj() != 0)
         {
             /* ask the system for the resource */
@@ -359,24 +367,6 @@ int CHtmlResFinder::find_resource(CStringBuf *filenamebuf,
             }
         }
 
-        /*
-         *   It's not a bundled resource in the .gam/.t3 file, and it's not
-         *   an embedded resource in the interpreter executable.  The only
-         *   possibility left is that it's an unbundled resource in an
-         *   external file.  We allow access to external files only if the
-         *   safety level is 3 (local folder read access) or lower.  
-         */
-        int read_safety = 4, write_safety = 4;
-        if (appctx_ != 0 && appctx_->get_io_safety_level != 0)
-            appctx_->get_io_safety_level(appctx_->io_safety_level_ctx,
-                                         &read_safety, &write_safety);
-        if (read_safety > 3)
-        {
-            *fp_ret = 0;
-            *res_size = 0;
-            return FALSE;
-        }
-        
         /* use the resource name as a filename, after URL conversion */
         fname = resname;
         fnamelen = resnamelen;
@@ -384,18 +374,30 @@ int CHtmlResFinder::find_resource(CStringBuf *filenamebuf,
     }
 
     /*
-     *   There's no entry in the resource map matching this name - map the
-     *   resource name to a filename, and start at offset zero in the file.  
+     *   There's no entry in the resource map matching this name.  Map the
+     *   resource name to a local filename in the resource directory; if that
+     *   fails, there's nowhere else to look, of return failure.
      */
-    resname_to_filename(cvtbuf, sizeof(cvtbuf), fname, fnamelen, is_url);
+    if (!resname_to_filename(cvtbuf, sizeof(cvtbuf), fname, fnamelen, is_url))
+    {
+        if (fp_ret != 0)
+            *fp_ret = 0;
+        *res_size = 0;
+        return FALSE;
+    }
+
+    /* 
+     *   when resource comes from an external local file, the entire file is
+     *   the single resource, so the resource data starts at offset zero 
+     */
     *start_seekpos = 0;
-    
+
     /* store the name of the stand-alone external file */
     if (filenamebuf != 0)
         filenamebuf->set(cvtbuf);
     
     /* try opening the file */
-    fp = osfoprb(cvtbuf, OSFTBIN);
+    osfildef *fp = osfoprb(cvtbuf, OSFTBIN);
     
     /* 
      *   if we failed, and the path looks like an "absolute" local path, try
@@ -461,15 +463,21 @@ int CHtmlResFinder::find_resource(CStringBuf *filenamebuf,
  *   Given a resource name, generate the external filename for the
  *   resource 
  */
-void CHtmlResFinder::resname_to_filename(char *outbuf,
-                                         size_t outbufsize,
-                                         const char *resname,
-                                         size_t resname_len,
-                                         int is_url)
+int CHtmlResFinder::resname_to_filename(
+    char *outbuf, size_t outbufsize,
+    const char *resname, size_t resname_len, int is_url)
 {
     char buf[OSFNMAX];
     char rel_fname[OSFNMAX];
 
+    /* make sure the file safety level allows read access to external files */
+    int read_safety = 4, write_safety = 4;
+    if (appctx_ != 0 && appctx_->get_io_safety_level != 0)
+        appctx_->get_io_safety_level(appctx_->io_safety_level_ctx,
+                                     &read_safety, &write_safety);
+    if (read_safety > 3)
+        return FALSE;
+        
     /* generate a null-terminated version of the resource name */
     if (resname_len > sizeof(buf) - 1)
         resname_len = sizeof(buf) - 1;
@@ -478,9 +486,31 @@ void CHtmlResFinder::resname_to_filename(char *outbuf,
 
     /* convert the URL to a filename, if desired */
     if (is_url)
-        os_cvt_url_dir(rel_fname, sizeof(rel_fname), buf, FALSE);
+        os_cvt_url_dir(rel_fname, sizeof(rel_fname), buf);
     else
         strcpy(rel_fname, buf);
+
+    /*
+     *   If we have a non-URL absolute path, and we're running as a debugger,
+     *   allow access without enforcing any sandbox restrictions.  In debug
+     *   builds, the compiler embed links to resource files rather than
+     *   actually embedding the resource data.  These links can come from
+     *   library folders or elsewhere.  In normal interpreter mode, this
+     *   could pose a security risk, as a malicious game could embed a link
+     *   to an absolute path to a system file - so we have to sandbox links
+     *   in interpreter mode, just as we sandbox any direct file reference.
+     *   But in debugger mode, the user is presumably working with the game's
+     *   source code, and in most cases with his or her own source code, so
+     *   we can assume that the code is more trusted.
+     */
+    if (debugger_mode_
+        && !is_url
+        && os_is_file_absolute(rel_fname)
+        && !osfacc(rel_fname))
+    {
+        safe_strcpy(outbuf, outbufsize, rel_fname);
+        return TRUE;
+    }
 
     /*
      *   Get the resource path prefix.  If we have an explicit resource root
@@ -492,6 +522,19 @@ void CHtmlResFinder::resname_to_filename(char *outbuf,
     {
         /* use the resource directory */
         os_build_full_path(outbuf, outbufsize, res_dir_.get(), rel_fname);
+
+        /* 
+         *   Make sure the result is within this directory; if so, and it
+         *   exists, return this file.  The same-directory check is for file
+         *   safety purposes: we don't want to let the game peek outside the
+         *   sandbox using ".." paths, symlinks, etc.  If the file safety
+         *   level is 1 or less (1 is "read any/write local", 0 is "read
+         *   any/write any"), allow read access regardless of location.
+         */
+        if ((read_safety <= 1
+             || os_is_file_in_dir(outbuf, res_dir_.get(), TRUE, FALSE))
+            && !osfacc(outbuf))
+            return TRUE;
     }
     else if (files_[0]->get_fname() != 0)
     {
@@ -500,42 +543,50 @@ void CHtmlResFinder::resname_to_filename(char *outbuf,
 
         /* build the full path */
         os_build_full_path(outbuf, outbufsize, buf, rel_fname);
+
+        /* if the result exists and satifies file safety, return it */
+        if ((read_safety <= 1
+             || os_is_file_in_dir(outbuf, buf, TRUE, FALSE))
+            && !osfacc(outbuf))
+            return TRUE;
     }
     else
     {
-        size_t len;
-
         /* 
          *   we have no root path; just use the relative filename as it is;
          *   limit the copy length to the buffer size 
          */
-        len = strlen(rel_fname);
+        size_t len = strlen(rel_fname);
         if (len > outbufsize)
             len = outbufsize - 1;
 
         /* copy and null-terminate the result */
         memcpy(outbuf, rel_fname, len);
         outbuf[len] = '\0';
+
+        /* if the result exists and satifies file safety, return it */
+        if ((read_safety <= 1
+             || os_is_file_in_dir(outbuf, OSPATHPWD, TRUE, FALSE))
+            && !osfacc(outbuf))
+            return TRUE;
     }
 
-    /* if the file doesn't exist, check the search path */
-    if (osfacc(outbuf))
+    /* no luck with the basic resource directory; check the search path */
+    for (const CHtmlResFinderPathEntry *entry = search_path_head_ ;
+         entry != 0 ; entry = entry->get_next())
     {
-        const CHtmlResFinderPathEntry *entry;
+        /* try building this path into a full filename */
+        os_build_full_path(outbuf, outbufsize, entry->get_path(), rel_fname);
         
-        /* check each search path entry */
-        for (entry = search_path_head_ ; entry != 0 ;
-             entry = entry->get_next())
-        {
-            /* try building this path into a fuill filename */
-            os_build_full_path(outbuf, outbufsize,
-                               entry->get_path(), rel_fname);
-
-            /* if that exists, stop and return this path */
-            if (!osfacc(outbuf))
-                break;
-        }
+        /* if the result exists and satifies file safety, return it */
+        if ((read_safety <= 1
+             || os_is_file_in_dir(outbuf, entry->get_path(), TRUE, FALSE))
+            && !osfacc(outbuf))
+            return TRUE;
     }
+
+    /* no luck finding the file */
+    return FALSE;
 }
 
 /*
@@ -590,10 +641,8 @@ void CHtmlResFinder::add_resource(const char *fname, size_t fnamelen,
  */
 void CHtmlResFinder::add_res_path(const char *path, size_t len)
 {
-    CHtmlResFinderPathEntry *entry;
-    
     /* create a search path entry */
-    entry = new CHtmlResFinderPathEntry(path, len);
+    CHtmlResFinderPathEntry *entry = new CHtmlResFinderPathEntry(path, len);
 
     /* link it in at the end of our list */
     if (search_path_tail_ != 0)

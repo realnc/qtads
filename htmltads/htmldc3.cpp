@@ -38,6 +38,129 @@ Modified
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   Certain variables are convenient to keep in absolute format while in
+ *   memory, but for project portability reasons they should be in relative
+ *   format (if possible) in the saved config file.
+ */
+static const char *abs_rel_vars[] = {
+    "build:symfile path",
+    "build:objfile path",
+    "build:source",
+    "build:rlsgam",
+    "build:exe",
+    "auto-script:dir",
+    "build:installer prog",
+    "build:zipfile",
+    "build:srczipfile",
+    "build:webpage dir",
+    "breakpoints:file",
+    "mdi win list",
+    "mdi win title"
+};
+
+/*
+ *   Some variables use a filename as the element portion of the variable
+ *   name - e.g., "src win pos:thing.t".  In memory, we store these using
+ *   absolute paths; but in the config file, we want to use relative paths.
+ *   We convert the element portion of the variables listed here between
+ *   relative and absolute paths when reading and writing the config file.
+ */
+static const char *abs_rel_name_vars[] = {
+    "src win pos",
+    "src win edit mode",
+    "src win selrange",
+    "src win split",
+    "line wrap",
+    
+};
+
+/*
+ *   Convert a relative path (as stored in the config file) to an absolute
+ *   path (for storage in our in-memory config variable list). 
+ */
+static void rel_var_to_abs(char *buf, size_t buflen, const char *val,
+                           const char *projdir, const char *tadsdir)
+{
+    /* check for an installation-relative value */
+    if (memcmp(val, "%tads%", 6) == 0)
+    {
+        /* return the full path relative to the project folder */
+        os_build_full_path(buf, buflen, tadsdir, val + 6);
+        return;
+    }
+
+    /* check for a stuttered leading % - if found, skip the extra % */
+    if (val[0] == '%' && val[1] == '%')
+        val += 1;
+
+    /* if the path is relative, it's relative to the project directory */
+    if (!os_is_file_absolute(val))
+    {
+        os_build_full_path(buf, buflen, projdir, val);
+        return;
+    }
+
+    /* it's already relative - copy it as-is */
+    safe_strcpy(buf, buflen, val);
+}
+
+/*
+ *   Stutter a leading '%' in a relativized file name 
+ */
+static void abs_var_to_rel_pct(char *buf, size_t buflen)
+{
+    if (buf[0] == '%' && buflen >= 3)
+    {
+        buf[buflen-2] = '\0';
+        memmove(buf + 1, buf, strlen(buf));
+        buf[0] = '%';
+    }
+}
+
+/*
+ *   Convert an absolute path (as stored in our memory config list) to a
+ *   relative path (for storage in the config file).
+ */
+static void abs_var_to_rel(char *buf, size_t buflen, const char *val,
+                           const char *projdir, const char *tadsdir)
+{
+    /* if it's in the project directory, make it relative */
+    if (os_is_file_in_dir(val, projdir, TRUE, TRUE))
+    {
+        /* get the relative path */
+        os_get_rel_path(buf, buflen, projdir, val);
+
+        /* stutter any leading '%' */
+        abs_var_to_rel_pct(buf, buflen);
+
+        /* done */
+        return;
+    }
+
+    /* if it's in the install directory, make it relative to that */
+    if (os_is_file_in_dir(val, tadsdir, TRUE, TRUE))
+    {
+        /* start with @tads@ */
+        safe_strcpy(buf, buflen, "%tads%");
+        size_t len = strlen(buf);
+
+        /* add the relative path within the install directory */
+        os_get_rel_path(buf + len, buflen - len, tadsdir, val);
+
+        /* return the result */
+        return;
+    }
+
+    /* it's already relative - copy it as-is */
+    safe_strcpy(buf, buflen, val);
+
+    /* stutter any leading '%' */
+    abs_var_to_rel_pct(buf, buflen);
+}
+
+
+/* ------------------------------------------------------------------------ */
+/*
  *   Option file comment parsing states 
  */
 enum comment_state_t
@@ -61,10 +184,15 @@ enum comment_state_t
 class CConfigOptHelper: public CTcOptFileHelper
 {
 public:
-    CConfigOptHelper(CHtmlDebugConfig *config)
+    CConfigOptHelper(CHtmlDebugConfig *config,
+                     const char *projdir, const char *tadsdir)
     {
         /* remember my debugger configuration object */
         config_ = config;
+
+        /* remember the project and install directories */
+        projdir_ = projdir;
+        tadsdir_ = tadsdir;
 
         /* we haven't found the first comment yet */
         cur_comment_ = COMMENT_START;
@@ -251,11 +379,9 @@ public:
         /* check for a length prefix */
         if (*p == '*')
         {
-            int len;
-
             /* scan the length */
             ++p;
-            len = atoi(p);
+            int len = atoi(p);
 
             /* skip to the next space, then skip intervening whitespace */
             for ( ; *p != '\0' && !is_space(*p) ; ++p) ;
@@ -321,6 +447,28 @@ public:
         /* the value follows */
         val = p;
 
+        /*
+         *   If this is a variable that uses a filename as the element
+         *   portion of the name, convert the element name to absolute path
+         *   format if it's given in relative format. 
+         */
+        for (int i = 0 ; i < countof(abs_rel_name_vars) ; ++i)
+        {
+            if (strcmp(varname.get(), abs_rel_name_vars[i]) == 0)
+            {
+                /* found it - convert to an absolute path */
+                char absbuf[OSFNMAX];
+                rel_var_to_abs(absbuf, sizeof(absbuf), elename.get(),
+                               projdir_, tadsdir_);
+
+                /* store it */
+                elename.set(absbuf);
+
+                /* no need to look any further */
+                break;
+            }
+        }
+        
         /* 
          *   if the line doesn't look well-formed, ignore it - we must have a
          *   non-empty variable name, and a one-character type code 
@@ -336,11 +484,9 @@ public:
         case 'S':
             /* string */
             {
-                int idx;
-
                 /* get the index value */
-                idx = atoi(val);
-
+                int idx = atoi(val);
+                
                 /* skip to the colon */
                 for ( ; *val != ':' && *val != '\0' ; ++val) ;
 
@@ -381,9 +527,8 @@ public:
         case 'C':
             /* color */
             {
-                int r, g, b;
-
                 /* scan the red, green, and blue values */
+                int r, g, b;
                 sscanf(val, "%d,%d,%d", &r, &g, &b);
 
                 /* store the color */
@@ -395,12 +540,9 @@ public:
         case 'B':
             /* binary data */
             {
-                unsigned char *binval;
-                unsigned char *dst;
-                size_t len;
 
                 /* if the value length isn't even, it's not well-formed */
-                len = strlen(val);
+                size_t len = strlen(val);
                 if ((len & 1) != 0)
                     return;
 
@@ -410,10 +552,10 @@ public:
                  *   the value string, since each two characters in the value
                  *   encode one byte 
                  */
-                binval = (unsigned char *)th_malloc(len / 2);
+                unsigned char *binval = (unsigned char *)th_malloc(len / 2);
 
                 /* convert the value to bytes */
-                for (dst = binval ; *val != '\0' ; val += 2)
+                for (unsigned char *dst = binval ; *val != '\0' ; val += 2)
                 {
                     /* 
                      *   if we don't have two hex digits, it's not
@@ -445,6 +587,12 @@ public:
 protected:
     /* my debugger configuration object */
     CHtmlDebugConfig *config_;
+
+    /* local file system name of folder containing the project */
+    const char *projdir_;
+
+    /* TADS install directory path */
+    const char *tadsdir_;
 
     /* current comment state */
     comment_state_t cur_comment_;
@@ -512,10 +660,9 @@ void CHtmlDebugConfig::setval_rel_url(const char *var, const char *subvar,
                                       int idx, const char *val,
                                       const char *base_path)
 {
-    char buf[OSFNMAX];
-
     /* convert from URL notation to local conventions */
-    os_cvt_url_dir(buf, sizeof(buf), val, FALSE);
+    char buf[OSFNMAX];
+    os_cvt_url_dir(buf, sizeof(buf), val);
 
     /* 
      *   if the result is a relative filename or path, build the full path
@@ -523,9 +670,8 @@ void CHtmlDebugConfig::setval_rel_url(const char *var, const char *subvar,
      */
     if (!os_is_file_absolute(buf) && base_path != 0 && base_path[0] != '\0')
     {
-        char buf2[OSFNMAX];
-        
         /* copy it into another buffer for a moment */
+        char buf2[OSFNMAX];
         strcpy(buf2, buf);
 
         /* combine it with the base path */
@@ -541,47 +687,40 @@ void CHtmlDebugConfig::setval_rel_url(const char *var, const char *subvar,
  *   Read a .t3m file (T3 makefile)
  */
 int CHtmlDebugConfig::load_t3m_file(const textchar_t *fname,
-                                    const char *sys_lib_path)
+                                    const char *sys_lib_path,
+                                    const char *tads_path)
 {
-    osfildef *fp;
-    CConfigOptHelper opt_helper(this);
-    char **argv;
-    int argc;
     int i;
     char *p;
-    int def_idx;
-    int undef_idx;
-    int inc_idx;
-    int src_idx;
-    int res_idx;
-    int symdir_idx;
-    int objdir_idx;
-    int srcdir_idx;
-    int extra_idx;
     CStringBuf optbuf;
-    char proj_path[OSFNMAX];
-    int res_recurse = TRUE;
 
     /* extract the project file path */
+    char proj_path[OSFNMAX];
     os_get_path_name(proj_path, sizeof(proj_path), fname);
 
+    /* set up the config reader */
+    CConfigOptHelper opt_helper(this, proj_path, tads_path);
+
+    /* assume any resource folders are to include subfolder contents */
+    int res_recurse = TRUE;
+
     /* we don't have any -I, -D, or -U options yet */
-    inc_idx = def_idx = undef_idx = 0;
+    int inc_idx = 0, def_idx = 0, undef_idx = 0;
 
     /* we don't have any -F options yet */
-    symdir_idx = objdir_idx = srcdir_idx = 0;
+    int symdir_idx = 0, objdir_idx = 0, srcdir_idx = 0;
 
     /* we have no extra options yet */
-    extra_idx = 0;
+    int extra_idx = 0;
 
     /* we have no source files yet */
-    src_idx = 0;
+    int src_idx = 0;
 
     /* we have no resource files yet */
-    res_idx = 0;
+    int res_idx = 0;
 
     /* open the file - give up immediately if we can't */
-    fp = osfoprt(fname, OSFTTEXT);
+    osfildef *fp = osfoprt(fname, OSFTTEXT);
     if (fp == 0)
         return 1;
 
@@ -589,10 +728,10 @@ int CHtmlDebugConfig::load_t3m_file(const textchar_t *fname,
     hashtab_->delete_all_entries();
 
     /* parse the file once, to get the argument count */
-    argc = CTcCommandUtil::parse_opt_file(fp, 0, 0);
+    int argc = CTcCommandUtil::parse_opt_file(fp, 0, 0);
 
     /* allocate space for the argument list */
-    argv = (char **)th_malloc(argc * sizeof(argv[0]));
+    char **argv = (char **)th_malloc(argc * sizeof(argv[0]));
 
     /* 
      *   Seek back to the start of the file and parse it again now that we
@@ -615,7 +754,7 @@ int CHtmlDebugConfig::load_t3m_file(const textchar_t *fname,
     setval("makefile", "list_includes", FALSE);
     setval("build", "gen sourceTextGroup", FALSE);
 
-    /* parse the options */
+    /* parse the t3m options */
     for (i = 0 ; i < argc && argv[i][0] == '-' ; ++i)
     {
         /* 
@@ -873,15 +1012,9 @@ int CHtmlDebugConfig::load_t3m_file(const textchar_t *fname,
     /* scan the modules */
     for ( ; i < argc ; ++i)
     {
-        int is_source;
-        int is_lib;
-        char fname[OSFNMAX];
-        const char *file_loc;
-        char full_fname[OSFNMAX];
-
         /* we don't know the file type yet */
-        is_source = FALSE;
-        is_lib = FALSE;
+        int is_source = FALSE;
+        int is_lib = FALSE;
 
         /* check to see if we have a module type option */
         if (argv[i][0] == '-')
@@ -947,10 +1080,15 @@ int CHtmlDebugConfig::load_t3m_file(const textchar_t *fname,
         }
 
         /* convert the name from URL format to local format */
-        os_cvt_url_dir(fname, sizeof(fname), argv[i], FALSE);
+        char fname[OSFNMAX];
+        os_cvt_url_dir(fname, sizeof(fname), argv[i]);
 
         /* add a default extension according to the file type */
         os_defext(fname, is_source ? "t" : "tl");
+
+        /* build the full path to the file, based on the project path */
+        char full_fname[OSFNMAX];
+        os_build_full_path(full_fname, sizeof(full_fname), proj_path, fname);
 
         /* 
          *   Check to see if this is a user or system file: if we can find it
@@ -959,8 +1097,7 @@ int CHtmlDebugConfig::load_t3m_file(const textchar_t *fname,
          *   a system file.  If we can't find it in either place, assume it's
          *   a user file that doesn't exist yet.  
          */
-        os_build_full_path(full_fname, sizeof(full_fname),
-                           proj_path, fname);
+        const char *file_loc;
         if (!osfacc(full_fname))
         {
             /* it exists in the project directory, so it's a user file */
@@ -1070,7 +1207,7 @@ int CHtmlDebugConfig::load_t3m_file(const textchar_t *fname,
              *   it's a filename - convert it from URL notation to local file
              *   naming conventions 
              */
-            os_cvt_url_dir(fname, sizeof(fname), argv[i], FALSE);
+            os_cvt_url_dir(fname, sizeof(fname), argv[i]);
 
             /* add the resource */
             setval("build", "image_resources", res_idx, fname);
@@ -1081,6 +1218,89 @@ int CHtmlDebugConfig::load_t3m_file(const textchar_t *fname,
 
             /* count it */
             ++res_idx;
+        }
+    }
+
+    /*
+     *   Look for a *.tdbconfig file with the same base name as the project
+     *   file.  Starting in HT-23, we store Workbench-specific configuration
+     *   variables in this separate file, so that the project makefile isn't
+     *   affected by the UI configuration in Workbench.  This is important
+     *   when projects are placed under source control or used in
+     *   collaborations, since Workbench makes lots of superficial updates
+     *   that people generally don't consider to be part of the project per
+     *   se - it's more of the nature of local per-user settings.
+     *   
+     *   Before HT-23, we stored the Workbench configuration variables in the
+     *   project (.t3m) file itself, in a special section marked off with a
+     *   [Config:devsys] tag.  We'll still parse old files in that format,
+     *   since the .t3m reader still handles those.  This means that opening
+     *   an old project in a new version of Workbench will automatically
+     *   update the project to use the new two-file config scheme.
+     */
+    char cfgfname[OSFNMAX + 10];
+    safe_strcpy(cfgfname, sizeof(cfgfname), fname);
+    os_remext(cfgfname);
+    os_addext(cfgfname, "tdbconfig");
+
+    /* try opening the file */
+    osfildef *fpcfg = osfoprt(cfgfname, OSFTTEXT);
+    if (fpcfg != 0)
+    {
+        /* read the file */
+        for (;;)
+        {
+            /* read a line */
+            char lbuf[4096];
+            if (osfgets(lbuf, sizeof(lbuf), fpcfg) == 0)
+                break;
+
+            /* strip trailing newlines */
+            for (size_t l = strlen(lbuf) ;
+                 l != 0 && (lbuf[l-1] == '\n' || lbuf[l-1] == '\r') ;
+                 lbuf[--l] = '\0') ;
+
+            /* if it's blank or starts with '#' (comment), ignore it */
+            for (p = lbuf ; *p != '#' && *p != '\0' ; ++p) ;
+            if (*p == '#' || *p == '#')
+                continue;
+
+            /* 
+             *   run it through the [Config:devsys] parser, as though we read
+             *   this from a [Config:devsys] section in the .t3m file 
+             */
+            opt_helper.process_config_line("devsys", lbuf, FALSE);
+        }
+
+        /* done with the file */
+        osfcls(fpcfg);
+    }
+
+    /* 
+     *   make sure that certain directory entry variables are expressed
+     *   internally in absolute path format
+     */
+    for (i = 0 ; i < countof(abs_rel_vars) ; ++i)
+    {
+        /* make a copy so that we can extract the NAME:ELE parts */
+        char varnm[128];
+        strcpy(varnm, abs_rel_vars[i]);
+        char *ele = strchr(varnm, ':');
+        if (ele != 0)
+            *ele++ = '\0';
+
+        /* run through this item's string list */
+        for (int j = 0 ; j < get_strlist_cnt(varnm, ele) ; ++j)
+        {
+            /* get this value */
+            const char *val = getval_strptr(varnm, ele, j);
+
+            /* convert to absolute notation */
+            char absbuf[OSFNMAX];
+            rel_var_to_abs(absbuf, sizeof(absbuf), val, proj_path, tads_path);
+
+            /* replace the value with the relative path */
+            setval(varnm, ele, j, absbuf);
         }
     }
 
@@ -1103,6 +1323,15 @@ struct save_file_enum_ctx_t
 {
     /* the file we're writing */
     osfildef *fp;
+
+    /* name of the file */
+    const char *fname;
+
+    /* path to the config file */
+    const char *fpath;
+
+    /* TADS install path */
+    const char *tads_path;
 };
 
 /*
@@ -1117,10 +1346,10 @@ static void clear_status_cb(void * /*ctx*/, CHtmlHashEntry *entry)
 /*
  *   save a variable name to a config file 
  */
-static void save_var_name(osfildef *fp, CHtmlHashEntryConfig *entry,
-                          int colons)
+static void save_var_name(
+    save_file_enum_ctx_t *ctx, const char *varname, size_t varlen, int colons)
 {
-    char buf[256];
+    char buf[OSFNMAX + 64];
     
     /*  
      *   The hashtable entry already stores the name and element names
@@ -1140,8 +1369,7 @@ static void save_var_name(osfildef *fp, CHtmlHashEntryConfig *entry,
     if (colons > 1)
     {
         /* multiple colons - write with the special length-prefix notation */
-        sprintf(buf, "*%d %.*s:", (int)entry->getlen(),
-                (int)entry->getlen(), entry->getstr());
+        sprintf(buf, "*%d %.*s:", (int)varlen, (int)varlen, varname);
     }
     else
     {
@@ -1149,24 +1377,25 @@ static void save_var_name(osfildef *fp, CHtmlHashEntryConfig *entry,
          *   standard zero- or one-colon name - write it out normally, adding
          *   an extra colon at the end if there is no embedded colon 
          */
-        sprintf(buf, "%.*s%s:",
-                (int)entry->getlen(), entry->getstr(),
-                colons == 0 ? ":" : "");
+        sprintf(buf, "%.*s%s:", (int)varlen, varname, colons == 0 ? ":" : "");
     }
-    os_fprintz(fp, buf);
+
+    /* write it to the file */
+    os_fprintz(ctx->fp, buf);
 }
 
 /*
- *   hashtable enumerator: save all generic variables 
+ *   Hashtable enumerator: save all development system variables.  These are
+ *   the variables that aren't part of the t3make project file, but are
+ *   specific to the IDE and/or debugger.
  */
-static void save_generic_vars_cb(void *ctx0, CHtmlHashEntry *entry0)
+static void save_devsys_vars_cb(void *ctx0, CHtmlHashEntry *entry0)
 {
+    char fbuf[128];
+
+    /* get the context and the hash table entry, properly cast */
     save_file_enum_ctx_t *ctx = (save_file_enum_ctx_t *)ctx0;
     CHtmlHashEntryConfig *entry = (CHtmlHashEntryConfig *)entry0;
-    const char *p;
-    size_t rem;
-    int colons;
-    char fbuf[128];
 
     /*
      *   If this is a "makefile" variable, it's metadata about the makefile,
@@ -1198,9 +1427,49 @@ static void save_generic_vars_cb(void *ctx0, CHtmlHashEntry *entry0)
         return;
     }
 
+    /* 
+     *   Check for a variable name that uses a filename as the element
+     *   portion.  For such variables, we need to convert the
+     *   filename/element to relative path notation for storing in the file. 
+     */
+    const char *varname = entry->getstr();
+    char varnamebuf[OSFNMAX + 64];
+    size_t varlen = entry->getlen();
+    for (int i = 0 ; i < countof(abs_rel_name_vars) ; ++i)
+    {
+        /* check to see if the name starts with this variable name */
+        size_t alen = strlen(abs_rel_name_vars[i]);
+        if (varlen > alen + 1
+            && varname[alen] == ':'
+            && memcmp(varname, abs_rel_name_vars[i], alen) == 0)
+        {
+            /* 
+             *   it's a match - convert the element/filename portion to
+             *   relative notation for storage in the file 
+             */
+            char elebuf[OSFNMAX], relbuf[OSFNMAX];
+            safe_strcpy(elebuf, sizeof(elebuf),
+                        varname + alen + 1, varlen - alen - 1);
+            abs_var_to_rel(relbuf, sizeof(relbuf), elebuf,
+                           ctx->fpath, ctx->tads_path);
+
+            /* build the relativized variable name */
+            sprintf(varnamebuf, "%s:%s", abs_rel_name_vars[i], relbuf);
+
+            /* use the relativized name in the config file */
+            varname = varnamebuf;
+            varlen = strlen(varname);
+
+            /* no need to look any further */
+            break;
+        }
+    }
+
     /* count the number of colons in the entry's variable name string */
-    for (p = entry->getstr(), rem = entry->getlen(), colons = 0 ;
-         rem != 0 ; ++p, --rem)
+    const char *p;
+    size_t rem;
+    int colons = 0;
+    for (p = varname, rem = varlen ; rem != 0 ; ++p, --rem)
     {
         /* if this is a colon, count it */
         if (*p == ':')
@@ -1208,7 +1477,7 @@ static void save_generic_vars_cb(void *ctx0, CHtmlHashEntry *entry0)
     }
 
     /* write the variable name */
-    save_var_name(ctx->fp, entry, colons);
+    save_var_name(ctx, varname, varlen, colons);
 
     /* get the type code for writing to the file */
     switch (entry->type_)
@@ -1219,24 +1488,56 @@ static void save_generic_vars_cb(void *ctx0, CHtmlHashEntry *entry0)
          *   separate entry 
          */
         {
-            CHtmlDcfgString *str;
-            int idx;
+            /* 
+             *   check to see if this is in the list of variables we should
+             *   express in relative form in the saved config file 
+             */
+            int to_rel = FALSE;
+            for (int i = 0 ; i < countof(abs_rel_vars) ; ++i)
+            {
+                /* if this is the variable, note it */
+                const char *varnm = abs_rel_vars[i];
+                if (strlen(varnm) == entry->getlen()
+                    && memcmp(entry->getstr(), varnm, entry->getlen()) == 0)
+                {
+                    /* it's a relative variable - note it and stop looking */
+                    to_rel = TRUE;
+                    break;
+                }
+            }
 
+            /* write each string in the list */
+            int idx;
+            CHtmlDcfgString *str;
             for (idx = 0, str = entry->val_.strlist_ ; str != 0 ;
                  ++idx, str = str->next_)
             {
+                const char *val;
+                char valbuf[OSFNMAX];
+
                 /* if this entry is null, skip it */
-                if (str->str_.get() == 0)
+                if ((val = str->str_.get()) == 0)
                     continue;
+
+                /* if it's a relative variable, convert it */
+                if (to_rel)
+                {
+                    /* get the relative version */
+                    abs_var_to_rel(valbuf, sizeof(valbuf), val,
+                                   ctx->fpath, ctx->tads_path);
+
+                    /* use this instead of the original value */
+                    val = valbuf;
+                }
                 
                 /* if this isn't the first entry, write the name again */
                 if (idx != 0)
-                    save_var_name(ctx->fp, entry, colons);
+                    save_var_name(ctx, varname, varlen, colons);
                 
                 /* write the type, index, and value */
                 sprintf(fbuf, "S:%d:", idx);
                 os_fprintz(ctx->fp, fbuf);
-                os_fprintz(ctx->fp, str->str_.get());
+                os_fprintz(ctx->fp, val);
                 os_fprintz(ctx->fp, "\n");
             }
         }
@@ -1350,7 +1651,8 @@ char *CHtmlDebugConfig::find_url_ext(const char *url)
 /*
  *   Save a .t3m file (T3 makefile) 
  */
-int CHtmlDebugConfig::save_t3m_file(const textchar_t *fname)
+int CHtmlDebugConfig::save_t3m_file(
+    const textchar_t *fname, const char *tads_path)
 {
     osfildef *fp;
     save_file_enum_ctx_t cbctx;
@@ -1368,10 +1670,13 @@ int CHtmlDebugConfig::save_t3m_file(const textchar_t *fname)
      *   notation
      */
     os_get_path_name(proj_path, sizeof(proj_path), fname);
-    os_cvt_dir_url(proj_url, sizeof(proj_url), proj_path, TRUE);
+    os_cvt_dir_url(proj_url, sizeof(proj_url), proj_path);
 
     /* set up our callback context */
     cbctx.fp = fp;
+    cbctx.fname = fname;
+    cbctx.fpath = proj_path;
+    cbctx.tads_path = tads_path;
 
     /*
      *   First, run through the table of variables and set everything's
@@ -1497,7 +1802,7 @@ int CHtmlDebugConfig::save_t3m_file(const textchar_t *fname)
         /* mark the source_file_types variable as saved */
         t3m_get_entry_for_save("build", "source_file_types");
 
-        /* make the source_files-sys variable as saved */
+        /* mark the source_files-sys variable as saved */
         t3m_get_entry_for_save("build", "source_files-sys");
 
         /* scan the string list */
@@ -1520,7 +1825,7 @@ int CHtmlDebugConfig::save_t3m_file(const textchar_t *fname)
             os_fprintz(fp, tbuf[0] == 's' ? "-source " : "-lib ");
 
             /* convert the filename to URL notation */
-            os_cvt_dir_url(url, sizeof(url), str->str_.get(), FALSE);
+            os_cvt_dir_url(url, sizeof(url), str->str_.get());
 
             /* note the extension implied for the type */
             defext = (tbuf[0] == 's' ? "t" : "tl");
@@ -1571,7 +1876,7 @@ int CHtmlDebugConfig::save_t3m_file(const textchar_t *fname)
         int recurse = TRUE;
 
         /* 
-         *   make the image_resources-sys variable as saved, even though we
+         *   mark the image_resources-sys variable as saved, even though we
          *   actually don't have any use for it 
          */
         t3m_get_entry_for_save("build", "image_resources-sys");
@@ -1614,41 +1919,79 @@ int CHtmlDebugConfig::save_t3m_file(const textchar_t *fname)
             }
 
             /* write this file entry in URL notation */
-            os_cvt_dir_url(url, sizeof(url), str->str_.get(), FALSE);
+            os_cvt_dir_url(url, sizeof(url), str->str_.get());
             t3m_save_write_arg(fp, url);
             os_fprintz(fp, "\n");
         }
     }
-
-    /*
-     *   Create our [Config:xxx] section, and write out everything that we
-     *   haven't specifically mapped to a regular option setting or used for
-     *   some purpose of our own.  Everything with status == 0 and with a
-     *   primary variable name other than "makefile" should be written.
-     *   (Items with status != 0 are not written because they're the
-     *   variables we mapped to makefile options.  Items with variable name
-     *   "makefile" are not written because they're configuration data
-     *   related to the makefile itself, which we use to construct the
-     *   makefile.)  
-     */
-    os_fprintz(fp, "\n# The following is machine-generated - "
-               "DO NOT EDIT\n"
-               "[Config:devsys]\n");
-    cbctx.fp = fp;
-    hashtab_->enum_entries(&save_generic_vars_cb, &cbctx);
-    os_fprintz(fp, "\n");
 
     /* 
      *   Finally, write out all of the foreign [Config:xxx] sections we found
      *   in the file.  When we loaded the file, we saved the original raw
      *   text of all of the foreign configuration sections (including their
      *   "[Config:xxx]" marker lines), so we simply need to dump out the
-     *   saved strings verbatim.  
+     *   saved strings verbatim.
+     *   
+     *   This is historical and probably never used.  Before HT-23, Workbench
+     *   stored its custom config data in the project (.t3m) file in a
+     *   special [Config:devsys] section.  The idea was that other tools
+     *   might come along that also wanted to add tool-specific data to the
+     *   project file, such as Workbench equivalents on other platforms, or
+     *   maybe even completely different sorts of tools (profilers, maybe).
+     *   So they'd each have a [Config:xxx] section of their own, with
+     *   different xxx tags for each tool.  Each tool would treat other
+     *   [Config:xxx] sections as opaque, and simply carry forward any such
+     *   sections unchanged when updating a t3m file.
+     *   
+     *   As far as I know, Workbench on Windows is the only tool that ever
+     *   used this mechanism, and starting in HT-23, Workbench parts ways
+     *   with this scheme.  So I don't think we'll ever encounter a foreign
+     *   config section in practice.  But just in case there's something out
+     *   there I don't know about, or just in case this turns out to be a
+     *   useful mechanism after all for some future tool, we'll keep the code
+     *   that handles it.
      */
     t3m_copy_to_file(fp, "makefile", "foreign_config");
 
     /* done with the file */
     osfcls(fp);
+
+    /*
+     *   Now create the separate Workbench config file.  This file contains
+     *   the UI configuration for Workbench that's not part of the t3make
+     *   project file (the .t3m file).  This goes by the same name as the
+     *   project file, with the *.t3m suffix replaced by *.tdbconfig.
+     */
+    char cfgfname[OSFNMAX + 10];
+    safe_strcpy(cfgfname, sizeof(cfgfname), fname);
+    os_remext(cfgfname);
+    os_addext(cfgfname, "tdbconfig");
+
+    /* open the file */
+    osfildef *cfgfp = osfopwt(cfgfname, OSFTTEXT);
+    if (cfgfp == 0)
+        return 1;
+
+    /* write a descriptive comment at the start of the file */
+    os_fprintz(cfgfp, "# THIS FILE IS MACHINE GENERATED - DO NOT EDIT\n"
+               "# TADS Workbench configuration settings\n\n");
+    
+    /*   
+     *   Write out everything that we haven't specifically mapped to a
+     *   regular option setting or used for some purpose of our own.
+     *   Everything with status == 0 and with a primary variable name other
+     *   than "makefile" should be written.  Items with status != 0 aren't
+     *   written here because they're the variables we mapped to makefile
+     *   options.  Items with variable name "makefile" aren't written here
+     *   because they're configuration data related to the makefile itself,
+     *   which we use to construct the makefile.
+     */
+    cbctx.fp = cfgfp;
+    hashtab_->enum_entries(&save_devsys_vars_cb, &cbctx);
+
+    /* done with the file */
+    os_fprintz(cfgfp, "\n");
+    osfcls(cfgfp);
 
     /* success */
     return 0;
@@ -1662,10 +2005,8 @@ int CHtmlDebugConfig::save_t3m_file(const textchar_t *fname)
 CHtmlHashEntryConfig *CHtmlDebugConfig::t3m_get_entry_for_save(
     const char *var, const char *ele)
 {
-    CHtmlHashEntryConfig *entry;
-
     /* get the entry */
-    entry = get_entry(var, ele, FALSE);
+    CHtmlHashEntryConfig *entry = get_entry(var, ele, FALSE);
 
     /* if we found it, mark it as explicitly saved */
     if (entry != 0)
@@ -1682,18 +2023,16 @@ CHtmlHashEntryConfig *CHtmlDebugConfig::t3m_get_entry_for_save(
 void CHtmlDebugConfig::t3m_copy_to_file(osfildef *fp, const char *var,
                                         const char *ele)
 {
-    CHtmlHashEntryConfig *entry;
-    CHtmlDcfgString *str;
-
     /* get the variable's hash entry */
-    entry = t3m_get_entry_for_save(var, ele);
+    CHtmlHashEntryConfig *entry = t3m_get_entry_for_save(var, ele);
 
     /* if it doesn't exist, or it's not a string list, ignore it */
     if (entry == 0 || entry->type_ != HTML_DCFG_TYPE_STRLIST)
         return;
 
     /* write out each string in the list */
-    for (str = entry->val_.strlist_ ; str != 0 ; str = str->next_)
+    for (CHtmlDcfgString *str = entry->val_.strlist_ ; str != 0 ;
+         str = str->next_)
     {
         /* write out this string and a newline */
         if (str->str_.get() != 0)
@@ -1733,10 +2072,8 @@ void CHtmlDebugConfig::t3m_save_option_strs(osfildef *fp, const char *var,
             /* if they want it converted to a URL, do so */
             if (cvt_to_url)
             {
-                size_t base_len;
-                
                 /* convert it into URL format */
-                os_cvt_dir_url(url, sizeof(url), p, FALSE);
+                os_cvt_dir_url(url, sizeof(url), p);
 
                 /* use the URL version as the string to write */
                 p = url;
@@ -1746,12 +2083,14 @@ void CHtmlDebugConfig::t3m_save_option_strs(osfildef *fp, const char *var,
                  *   URL as a prefix, then remove the prefix and just store
                  *   the relative portion 
                  */
+                size_t base_len;
                 if (base_path_url != 0
                     && (base_len = strlen(base_path_url)) < strlen(url)
-                    && memcmp(base_path_url, url, base_len) == 0)
+                    && memcmp(base_path_url, url, base_len) == 0
+                    && url[base_len] == '/')
                 {
                     /* use only the part after the path prefix */
-                    p = url + base_len;
+                    p = url + base_len + 1;
                 }
             }
             

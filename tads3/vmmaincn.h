@@ -70,10 +70,14 @@ public:
                      const char *script_file, int script_quiet,
                      const char *log_file,
                      const char *cmd_log_file,
-                     const char *banner_str)
+                     const char *banner_str,
+                     int more_mode)
     {
         /* set up for global access */
         VMGLOB_PTR(vmg);
+
+        /* set the [More] mode as desired */
+        G_console->set_more_state(more_mode);
 
         /* if we have a script file, set up script input on the console */
         if (script_file != 0)

@@ -323,9 +323,9 @@ CHtmlSysFrameQt::fRunT2Game( const QString& fname )
 void
 CHtmlSysFrameQt::fRunT3Game( const QString& fname )
 {
+    vm_run_image_params params(this->fClientifc, this->fHostifc, fname.toLocal8Bit());
     this->fTads3 = true;
-    vm_run_image(this->fClientifc, fname.toLocal8Bit(), this->fHostifc, 0, 0, 0, false, 0, 0, false,
-                 false, false, 0, 0, 0, 0, 0);
+    vm_run_image(&params);
 }
 
 

@@ -874,7 +874,7 @@ int CVmObjStringBuffer::index_val_q(VMG_ vm_val_t *result, vm_obj_id_t self,
                                     const vm_val_t *index_val)
 {
     /* get the index as an integer */
-    int32_t idx = index_val->num_to_int();
+    int32_t idx = index_val->num_to_int(vmg0_);
 
     /* adjust to zero-based indexing or a negative end-based index */
     idx += (idx < 0 ? get_ext()->len : -1);
@@ -899,10 +899,8 @@ int CVmObjStringBuffer::set_index_val_q(VMG_ vm_val_t *result,
                                         const vm_val_t *index_val,
                                         const vm_val_t *new_val)
 {
-    wchar_t ch;
-
     /* the index must be an integer */
-    long idx = index_val->num_to_int();
+    int32_t idx = index_val->num_to_int(vmg0_);
 
     /* adjust to zero-based indexing or a negative end-based index */
     idx += (idx < 0 ? get_ext()->len : -1);
@@ -916,10 +914,16 @@ int CVmObjStringBuffer::set_index_val_q(VMG_ vm_val_t *result,
      *   value to set at the given character.  Otherwise, cast it to a string
      *   and take its first character.  
      */
-    if (new_val->is_numeric())
+    wchar_t ch;
+    if (new_val->is_numeric(vmg0_))
     {
         /* it's an integer - treat it as a unicode character value */
-        ch = (wchar_t)new_val->num_to_int();
+        int32_t ich = new_val->num_to_int(vmg0_);
+        if (ich < 0 || ich > 65535)
+            err_throw(VMERR_BAD_VAL_BIF);
+
+        /* it's in range - cast to wchar_t */
+        ch = (wchar_t)ich;
     }
     else
     {

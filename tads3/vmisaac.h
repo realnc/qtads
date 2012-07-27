@@ -43,6 +43,19 @@ struct isaacctx
  */
 void isaac_init(isaacctx *ctx, int flag);
 
+/* 
+ *   Get/set the internal state.  This allows saving and restoring the
+ *   internal state of the RNG.  'get' returns the size of the byte buffer
+ *   required; call with buf==0 to determine the size needed.
+ *   
+ *   'get' and 'set' both expect the caller to know the correct size from a
+ *   size-query call to 'get'.  The size passed to 'set' must always exactly
+ *   match the size returned from 'get', since anything else could corrupt
+ *   the internal state.
+ */
+size_t isaac_get_state(isaacctx *ctx, char *buf);
+void isaac_set_state(isaacctx *ctx, const char *buf);
+
 /* generate a group of random values */
 void isaac_gen_group(isaacctx *ctx);
 

@@ -447,9 +447,14 @@ const err_msg_t tc_messages_english[] =
     "reading source code." },
 
     { TCERR_INT_CONST_OV,
-    "integer constant exceeds maximum value",
-    "An integer constant value exceeds the maximum that can be stored. "
-    "Integers are limited to -2147483648 to 2147483647." },
+    "constant value exceeds integer range; promoted to BigNumber",
+    "The numeric value specified is outside of the range that can be "
+    "stored in the TADS integer type (-2147483648 to +2147483647), so it "
+    "has been automatically promoted to a BigNumber (floating point) "
+    "value. BigNumber values can represent much larger numbers than "
+    "TADS integers, but some functions that require numeric arguments "
+    "only accept integer values. If you're using this value in such a "
+    "context, it might cause an error at run-time." },
 
     { TCERR_BACKSLASH_SEQ,
     "invalid backslash escape sequence \\%c in string",
@@ -2158,6 +2163,17 @@ const err_msg_t tc_messages_english[] =
     "The syntax for the defined() operator is invalid. This operator "
     "requires a single symbol name as the argument, in parentheses." },
 
+    { TCERR___OBJREF_SYNTAX,
+    "invalid syntax for __objref() operator",
+    "The syntax for the __objref() operator is invalid. This operator "
+    "requires syntax of the form __objref(symbol) or __objref(symbol, mode), "
+    "where the mode is 'warn' or 'error'." },
+
+    { TCERR_BAD_OP_FOR_FLOAT,
+    "floating point values can't be used with this operator",
+    "Floating point values can't be used with this operator. Only ordinary "
+    "integer values can be used." },
+
     { TCERR_CODEGEN_NO_MEM,
     "out of memory for code generation",
     "Out of memory.  The compiler cannot allocate memory to generate "
@@ -2597,6 +2613,14 @@ const err_msg_t tc_messages_english[] =
     "The usual way to declare an intrinsic class is simply to #include "
     "the system header file that defines the class, near the beginning "
     "of your source file." },
+
+    { TCERR_FUNC_CALL_NO_PROTO,
+    "cannot call extern function %.*s without an argument list definition",
+    "The function %.*s was declared 'extern' without an argument list "
+    "definition. This function can't be called without declaring the "
+    "argument list. You can declare the argument list in the 'extern' "
+    "statement, but note that in most cases the problem is that the "
+    "function itself is never defined within the program." },
 
     { TCERR_SYMEXP_INV_TYPE,
     "invalid symbol type in symbol file",

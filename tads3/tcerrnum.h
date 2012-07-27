@@ -225,7 +225,7 @@ Modified
 /* '<>' operator is obsolete */
 #define TCERR_LTGT_OBSOLETE       10064
 
-/* integer constant exceeds maximum value */
+/* integer constant exceeds maximum value (promoting to BigNumber) */
 #define TCERR_INT_CONST_OV        10065
 
 /* unrecognized escape sequence \%c in string */
@@ -1005,6 +1005,12 @@ Modified
 /* invalid defined() syntax */
 #define TCERR_DEFINED_SYNTAX           11233
 
+/* invalid __objref() syntax */
+#define TCERR___OBJREF_SYNTAX          11234
+
+/* invalid constant value type for operator */
+#define TCERR_BAD_OP_FOR_FLOAT         11235
+
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -1209,6 +1215,8 @@ Modified
 /* metaclass %.*s is not defined in this module */
 #define TCERR_EXT_METACLASS        11565
 
+/* cannot call extern function without an argument list prototype */
+#define TCERR_FUNC_CALL_NO_PROTO   11566
 
 
 /* ------------------------------------------------------------------------ */

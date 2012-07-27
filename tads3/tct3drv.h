@@ -338,7 +338,7 @@ public:
 class CTPNComma: public CTPNCommaBase
 {
 public:
-    CTPNComma(class CTcPrsNode *lhs, CTcPrsNode *rhs)
+    CTPNComma(class CTcPrsNode *lhs, class CTcPrsNode *rhs)
         : CTPNCommaBase(lhs, rhs) { }
 
     /* generate code */
@@ -1016,9 +1016,10 @@ class CTcSymFunc: public CTcSymFuncBase
 public:
     CTcSymFunc(const char *str, size_t len, int copy,
                int argc, int opt_argc, int varargs, int has_retval,
-               int is_multimethod, int is_mm_base, int is_extern)
+               int is_multimethod, int is_mm_base,
+               int is_extern, int has_proto)
         : CTcSymFuncBase(str, len, copy, argc, opt_argc, varargs, has_retval,
-                         is_multimethod, is_mm_base, is_extern)
+                         is_multimethod, is_mm_base, is_extern, has_proto)
     {
         /* 
          *   we don't have a valid absolute address - by default, we use

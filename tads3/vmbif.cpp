@@ -36,6 +36,7 @@ Modified
 #include "vmobj.h"
 #include "vmrun.h"
 #include "vmcset.h"
+#include "vmfilnam.h"
 
 
 /* ------------------------------------------------------------------------ */
@@ -372,19 +373,14 @@ vm_obj_id_t CVmBif::str_from_ui_str(VMG_ const char *str)
 
 vm_obj_id_t CVmBif::str_from_ui_str(VMG_ const char *str, size_t len)
 {
-    char *outp;
-    size_t outlen;
-    vm_obj_id_t str_id;
-    CVmObjString *str_obj;
-
     /* figure out how much space we need */
-    outp = 0;
-    outlen = 0;
+    char *outp = 0;
+    size_t outlen = 0;
     outlen = G_cmap_from_ui->map(0, &outlen, str, len);
 
     /* allocate a string of that size */
-    str_id = CVmObjString::create(vmg_ FALSE, outlen);
-    str_obj = (CVmObjString *)vm_objp(vmg_ str_id);
+    vm_obj_id_t str_id = CVmObjString::create(vmg_ FALSE, outlen);
+    CVmObjString *str_obj = (CVmObjString *)vm_objp(vmg_ str_id);
 
     /* map the string into the new string buffer */
     outp = str_obj->cons_get_buf();
@@ -610,6 +606,36 @@ void CVmBif::get_str_val_buf(VMG_ char *buf, size_t buflen,
 
 
 /* ------------------------------------------------------------------------ */
+/*
+ *   Pop a filename value.  The source value can be string or FileName
+ *   object. 
+ */
+void CVmBif::pop_fname_val(VMG_ char *buf, size_t buflen)
+{
+    get_fname_val(vmg_ buf, buflen, G_stk->get(0));
+    G_stk->discard(1);
+}
+
+void CVmBif::get_fname_val(VMG_ char *buf, size_t buflen, const vm_val_t *val)
+{
+    CVmObjFileName *fn;
+    const char *str;
+    if ((fn = vm_val_cast(CVmObjFileName, val)) != 0)
+    {
+        /* get the FileName object's path as a local filename string */
+        get_str_val_fname(vmg_ buf, buflen, fn->get_path_string());
+    }
+    else if ((str = val->get_as_string(vmg0_)) != 0)
+    {
+        /* get the string value as a local filename string */
+        get_str_val_fname(vmg_ buf, buflen, str);
+    }
+    else
+    {
+        err_throw(VMERR_BAD_VAL_BIF);
+    }
+}
+
 /*
  *   Pop a string into a buffer, translating the string into the filename
  *   character set and null-terminating the result.  

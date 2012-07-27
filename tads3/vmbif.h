@@ -358,13 +358,24 @@ public:
                                 const vm_val_t *val);
 
     /*
-     *   Pop a null-terminated string into the given buffer, converting
-     *   the string to the filename character set.  Null-terminates the
-     *   resulting string.  
+     *   Pop a string value, returning the result as a filename in the given
+     *   buffer.  The returned filename is null-terminated and converted to
+     *   the local filename character set.  The source value must be a
+     *   string.
      */
     static void pop_str_val_fname(VMG_ char *buf, size_t buflen);
     static void get_str_val_fname(VMG_ char *buf, size_t buflen,
                                   const char *strp);
+
+    /*
+     *   Pop a filename value, returning the result as a filename in the
+     *   given buffer.  The returned filename is null-terminated and
+     *   converted to the local filename character set.  The source value can
+     *   be a string or FileName object. 
+     */
+    static void pop_fname_val(VMG_ char *buf, size_t buflen);
+    static void get_fname_val(VMG_ char *buf, size_t buflen,
+                              const vm_val_t *val);
     
     /*
      *   Pop a null-terminated string into the given buffer, converting the

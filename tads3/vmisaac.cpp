@@ -138,3 +138,50 @@ void isaac_init(isaacctx *ctx, int flag)
     /* prepare to use the first set of results */    
     ctx->cnt = ISAAC_RANDSIZ;
 }
+
+/*
+ *   Get the internal state 
+ */
+size_t isaac_get_state(isaacctx *ctx, char *buf)
+{
+    /* if the didn't provide a buffer, it's a size-needed query */
+    const size_t sz = 4 * (4 + ISAAC_RANDSIZ + ISAAC_RANDSIZ);
+    if (buf == 0)
+        return sz;
+
+    /* copy the scalar members */
+    oswp4(buf, ctx->cnt); buf += 4;
+    oswp4(buf, ctx->a);   buf += 4;
+    oswp4(buf, ctx->b);   buf += 4;
+    oswp4(buf, ctx->c);   buf += 4;
+
+    /* copy the array members */
+    for (int i = 0 ; i < ISAAC_RANDSIZ ; ++i, buf += 8)
+    {
+        oswp4(buf, ctx->rsl[i]);
+        oswp4(buf+4, ctx->mem[i]);
+    }
+
+    return sz;
+}
+
+/*
+ *   Set the internal state 
+ */
+void isaac_set_state(isaacctx *ctx, const char *buf)
+{
+    /* decode the buffer into our context */
+    ctx->cnt = osrp4(buf); buf += 4;
+    ctx->a = osrp4(buf);   buf += 4;
+    ctx->b = osrp4(buf);   buf += 4;
+    ctx->c = osrp4(buf);   buf += 4;
+    for (int i = 0 ; i < ISAAC_RANDSIZ ; ++i, buf += 8)
+    {
+        ctx->rsl[i] = osrp4(buf);
+        ctx->mem[i] = osrp4(buf+4);
+    }
+
+    /* sanity check the result: make sure 'cnt' is in range */
+    if (ctx->cnt > ISAAC_RANDSIZ)
+        ctx->cnt = 0;
+}

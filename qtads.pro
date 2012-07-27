@@ -178,14 +178,13 @@ HEADERS += \
     src/syssoundwav.h \
     src/syssoundmpeg.h \
     src/syssoundmidi.h \
-    src/qtadscharmap.h \
     src/qtadsimage.h \
     src/qtadssound.h \
     src/dispwidget.h \
     src/dispwidgetinput.h \
     src/qtadshostifc.h \
     src/qtadstimer.h \
-    src/vmuni.h \
+    #src/vmuni.h \
     src/confdialog.h \
     src/settings.h \
     src/gameinfodialog.h \
@@ -206,8 +205,6 @@ SOURCES += \
     src/sysimage.cc \
     src/syssound.cc \
     src/missing.cc \
-    src/charmap.cc \
-    src/qtadscharmap.cc \
     src/qtadsimage.cc \
     src/qtadssound.cc \
     src/main.cc \
@@ -284,11 +281,15 @@ SOURCES += \
     $$T2DIR/linfdum.c \
     $$T2DIR/osrestad.c \
     $$T2DIR/bifgdum.c \
-    $$T2DIR/output.c
+    $$T2DIR/output.c \
+    $$T2DIR/osstzprs.c \
+    $$T2DIR/osnoui.c
 
 # Tads3 sources.
 SOURCES += \
+    $$T3DIR/derived/vmuni_cs.cpp \
     $$T3DIR/askf_os3.cpp \
+    $$T3DIR/charmap.cpp \
     $$T3DIR/gameinfo.cpp \
     $$T3DIR/indlg_os3.cpp \
     $$T3DIR/md5.cpp \
@@ -324,6 +325,7 @@ SOURCES += \
     $$T3DIR/vmbiftio.cpp \
     $$T3DIR/vmbiftix.cpp \
     $$T3DIR/vmbignum.cpp \
+    $$T3DIR/vmbignumlib.cpp \
     $$T3DIR/vmbt3_nd.cpp \
     $$T3DIR/vmbytarr.cpp \
     $$T3DIR/vmcfgfl.cpp \
@@ -333,11 +335,13 @@ SOURCES += \
     $$T3DIR/vmconsol.cpp \
     $$T3DIR/vmcrc.cpp \
     $$T3DIR/vmcset.cpp \
+    $$T3DIR/vmdate.cpp \
     $$T3DIR/vmdict.cpp \
     $$T3DIR/vmdynfunc.cpp \
     $$T3DIR/vmerr.cpp \
     $$T3DIR/vmerrmsg.cpp \
     $$T3DIR/vmfile.cpp \
+    $$T3DIR/vmfilnam.cpp \
     $$T3DIR/vmfilobj.cpp \
     $$T3DIR/vmfref.cpp \
     $$T3DIR/vmfunc.cpp \
@@ -360,6 +364,7 @@ SOURCES += \
     $$T3DIR/vmmeta.cpp \
     $$T3DIR/vmnetfillcl.cpp \
     $$T3DIR/vmobj.cpp \
+    $$T3DIR/vmop.cpp \
     $$T3DIR/vmpack.cpp \
     $$T3DIR/vmpat.cpp \
     $$T3DIR/vmpool.cpp \
@@ -380,5 +385,7 @@ SOURCES += \
     $$T3DIR/vmtobj.cpp \
     $$T3DIR/vmtype.cpp \
     $$T3DIR/vmtypedh.cpp \
+    $$T3DIR/vmtz.cpp \
+    $$T3DIR/vmtzobj.cpp \
     $$T3DIR/vmundo.cpp \
     $$T3DIR/vmvec.cpp

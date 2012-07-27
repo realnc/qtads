@@ -27,24 +27,23 @@ h4 {
 }
 ul {
     margin-left: 1ex;
+    padding: 0px 0em;
 }
 li {
-    margin-top: 0.75em;
-    margin-bottom: 0.75em;
+    margin: 0.75em 0px;
     padding-bottom: 1em;
-    border-bottom: 1px solid #808080;
+    border-bottom: 1px dotted #808080;
     list-style: none;
 }
-li.last {
+li.last, li:last-child {
     border-bottom: none;
 }
 ul.toc, li ul {
-    margin-top: 0.75em;
-    margin-left: 3em;
+    margin: 0.75em 0px 0.75em 1em;
+    padding-left: 1.5em;
 }
 li li {
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
+    margin: 0.25em 0px 0.25em 0em;
     border: none;
     list-style: disc outside;
 }
@@ -74,6 +73,190 @@ Note that we've tried to keep all of the documentation that accompanies
 this release up-to-date with these changes.  This file is provided as a
 quick overview for experienced TADS users so that you can quickly see
 what has changed since the last version you installed.
+
+
+<!------------------------------------------------------------------------>
+<p>
+<h3>Changes in Release HT-23 (Windows build Win117; TADS 2.5.15/3.1.1)</h3>
+<i>Released July 14, 2012</i>
+
+<ul>
+
+<li>The Workbench text editor on Windows now provides custom editor
+modes for Javascript and CSS files, with full support for syntax
+coloring, code folding, and auto indenting.  (These file types are
+useful when working with the Web UI.)
+
+<li>The integrated Scintilla editor in Workbench for Windows has been
+updated to the latest version (3.0.2).
+
+<li>On Windows, you can now use drag-and-drop to open a file in the
+Workbench text editor.  Simply drag a file from the Windows desktop
+and drop it onto Workbench, and Workbench will open the file in the
+text editor.
+
+<li>Workbench for Windows now displays the contents of resource
+folders directly in the project tree.  In the past, Workbench allowed
+you to add a folder from the file system to the project tree, and
+showed the folder itself in the tree, but didn't show the folder's
+contents; you had to go out to the Windows desktop to view a folder's
+contents.  This makes it easier to see the full list of resource files
+that are part of the project.
+
+<li>Workbench for Windows now displays library resource files
+(including resource directories, as described above) in the project
+tree.  This is useful for Web UI games, since it makes it makes it
+easier to find and open library text resources (HTML, Javascript, CSS)
+in the Workbench text editor.
+
+<li>When you open a project in Workbench for Windows, Workbench now
+creates a <i>project</i>.tdbconfig file in the project directory to
+store your user interface settings for the project.  The stored
+settings include things like which files are open in Workbench editor
+windows, window sizes and positions, past search strings, text editor
+option settings, and many other settings specific to the Workbench UI
+for the project.  The new file has the same base name as the project
+(.t3m) file, with the .t3m suffix replaced by .tdbconfig.
+
+<p>In the past, these UI settings were stored directly in the project
+(.t3m) file itself.  There are two main reasons for moving them into a
+separate file.  First, the old arrangement was problematic for
+collaboration, because the UI settings aren't really project-level
+settings at all; they're really per-user settings, since each user
+collaborating on a project might have different UI preferences.  With
+this change, collaborators can share the .t3m file, which contains
+only the project-level build settings, but keep individual .tdbconfig
+files for their personalized UI settings.  Second, the single-file
+setup wasn't great for use with source control systems, because
+Workbench updated the .t3m file virtually every time you opened the
+project.  The constant updating tended to create numerous superfluous
+history updates for a .t3m file under source control.  Workbench still
+writes a fresh copy of the .t3m file each time a project is closed, so
+the .t3m file's timestamp will be updated, but the contents should be
+left unchanged as long as you don't make any actual changes to the
+build settings (in which case you'd want to update the source control
+version of the file anyway to capture the changes in the build
+settings).
+
+<p>Workbench still recognizes the old single-file format, but now
+always saves updates in the two-file format.  This means that you can
+open old projects without having to make any manual changes.  When you
+open an old project, Workbench automatically converts it to the
+new two-file format when you close the project.
+
+<li>Several bugs in the automatic code formatter in the Workbench
+text editor on Windows have been fixed:
+
+<ul>
+
+   <li>Selecting the text of an object definition and explicitly
+reindenting the region (with Alt+Q) didn't work properly if a
+function definition immediately preceded the object.
+(<a href="http://bugdb.tads.org/view.php?id=0000152">bugdb.tads.org
+#0000152</a>)
+
+
+   <li>The body of a function defined with the "replace" or "modify"
+keyword, but no "function" keyword, wasn't indented properly when
+explicitly reindenting a region (with Alt+Q).
+(<a href="http://bugdb.tads.org/view.php?id=0000153">bugdb.tads.org
+#0000153</a>)
+
+   <li>The next line after a line ending in a "//" comment at the top
+level (outside of any function or object definition) wasn't indented
+properly.
+(<a href="http://bugdb.tads.org/view.php?id=0000154">bugdb.tads.org
+#0000154</a>)
+
+<li>Workbench for Windows now stores filename paths in the saved
+project configuration using relative path notation for files that are
+within the project directory or its subfolders.  (The project
+directory is the folder containing the .t3m file for the project.)  In
+the past, Workbench stored absolute paths for many of the files
+referenced in a config file, which made it more difficult to move a
+project to a new folder or use it on a different machine with a
+different directory layout.
+
+(<a href="http://bugdb.tads.org/view.php?id=0000133">bugdb.tads.org
+#0000133</a>)
+
+<li>Workbench for Windows now stores the global options file
+(htmltdb3.t3c) in the local Windows "Application Data" folder, to
+ensure that the file is accessible to each Workbench user.  In the
+past, the options file was stored in the "Program Files" folder where
+Workbench is installed.  This was problematic for users without
+Administrator privileges, since the Program Files folder is normally
+read-only for non-admin users.  In such cases, Workbench was unable to
+save updates to the option settings, since it has to write to the
+options file to save those updates.
+
+<p>The new scheme works as follows:
+
+<ul>
+
+   <li>If Workbench is installed in a subfolder of the system's
+Program Files folder (usually C:\Program Files), the global options
+file is stored in the system's Application Data folder, in a
+corresponding subfolder.  For example, if Workbench is installed in
+&lt;Program Files&gt;\TADS 3, the options file is stored in &lt;Application
+Data&gt;\TADS 3.  Using a corresponding subfolder allows you to have
+multiple Workbench versions installed on the same machine by ensuring
+that each version's options file is in a separate location.
+
+   <li>If Workbench isn't installed within Program Files, the options
+file is stored directly in the install directory (where the Workbench
+.exe file is located).  The assumption in this case is that you've
+installed Workbench in a private user directory, and that you want to
+keep the installation self-contained by keeping everything in that
+single folder.
+
+</ul>
+
+(<a
+href="http://bugdb.tads.org/view.php?id=0000114">bugdb.tads.org
+#0000114</a>)
+
+<li>When running a TADS 3 program within Workbench for Windows, the
+File object now uses the project directory as the default working
+directory.  This restores the behavior that was in versions prior to
+TADS 3.1.0; in 3.1.0, the File object used the .t3 folder as the
+default directory.  The .t3 folder is still the default when running
+the game in a normal interpreter (HTML TADS, or t3run in a DOS box).
+For debugging purposes under Workbench, though, it's more convenient
+to use the project directory as the working directory.  The debugging
+.t3 file when working with Workbench is typically stored in a separate
+folder along with the other compiler output files, to keep the main
+project folder tidy; you usually want to keep any files you access
+through the File object together with the project source files instead
+of those compiler output files.
+
+(<a
+href="http://bugdb.tads.org/view.php?id=0000120">bugdb.tads.org
+#0000120</a>)
+
+<li>In version 3.1, the HTMLT3.EXE interpreter process didn't
+terminate properly after the user closed the UI window of a Web UI
+game running in local stand-alone mode.  The HTMLT3.EXE process kept
+running indefinitely in the background in this situation, making it
+necessary to manually terminate the process (using the Windows Task
+Manager, for example).  This has been fixed.
+
+(<a
+href="http://bugdb.tads.org/view.php?id=0000131">bugdb.tads.org
+#0000131</a>)
+
+<li>HTML TADS displayed a [More] prompt unnecessarily in cases where
+the text output just filled the available space, even when this left
+the window scrolled all the way down (so that responding to the [More]
+wouldn't have any effect on scrolling, but would only serve to clear
+the prompt itself).  The prompt is no longer shown in cases where the
+window is already scrolled all the way to the bottom.
+
+(<a
+href="http://bugdb.tads.org/view.php?id=0000155">bugdb.tads.org
+#0000155</a>)
+
+</ul>
 
 
 <!------------------------------------------------------------------------>
@@ -219,9 +402,10 @@ locations by line and column numbers.  It doesn't attempt to analyze
 the differences in the file to find the same actual text that was
 previously selected.)
 
-<li>The Windows debugger didn't respond properly to the Terminate Program
-command when the game was started via a Step In or Step Over command
-(rather than the Go command).  This has been corrected.
+<li class="last">The Windows debugger didn't respond properly to the
+Terminate Program command when the game was started via a Step In or
+Step Over command (rather than the Go command).  This has been
+corrected.
 
 (<a
 href="http://bugdb.tads.org/view.php?id=0000105">bugdb.tads.org
@@ -237,13 +421,13 @@ href="http://bugdb.tads.org/view.php?id=0000105">bugdb.tads.org
 
 <ul>
 
-<li>In releases Win113 and Win114, audio playback of compressed sound
-types (MP3, OGG) didn't work for resources embedded in a .t3 or .gam
-file.  The audio generally just didn't play back when embedded, and
-the audio player sometimes showed a spurious error or warning.  This
-has been corrected; an embedded version of an audio stream should once
-again work the same way as the stand-alone file version of the same
-stream.  (bugdb.tads.org #0000080)
+<li class="last">In releases Win113 and Win114, audio playback of
+compressed sound types (MP3, OGG) didn't work for resources embedded
+in a .t3 or .gam file.  The audio generally just didn't play back when
+embedded, and the audio player sometimes showed a spurious error or
+warning.  This has been corrected; an embedded version of an audio
+stream should once again work the same way as the stand-alone file
+version of the same stream.  (bugdb.tads.org #0000080)
 
 </ul>
 

@@ -159,7 +159,7 @@ protected:
  *   storage server run-time error, so this won't return.  On success, we
  *   simply return.  
  */
-void vmnet_check_storagesrv_reply(VMG_ int htmlstat, CVmStream *reply,
+void vmnet_check_storagesrv_reply(VMG_ int htmlstat, CVmDataSource *reply,
                                   const char *headers);
 
 /*
@@ -176,7 +176,7 @@ void vmnet_check_storagesrv_reply(VMG_ int htmlstat, CVmStream *reply,
  *   
  *   The caller must delete the returned buffer with t3free().  
  */
-char *vmnet_get_storagesrv_stat(VMG_ int htmlstat, CVmStream *reply,
+char *vmnet_get_storagesrv_stat(VMG_ int htmlstat, CVmDataSource *reply,
                                 const char *headers);
 
 /*
@@ -520,7 +520,7 @@ public:
         servers = 0;
 
         /* note the time we started running */
-        time(&start_time);
+        os_time(&start_time);
 
         /* start with thread #1 */
         next_thread_id = 1;
@@ -563,7 +563,7 @@ public:
 
     /* get the start time as an ASCII string */
     const char *asc_start_time() const
-        { return asctime(localtime(&start_time)); }
+        { return asctime(os_localtime(&start_time)); }
 
     /* get the 'quit' event object */
     OS_Event *get_quit_evt() const { return quit_evt; }
@@ -576,7 +576,7 @@ protected:
     void remove_thread(class TadsServerThread *t);
 
     /* time the server started running */
-    time_t start_time;
+    os_time_t start_time;
 
     /* 
      *   Password: this is a random string generated at startup, to secure

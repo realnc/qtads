@@ -43,6 +43,7 @@ Modified
 #include "vmerr.h"
 #include "vmerrnum.h"
 #include "vmsrcf.h"
+#include "vmerr.h"
 #include "tcerr.h"
 
 
@@ -1016,10 +1017,8 @@ void CHtmlDebugHelper::vm_get_error_text(struct dbgcxdef *ctx, int err,
 void CHtmlDebugHelper::vm_format_error(struct dbgcxdef *ctx, int err,
                                        textchar_t *buf, size_t buflen)
 {
-    const char *txt;
-    
     /* get the error message */
-    txt = err_get_msg(vm_messages, vm_message_count, err, FALSE);
+    const char *txt = err_get_msg(vm_messages, vm_message_count, err, FALSE);
 
     /* try the compiler messages if we didn't find anything */
     if (txt == 0)
@@ -1034,7 +1033,7 @@ void CHtmlDebugHelper::vm_format_error(struct dbgcxdef *ctx, int err,
     else
     {
         /* format the message using the global error stack */
-        err_format_msg(buf, buflen, txt, G_err->cur_exc_);
+        err_format_msg(buf, buflen, txt, G_err_frame->exc_);
     }
 }
 
@@ -1045,10 +1044,8 @@ void CHtmlDebugHelper::vm_format_error(struct dbgcxdef *ctx, int err,
 int CHtmlDebugHelper::vm_load_file_into_win(CHtmlDbg_win_link *win_link,
                                             const textchar_t *fname)
 {
-    osfildef *fp;
-
     /* open the file */
-    fp = osfoprbv(fname, OSFTTEXT);
+    osfildef *fp = osfoprbv(fname, OSFTTEXT);
 
     /* if we couldn't open the file, return failure */
     if (fp == 0)

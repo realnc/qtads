@@ -80,6 +80,21 @@ public:
         appctx->add_resource_link_ctx = this;
     }
 
+    /* 
+     *   Set debugger mode.  The host system should call this with 'flag' set
+     *   to TRUE if this is a debugger application, rather than an ordinary
+     *   interpreter.  In debugger mode, we allow resource file links (as
+     *   opposed to embedded resources) to access files outside of the
+     *   resource directory path list.  In normal interpreter mode, we
+     *   enforce the standard file safety sandbox settings on resource links,
+     *   to prevent malicious game programs from using links to access files
+     *   outside of the sandbox.  We override the file safety sandbox for
+     *   resource links when the application is a debugger, because we assume
+     *   that the debugger is only used with code written by the local user
+     *   or a trusted collaborator.
+     */
+    void set_debugger_mode(int flag) { debugger_mode_ = flag; }
+
     /*
      *   Get the filename and seek offset to use to read a resource.  If
      *   we can find the resource in our .GAM file resource map, we'll
@@ -138,12 +153,12 @@ private:
     int add_resfile(const char *fname);
 
     /* 
-     *   given a resource name, construct the name of the external file
-     *   containing the resource 
+     *   Given a resource name, construct the name of the external file
+     *   containing the resource.  Returns true on success, false on failure.
      */
-    void resname_to_filename(char *fname_buf, size_t fname_buf_size,
-                             const char *resname, size_t resname_len,
-                             int is_url);
+    int resname_to_filename(char *fname_buf, size_t fname_buf_size,
+                            const char *resname, size_t resname_len,
+                            int is_url);
 
     /*
      *   Static functions used as function pointers in the appctx
@@ -187,6 +202,9 @@ private:
 
     /* the host application context object */
     appctxdef *appctx_;
+
+    /* are we running as a debugger? */
+    int debugger_mode_;
 };
 
 /*

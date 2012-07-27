@@ -2825,12 +2825,25 @@ public:
     void set_int(long val) { typ_ = TC_CVT_INT; val_.intval_ = val; }
 
     /* set a floating-point value */
-    void set_float(const char *val, size_t len)
-    {
-        typ_ = TC_CVT_FLOAT;
-        val_.floatval_.txt_ = val;
-        val_.floatval_.len_ = len;
-    }
+    void set_float(const char *val, size_t len, int promoted);
+
+    /* set a floating-point value from a vbignum_t */
+    void set_float(const class vbignum_t *val, int promoted);
+
+    /* set a floating-point value promoted from an integer */
+    void set_float(ulong i);
+
+    /* 
+     *   Check to see if a promoted float value can be demoted back to int.
+     *   If the value is a float that was flagged as promoted from an int
+     *   constant, and the value fits in an int32, we'll demote the value
+     *   back to an int.  This has no effect if the value isn't a float,
+     *   wasn't promoted, or doesn't fit in an int.  This can be used after a
+     *   constant-folding operation is applied to a value that was at some
+     *   point promoted from int to see if the promotion is no longer
+     *   required.
+     */
+    void demote_float();
 
     /* set an enumerator value */
     void set_enum(ulong val) { typ_ = TC_CVT_ENUM; val_.enumval_ = val; }
@@ -2838,6 +2851,9 @@ public:
     /* set a single-quoted string value */
     void set_sstr(const char *val, size_t len);
     void set_sstr(const CTcToken *tok);
+
+    /* set a regex string value (R'...' or R"...") */
+    void set_restr(const CTcToken *tok);
 
     /* set a list value */
     void set_list(class CTPNList *lst);
@@ -2913,6 +2929,9 @@ public:
     const char *get_val_float() const { return val_.floatval_.txt_; }
     size_t get_val_float_len() const { return val_.floatval_.len_; }
 
+    /* was the value promoted to float from int due to overflow? */
+    int is_promoted() const { return promoted_; }
+
     /* get my enumerator value (no type checking) */
     ulong get_val_enum() const { return val_.enumval_; }
 
@@ -2974,14 +2993,17 @@ public:
      */
     int get_val_bool() const
     {
-        return !(typ_ == TC_CVT_NIL
-                 || (typ_ == TC_CVT_INT && get_val_int() == 0));
+        return !(typ_ == TC_CVT_NIL || equals_zero());
     }
+
+    /* is this is a numeric value equal to zero? */
+    int equals_zero() const;
 
     /*
      *   Set/get the compile-time constant flag.  A compile-time constant is
      *   a value that's constant at compile-time, but which can vary from one
-     *   compilation to the next.  The defined() operator has this property.
+     *   compilation to the next.  The defined() and __objref() operators
+     *   have this property.
      */
     void set_ctc(int f) { ctc_ = f; }
     int is_ctc() const { return ctc_; }
@@ -3084,6 +3106,14 @@ private:
      *   automatically omit the referring code when module B is omitted.
      */
     uint ctc_ : 1;
+
+    /* 
+     *   Is this a promoted value?  This is set to true for promotions from
+     *   int to BigNumber that are due to overflows.  This isn't set for
+     *   values explicitly entered as floating point values or that were
+     *   constant-folded from expressions containing explicit floats.
+     */
+    uint promoted_ : 1;
 };
 
 
@@ -3597,8 +3627,12 @@ public:
                        class CTcPrsNode *right) const;
 
 protected:
-    /* calculate the result */
-    virtual long calc_result(long val1, long val2) const = 0;
+    /* calculate the result of the operand applied to constant int values */
+    virtual long calc_result(long val1, long val2, int &ov) const = 0;
+
+    /* calculate the result for constant float values */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const = 0;
 };
 
 /* bitwise OR */
@@ -3614,9 +3648,20 @@ public:
                     class CTcPrsNode *right) const;
 
 protected:
-    /* calculate the result */
-    virtual long calc_result(long val1, long val2) const
-        { return val1 | val2; }
+    /* calculate a constant integer result */
+    virtual long calc_result(long val1, long val2, int &ov) const
+    {
+        ov = FALSE;
+        return val1 | val2;
+    }
+
+    /* calculate a constant float result */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const
+    {
+        G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
+        return 0;
+    }
 };
 
 /* bitwise XOR */
@@ -3633,8 +3678,19 @@ public:
 
 protected:
     /* calculate the result */
-    virtual long calc_result(long val1, long val2) const
-        { return val1 ^ val2; }
+    virtual long calc_result(long val1, long val2, int &ov) const
+    {
+        ov = FALSE;
+        return val1 ^ val2;
+    }
+
+    /* calculate a constant float result */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const
+    {
+        G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
+        return 0;
+    }
 };
 
 /* bitwise AND */
@@ -3651,8 +3707,19 @@ public:
 
 protected:
     /* calculate the result */
-    virtual long calc_result(long val1, long val2) const
-        { return val1 & val2; }
+    virtual long calc_result(long val1, long val2, int &ov) const
+    {
+        ov = FALSE;
+        return val1 & val2;
+    }
+
+    /* calculate a constant float result */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const
+    {
+        G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
+        return 0;
+    }
 };
 
 /*
@@ -3669,7 +3736,19 @@ public:
                     class CTcPrsNode *right) const;
 
 protected:
-    long calc_result(long a, long b) const { return a << b; }
+    long calc_result(long a, long b, int &ov) const
+    {
+        ov = FALSE;
+        return a << b;
+    }
+
+    /* calculate a constant float result */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const
+    {
+        G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
+        return 0;
+    }
 };
 
 /*
@@ -3686,7 +3765,19 @@ public:
                     class CTcPrsNode *right) const;
 
 protected:
-    long calc_result(long a, long b) const { return t3_ashr(a, b); }
+    long calc_result(long a, long b, int &ov) const
+    {
+        ov = FALSE;
+        return t3_ashr(a, b);
+    }
+
+    /* calculate a constant float result */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const
+    {
+        G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
+        return 0;
+    }
 };
 
 /*
@@ -3703,7 +3794,20 @@ public:
                     class CTcPrsNode *right) const;
 
 protected:
-    long calc_result(long a, long b) const { return t3_lshr(a, b); }
+    /* calculate a constant integer result */
+    long calc_result(long a, long b, int &ov) const
+    {
+        ov = FALSE;
+        return t3_lshr(a, b);
+    }
+
+    /* calculate a constant float result */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const
+    {
+        G_tok->log_error(TCERR_BAD_OP_FOR_FLOAT);
+        return 0;
+    }
 };
 
 /*
@@ -3720,7 +3824,17 @@ public:
                     class CTcPrsNode *right) const;
 
 protected:
-    long calc_result(long a, long b) const { return a * b; }
+    /* calculate a constant integer result */
+    long calc_result(long a, long b, int &ov) const
+    {
+        int64_t prod = a * b;
+        ov = (prod > (int64_t)INT32MAXVAL || prod < (int64_t)INT32MINVAL);
+        return (long)prod;
+    }
+
+    /* calculate a constant float result */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const;
 };
 
 /*
@@ -3741,7 +3855,12 @@ public:
                     class CTcPrsNode *right) const;
     
 protected:
-    long calc_result(long a, long b) const;
+    /* calculate a constant integer result */
+    long calc_result(long a, long b, int &ov) const;
+
+    /* calculate a constant float result */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const;
 };
 
 
@@ -3759,7 +3878,12 @@ public:
                     class CTcPrsNode *right) const;
 
 protected:
-    long calc_result(long a, long b) const;
+    /* calculate a constant integer result */
+    long calc_result(long a, long b, int &ov) const;
+
+    /* calculate a constant float result */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const;
 };
 
 /*
@@ -3781,7 +3905,17 @@ public:
                        class CTcPrsNode *right) const;
 
 protected:
-    long calc_result(long a, long b) const { return a + b; }
+    /* calculate a constant integer result */
+    long calc_result(long a, long b, int &ov) const
+    {
+        int32_t sum = (int32_t)(a + b);
+        ov = (a >= 0 ? b > 0 && sum < a : b < 0 && sum > a);
+        return sum;
+    }
+
+    /* calculate a constant float result */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const;
 };
 
 /*
@@ -3803,7 +3937,17 @@ public:
                        class CTcPrsNode *right) const;
 
 protected:
-    long calc_result(long a, long b) const { return a - b; }
+    /* calculate a constant integer result */
+    long calc_result(long a, long b, int &ov) const
+    {
+        int32_t diff = (int32_t)(a - b);
+        ov = (a >= 0 ? b < 0 && diff < a : b > 0 && diff > a);
+        return diff;
+    }
+
+    /* calculate a constant float result */
+    virtual class vbignum_t *calc_result(
+        const class vbignum_t &a, const class vbignum_t &b) const;
 };
 
 /*

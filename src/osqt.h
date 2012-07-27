@@ -23,6 +23,8 @@
 #ifndef OSQT_H
 #define OSQT_H
 
+#include <QtGlobal>
+
 /* Most systems have typedefs for ushort, uint and ulong.  If not, the
  * qtads.pro project file should be modified to define OS_NO_TYPES_DEFINED. */
 #ifndef OS_NO_TYPES_DEFINED
@@ -30,6 +32,10 @@
 #define OS_UINT_DEFINED
 #define OS_ULONG_DEFINED
 #endif
+
+#define USE_DOSEXT
+#define OSNOUI_OMIT_TEMPFILE
+#define fname_memcmp memcmp
 
 /* ANSI C99 exact-size integer types.  We simply map them to the Qt types.
  * If these types have already been defined, it's harmless to typedef them
@@ -40,6 +46,11 @@ typedef quint16 uint16_t;
 typedef qint32 int32_t;
 typedef quint32 uint32_t;
 
+/* TODO: Implement threads.
+ */
+#define OS_DECLARATIVE_TLS
+#define OS_DECL_TLS(t, v) t v
+
 /* Standard C headers should never be included from inside an extern "C" block.
  * However, we are included from tads2/os.h from inside such a block ourselves,
  * so everything we include will be extern "C" too.  We need to reverse this or
@@ -49,6 +60,8 @@ extern "C++" {
 #endif
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #ifdef __cplusplus
 }
@@ -120,13 +133,17 @@ extern "C++" {
 #define OSPATHCHAR '/'
 #endif
 
+/* Directory separator for PATH-style environment variables. */
+#define OSPATHSEP ':'
+
+/* String giving the special path representing the current
+ * working directory. */
+#define OSPATHPWD "."
+
 #ifndef OS_NEWLINE_SEQ
 /* ASCII string giving the local newline sequence to write on output. */
 #define OS_NEWLINE_SEQ  "\n"
 #endif
-
-/* Directory separator for PATH-style environment variables. */
-#define OSPATHSEP ':'
 
 /* File handle structure for osfxxx functions. */
 typedef FILE osfildef;
@@ -153,6 +170,31 @@ typedef FILE osfildef;
 #define OSFSK_SET SEEK_SET /* Set position relative to the start of the file. */
 #define OSFSK_CUR SEEK_CUR /* Set position relative to the current file position. */
 #define OSFSK_END SEEK_END /* Set position relative to the end of the file. */
+
+/* File modes.  On Windows, we do the Microsoft thing.  Everywhere else, we
+ * assume POSIX stat(2). */
+#ifdef Q_OS_WIN32
+    #define OSFMODE_FILE     _S_IFREG
+    #define OSFMODE_DIR      _S_IFDIR
+    #define OSFMODE_BLK      0
+    #define OSFMODE_CHAR     _S_IFCHR
+    #define OSFMODE_PIPE     _S_IFIFO
+    #define OSFMODE_SOCKET   0
+    #define OSFMODE_LINK     0
+#else
+    #define OSFMODE_FILE    S_IFREG
+    #define OSFMODE_DIR     S_IFDIR
+    #define OSFMODE_CHAR    S_IFCHR
+    #define OSFMODE_BLK     S_IFBLK
+    #define OSFMODE_PIPE    S_IFIFO
+    #define OSFMODE_LINK    S_IFLNK
+    #define OSFMODE_SOCKET  S_IFSOCK
+#endif
+
+/* Directory enumerator handle.  This must be usable from C code, so we
+ * use "struct" rather than "class".
+ */
+typedef struct QDirIterator* osdirhdl_t;
 
 
 /* ============= Functions follow ================ */
@@ -235,12 +277,20 @@ osfoprwb( const char* fname, os_filetype_t typ );
 /* Delete a file. */
 #define osfdel remove
 
+/* Rename a file. */
+int
+os_rename_file( const char* oldname, const char* newname );
+
 /* Access a file - determine if the file exists.
  *
  * We map this to the access() function.  It should be available in
  * virtually every system out there, as it appears in many standards
  * (SVID, AT&T, POSIX, X/OPEN, BSD 4.3, DOS, MS Windows, maybe more). */
 #define osfacc(fname) (access((fname), F_OK))
+
+/* Get a file's mode. */
+int
+osfmode( const char* fname, int follow_links, unsigned long* mode );
 
 /* Get a character from a file. */
 #define osfgetc fgetc

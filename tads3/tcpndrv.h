@@ -1373,7 +1373,7 @@ public:
     CTcSymFuncBase(const char *str, size_t len, int copy,
                    int argc, int opt_argc, int varargs, int has_retval,
                    int is_multimethod, int is_multimethod_base,
-                   int is_extern)
+                   int is_extern, int has_proto)
         : CTcSymbol(str, len, copy, TC_SYM_FUNC)
     {
         /* remember the interface information */
@@ -1386,6 +1386,9 @@ public:
 
         /* note whether it's external */
         is_extern_ = is_extern;
+
+        /* note whether it has a prototype */
+        has_proto_ = has_proto;
 
         /* no code stream anchor yet */
         anchor_ = 0;
@@ -1453,6 +1456,10 @@ public:
     /* get/set the 'extern' flag */
     int is_extern() const { return is_extern_; }
     void set_extern(int f) { is_extern_ = f; }
+
+    /* get/set the 'has prototype' flag */
+    int has_proto() const { return has_proto_; }
+    void set_has_proto(int f) { has_proto_ = f; }
 
     /* get/set the multi-method flag */
     int is_multimethod() const { return is_multimethod_; }
@@ -1596,6 +1603,13 @@ protected:
 
     /* flag: this multi-method is defined in this file */
     unsigned int mm_def_ : 1;
+
+    /* 
+     *   Flag: this function has a known prototype.  An 'extern' function
+     *   declaration is allowed without a prototype, in which case the
+     *   function can be defined elsewhere with any prototype. 
+     */
+    unsigned int has_proto_ : 1;
 };
 
 /*
@@ -3557,8 +3571,10 @@ public:
     /* adjust for dynamic (run-time) compilation */
     class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info)
     {
-        then_part_ = (CTPNStm *)then_part_->adjust_for_dyn(info);
-        else_part_ = (CTPNStm *)then_part_->adjust_for_dyn(info);
+        if (then_part_ != 0)
+            then_part_ = (CTPNStm *)then_part_->adjust_for_dyn(info);
+        if (else_part_ != 0)
+            else_part_ = (CTPNStm *)else_part_->adjust_for_dyn(info);
         return this;
     }
 

@@ -74,9 +74,21 @@ Modified
  *   - otherwise, leave the symbol undefined.  
  */
 #ifdef COMPILER_DETECTS_THROW_NORETURN
+#define COMPILER_DETECTS_THROW_NORETURN_IN_VMERR
 #define AFTER_ERR_THROW(code)
 #else
 #define AFTER_ERR_THROW(code)   code
+#endif
+
+/* 
+ *   And the same idea as above, but for the special case where the compiler
+ *   detects this within the vmerr.cpp module (for static functions in the
+ *   same module), but not across modules.
+ */
+#ifdef COMPILER_DETECTS_THROW_NORETURN_IN_VMERR
+#define VMERR_AFTER_ERR_THROW(code)
+#else
+#define VMERR_AFTER_ERR_THROW(code)  code
 #endif
 
 /*
@@ -206,8 +218,8 @@ typedef unsigned long  ulong;
 #define INT16MAXVAL    32767
 #define INT16MINVAL    (-32768)
 #define UINT16MAXVAL   65535
-#define INT32MAXVAL    2147483647
-#define INT32MINVAL    (-2147483648)
+#define INT32MAXVAL    2147483647L
+#define INT32MINVAL    (-2147483647L-1)
 #define UINT32MAXVAL   4294967295U
 
 
@@ -389,6 +401,47 @@ inline void lib_strcpy(char *dst, size_t dstsiz, const char *src)
     lib_strcpy(dst, dstsiz, src, strlen(src));
 }
 
+/*
+ *   Compare two counted-length strings, with or without case sensitivity.
+ */
+inline int lib_strcmp(const char *str1, size_t len1,
+                      const char *str2, size_t len2)
+{
+    int bylen = len1 - len2, bymem;
+    if (bylen == 0)
+        return memcmp(str1, str2, len1);
+    else if (bylen < 0)
+        bymem = memcmp(str1, str2, len1);
+    else
+        bymem = memcmp(str1, str2, len2);
+    return (bymem != 0 ? bymem : bylen);
+}
+inline int lib_stricmp(const char *str1, size_t len1,
+                       const char *str2, size_t len2)
+{
+    int bylen = len1 - len2, bymem;
+    if (bylen == 0)
+        return memicmp(str1, str2, len1);
+    else if (bylen < 0)
+        bymem = memicmp(str1, str2, len1);
+    else
+        bymem = memicmp(str1, str2, len2);
+    return (bymem != 0 ? bymem : bylen);
+}
+
+/*
+ *   Compare a counted-length string to a regular C string, with or without
+ *   case sensitivity.
+ */
+inline int lib_strcmp(const char *str1, size_t len1, const char *str2)
+{
+    return lib_strcmp(str1, len1, str2, strlen(str2));
+}
+inline int lib_stricmp(const char *str1, size_t len1, const char *str2)
+{
+    return lib_stricmp(str1, len1, str2, strlen(str2));
+}
+
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -412,6 +465,17 @@ inline char *lib_strnchr(const char *src, size_t len, int ch)
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   Limited-length atoi 
+ */
+int lib_atoi(const char *str, size_t len);
+
+/*
+ *   Limited-length atoi, with auto-advance of the string
+ */
+int lib_atoi_adv(const char *&str, size_t &len);
+
+/* ------------------------------------------------------------------------ */
+/*
  *   Compare two strings, ignoring differences in whitespace between the
  *   strings.  Returns true if the strings are equal (other than
  *   whitespace, false if not.
@@ -426,6 +490,52 @@ inline char *lib_strnchr(const char *src, size_t len, int ch)
  */
 int lib_strequal_collapse_spaces(const char *a, size_t a_len,
                                  const char *b, size_t b_len);
+
+
+/* ------------------------------------------------------------------------ */
+/* 
+ *   Utility routine - compare UTF-8 strings with full Unicode case folding.
+ *   Returns <0 if a<b, 0 if a==b, >0 if a>b.
+ *   
+ *   If 'bmatchlen' is non-null, string 'a' can match as a leading substring
+ *   of string 'b'.  If 'b' is identical to 'a' or contains 'a' as a leading
+ *   substring, we'll return 0 to indicate a match, and fill in '*bmatchlen'
+ *   with the number of bytes matched.
+ *   
+ *   If 'bmatchlen' is null, we'll do a straightforward string comparison, so
+ *   a 0 return means the two strings match exactly.
+ */
+int t3_compare_case_fold(
+    const char *a, size_t alen,
+    const char *b, size_t blen, size_t *bmatchlen);
+
+/* compare a UTF-8 string against a wchar_t* string */
+int t3_compare_case_fold(
+    const wchar_t *a, size_t alen,
+    const char *b, size_t blen, size_t *bmatchlen);
+
+/*
+ *   Compare the minimum portions of two UTF-8 strings with case folding.
+ *   This compares the folded version of the first character of each string
+ *   to the other.  If they match, we advance the pointers and lengths past
+ *   the matched text and return 0; otherwise we return < 0 if the first
+ *   string sorts before the second, > 0 if the first sorts after the second.
+ *   
+ *   In the simplest case, this matches one character from each string.
+ *   However, there are situations where the folded version of one character
+ *   can correspond to two characters of source text in the other string,
+ *   such as the German ess-zed: this will match "ss" in the source text in
+ *   the other string, consuming only one character (the ess-zed) in one
+ *   string but two ("ss") in the other.
+ */
+int t3_compare_case_fold_min(class utf8_ptr &a, size_t &alen,
+                             class utf8_ptr &b, size_t &blen);
+
+int t3_compare_case_fold_min(class utf8_ptr &a, size_t &alen,
+                             const wchar_t* &b, size_t &blen);
+
+int t3_compare_case_fold_min(const wchar_t* &a, size_t &alen,
+                             const wchar_t* &b, size_t &blen);
 
 
 /* ------------------------------------------------------------------------ */

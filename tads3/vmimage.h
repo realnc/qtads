@@ -641,6 +641,9 @@ class CVmImageFile
 public:
     /* delete the loader */
     virtual ~CVmImageFile() { }
+
+    /* duplicate the image file interface, a la stdio freopen() */
+    virtual CVmImageFile *dup(const char *mode) = 0;
     
     /* 
      *   Copy data from the image file to the caller's buffer.  Reads from
@@ -701,6 +704,17 @@ public:
         len_ = len;
     }
 
+    CVmStream *clone(VMG_ const char *mode)
+    {
+        /* duplicate our file handle */
+        CVmImageFile *fpdup = fp_->dup(mode);
+        if (fpdup == 0)
+            return 0;
+
+        /* create a new image file stream wrapper for the duplicate handle */
+        return new CVmImageFileStream(fpdup, len_);
+    }
+
     /* read bytes into a buffer */
     virtual void read_bytes(char *buf, size_t len);
     virtual size_t read_nbytes(char *buf, size_t len);
@@ -745,7 +759,19 @@ public:
         /* we don't have any suballocation blocks yet */
         mem_head_ = mem_tail_ = 0;
     }
-    
+
+    /* duplicate the file interface */
+    virtual CVmImageFile *dup(const char *mode)
+    {
+        /* duplicate our file handle */
+        CVmFile *fpdup = fp_->dup(mode);
+        if (fpdup == 0)
+            return 0;
+
+        /* return a new wrapper object for the duplicate handle */
+        return new CVmImageFileExt(fpdup);
+    }
+
     /* 
      *   CVmImageFile interface implementation 
      */
@@ -860,6 +886,12 @@ public:
 
         /* start at the beginning of the data */
         pos_ = 0;
+    }
+
+    /* duplicate the file interface */
+    CVmImageFile *dup(const char *mode)
+    {
+        return new CVmImageFileMem(mem_, len_);
     }
 
     /* 

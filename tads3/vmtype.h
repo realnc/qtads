@@ -312,11 +312,25 @@ struct vm_val_t
     int is_logical() const { return (typ == VM_NIL || typ == VM_TRUE); }
 
     /* 
-     *   Get a logical as numeric TRUE or FALSE.  This does not perform
+     *   Get a logical as numeric TRUE or FALSE.  This doesn't perform
      *   any type checking; the caller must ensure that the value is
      *   either true or nil, or this may return meaningless results.  
      */
     int get_logical() const { return (typ == VM_TRUE); }
+
+    /* get as logical, checking type */
+    int get_logical_only() const
+    {
+        if (typ == VM_TRUE)
+            return TRUE;
+        else if (typ == VM_NIL)
+            return FALSE;
+        else
+        {
+            err_throw(VMERR_BAD_TYPE_BIF);
+            AFTER_ERR_THROW(return FALSE;)
+        }
+    }
 
     /*
      *   Get the underlying string constant value.  If the value does not
@@ -393,14 +407,11 @@ struct vm_val_t
         }
     }
 
-    /* determine if the value is some kind of number */
-    int is_numeric() const { return (typ == VM_INT); }
+    /* determine if the value is an integer */
+    int is_int() const { return (typ == VM_INT); }
 
-    /*
-     *   Convert a numeric value to an integer.  If the value is not
-     *   numeric, we'll throw an error. 
-     */
-    int32_t num_to_int() const
+    /* get the value as an integer, throwing an error if it's any other type */
+    int32_t get_as_int() const
     {
         /* check the type */
         if (typ == VM_INT)
@@ -410,21 +421,53 @@ struct vm_val_t
         }
         else
         {
-            /* 
-             *   other types are not numeric and can't be directly
-             *   converted to integer by arithmetic conversion
-             */
+            /* not an integer - throw an error */
             err_throw(VMERR_NUM_VAL_REQD);
-
-            /* the compiler might not know we'll never get here */
             AFTER_ERR_THROW(return 0;)
         }
     }
 
     /* 
-     *   Cast to an integer value.  
+     *   determine if the type is numeric - this returns true for integer and
+     *   BigNumber values, and could match future types that are numeric
      */
-    int32_t cast_to_int(VMG0_) const;
+    int is_numeric(VMG0_) const
+        { return typ == VM_INT || nonint_is_numeric(vmg0_); }
+
+    /*
+     *   Promote an integer to this numeric type.  For example, if 'this' is
+     *   a BigNumber, this creates a BigNumber representation of val.  This
+     *   converts the value in place, replacing '*val' with the promoted
+     *   value.
+     */
+    void promote_int(VMG_ vm_val_t *val) const;
+
+    /* 
+     *   Convert a numeric value to an integer.  This converts any type for
+     *   which is_numeric() returns true, but doesn't convert non-numeric
+     *   types.
+     */
+    int32_t num_to_int(VMG0_) const
+        { return typ == VM_INT ? val.intval : nonint_num_to_int(vmg0_); }
+
+    /*
+     *   Convert a numeric value to a double.  This converts any type for
+     *   which is_numeric() returns true, but doesn't convert non-numeric
+     *   types.
+     */
+    double num_to_double(VMG0_) const
+    {
+        return typ == VM_INT
+            ? (double)val.intval
+            : nonint_num_to_double(vmg0_);
+    }
+
+    /* 
+     *   Cast to an integer.  This is more aggressive than num_to_int(), in
+     *   that we actively try to convert non-numeric types.
+     */
+    int32_t cast_to_int(VMG0_) const
+        { return typ == VM_INT ? val.intval : nonint_cast_to_int(vmg0_); }
 
     /*
      *   Cast to a numeric type - integer or BigNumber.  If the value is
@@ -547,6 +590,16 @@ struct vm_val_t
 private:
     /* out-of-line comparison, used when we don't have two integers */
     int gen_compare_to(VMG_ const vm_val_t *val) const;
+
+    /* 
+     *   internal int conversion and casting - we separate these from
+     *   num_to_int and cast_to_int so that cast_to_int can be inlined for
+     *   the common case where the value is already an int 
+     */
+    int nonint_is_numeric(VMG0_) const;
+    int32_t nonint_num_to_int(VMG0_) const;
+    double nonint_num_to_double(VMG0_) const;
+    int32_t nonint_cast_to_int(VMG0_) const;
 };
 
 /* ------------------------------------------------------------------------ */

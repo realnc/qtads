@@ -226,6 +226,7 @@ enum tc_toktyp_t
     TOKT_DSTR_START,          /* start of a dstring with embedding - "...<< */
     TOKT_DSTR_MID,          /* middle of a dstring with embedding - >>...<< */
     TOKT_DSTR_END,              /* end of a dstring with embedding - >>..." */
+    TOKT_RESTR,             /* regular expression string - R'...' or R"..." */
     TOKT_LPAR,                                            /* left paren '(' */
     TOKT_RPAR,                                           /* right paren ')' */
     TOKT_COMMA,                                                /* comma ',' */
@@ -281,8 +282,10 @@ enum tc_toktyp_t
     TOKT_QQ,                                   /* double question mark '??' */
     TOKT_COLONCOLON,                                   /* double-colon '::' */
     TOKT_FLOAT,                                    /* floating-point number */
+    TOKT_BIGINT,          /* an integer promoted to a float due to overflow */
     TOKT_AT,                                                     /* at-sign */
     TOKT_DOTDOT,                                       /* range marker '..' */
+    TOKT_FMTSPEC,                  /* sprintf format spec for <<%fmt expr>> */
 
     /* keywords */
     TOKT_SELF,
@@ -725,6 +728,9 @@ struct tok_embed_ctx
 class CTcToken
 {
 public:
+    CTcToken() { }
+    CTcToken(tc_toktyp_t typ) : typ_(typ) { }
+    
     /* get/set the token type */
     tc_toktyp_t gettyp() const { return typ_; }
     void settyp(tc_toktyp_t typ) { typ_ = typ; }
@@ -743,14 +749,12 @@ public:
     }
 
     /* get/set the integer value */
-    long get_int_val() const { return int_val_; }
-    void set_int_val(long val, int overflow)
+    ulong get_int_val() const { return int_val_; }
+    void set_int_val(ulong val)
     {
         typ_ = TOKT_INT;
         int_val_ = val;
-        int_overflow_ = overflow;
     }
-    int get_int_overflow() const { return int_overflow_; }
 
     /* 
      *   compare the text to the given string - returns true if the text
@@ -772,7 +776,6 @@ public:
         text_ = tok.text_;
         text_len_ = tok.text_len_;
         int_val_ = tok.int_val_;
-        int_overflow_ = tok.int_overflow_;
         fully_expanded_ = tok.fully_expanded_;
     }
 
@@ -790,10 +793,7 @@ private:
     size_t text_len_;
 
     /* integer value - valid when the token type is TOKT_INT */
-    long int_val_;
-
-    /* flag: for an integer token, the constant overflowed a 32-bit int */
-    uint int_overflow_ : 1;
+    ulong int_val_;
 
     /* 
      *   flag: the token has been fully expanded, and should not be
@@ -1015,6 +1015,12 @@ public:
      */
     void unget();
     void unget(const CTcToken *prv);
+
+    /* 
+     *   Push a token into the token stream.  The given token becomes the
+     *   next token to be retrieved.  This doesn't affect the current token.
+     */
+    void push(const CTcToken *tok);
 
     /* get the current token */
     const class CTcToken *getcur() const { return &curtok_; }
@@ -1449,6 +1455,19 @@ private:
 
     /* splice lines for a string that runs across multiple lines */
     void splice_string();
+
+    /* scan a sprintf format spec */
+    void scan_sprintf_spec(utf8_ptr *p);
+
+    /* translate a \ escape sequence */
+    void xlat_escape(utf8_ptr *dst, utf8_ptr *p, wchar_t qu, int triple);
+
+    /* skip an ordinary character or \ escape sequence */
+    void skip_escape(utf8_ptr *p);
+
+    /* translate escape sequences in a string segment */
+    void xlat_escapes(utf8_ptr *dstp, const utf8_ptr *srcp,
+                      const utf8_ptr *endp);
 
     /* expand macros in the current line */
     int expand_macros_curline(int read_more, int allow_defined,

@@ -61,8 +61,8 @@ void vm_log(VMG_ const char *str, size_t len)
         CVmFileSource ds(fp);
 
         /* get a printable timestamp */
-        time_t timer = time(0);
-        struct tm *tblk = localtime(&timer);
+        os_time_t timer = os_time(0);
+        struct tm *tblk = os_localtime(&timer);
         char *tmsg = asctime(tblk);
 
         /* remove the trailing '\n' from the asctime message */

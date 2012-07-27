@@ -92,6 +92,41 @@ osfoprwb( const char* fname, os_filetype_t filetype )
 }
 
 
+/* Duplicate a file handle.
+ */
+osfildef*
+osfdup( osfildef* orig, const char* mode )
+{
+    char realmode[5];
+    char *p = realmode;
+    const char *m;
+
+    /* verify that there aren't any unrecognized mode flags */
+    for (m = mode ; *m != '\0' ; ++m)
+    {
+        if (strchr("rw+bst", *m) == 0)
+            return 0;
+    }
+
+    /* figure the read/write mode - translate r+ and w+ to r+ */
+    if ((mode[0] == 'r' || mode[0] == 'w') && mode[1] == '+')
+        *p++ = 'r', *p++ = '+';
+    else if (mode[0] == 'r')
+        *p++ = 'r';
+    else if (mode[0] == 'w')
+        *p++ = 'w';
+    else
+        return 0;
+
+    /* end the mode string */
+    *p = '\0';
+
+    /* duplicate the handle in the given mode */
+    return fdopen(dup(fileno(orig)), mode);
+}
+
+
+#if 0
 /* Print a counted-length string (which might not be null-terminated)
  * to a file.
  */
@@ -114,6 +149,168 @@ os_fprintz( osfildef* fp, const char* str )
     Q_ASSERT(str != 0);
 
     std::fprintf(fp, "%s", str);
+}
+#endif
+
+
+int
+os_rename_file( const char* oldname, const char* newname )
+{
+    return QFile::rename(QString::fromLocal8Bit(oldname),
+                         QString::fromLocal8Bit(newname));
+}
+
+
+int
+os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
+{
+#ifdef Q_OS_WIN32
+    struct __stat64 info;
+
+    // $$$ we should support Windows symlinks and junction points
+
+    /* get the file information */
+    if (_stat64(fname, &info))
+        return FALSE;
+
+    /* translate the status fields */
+    s->sizelo = (uint32_t)(info.st_size & 0xFFFFFFFF);
+    s->sizehi = (uint32_t)(info.st_size >> 32);
+    s->cre_time = (os_time_t)info.st_ctime;
+    s->mod_time = (os_time_t)info.st_mtime;
+    s->acc_time = (os_time_t)info.st_atime;
+    s->mode = info.st_mode;
+
+    /* success */
+    return TRUE;
+#else
+    struct stat info;
+
+    /* get the file information */
+    if (follow_links ? stat(fname, &info) : lstat(fname, &info))
+        return FALSE;
+
+    /* translate the status fields */
+    if (sizeof(info.st_size) <= 4)
+    {
+        s->sizelo = info.st_size;
+        s->sizehi = 0;
+    }
+    else
+    {
+        s->sizelo = (uint32_t)(info.st_size & 0xFFFFFFFF);
+        s->sizehi = (uint32_t)(info.st_size >> 32);
+    }
+    s->cre_time = info.st_ctime;
+    s->mod_time = info.st_mtime;
+    s->acc_time = info.st_atime;
+    s->mode = info.st_mode;
+
+    /* success */
+    return TRUE;
+#endif
+}
+
+
+/* Manually resolve a symbolic link.
+ */
+int
+os_resolve_symlink( const char* fname, char* target, size_t target_size )
+{
+    const QByteArray& str(QFileInfo(QString::fromLocal8Bit(fname)).symLinkTarget().toLocal8Bit());
+    if (str.isEmpty() or str.size() >= target_size) {
+        return false;
+    }
+    qstrcpy(target, str.constData());
+}
+
+
+/* Get a list of root directories.
+ */
+size_t
+os_get_root_dirs( char* buf, size_t buflen )
+{
+    const QFileInfoList& rootList = QDir::drives();
+    // Paranoia.
+    if (rootList.size() == 0) {
+        return 0;
+    }
+
+    QByteArray str;
+    for (int i = 0; i < rootList.size(); ++i) {
+        str += rootList.at(i).path().toLatin1();
+        // Every path needs to be NULL-terminated.
+        str += '\0';
+    }
+    // The whole result must end with two NULL bytes.
+    str += '\0';
+
+    if (buf != 0 and buflen >= str.size()) {
+        memcpy(buf, str.constData(), str.size());
+    }
+    return str.size();
+}
+
+
+int
+os_open_dir( const char* dirname, osdirhdl_t* handle )
+{
+    QDirIterator* d = new QDirIterator(QString::fromLocal8Bit(dirname),
+                                       QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+    *handle = d;
+    return true;
+}
+
+
+int
+os_read_dir( osdirhdl_t handle, char* fname, size_t fname_size )
+{
+    handle->next();
+    const QByteArray& str(handle->fileName().toLocal8Bit());
+    if (str.isEmpty() or str.size() >= fname_size) {
+        return false;
+    }
+    qstrcpy(fname, str.constData());
+    return true;
+}
+
+
+void
+os_close_dir( osdirhdl_t handle )
+{
+    delete handle;
+}
+
+
+/* Get a file's mode/type.  This returns the same information as
+ * the 'mode' member of os_file_stat_t from os_file_stat(), so we
+ * simply call that routine and return the value.
+ */
+int
+osfmode( const char* fname, int follow_links, unsigned long* mode )
+{
+    os_file_stat_t s;
+    int ok;
+    if ((ok = os_file_stat(fname, follow_links, &s)) != false)
+        *mode = s.mode;
+    return ok;
+}
+
+
+/* Determine if the given filename refers to a special file.
+ */
+os_specfile_t
+os_is_special_file( const char* fname )
+{
+    // We also check for "./" and "../" instead of just "." and
+    // "..".  (We use OSPATHCHAR instead of '/' though.)
+    const char selfWithSep[3] = {'.', OSPATHCHAR, '\0'};
+    const char parentWithSep[4] = {'.', '.', OSPATHCHAR, '\0'};
+    if ((strcmp(fname, ".") == 0) or (strcmp(fname, selfWithSep) == 0))
+        return OS_SPECFILE_SELF;
+    if ((strcmp(fname, "..") == 0) or (strcmp(fname, parentWithSep) == 0))
+        return OS_SPECFILE_PARENT;
+    return OS_SPECFILE_NONE;
 }
 
 
@@ -247,6 +444,7 @@ os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
  *
  * FIXME: We only look in the current directory, whatever that might be.
  */
+#if 0
 int
 os_locate( const char* fname, int /*flen*/, const char* /*arg0*/, char* buf, size_t bufsiz )
 {
@@ -263,6 +461,7 @@ os_locate( const char* fname, int /*flen*/, const char* /*arg0*/, char* buf, siz
     // Not found or buffer not big enough.
     return false;
 }
+#endif
 
 
 /* --------------------------------------------------------------------
@@ -328,9 +527,35 @@ os_gen_temp_filename( char* buf, size_t buflen )
 
 
 /* --------------------------------------------------------------------
+ * Basic directory/folder management routines.
+ */
+
+/* Create a directory.
+ */
+int
+os_mkdir( const char* dir, int create_parents )
+{
+    if (create_parents) {
+        return QDir().mkpath(QString::fromLocal8Bit(dir));
+    }
+    return QDir().mkdir(QString::fromLocal8Bit(dir));
+}
+
+
+/* Remove a directory.
+ */
+int
+os_rmdir( const char* dir )
+{
+    return QDir().rmdir(QString::fromLocal8Bit(dir));
+}
+
+
+/* --------------------------------------------------------------------
  * Filename manipulation routines.
  */
 
+#if 0
 /* Apply a default extension to a filename, if it doesn't already have one.
  */
 void
@@ -443,6 +668,7 @@ os_is_file_absolute( const char* fname )
 {
     return QFileInfo(QString::fromLocal8Bit(fname)).isAbsolute();
 }
+#endif
 
 
 /* Get the absolute, fully qualified filename for a file.
@@ -495,7 +721,8 @@ canonicalize_path( char* path )
 }
 
 int
-os_is_file_in_dir( const char* filename, const char* path, int allow_subdirs )
+os_is_file_in_dir( const char* filename, const char* path, int include_subdirs,
+                   int match_self )
 {
     char filename_buf[OSFNMAX], path_buf[OSFNMAX];
     size_t flen, plen;
@@ -565,7 +792,7 @@ os_is_file_in_dir( const char* filename, const char* path, int allow_subdirs )
      *   in the 'path' directory; otherwise it's in a subdirectory of 'path'
      *   and thus isn't a match.
      */
-    if (allow_subdirs)
+    if (include_subdirs)
     {
         /*
          *   filename is in the 'path' directory or one of its
@@ -595,7 +822,9 @@ os_is_file_in_dir( const char* filename, const char* path, int allow_subdirs )
         return (*p == '\0');
     }
 }
+
 #else
+
 int
 os_is_file_in_dir( const char* filename, const char* path, int include_subdirs )
 {
@@ -894,6 +1123,40 @@ os_input_dialog( int icon_id, const char* prompt, int standard_button_set, const
 /* --------------------------------------------------------------------
  * Time-functions.
  */
+
+/* Higher-precision time (nanosecond precision).
+ */
+void
+os_time_ns( os_time_t* seconds, long* nanoseconds )
+{
+    const QDateTime& curTime = QDateTime::currentDateTime();
+    *seconds = curTime.toTime_t();
+    *nanoseconds = curTime.time().msec() * 1000000;
+}
+
+
+/* Get the local time zone name, as a location name in the IANA zoneinfo
+ * database.
+ *
+ * TODO: Implement.
+ */
+int
+os_get_zoneinfo_key( char* buf, size_t buflen )
+{
+    return false;
+}
+
+
+/* Get a description of the local time zone.
+ *
+ * TODO: Implement.
+ */
+int
+os_get_timezone_info( struct os_tzinfo_t* info )
+{
+    return false;
+}
+
 
 /* Get the current system high-precision timer.
  */

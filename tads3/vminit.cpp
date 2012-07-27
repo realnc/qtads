@@ -49,6 +49,7 @@ Modified
 #include "vmtobj.h"
 #include "osifcnet.h"
 #include "vmhash.h"
+#include "vmtz.h"
 
 
 
@@ -79,8 +80,8 @@ void vm_init_base(vm_globals **vmg, const vm_init_options *opts)
     /* initialize the error stack */
     err_init(VM_ERR_STACK_BYTES);
 
-    /* get the character map loader from the host interface */
-    map_loader = opts->hostifc->get_cmap_res_loader();
+    /* get the system resource loader from the host interface */
+    map_loader = opts->hostifc->get_sys_res_loader();
 
     /* if an external message set hasn't been loaded, try loading one */
     if (!err_is_message_file_loaded() && map_loader != 0)
@@ -113,9 +114,6 @@ void vm_init_base(vm_globals **vmg, const vm_init_options *opts)
     os_build_full_path(G_syslogfile, sizeof(G_syslogfile),
                        path, "tadslog.txt");
 
-    /* we don't have a resource loader for program resources yet */
-    G_res_loader = 0;
-
     /* create the object table */
     VM_IF_ALLOC_PRE_GLOBAL(G_obj_table = new CVmObjTable());
     G_obj_table->init(vmg0_);
@@ -135,6 +133,9 @@ void vm_init_base(vm_globals **vmg, const vm_init_options *opts)
     /* create the metafile and function set tables */
     G_meta_table = new CVmMetaTable(5);
     G_bif_table = new CVmBifTable(5);
+
+    /* create the time zone cache */
+    G_tzcache = new CVmTimeZoneCache();
 
     /* initialize the metaclass registration tables */
     vm_register_metaclasses();
@@ -170,7 +171,7 @@ void vm_init_base(vm_globals **vmg, const vm_init_options *opts)
     G_bif_tads_globals = new CVmBifTADSGlobals(vmg0_);
 
     /* allocate the BigNumber register cache */
-    G_bignum_cache = new CVmBigNumCache(32);
+    CVmObjBigNum::init_cache();
 
     /* no image loader yet */
     G_image_loader = 0;
@@ -298,7 +299,7 @@ void vm_terminate(vm_globals *vmg__, CVmMainClientIfc *clientifc)
     lib_free_str(G_disp_cset_name);
 
     /* delete the BigNumber register cache */
-    delete G_bignum_cache;
+    CVmObjBigNum::term_cache();
 
     /* delete the TADS intrinsic function set's globals */
     delete G_bif_tads_globals;
@@ -332,9 +333,16 @@ void vm_terminate(vm_globals *vmg__, CVmMainClientIfc *clientifc)
     VM_IFELSE_ALLOC_PRE_GLOBAL(delete G_const_pool,
                                G_const_pool->terminate());
 
-    /* delete the object table */
-    G_obj_table->delete_obj_table(vmg0_);
-    VM_IF_ALLOC_PRE_GLOBAL(delete G_obj_table);
+    /* 
+     *   Clear the object table.  This deletes garbage-collected objects but
+     *   doesn't delete the object table itself; we'll do that after we've
+     *   cleared out the metaclass and function-set tables.  We need to
+     *   remove the gc objects before the metaclasses and function tables
+     *   because the gc objects sometimes depend on their metaclasses.  But
+     *   the metaclasses and function sets sometimes keep VM globals, so we
+     *   need to keep the object table around until after they're cleaned up.
+     */
+    G_obj_table->clear_obj_table(vmg0_);
 
     /* delete the dependency tables */
     G_bif_table->clear(vmg0_);
@@ -344,9 +352,16 @@ void vm_terminate(vm_globals *vmg__, CVmMainClientIfc *clientifc)
     /* delete the undo manager */
     delete G_undo;
 
+    /* delete the object table */
+    G_obj_table->delete_obj_table(vmg0_);
+    VM_IF_ALLOC_PRE_GLOBAL(delete G_obj_table);
+
     /* delete the memory manager and heap manager */
     delete G_mem;
     delete G_varheap;
+
+    /* delete the time zone cache */
+    delete G_tzcache;
 
     /* delete the error context */
     err_terminate();

@@ -41,7 +41,7 @@ Modified
 /*
  *   The HTML TADS HT-n version ID string
  */
-#define HTMLTADS_VERSION   "HT-22"
+#define HTMLTADS_VERSION   "HT-23"
 
 
 #endif /* HTMLVER_H */

@@ -112,7 +112,7 @@ class QTadsHostIfc: public CVmHostIfc {
     }
 
     virtual class CResLoader*
-    get_cmap_res_loader()
+    get_sys_res_loader()
     { return this->fCmapResLoader; }
 
     void
