@@ -41,12 +41,6 @@
 #include <cstring>
 #include <ctime>
 
-// So that we can use _stat64() when building on Windows.
-#ifdef Q_OS_WIN32
-    #undef __MSVCRT_VERSION__
-    #define __MSVCRT_VERSION__  0x0601
-#endif
-
 #include "os.h"
 #include "osifcext.h"
 #include "globals.h"
