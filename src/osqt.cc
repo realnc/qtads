@@ -261,7 +261,7 @@ int
 os_open_dir( const char* dirname, osdirhdl_t* handle )
 {
     QDirIterator* d = new QDirIterator(QString::fromLocal8Bit(dirname),
-                                       QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+                                       QDir::Dirs | QDir::Files);
     *handle = d;
     return true;
 }
