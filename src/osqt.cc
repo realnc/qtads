@@ -1173,10 +1173,10 @@ long
 os_get_sys_clock_ms( void )
 {
     static QTime zeroPoint(QTime::currentTime());
-    static int lastRet = -1;
-    static unsigned int wraps = 0;
+    static long lastRet = -1;
+    static unsigned long wraps = 0;
 
-    int ret = zeroPoint.elapsed();
+    long ret = zeroPoint.elapsed();
 
     if (ret < lastRet) {
         // Timer has wrapped to zero.  This only happens when 24 hours have
@@ -1190,7 +1190,7 @@ os_get_sys_clock_ms( void )
     }
 
     lastRet = ret;
-    return ret + (wraps * 86400000);
+    return ret + (wraps * 86400000L);
 }
 
 
