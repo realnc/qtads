@@ -262,6 +262,10 @@ os_open_dir( const char* dirname, osdirhdl_t* handle )
 {
     QDirIterator* d = new QDirIterator(QString::fromLocal8Bit(dirname),
                                        QDir::Dirs | QDir::Files | QDir::Hidden | QDir::System);
+    if (d->next().isEmpty()) {
+        // We can't read anything.  Don't know why, don't care.
+        return false;
+    }
     *handle = d;
     return true;
 }
@@ -270,12 +274,12 @@ os_open_dir( const char* dirname, osdirhdl_t* handle )
 int
 os_read_dir( osdirhdl_t handle, char* fname, size_t fname_size )
 {
-    handle->next();
     const QByteArray& str(handle->fileName().toLocal8Bit());
     if (str.isEmpty() or str.size() >= fname_size) {
         return false;
     }
     qstrcpy(fname, str.constData());
+    handle->next();
     return true;
 }
 
