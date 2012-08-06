@@ -139,6 +139,7 @@ macx|win32 {
 #   VM_UNDO_MAX_SAVEPTS=255
 
 INCLUDEPATH += src $$T2DIR $$T3DIR $$HTDIR
+win32:INCLUDEPATH += $$T2DIR/msdos
 DEPENDPATH += src $$T2DIR $$T3DIR $$HTDIR
 OBJECTS_DIR = obj
 MOC_DIR = tmp
@@ -219,6 +220,12 @@ SOURCES += \
     src/gameinfodialog.cc \
     src/kcolorbutton.cc \
     src/aboutqtadsdialog.cc
+
+unix:SOURCES += \
+    $$T2DIR/tz_posix.c
+
+win32:SOURCES += \
+    $$T2DIR/msdos/tz_w32.c
 
 # Portable Tads headers.  We simply include every header from the Tads
 # directories.  It's sub-optimal, but the safest solution.

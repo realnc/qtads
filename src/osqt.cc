@@ -1144,29 +1144,6 @@ os_time_ns( os_time_t* seconds, long* nanoseconds )
 }
 
 
-/* Get the local time zone name, as a location name in the IANA zoneinfo
- * database.
- *
- * TODO: Implement.
- */
-int
-os_get_zoneinfo_key( char* buf, size_t buflen )
-{
-    return false;
-}
-
-
-/* Get a description of the local time zone.
- *
- * TODO: Implement.
- */
-int
-os_get_timezone_info( struct os_tzinfo_t* info )
-{
-    return false;
-}
-
-
 /* Get the current system high-precision timer.
  */
 long
