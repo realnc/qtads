@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-tads">
+    <comment>TADS 2 Game</comment>
+    <magic priority="50">
+      <match type="string" offset="0" value="TADS2 bin\x0A\x0D\x1A"/>
+    </magic>
+    <glob pattern="*.gam"/>
+  </mime-type>
+  <mime-type type="application/x-t3vm-image">
+    <comment>TADS 3 Executable</comment>
+    <magic priority="50">
+      <match type="string" offset="0" value="T3-image\x0D\x0A\x1A"/>
+    </magic>
+    <glob pattern="*.t3"/>
+    <glob pattern="*.t3x"/>
+  </mime-type>
+</mime-info>
