@@ -51,7 +51,11 @@ CHtmlSysFrameQt::fCtxGetIOSafetyLevel( void*, int* read, int* write )
 
 CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion,
                                   const char* orgName, const char* orgDomain )
-: QApplication(argc, argv), fGameWin(0), fGameRunning(false), fReformatPending(false), fNonStopMode(false)
+    : QApplication(argc, argv),
+      fGameWin(0),
+      fGameRunning(false),
+      fReformatPending(false),
+      fNonStopMode(false)
 {
     //qDebug() << Q_FUNC_INFO;
     Q_ASSERT(qFrame == 0);

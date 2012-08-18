@@ -37,8 +37,18 @@ QList<QTadsSound*> QTadsSound::fObjList;
 
 
 QTadsSound::QTadsSound( QObject* parent, Mix_Chunk* chunk, SoundType type )
-: QObject(parent), fChunk(chunk), fChannel(-1), fType(type), fPlaying(false), fFadeOut(0), fCrossFade(false),
-  fFadeOutTimer(new QTimer(0)), fDone_func(0), fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
+    : QObject(parent),
+      fChunk(chunk),
+      fChannel(-1),
+      fType(type),
+      fPlaying(false),
+      fFadeOut(0),
+      fCrossFade(false),
+      fFadeOutTimer(new QTimer(0)),
+      fDone_func(0),
+      fDone_func_ctx(0),
+      fRepeats(0),
+      fRepeatsWanted(1)
 {
     // FIXME: Calculate sound length in a safer way.
     this->fLength = (this->fChunk->alen * 8) / (2 * 16 * 44.1);

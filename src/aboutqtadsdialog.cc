@@ -8,7 +8,8 @@
 
 
 AboutQtadsDialog::AboutQtadsDialog(QWidget *parent)
-: QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::AboutQtadsDialog)
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
+      ui(new Ui::AboutQtadsDialog)
 {
     ui->setupUi(this);
 

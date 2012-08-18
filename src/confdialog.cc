@@ -29,7 +29,8 @@
 
 
 ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
-: QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::ConfDialog)
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
+      ui(new Ui::ConfDialog)
 {
     ui->setupUi(this);
     Settings* sett = qFrame->settings();

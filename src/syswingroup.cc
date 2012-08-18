@@ -42,13 +42,13 @@ QTadsFrame::resizeEvent( QResizeEvent* e )
 
 
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
-: fConfDialog(0),
-  fGameInfoDialog(0),
-  fAboutBoxDialog(0),
-  fAboutBox(0),
-  fAboutQtadsDialog(0),
-  fNetManager(0),
-  fSilentIfNoUpdates(false)
+    : fConfDialog(0),
+      fGameInfoDialog(0),
+      fAboutBoxDialog(0),
+      fAboutBox(0),
+      fAboutQtadsDialog(0),
+      fNetManager(0),
+      fSilentIfNoUpdates(false)
 {
     //qDebug() << Q_FUNC_INFO << "called";
     Q_ASSERT(qWinGroup == 0);

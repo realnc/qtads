@@ -32,10 +32,21 @@
 
 
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidget, QWidget* parent )
-: QScrollArea(parent), CHtmlSysWin(formatter), fBannerStyleModeMode(true), fBannerStyleAutoVScroll(true),
-  fBannerStyleGrid(false), fBannerStyleBorder(0), fDontReformat(0), fInPagePauseMode(false),
-  fParentBanner(0), fBgImage(0), fBorderLine(qWinGroup->centralWidget()), lastInputHeight(0),
-  margins(8, 2, 8, 2), bannerSize(0), bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
+    : QScrollArea(parent),
+      CHtmlSysWin(formatter),
+      fBannerStyleModeMode(true),
+      fBannerStyleAutoVScroll(true),
+      fBannerStyleGrid(false),
+      fBannerStyleBorder(0),
+      fDontReformat(0),
+      fInPagePauseMode(false),
+      fParentBanner(0),
+      fBgImage(0),
+      fBorderLine(qWinGroup->centralWidget()),
+      lastInputHeight(0),
+      margins(8, 2, 8, 2),
+      bannerSize(0),
+      bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
 {
     if (dispWidget == 0) {
         this->dispWidget = new DisplayWidget(this, formatter);

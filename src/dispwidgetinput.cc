@@ -32,8 +32,12 @@
 
 
 DisplayWidgetInput::DisplayWidgetInput( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
-: DisplayWidget(parent, formatter), fCursorPos(0, 0), fLastCursorPos(0, 0), fCursorVisible(false),
-  fBlinkVisible(false), fBlinkTimer(new QTimer(this))
+    : DisplayWidget(parent, formatter),
+      fCursorPos(0, 0),
+      fLastCursorPos(0, 0),
+      fCursorVisible(false),
+      fBlinkVisible(false),
+      fBlinkTimer(new QTimer(this))
 {
     connect(this->fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
     this->resetCursorBlinking();

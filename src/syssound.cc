@@ -35,7 +35,12 @@
 CHtmlSysSoundMidiQt* CHtmlSysSoundMidiQt::fActiveMidi = 0;
 
 CHtmlSysSoundMidiQt::CHtmlSysSoundMidiQt( SDL_RWops* music )
-: fRWops(music), fPlaying(false), fDone_func(0), fDone_func_ctx(0), fRepeats(0), fRepeatsWanted(1)
+    : fRWops(music),
+      fPlaying(false),
+      fDone_func(0),
+      fDone_func_ctx(0),
+      fRepeats(0),
+      fRepeatsWanted(1)
 {
     this->fMusic = Mix_LoadMUS_RW(this->fRWops);
 }

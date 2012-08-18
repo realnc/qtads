@@ -37,8 +37,12 @@
 
 
 CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* parent )
-: CHtmlSysWinQt(formatter, 0, parent), fInputMode(NoInput), fInputReady(false), fRestoreFromCancel(false),
-  fLastKeyEvent(Qt::Key_Any), fTag(0)
+    : CHtmlSysWinQt(formatter, 0, parent),
+      fInputMode(NoInput),
+      fInputReady(false),
+      fRestoreFromCancel(false),
+      fLastKeyEvent(Qt::Key_Any),
+      fTag(0)
 {
     this->dispWidget = new DisplayWidgetInput(this, formatter);
     this->fCastDispWidget = static_cast<DisplayWidgetInput*>(this->dispWidget);

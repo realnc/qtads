@@ -150,7 +150,8 @@ loadCoverArtImage()
 
 
 GameInfoDialog::GameInfoDialog( const QByteArray& fname, QWidget* parent )
-  : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint), ui(new Ui::GameInfoDialog)
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
+      ui(new Ui::GameInfoDialog)
 {
     ui->setupUi(this);
 
