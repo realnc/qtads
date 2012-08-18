@@ -34,6 +34,7 @@
 CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidget, QWidget* parent )
     : QScrollArea(parent),
       CHtmlSysWin(formatter),
+      fBannerPos(HTML_BANNERWIN_POS_TOP),
       fBannerStyleModeMode(true),
       fBannerStyleAutoVScroll(true),
       fBannerStyleGrid(false),
