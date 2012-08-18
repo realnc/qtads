@@ -5,7 +5,9 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.1.4</string>
+    <string>2.1.4 git</string>
+    <key>CFBundleVersion</key>
+    <string>2.1.4d</string>
     <key>NSHumanReadableCopyright</key>
     <string>Copyright © 2012, Mike Roberts; © 2012, Nikos Chantziaras.</string>
     <key>CFBundleIconFile</key>
