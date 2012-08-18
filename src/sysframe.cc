@@ -323,7 +323,11 @@ CHtmlSysFrameQt::fRunT2Game( const QString& fname )
 void
 CHtmlSysFrameQt::fRunT3Game( const QString& fname )
 {
-    vm_run_image_params params(this->fClientifc, this->fHostifc, fname.toLocal8Bit());
+    // vm_run_image_params doesn't copy the filename string but stores
+    // the pointer directly.  We therefore need to hold a reference to
+    // the data so that it won't go out of scope.
+    const QByteArray& fnameData= fname.toLocal8Bit();
+    vm_run_image_params params(this->fClientifc, this->fHostifc, fnameData.constData());
     this->fTads3 = true;
     vm_run_image(&params);
 }
