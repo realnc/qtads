@@ -614,12 +614,6 @@
       <layout class="QVBoxLayout" name="verticalLayout_10">
        <item>
         <widget class="QLabel" name="label_18">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
          <property name="text">
           <string>The file safety setting applies only to explicit file operations by the game. It does not affect saving or restoring games or logging a transcript to a file.</string>
          </property>
@@ -704,12 +698,6 @@
       <layout class="QVBoxLayout" name="verticalLayout_12">
        <item>
         <widget class="QLabel" name="label_19">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The online update check will never download or install updates. It will only inform you about available updates. The automatic update check is only performed by the application at startup; no background services of any kind will be installed on your computer.&lt;/p&gt;&lt;p&gt;Choose how often the application should check for available updates:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -772,12 +760,6 @@
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
         <widget class="QLabel" name="label_16">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
          <property name="text">
           <string>The majority of TADS 2 games don't use Unicode to display characters not covered by the ASCII character set. They also don't tell interpreters what encoding they actually use. Here you can select the character set that should be used for TADS 2 games. Note that this setting only takes effect on newly added text; already existing text will not be converted.</string>
          </property>
