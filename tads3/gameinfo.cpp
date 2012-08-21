@@ -326,7 +326,7 @@ int CTadsGameInfo::parse_file(osfildef *fp, unsigned long res_seek_pos,
             p.inc(&rem);
 
         /* if the line starts with '#', it's a comment, so skip it */
-        if (p.getch() == '#')
+        if (rem == 0 || p.getch() == '#')
         {
             /* skip the entire line, and go back for the next one */
             skip_to_next_line(&p, &rem);
