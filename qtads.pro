@@ -222,10 +222,10 @@ SOURCES += \
     src/aboutqtadsdialog.cc
 
 unix:SOURCES += \
-    $$T2DIR/tz_posix.c
+    $$T2DIR/ostzposix.c
 
 win32:SOURCES += \
-    $$T2DIR/msdos/tz_w32.c
+    $$T2DIR/msdos/ostzw32.c
 
 # Portable Tads headers.  We simply include every header from the Tads
 # directories.  It's sub-optimal, but the safest solution.
