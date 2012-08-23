@@ -259,6 +259,7 @@ os_resolve_symlink( const char* fname, char* target, size_t target_size )
         return false;
     }
     qstrcpy(target, str.constData());
+    return true;
 }
 
 
