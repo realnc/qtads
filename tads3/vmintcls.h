@@ -111,15 +111,16 @@ public:
     }
 
     /*
-     *   Set the class state value with undo.  This is current unimplemented
+     *   Set the class state value with undo.  This is unimplemented for now,
      *   since no one needs it.  In principle it could be useful to be able
-     *   to store a scalar value here, in which case we'd want to be able to
-     *   undo changes.  In practice, we so far always store a container
-     *   object in class_state, such as a Vector or TadsObject, since we need
-     *   to be able to store more than just a single scalar value.  Since all
-     *   of the actual state is stored within the container, and the
-     *   container classes we use all handle undo, we don't really seem to
-     *   need undo at the class_state level.
+     *   to store a scalar value in the class state slot, in which case we'd
+     *   need to have special code here in order to undo changes.  So far,
+     *   though, we always store an object reference in class_state, such as
+     *   a Vector or TadsObject, since we need to be able to store more than
+     *   just a single scalar value.  Since all of the state data are then
+     *   stored within those container objects, and the container classes we
+     *   use all handle undo themselves, there's no need for any undo action
+     *   at the class_state level.
      */
     // Unimplemented!
     void set_class_state_undo(VMG_ class CVmUndo *undo, const vm_val_t *val);

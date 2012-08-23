@@ -7178,7 +7178,7 @@ int CTcTokenizer::find_include_once(const char *fname)
     for (prvinc = prev_includes_ ; prvinc != 0 ; prvinc = prvinc->nxt)
     {
         /* if this one matches, we found it, so return true */
-        if (strcmp(fname, prvinc->fname) == 0)
+        if (os_file_names_equal(fname, prvinc->fname))
             return TRUE;
     }
 

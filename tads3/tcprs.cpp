@@ -1043,16 +1043,14 @@ int CTcParser::parse_op_name(CTcToken *tok, int *op_argp)
  */
 CTcPrsNode *CTcParser::create_sym_node(const textchar_t *sym, size_t sym_len)
 {
-    CTcSymbol *entry;
-    CTcPrsSymtab *symtab;
-    
     /* 
      *   First, look up the symbol in local scope.  Local scope symbols
      *   can always be resolved during parsing, because the language
      *   requires that local scope items be declared before their first
      *   use. 
      */
-    entry = local_symtab_->find(sym, sym_len, &symtab);
+    CTcPrsSymtab *symtab;
+    CTcSymbol *entry = local_symtab_->find(sym, sym_len, &symtab);
 
     /* if we found it in local scope, return a resolved symbol node */
     if (entry != 0 && symtab != global_symtab_)
@@ -1647,11 +1645,9 @@ int CTcConstVal::is_equal_to(const CTcConstVal *val) const
  */
 CTcPrsNode *CTcPrsOpBin::parse() const
 {
-    CTcPrsNode *lhs;
-    CTcPrsNode *rhs;
-    
     /* parse our left side - if that fails, return failure */
-    if ((lhs = left_->parse()) == 0)
+    CTcPrsNode *lhs = left_->parse();
+    if (lhs == 0)
         return 0;
 
     /* keep going as long as we find our operator */
@@ -1660,17 +1656,16 @@ CTcPrsNode *CTcPrsOpBin::parse() const
         /* check my operator */
         if (G_tok->cur() == get_op_tok())
         {
-            CTcPrsNode *const_tree;
-
             /* skip the matching token */
             G_tok->next();
             
             /* parse the right-hand side */
-            if ((rhs = right_->parse()) == 0)
+            CTcPrsNode *rhs = right_->parse();
+            if (rhs == 0)
                 return 0;
 
             /* try folding our subnodes into a constant value, if possible */
-            const_tree = eval_constant(lhs, rhs);
+            CTcPrsNode *const_tree = eval_constant(lhs, rhs);
 
             /* 
              *   if we couldn't calculate a constant value, build the tree
@@ -1710,10 +1705,9 @@ CTcPrsNode *CTcPrsOpBin::parse() const
  */
 CTcPrsNode *CTcPrsOpBinGroup::parse() const
 {
-    CTcPrsNode *lhs;
-
     /* parse our left side - if that fails, return failure */
-    if ((lhs = left_->parse()) == 0)
+    CTcPrsNode *lhs = left_->parse();
+    if (lhs == 0)
         return 0;
 
     /* keep going as long as we find one of our operators */
@@ -1729,22 +1723,18 @@ CTcPrsNode *CTcPrsOpBinGroup::parse() const
  */
 int CTcPrsOpBinGroup::find_and_apply_op(CTcPrsNode **lhs) const
 {
-    const CTcPrsOpBin *const *op;
-    CTcPrsNode *rhs;
-
     /* check each operator at this precedence level */
-    for (op = ops_ ; *op != 0 ; ++op)
+    for (const CTcPrsOpBin *const *op = ops_ ; *op != 0 ; ++op)
     {
         /* check this operator's token */
         if (G_tok->cur() == (*op)->get_op_tok())
         {
-            CTcPrsNode *const_tree;
-
             /* skip the operator token */
             G_tok->next();
 
             /* parse the right-hand side */
-            if ((rhs = right_->parse()) == 0)
+            CTcPrsNode *rhs = right_->parse();
+            if (rhs == 0)
             {
                 /* error - cancel the entire expression */
                 *lhs = 0;
@@ -1752,7 +1742,7 @@ int CTcPrsOpBinGroup::find_and_apply_op(CTcPrsNode **lhs) const
             }
 
             /* try folding our subnodes into a constant value */
-            const_tree = (*op)->eval_constant(*lhs, rhs);
+            CTcPrsNode *const_tree = (*op)->eval_constant(*lhs, rhs);
 
             /* 
              *   if we couldn't calculate a constant value, build the tree
@@ -1796,17 +1786,14 @@ int CTcPrsOpBinGroup::find_and_apply_op(CTcPrsNode **lhs) const
  */
 CTcPrsNode *CTcPrsOpBinGroupCompare::parse() const
 {
-    CTcPrsNode *lhs;
-
     /* parse our left side - if that fails, return failure */
-    if ((lhs = left_->parse()) == 0)
+    CTcPrsNode *lhs = left_->parse();
+    if (lhs == 0)
         return 0;
 
     /* keep going as long as we find one of our operators */
     for (;;)
     {
-        CTPNArglist *rhs;
-        
         /* 
          *   try one of our regular operators - if we find it, go back for
          *   another round to see if there's another operator following
@@ -1828,7 +1815,7 @@ CTcPrsNode *CTcPrsOpBinGroupCompare::parse() const
                 && G_tok->getcur()->text_matches("in", 2))
             {
                 /* scan the expression list */
-                rhs = parse_inlist();
+                CTPNArglist *rhs = parse_inlist();
                 if (rhs == 0)
                     return 0;
 
@@ -1859,7 +1846,7 @@ CTcPrsNode *CTcPrsOpBinGroupCompare::parse() const
                 && G_tok->getcur()->text_matches("in", 2))
             {
                 /* scan the expression list */
-                rhs = parse_inlist();
+                CTPNArglist *rhs = parse_inlist();
                 if (rhs == 0)
                     return 0;
 
@@ -3228,17 +3215,13 @@ CTcPrsNode *CTcPrsOpAdd::build_tree(CTcPrsNode *left,
  */
 CTcPrsNode *CTcPrsOpAsi::parse() const
 {
-    CTcPrsNode *lhs;
-    CTcPrsNode *rhs;
-    tc_toktyp_t curtyp;
-    
     /* start by parsing a conditional subexpression */
-    lhs = S_op_if.parse();
+    CTcPrsNode *lhs = S_op_if.parse();
     if (lhs == 0)
         return 0;
 
     /* get the next operator */
-    curtyp = G_tok->cur();
+    tc_toktyp_t curtyp = G_tok->cur();
 
     /* check to see if it's an assignment operator of some kind */
     switch(curtyp)
@@ -3292,7 +3275,7 @@ CTcPrsNode *CTcPrsOpAsi::parse() const
      *   right-hand side will contain all remaining assignment expressions
      *   incorporated into it.  
      */
-    rhs = parse();
+    CTcPrsNode *rhs = parse();
     if (rhs == 0)
         return 0;
 
@@ -3401,12 +3384,8 @@ CTcPrsNode *CTcPrsOpIfnil::parse() const
 
 CTcPrsNode *CTcPrsOpIf::parse() const
 {
-    CTcPrsNode *first;
-    CTcPrsNode *second;
-    CTcPrsNode *third;
-
     /* parse the conditional part */
-    first = S_op_ifnil.parse();
+    CTcPrsNode *first = S_op_ifnil.parse();
     if (first == 0)
         return 0;
 
@@ -3424,7 +3403,7 @@ CTcPrsNode *CTcPrsOpIf::parse() const
      *   steal away operands from a ',' before our ':' because that would
      *   leave the ':' with nothing to go with) 
      */
-    second = G_prs->parse_expr_or_dstr(TRUE);
+    CTcPrsNode *second = G_prs->parse_expr_or_dstr(TRUE);
     if (second == 0)
         return 0;
     
@@ -3451,7 +3430,7 @@ CTcPrsNode *CTcPrsOpIf::parse() const
      *   double-quoted string expression - but not a comma expression, since
      *   we have higher precedence than ',' 
      */
-    third = G_prs->parse_expr_or_dstr(FALSE);
+    CTcPrsNode *third = G_prs->parse_expr_or_dstr(FALSE);
     if (third == 0)
         return 0;
         
@@ -4552,11 +4531,8 @@ CTcPrsNode *CTPNStrOneOfBase::fold_constants(CTcPrsSymtab *symtab)
 
 CTcPrsNode *CTcPrsOpUnary::parse() const
 {
-    CTcPrsNode *sub;
-    tc_toktyp_t op;
-    
     /* get the current token, which may be a prefix operator */
-    op = G_tok->cur();
+    tc_toktyp_t op = G_tok->cur();
 
     /* check for prefix operators */
     switch(op)
@@ -4575,50 +4551,57 @@ CTcPrsNode *CTcPrsOpUnary::parse() const
     case TOKT_INC:
     case TOKT_DEC:
     case TOKT_DELETE:
-        /* skip the operator */
-        G_tok->next();
-
-        /* 
-         *   recursively parse the unary expression to which to apply the
-         *   operator 
-         */
-        sub = parse();
-        if (sub == 0)
-            return 0;
-
-        /* apply the operator */
-        switch(op)
         {
-        case TOKT_NOT:
-            /* apply the NOT operator */
-            return parse_not(sub);
-
-        case TOKT_BNOT:
-            /* apply the bitwise NOT operator */
-            return parse_bnot(sub);
-
-        case TOKT_PLUS:
-            /* apply the unary positive operator */
-            return parse_pos(sub);
-
-        case TOKT_MINUS:
-            /* apply the unary negation operator */
-            return parse_neg(sub);
-
-        case TOKT_INC:
-            /* apply the pre-increment operator */
-            return parse_inc(TRUE, sub);
-
-        case TOKT_DEC:
-            /* apply the pre-decrement operator */
-            return parse_dec(TRUE, sub);
-
-        case TOKT_DELETE:
-            /* apply the deletion operator */
-            return parse_delete(sub);
-
-        default:
-            break;
+            /* skip the operator */
+            G_tok->next();
+            
+            /* 
+             *   recursively parse the unary expression to which to apply the
+             *   operator 
+             */
+            CTcPrsNode *sub = parse();
+            if (sub == 0)
+                return 0;
+            
+            /* apply the operator */
+            switch(op)
+            {
+            case TOKT_NOT:
+                /* apply the NOT operator */
+                return parse_not(sub);
+                
+            case TOKT_BNOT:
+                /* apply the bitwise NOT operator */
+                return parse_bnot(sub);
+                
+            case TOKT_PLUS:
+                /* apply the unary positive operator */
+                return parse_pos(sub);
+                
+            case TOKT_MINUS:
+                /* apply the unary negation operator */
+                return parse_neg(sub);
+                
+            case TOKT_INC:
+                /* apply the pre-increment operator */
+                return parse_inc(TRUE, sub);
+                
+            case TOKT_DEC:
+                /* apply the pre-decrement operator */
+                return parse_dec(TRUE, sub);
+                
+            case TOKT_DELETE:
+                /* apply the deletion operator */
+                return parse_delete(sub);
+                
+            default:
+                /* 
+                 *   we shouldn't ever get here, since this switch should
+                 *   contain every case that brought us into it in the first
+                 *   place
+                 */
+                return 0;
+            }
         }
 
     default:
@@ -4632,10 +4615,8 @@ CTcPrsNode *CTcPrsOpUnary::parse() const
  */
 CTcPrsNode *CTcPrsOpUnary::parse_not(CTcPrsNode *subexpr)
 {
-    CTcPrsNode *ret;
-
     /* try folding a constant value */
-    ret = eval_const_not(subexpr);
+    CTcPrsNode *ret = eval_const_not(subexpr);
 
     /* 
      *   if we got a constant result, return it; otherwise, create a NOT
@@ -5588,34 +5569,36 @@ CTcPrsNode *CTcPrsOpUnary::parse_primary()
         {
         case TOKT_LBRACE:
             /* short form of anonymous function */
-            return parse_anon_func(TRUE);
+            return parse_anon_func(TRUE, FALSE);
 
-        case TOKT_FUNCTION:
         case TOKT_METHOD:
-            /* anonymous function formerly required 'new', but no longer */
-            // G_tok->log_error(TCERR_ANON_FUNC_REQ_NEW);
+            /* parse an anonymous method */
+            return parse_anon_func(FALSE, TRUE);
             
-            /* 
-             *   parse it as an anonymous function anyway, even though the
-             *   syntax isn't quite correct - the rest of it might still
-             *   be okay, so we can at least continue parsing from here to
-             *   find out 
-             */
-            return parse_anon_func(FALSE);
+        case TOKT_FUNCTION:
+            /* parse an anonymous function */
+            return parse_anon_func(FALSE, FALSE);
+
+        case TOKT_OBJECT:
+            /* in-line object definition */
+            return parse_inline_object(FALSE);
 
         case TOKT_NEW:
             /* skip the operator and check for 'function' or 'method' */
-            if ((t = G_tok->next()) == TOKT_FUNCTION || t == TOKT_METHOD)
+            if ((t = G_tok->next()) == TOKT_FUNCTION)
             {
                 /* it's an anonymous function definition - go parse it */
-                sub = parse_anon_func(FALSE);
+                sub = parse_anon_func(FALSE, FALSE);
+            }
+            else if (t == TOKT_METHOD)
+            {
+                /* anonymous method */
+                sub = parse_anon_func(FALSE, TRUE);
             }
             else
             {
-                int trans;
-                
                 /* check for the 'transient' keyword */
-                trans = (G_tok->cur() == TOKT_TRANSIENT);
+                int trans = (G_tok->cur() == TOKT_TRANSIENT);
                 if (trans)
                     G_tok->next();
                 
@@ -6160,9 +6143,6 @@ CTcPrsNode *CTcPrsOpUnary::parse_inherited()
  */
 CTcPrsNode *CTcPrsOpUnary::parse_delegated()
 {
-    CTcPrsNode *lhs;
-    CTcPrsNode *target;
-
     /* 'delegated' always references 'self' */
     G_prs->set_self_referenced(TRUE);
 
@@ -6178,10 +6158,10 @@ CTcPrsNode *CTcPrsOpUnary::parse_delegated()
      *   expression, not to a subexpression involving a function/method
      *   call.  
      */
-    target = parse_postfix(FALSE, FALSE);
+    CTcPrsNode *target = parse_postfix(FALSE, FALSE);
 
     /* set up the "delegated" node */
-    lhs = new CTPNDelegated(target);
+    CTcPrsNode *lhs = new CTPNDelegated(target);
 
     /* return the rest as a normal member expression */
     return parse_member(lhs);
@@ -6192,9 +6172,10 @@ CTcPrsNode *CTcPrsOpUnary::parse_delegated()
  */
 CTcPrsNode *CTcPrsOpUnary::parse_list()
 {
-    CTPNList *lst;
-    CTcPrsNode *ele;
+    /* assume this isn't a lookup table (with "key->val" pairs) */
     int is_lookup_table = FALSE;
+
+    /* we're not at the default value for a lookup table ("*->val") */
     int at_def_val = FALSE;
 
     /* set up a nil value for adding placeholders (for error recovery) */
@@ -6208,7 +6189,7 @@ CTcPrsNode *CTcPrsOpUnary::parse_list()
      *   create the list expression -- we'll add elements to the list as
      *   we parse the elements
      */
-    lst = new CTPNList();
+    CTPNList *lst = new CTPNList();
 
     /* scan all list elements */
     for (;;)
@@ -6290,7 +6271,7 @@ CTcPrsNode *CTcPrsOpUnary::parse_list()
          *   below a comma expression, because commas can be used to
          *   separate list elements.  
          */
-        ele = S_op_asi.parse();
+        CTcPrsNode *ele = S_op_asi.parse();
         if (ele == 0)
             return 0;
         
@@ -8182,10 +8163,9 @@ void CTcSymLocalBase::check_local_references()
  */
 CTcSymbol *CTcSymLocalBase::new_ctx_var() const
 {
-    CTcSymLocal *lcl;
-    
     /* create a new local with the same name */
-    lcl = new CTcSymLocal(get_sym(), get_sym_len(), FALSE, FALSE, 0);
+    CTcSymLocal *lcl = new CTcSymLocal(
+        get_sym(), get_sym_len(), FALSE, FALSE, 0);
 
     /* refer the copy back to the original (i.e., me) */
     lcl->set_ctx_orig((CTcSymLocal *)this);
@@ -8218,8 +8198,8 @@ CTcSymbol *CTcSymLocalBase::new_ctx_var() const
 /*
  *   Apply context variable conversion 
  */
-int CTcSymLocalBase::apply_ctx_var_conv(CTcPrsSymtab *symtab,
-                                        CTPNCodeBody *code_body)
+int CTcSymLocalBase::apply_ctx_var_conv(
+    CTcPrsSymtab *symtab, CTPNCodeBody *code_body)
 {
     /* 
      *   if this symbol isn't referenced, simply delete it from the table,
@@ -8373,10 +8353,8 @@ CTcPrsNode *CTcSymObjBase::fold_constant()
  */
 void CTcSymObjBase::add_sc_name_entry(const char *txt, size_t len)
 {
-    CTPNSuperclass *entry;
-
     /* create the entry object */
-    entry = new CTPNSuperclass(txt, len);
+    CTPNSuperclass *entry = new CTPNSuperclass(txt, len);
 
     /* link it into our list */
     if (sc_name_tail_ != 0)
@@ -8391,19 +8369,16 @@ void CTcSymObjBase::add_sc_name_entry(const char *txt, size_t len)
  */
 int CTcSymObjBase::has_superclass(class CTcSymObj *sc_sym) const
 {
-    CTPNSuperclass *entry;
-
     /* 
      *   Scan my direct superclasses.  For each one, check to see if my
      *   superclass matches the given superclass, or if my superclass
      *   inherits from the given superclass.  
      */
-    for (entry = sc_name_head_ ; entry != 0 ; entry = entry->nxt_)
+    for (CTPNSuperclass *entry = sc_name_head_ ; entry != 0 ;
+         entry = entry->nxt_)
     {
-        CTcSymObj *entry_sym;
-
         /* look up this symbol */
-        entry_sym = (CTcSymObj *)G_prs->get_global_symtab()->find(
+        CTcSymObj *entry_sym = (CTcSymObj *)G_prs->get_global_symtab()->find(
             entry->get_sym_txt(), entry->get_sym_len());
 
         /* 
@@ -8443,10 +8418,8 @@ int CTcSymObjBase::has_superclass(class CTcSymObj *sc_sym) const
 void CTcSymObjBase::add_del_prop_to_list(CTcObjPropDel **list_head,
                                          CTcSymProp *prop_sym)
 {
-    CTcObjPropDel *entry;
-
     /* create the new entry */
-    entry = new CTcObjPropDel(prop_sym);
+    CTcObjPropDel *entry = new CTcObjPropDel(prop_sym);
 
     /* link it into my list */
     entry->nxt_ = *list_head;
@@ -8468,10 +8441,8 @@ void CTcSymObjBase::add_self_ref_fixup(CTcDataStream *stream, ulong ofs)
 void CTcSymObjBase::add_vocab_word(const char *txt, size_t len,
                                    tctarg_prop_id_t prop)
 {
-    CTcVocabEntry *entry;
-    
     /* create a new vocabulary entry */
-    entry = new (G_prsmem) CTcVocabEntry(txt, len, prop);
+    CTcVocabEntry *entry = new (G_prsmem) CTcVocabEntry(txt, len, prop);
 
     /* link it into my list */
     entry->nxt_ = vocab_;
@@ -8483,12 +8454,9 @@ void CTcSymObjBase::add_vocab_word(const char *txt, size_t len,
  */
 void CTcSymObjBase::delete_vocab_prop(tctarg_prop_id_t prop)
 {
-    CTcVocabEntry *entry;
-    CTcVocabEntry *prv;
-    CTcVocabEntry *nxt;
-    
     /* scan my list and delete each word defined for the given property */
-    for (prv = 0, entry = vocab_ ; entry != 0 ; entry = nxt)
+    for (CTcVocabEntry *prv = 0, *entry = vocab_, *nxt = 0 ;
+         entry != 0 ; entry = nxt)
     {
         /* remember the next entry */
         nxt = entry->nxt_;
@@ -8534,8 +8502,6 @@ void CTcSymObjBase::delete_vocab_prop(tctarg_prop_id_t prop)
  */
 void CTcSymObjBase::inherit_vocab()
 {
-    CTcObjScEntry *sc;
-
     /* 
      *   if I've already inherited my superclass vocabulary, there's
      *   nothing more we need to do 
@@ -8547,7 +8513,7 @@ void CTcSymObjBase::inherit_vocab()
     vocab_inherited_ = TRUE;
 
     /* inherit words from each superclass */
-    for (sc = sc_ ; sc != 0 ; sc = sc->nxt_)
+    for (CTcObjScEntry *sc = sc_ ; sc != 0 ; sc = sc->nxt_)
     {
         /* make sure this superclass has built its inherited list */
         sc->sym_->inherit_vocab();
@@ -8562,10 +8528,8 @@ void CTcSymObjBase::inherit_vocab()
  */
 void CTcSymObjBase::add_vocab_to_subclass(CTcSymObj *sub)
 {
-    CTcVocabEntry *entry;
-
     /* add each of my words to the subclass */
-    for (entry = vocab_ ; entry != 0 ; entry = entry->nxt_)
+    for (CTcVocabEntry *entry = vocab_ ; entry != 0 ; entry = entry->nxt_)
     {
         /* add this word to my dictionary */
         sub->add_vocab_word(entry->txt_, entry->len_, entry->prop_);
@@ -8631,13 +8595,12 @@ void CTcSymObjBase::add_template(CTcObjTemplate *tpl)
 /*
  *   add a property 
  */
-void CTcSymMetaclassBase::add_prop(const char *txt, size_t len,
-                                   const char *obj_fname, int is_static)
+void CTcSymMetaclassBase::add_prop(
+    const char *txt, size_t len, const char *obj_fname, int is_static)
 {
-    CTcSymProp *prop_sym;
-
     /* see if this property is already defined */
-    prop_sym = (CTcSymProp *)G_prs->get_global_symtab()->find(txt, len);
+    CTcSymProp *prop_sym =
+        (CTcSymProp *)G_prs->get_global_symtab()->find(txt, len);
     if (prop_sym != 0)
     {
         /* it's already defined - make sure it's a property */
@@ -8694,10 +8657,8 @@ void CTcSymMetaclassBase::add_prop(const char *txt, size_t len,
  */
 void CTcSymMetaclassBase::add_prop(class CTcSymProp *prop, int is_static)
 {
-    CTcSymMetaProp *entry;
-
     /* create a new list entry for the property */
-    entry = new (G_prsmem) CTcSymMetaProp(prop, is_static);
+    CTcSymMetaProp *entry = new (G_prsmem) CTcSymMetaProp(prop, is_static);
     
     /* link it at the end of our list */
     if (prop_tail_ != 0)
@@ -8715,9 +8676,8 @@ void CTcSymMetaclassBase::add_prop(class CTcSymProp *prop, int is_static)
  */
 CTcSymMetaProp *CTcSymMetaclassBase::get_nth_prop(int n) const
 {
-    CTcSymMetaProp *prop;
-    
     /* traverse the list to the desired index */
+    CTcSymMetaProp *prop;
     for (prop = prop_head_ ; prop != 0 && n != 0 ; prop = prop->nxt_, --n) ;
 
     /* return the property */
@@ -8753,9 +8713,8 @@ CTcPrsNode *CTcSymPropBase::fold_addr_const()
  */
 CTcPrsNode *CTcSymEnumBase::fold_constant()
 {
-    CTcConstVal cval;
-
     /* set up the enumerator constant */
+    CTcConstVal cval;
     cval.set_enum(get_enum_id());
 
     /* return a constant node */
@@ -8773,9 +8732,8 @@ CTcPrsNode *CTcSymEnumBase::fold_constant()
  */
 void CVmHashEntryPrsDict::add_item(tc_obj_id obj, tc_prop_id prop)
 {
-    CTcPrsDictItem *item;
-
     /* search my list for an existing association to the same obj/prop */
+    CTcPrsDictItem *item;
     for (item = list_ ; item != 0 ; item = item->nxt_)
     {
         /* if it matches, we don't need to add this one again */
@@ -8800,13 +8758,11 @@ void CVmHashEntryPrsDict::add_item(tc_obj_id obj, tc_prop_id prop)
 /*
  *   instantiate 
  */
-CTPNCodeBodyBase::CTPNCodeBodyBase(CTcPrsSymtab *lcltab,
-                                   CTcPrsSymtab *gototab, CTPNStm *stm,
-                                   int argc, int opt_argc, int varargs,
-                                   int varargs_list,
-                                   CTcSymLocal *varargs_list_local,
-                                   int local_cnt, int self_valid,
-                                   CTcCodeBodyRef *enclosing_code_body)
+CTPNCodeBodyBase::CTPNCodeBodyBase(
+    CTcPrsSymtab *lcltab, CTcPrsSymtab *gototab, CTPNStm *stm,
+    int argc, int opt_argc, int varargs,
+    int varargs_list, CTcSymLocal *varargs_list_local, int local_cnt,
+    int self_valid, CTcCodeBodyRef *enclosing_code_body)
 {
     /* remember the data in the code body */
     lcltab_ = lcltab;
@@ -8949,9 +8905,8 @@ void CTPNCodeBodyBase::add_abs_fixup(CTcDataStream *ds)
  */
 int CTPNCodeBodyBase::get_or_add_ctx_var_for_level(int level)
 {
-    CTcCodeBodyCtx *ctx;
-    
     /* scan our list to see if the level is already assigned */
+    CTcCodeBodyCtx *ctx;
     for (ctx = ctx_head_ ; ctx != 0 ; ctx = ctx->nxt_)
     {
         /* if we've already set up this level, return its variable */
@@ -8961,7 +8916,7 @@ int CTPNCodeBodyBase::get_or_add_ctx_var_for_level(int level)
 
     /* we didn't find it - allocate a new level structure */
     ctx = new (G_prsmem) CTcCodeBodyCtx();
-
+    
     /* set up its level and allocate a new variable and property for it */
     ctx->level_ = level;
     ctx->var_num_ = G_prs->alloc_ctx_holder_var();
@@ -8990,8 +8945,6 @@ int CTPNCodeBodyBase::get_or_add_ctx_var_for_level(int level)
  */
 int CTPNCodeBodyBase::get_ctx_var_for_level(int level, int *varnum)
 {
-    CTcCodeBodyCtx *ctx;
-
     /* if they want level zero, it's our local context */
     if (level == 0)
     {
@@ -9003,7 +8956,7 @@ int CTPNCodeBodyBase::get_ctx_var_for_level(int level, int *varnum)
     }
 
     /* scan our list to see if the level is already assigned */
-    for (ctx = ctx_head_ ; ctx != 0 ; ctx = ctx->nxt_)
+    for (CTcCodeBodyCtx *ctx = ctx_head_ ; ctx != 0 ; ctx = ctx->nxt_)
     {
         /* if we've already set up this level, return its variable */
         if (ctx->level_ == level)
@@ -9083,6 +9036,20 @@ class CTcSymFunc *CTPNCodeBodyBase::get_replaced_func() const
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   Anonymous function 
+ */
+
+/*
+ *   mark as replaced/obsolete 
+ */
+void CTPNAnonFuncBase::set_replaced(int flag)
+{
+    if (code_body_ != 0)
+        code_body_->set_replaced(flag);
+}
+
+/* ------------------------------------------------------------------------ */
+/*
  *   Generic statement node 
  */
 
@@ -9139,26 +9106,6 @@ void CTPNStmBase::gen_code_substm(CTPNStm *substm)
 
 /* ------------------------------------------------------------------------ */
 /*
- *   Object Definition Statement 
- */
-
-/*
- *   fold constants 
- */
-CTcPrsNode *CTPNStmObjectBase::fold_constants(CTcPrsSymtab *symtab)
-{
-    CTPNObjProp *prop;
-
-    /* fold constants in each of our property list entries */
-    for (prop = first_prop_ ; prop != 0 ; prop = prop->nxt_)
-        prop->fold_constants(symtab);
-
-    /* we're not changed directly by this */
-    return this;
-}
-
-/* ------------------------------------------------------------------------ */
-/*
  *   superclass record
  */
 
@@ -9180,9 +9127,6 @@ CTcSymbol *CTPNSuperclass::get_sym() const
  */
 int CTPNSuperclass::is_subclass_of(const CTPNSuperclass *other) const
 {
-    CTcSymObj *sym;
-    CTPNSuperclass *sc;
-
     /* 
      *   if my name matches, we're a subclass (we are a subclass of
      *   ourselves) 
@@ -9197,14 +9141,15 @@ int CTPNSuperclass::is_subclass_of(const CTPNSuperclass *other) const
      *   tads-object - if it's not, we're definitely not a subclass of
      *   anything.  
      */
-    sym = (CTcSymObj *)get_sym();
+    CTcSymObj *sym = (CTcSymObj *)get_sym();
     if (sym == 0
         || sym->get_type() != TC_SYM_OBJ
         || sym->get_metaclass() != TC_META_TADSOBJ)
         return FALSE;
 
     /* scan our symbol's superclass list for a match */
-    for (sc = sym->get_sc_name_head() ; sc != 0 ; sc = sc->nxt_)
+    for (CTPNSuperclass *sc = sym->get_sc_name_head() ;
+         sc != 0 ; sc = sc->nxt_)
     {
         /* 
          *   if this one's a subclass of the given class, we're a subclass

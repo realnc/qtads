@@ -485,8 +485,6 @@ public:
      */
     static int s_is_continuation(const char *p)
     {
-        unsigned int ch;
-
         /*   
          *   Continuation bytes have the pattern 10xxxxxx.  Initial bytes
          *   never have this pattern.  So, if a byte ANDed with 0xC0 is
@@ -506,7 +504,7 @@ public:
          *   this with the previous calculation, which will give us 1 for
          *   10xxxxxx and 0 for anything else.  
          */
-        ch = (unsigned int)(unsigned char)*p;
+        unsigned int ch = (unsigned int)(unsigned char)*p;
         return (((ch & 0x80) >> 7)
                 & (((~(ch & 0x40)) & 0x40) >> 6));
     }
@@ -523,9 +521,6 @@ public:
      */
     static size_t s_trunc(const char *p, size_t len)
     {
-        const char *last_ch;
-        size_t last_ch_len;
-
         /* 
          *   if the length is zero, no adjustment is needed - you
          *   obviously can't divide zero bytes 
@@ -539,7 +534,7 @@ public:
          *   the buffer is at index (len-1), since the byte at index (len)
          *   is the next byte after the truncated region.  
          */
-        last_ch = p + len - 1;
+        const char *last_ch = p + len - 1;
 
         /* 
          *   Decrement this byte pointer until we get to the start of the
@@ -555,7 +550,7 @@ public:
          *   actually in the truncated region - this is simply the number
          *   of bytes from where we are now to the end of the region 
          */
-        last_ch_len = len - (last_ch - p);
+        size_t last_ch_len = len - (last_ch - p);
 
         /*
          *   Now compute the actual size of this last character.  If the
@@ -619,11 +614,9 @@ public:
     static size_t to_wchar(wchar_t *buf, size_t bufcnt, const char *str,
                            size_t len)
     {
-        utf8_ptr p;
-        int cnt;
-
         /* scan the string */
-        for (cnt = 0, p.set((char *)str) ; len != 0 ; p.inc(&len), ++cnt)
+        int cnt = 0;
+        for (utf8_ptr p((char *)str) ; len != 0 ; p.inc(&len), ++cnt)
         {
             /* if there's room, add this character to the output buffer */
             if (bufcnt > 0)

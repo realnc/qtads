@@ -2174,6 +2174,13 @@ const err_msg_t tc_messages_english[] =
     "Floating point values can't be used with this operator. Only ordinary "
     "integer values can be used." },
 
+    { TCERR_INLINE_OBJ_REQ_LBRACE,
+    "expected inline object property list starting with '{' (found '%.*s')",
+    "An inline property definition must contain a property list enclosed "
+    "in braces, '{ ... }'. The compiler found '%.*s' where it expected "
+    "to see the left brace '{' at the start of the property list. Check "
+    "the object definition syntax." },
+
     { TCERR_CODEGEN_NO_MEM,
     "out of memory for code generation",
     "Out of memory.  The compiler cannot allocate memory to generate "
@@ -2621,6 +2628,14 @@ const err_msg_t tc_messages_english[] =
     "argument list. You can declare the argument list in the 'extern' "
     "statement, but note that in most cases the problem is that the "
     "function itself is never defined within the program." },
+
+    { TCERR_UNDEF_METACLASS,
+    "\"%.*s\" is not defined or is not an intrinsic class",
+    "The compiler requires \"%.*s\" to be defined as an intrinsic class; "
+    "the symbol is either undefined or is defined as a different type. "
+    "Check that the system header that defines this class is #included "
+    "in this source file, and that there are no conflicting definitions "
+    "of the class name." },
 
     { TCERR_SYMEXP_INV_TYPE,
     "invalid symbol type in symbol file",

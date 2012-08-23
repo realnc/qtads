@@ -99,7 +99,8 @@ int (*CVmObjString::func_table_[])(VMG_ vm_val_t *retval,
     &CVmObjString::getp_compareTo,                                    /* 24 */
     &CVmObjString::getp_compareIgnoreCase,                            /* 25 */
     &CVmObjString::getp_findLast,                                     /* 26 */
-    &CVmObjString::getp_findAll                                       /* 27 */
+    &CVmObjString::getp_findAll,                                      /* 27 */
+    &CVmObjString::getp_match                                         /* 28 */
 };
 
 /* static property indices */
@@ -2061,6 +2062,127 @@ int CVmObjString::getp_findAll(VMG_ vm_val_t *retval,
 
     /* discard arguments and gc protection */
     G_stk->discard(orig_argc + 1);
+
+    /* handled */
+    return TRUE;
+}
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   property evaluator - match
+ */
+int CVmObjString::getp_match(VMG_ vm_val_t *retval,
+                             const vm_val_t *self_val, const char *str,
+                             uint *argc)
+{
+    /* check arguments */
+    uint orig_argc = (argc != 0 ? *argc : 0);
+    static CVmNativeCodeDesc desc(1, 1);
+    if (get_prop_check_argc(retval, argc, &desc))
+        return TRUE;
+
+    /* get the string length and buffer pointer */
+    size_t len = vmb_get_len(str);
+    str += VMB_LEN;
+
+    /* remember the base string */
+    const char *basestr = str;
+    
+    /* retrieve the string or regex pattern to match */
+    vm_val_t *targ = G_stk->get(0);
+    const char *targstr = 0;
+    CVmObjPattern *targpat = 0;
+    size_t targstrlen = 0;
+    if ((targstr = targ->get_as_string(vmg0_)) != 0)
+    {
+        /* it's a literal string - get its length and text pointer */
+        targstrlen = vmb_get_len(targstr);
+        targstr += VMB_LEN;
+    }
+    else if ((targpat = vm_val_cast(CVmObjPattern, targ)) != 0)
+    {
+        /* it's a pattern */
+    }
+    else
+    {
+        /* we need a string or a pattern; other values are invalid */
+        err_throw(VMERR_BAD_TYPE_BIF);
+    }
+
+    /* retrieve the starting index, if present */
+    int32_t start_idx = 0;
+    if (orig_argc >= 2 && G_stk->get(1)->typ != VM_NIL)
+    {
+        /* get the starting index value */
+        start_idx = G_stk->get(1)->num_to_int(vmg0_);
+
+        /* set up a UTF-8 pointer for traversing the string */
+        utf8_ptr strp((char *)str);
+
+        /*
+         *   A positive index value is a 1-based index from the start of the
+         *   string.  A negative index is from the end of the string, with -1
+         *   pointing to the last character. 
+         */
+        start_idx += (start_idx < 0 ? (int)strp.len(len) : -1);
+
+        /* skip that many characters */
+        int32_t i;
+        for (i = 0 ; i < start_idx && len > targstrlen ; ++i, strp.inc(&len)) ;
+
+        /* 
+         *   if the start index was past the end of the string (or past the
+         *   point where the remaining subject string is too short for the
+         *   target string), we definitely can't match 
+         */
+        if (i < start_idx)
+        {
+            retval->set_nil();
+            goto done;
+        }
+
+        /* start the search here */
+        str = strp.getptr();
+    }
+
+    /* match the string or pattern */
+    if (targstr != 0)
+    {
+        /* make sure it's long enough, then match the text literally */
+        if (len >= targstrlen && memcmp(targstr, str, targstrlen) == 0)
+        {
+            /* matched - return the match length */
+            retval->set_int(targstrlen);
+        }
+        else
+        {
+            /* no match */
+            retval->set_nil();
+        }
+    }
+    else
+    {
+        /* RexPattern - get the compiled pattern */
+        re_compiled_pattern *cpat = targpat->get_pattern(vmg0_);
+
+        /* save the last search source string */
+        G_bif_tads_globals->last_rex_str->val = *self_val;
+        G_bif_tads_globals->rex_searcher->clear_group_regs();
+
+        /* match the pattern */
+        int matchlen = G_bif_tads_globals->rex_searcher->match_pattern(
+            cpat, basestr, str, len);
+
+        /* if it matched (len >= 0), return the length, otherwise nil */
+        if (matchlen >= 0)
+            retval->set_int(matchlen);
+        else
+            retval->set_nil();
+    }
+
+done:
+    /* discard arguments */
+    G_stk->discard(orig_argc);
 
     /* handled */
     return TRUE;

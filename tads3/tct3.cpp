@@ -1996,15 +1996,13 @@ void CTcGenTarg::set_method_ofs(ulong ofs)
 /*
  *   Open a method 
  */
-void CTcGenTarg::open_method(CTcCodeStream *stream,
-                             CTcSymbol *fixup_owner_sym,
-                             CTcAbsFixup **fixup_list_head,
-                             CTPNCodeBody *code_body,
-                             CTcPrsSymtab *goto_tab,
-                             int argc, int opt_argc, int varargs,
-                             int is_constructor, int is_op_overload,
-                             int is_self_available,
-                             tct3_method_gen_ctx *ctx)
+void CTcGenTarg::open_method(
+    CTcCodeStream *stream,
+    CTcSymbol *fixup_owner_sym, CTcAbsFixup **fixup_list_head,
+    CTPNCodeBody *code_body, CTcPrsSymtab *goto_tab,
+    int argc, int opt_argc, int varargs,
+    int is_constructor, int is_op_overload, int is_self_available,
+    tct3_method_gen_ctx *ctx)
 {
     /* set the code stream as the current code generator output stream */
     G_cs = ctx->stream = stream;
@@ -8649,14 +8647,10 @@ void CTcSymLocal::s_gen_code_getlcl(int var_num, int is_param)
 /*
  *   assign a value 
  */
-int CTcSymLocal::gen_code_asi(int discard, int phase,
-                              tc_asitype_t typ, const char *,
-                              class CTcPrsNode *rhs,
-                              int ignore_errors,
-                              int xplicit, void **)
+int CTcSymLocal::gen_code_asi(
+    int discard, int phase, tc_asitype_t typ, const char *,
+    class CTcPrsNode *rhs, int ignore_errors, int xplicit, void **)
 {
-    int adding;
-    
     /* 
      *   if this is an explicit assignment, mark the variable as having had a
      *   value assigned to it 
@@ -8703,6 +8697,7 @@ int CTcSymLocal::gen_code_asi(int discard, int phase,
      *   generation to use more compact instruction sequences for certain
      *   types of assignments 
      */
+    int adding;
     switch(typ)
     {
     case TC_ASI_SIMPLE:
@@ -9068,8 +9063,8 @@ void CTcSymLocal::s_gen_code_setlcl_stk(int var_num, int is_param)
 /*
  *   call the symbol 
  */
-void CTcSymLocal::gen_code_call(int discard, int argc, int varargs,
-                                CTcNamedArgs *named_args)
+void CTcSymLocal::gen_code_call(
+    int discard, int argc, int varargs, CTcNamedArgs *named_args)
 {
     /* 
      *   to call a local, we'll simply evaluate the local normally, then
@@ -9134,10 +9129,9 @@ vm_prop_id_t CTcSymLocal::gen_code_propid(int check_only, int /*is_expr*/)
 /*
  *   evaluate a member expression 
  */
-void CTcSymLocal::gen_code_member(int discard,
-                                  CTcPrsNode *prop_expr, int prop_is_expr,
-                                  int argc, int varargs,
-                                  CTcNamedArgs *named_args)
+void CTcSymLocal::gen_code_member(
+    int discard, CTcPrsNode *prop_expr, int prop_is_expr,
+    int argc, int varargs, CTcNamedArgs *named_args)
 {
     /* generate code to evaluate the local */
     gen_code(FALSE);
@@ -9875,10 +9869,6 @@ struct defval_ctx
  */
 void CTPNCodeBody::gen_code(int, int)
 {
-    CTcCodeBodyCtx *cur_ctx;
-    int ctx_idx;
-    tct3_method_gen_ctx gen_ctx;
-
     /* if I've been replaced, don't bother generating any code */
     if (replaced_)
         return;
@@ -9897,12 +9887,12 @@ void CTPNCodeBody::gen_code(int, int)
      *   symbol table entry - fixups referencing us might already have been
      *   created by the time we generate our code).  
      */
-    G_cg->open_method(is_static_ ? G_cs_static : G_cs_main,
-                      fixup_owner_sym_, fixup_list_anchor_,
-                      this, gototab_,
-                      argc_, opt_argc_, varargs_,
-                      is_constructor_, op_overload_,
-                      self_valid_, &gen_ctx);
+    tct3_method_gen_ctx gen_ctx;
+    G_cg->open_method(
+        is_static_ ? G_cs_static : G_cs_main,
+        fixup_owner_sym_, fixup_list_anchor_,
+        this, gototab_, argc_, opt_argc_, varargs_,
+        is_constructor_, op_overload_, self_valid_, &gen_ctx);
 
     /* 
      *   Add a line record at the start of the method for all of the
@@ -10162,6 +10152,8 @@ void CTPNCodeBody::gen_code(int, int)
      *   entry for the invokee, so we no longer conflate the anonymous
      *   function object with 'self'.  
      */
+    CTcCodeBodyCtx *cur_ctx;
+    int ctx_idx;
     for (ctx_idx = 0, cur_ctx = ctx_head_ ; cur_ctx != 0 ;
          cur_ctx = cur_ctx->nxt_, ++ctx_idx)
     {
@@ -11127,15 +11119,6 @@ void CTPNStmStaticPropInit::gen_code(int, int)
  */
 void CTPNStmObject::gen_code(int, int)
 {
-    CTPNSuperclass *sc;
-    CTPNObjProp *prop;
-    int sc_cnt;
-    ulong start_ofs;
-    uint internal_flags;
-    uint obj_flags;
-    CTcDataStream *str;
-    int bad_sc;
-
     /* if this object has been replaced, don't generate any code for it */
     if (replaced_)
         return;
@@ -11144,10 +11127,10 @@ void CTPNStmObject::gen_code(int, int)
     add_implicit_constructor();
 
     /* get the appropriate stream for generating the data */
-    str = obj_sym_->get_stream();
+    CTcDataStream *str = obj_sym_->get_stream();
 
     /* clear the internal flags */
-    internal_flags = 0;
+    uint internal_flags = 0;
 
     /* 
      *   if we're a modified object, set the 'modified' flag in the object
@@ -11161,7 +11144,7 @@ void CTPNStmObject::gen_code(int, int)
         internal_flags |= TCT3_OBJ_TRANSIENT;
 
     /* clear the object flags */
-    obj_flags = 0;
+    uint obj_flags = 0;
 
     /* 
      *   If we're specifically marked as a 'class' object, or we're a
@@ -11171,7 +11154,7 @@ void CTPNStmObject::gen_code(int, int)
         obj_flags |= TCT3_OBJFLG_CLASS;
 
     /* remember our starting offset in the object stream */
-    start_ofs = str->get_ofs();
+    ulong start_ofs = str->get_ofs();
 
     /* 
      *   store our stream offset in our defining symbol, for storage in
@@ -11196,7 +11179,7 @@ void CTPNStmObject::gen_code(int, int)
     str->write2(0);
 
     /* write the fixed property count */
-    str->write2(prop_cnt_);
+    str->write2(proplist_.cnt_);
 
     /* write the object flags */
     str->write2(obj_flags);
@@ -11205,12 +11188,12 @@ void CTPNStmObject::gen_code(int, int)
      *   First, go through the superclass list and verify that each
      *   superclass is actually an object.  
      */
-    for (bad_sc = FALSE, sc_cnt = 0, sc = first_sc_ ; sc != 0 ; sc = sc->nxt_)
+    int bad_sc = FALSE;
+    int sc_cnt = 0;
+    for (CTPNSuperclass *sc = get_first_sc() ; sc != 0 ; sc = sc->nxt_)
     {
-        CTcSymObj *sc_sym;
-
         /* look up the superclass in the global symbol table */
-        sc_sym = (CTcSymObj *)sc->get_sym();
+        CTcSymObj *sc_sym = (CTcSymObj *)sc->get_sym();
 
         /* make sure it's defined, and that it's really an object */
         if (sc_sym == 0)
@@ -11275,7 +11258,7 @@ void CTPNStmObject::gen_code(int, int)
      *   the property ID's aren't finalized until after linking.  For now,
      *   just write them out in the order in which they were defined.  
      */
-    for (prop = first_prop_ ; prop != 0 ; prop = prop->nxt_)
+    for (CTPNObjProp *prop = proplist_.first_ ; prop != 0 ; prop = prop->nxt_)
     {
         /* make sure we have a valid property symbol */
         if (prop->get_prop_sym() != 0)
@@ -11301,9 +11284,7 @@ void CTPNStmObject::gen_code(int, int)
  */
 void CTPNStmObject::check_locals()
 {
-    CTPNObjProp *prop;
-
     /* check for unreferenced locals for each property */
-    for (prop = first_prop_ ; prop != 0 ; prop = prop->nxt_)
+    for (CTPNObjProp *prop = proplist_.first_ ; prop != 0 ; prop = prop->nxt_)
         prop->check_locals();
 }

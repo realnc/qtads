@@ -503,6 +503,15 @@ void err_throw_a(err_id_t error_code, int param_count, ...);
  */
 void err_rethrow();
 
+/* 
+ *   Get the current exception being handled in the nearest enclosing
+ *   err_catch block.  This searches the error frame stack for a frame in the
+ *   'caught' state, and returns the exception object from that frame.  This
+ *   allows retrieving the current exception being handled even when we enter
+ *   a new err_try block within an err_catch handler.
+ */
+CVmException *err_get_cur_exc();
+
 /*
  *   Fatal error - abort program 
  */
@@ -544,6 +553,9 @@ void err_abort(const char *message);
         os_tls_set(G_err_frame, err_cur__.prv_); \
         if (err_cur__.state_ & (ERR_STATE_EXCEPTION | ERR_STATE_RETHROWN)) \
         { \
+            if (os_tls_get(err_frame_t *, G_err_frame)->state_ \
+                & ERR_STATE_CAUGHT) \
+                t3free(os_tls_get(err_frame_t *, G_err_frame)->exc_); \
             os_tls_get(err_frame_t *, G_err_frame)->exc_ = err_cur__.exc_; \
             err_rethrow(); \
         } \

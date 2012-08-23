@@ -1011,6 +1011,9 @@ Modified
 /* invalid constant value type for operator */
 #define TCERR_BAD_OP_FOR_FLOAT         11235
 
+/* expected inline object property list starting with '{', found '%.*s' */
+#define TCERR_INLINE_OBJ_REQ_LBRACE    11236
+
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -1217,6 +1220,9 @@ Modified
 
 /* cannot call extern function without an argument list prototype */
 #define TCERR_FUNC_CALL_NO_PROTO   11566
+
+/* %.*s is not defined or is not a metaclass */
+#define TCERR_UNDEF_METACLASS      11567
 
 
 /* ------------------------------------------------------------------------ */

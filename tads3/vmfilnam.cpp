@@ -1578,6 +1578,38 @@ static int32_t filemode_to_filetype(int osmode)
 }
 
 /*
+ *   Translate OSFATTR_xxx values to FileAttrXxx values
+ */
+static int32_t map_file_attrs(unsigned long osattrs)
+{
+    /* 
+     *   mappings from OSFATTR_xxx values to FileAttrXxx values (see
+     *   include/filename.h in the system headers) 
+     */
+    static const struct {
+        unsigned long osattr;
+        int32_t tadsattr;
+    } xlat[] = {
+        { OSFATTR_HIDDEN,   0x0001 },   // FileTypeHidden
+        { OSFATTR_SYSTEM,   0x0002 },   // FileTypeSystem
+        { OSFATTR_READ,     0x0004 },   // FileTypeRead
+        { OSFATTR_WRITE,    0x0008 }    // FileTypeWrite
+    };
+
+    /* run through the bit flags, and set the translated bits */
+    int32_t tadsattrs = 0;
+    for (int i = 0 ; i < countof(xlat) ; ++i)
+    {
+        /* if this OS mode bit is set, set the corresponding TADS bit */
+        if ((osattrs & xlat[i].osattr) != 0)
+            tadsattrs |= xlat[i].tadsattr;
+    }
+
+    /* return the result */
+    return tadsattrs;
+}
+
+/*
  *   Push a file timestamp value 
  */
 static void push_file_time(VMG_ os_time_t t)
@@ -1667,11 +1699,11 @@ int CVmObjFileName::getp_getFileType(VMG_ vm_obj_id_t self,
     }
 
     int ok;
-    unsigned long osmode;
+    unsigned long osmode, osattr;
     err_try
     {
         /* get the file type from the netfile object */
-        ok = netfile->get_file_mode(vmg_ &osmode, follow_links);
+        ok = netfile->get_file_mode(vmg_ &osmode, &osattr, follow_links);
     }
     err_finally
     {
@@ -1752,9 +1784,13 @@ int CVmObjFileName::getp_getFileInfo(VMG_ vm_obj_id_t self,
     if (ok)
     {
         /* 
-         *   Success - build a new FileInfo(mode, size, ctime, mtime, atime).
-         *   Start by pushing the constructor arguments (last to first).
+         *   Success - build a new FileInfo(mode, size, ctime, mtime, atime,
+         *   target, attrs).  Start by pushing the constructor arguments
+         *   (last to first).
          */
+
+        /* push the file attributes */
+        G_stk->push()->set_int(map_file_attrs(stat.attrs));
 
         /* if this is a symbolic link file, get the target path */
         char target[OSFNMAX];
@@ -1803,7 +1839,7 @@ int CVmObjFileName::getp_getFileInfo(VMG_ vm_obj_id_t self,
          *   create one of those.  Otherwise just create a list from the
          *   values. 
          */
-        const int argc = 6;
+        const int argc = 7;
         vm_obj_id_t fi = G_predef->file_info;
         if (fi != VM_INVALID_OBJ)
         {
@@ -1881,7 +1917,7 @@ int CVmObjFileName::getp_listDir(VMG_ vm_obj_id_t self,
 
 /* ------------------------------------------------------------------------ */
 /*
- *   listDir method
+ *   forEachFile method
  */
 int CVmObjFileName::getp_forEachFile(VMG_ vm_obj_id_t self,
                                      vm_val_t *retval, uint *oargc)

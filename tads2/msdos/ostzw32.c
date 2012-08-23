@@ -1,9 +1,36 @@
+/* 
+ *   Copyright (c) 1987, 2002 by Michael J. Roberts.  All Rights Reserved.
+ *   
+ *   Please see the accompanying license file, LICENSE.TXT, for information
+ *   on using and copying this software.  
+ */
+/*
+Name
+  ostzw32.c - osifc timezone routines for Win32
+Function
+  
+Notes
+  
+Modified
+  08/05/12 MJRoberts  - Creation
+*/
+
 #include <windows.h>
-#include "lib.h"
+
+#include <stdio.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#include <time.h>
+
+#include "std.h"
+#include "os.h"
+
+extern void safe_strcpy(char *dst, size_t dstlen, const char *src);
 
 /* list of mappings from Windows zone names to Olson zone names */
 typedef struct win_zone_map_t win_zone_map_t;
-
 struct win_zone_map_t
 {
     const WCHAR *win_name;   /* Windows zone name ("Pacific Standard Time") */
@@ -11,16 +38,14 @@ struct win_zone_map_t
     const char *st_abbr;              /* standard time abbreviation ("PST") */
     const char *dst_abbr;             /* daylight time abbreviation ("PDT") */
 };
-
 static const win_zone_map_t S_win_zone_map[] = {
-/*
+/* 
  *   include the mapping file we generate from the Unicode CLDR file
  *   windowsZones.xml - this contains a list of { "win name", "olson name" }
  *   constant data definitions that will populate this array for us
  */
 #include "windowsZones.h"
 };
-
 
 /* find a Windows zone name in the zone map list */
 static const win_zone_map_t *win_to_zoneinfo(const wchar_t *win_name)
@@ -37,8 +62,7 @@ static const win_zone_map_t *win_to_zoneinfo(const wchar_t *win_name)
     return 0;
 }
 
-
-/*
+/* 
  *   Generate a timezone abbreviation from a windows zone name.  This is an
  *   approximation at best; we use this as a last resort when we can't find
  *   the zone in our zone list.  We'll simply pull out the initials of the
@@ -73,7 +97,6 @@ static void gen_tz_abbr(char *abbr, size_t abbrlen, const wchar_t *name)
         *abbr = '\0';
 }
 
-
 /*
  *   Get the zoneinfo (Olson) timezone name for the local machine/process.
  */
@@ -95,9 +118,8 @@ int os_get_zoneinfo_key(char *name, size_t namelen)
     return FALSE;
 }
 
-
 /*
- *   Get the current settings for the local time zone
+ *   Get the current settings for the local time zone 
  */
 int os_get_timezone_info(struct os_tzinfo_t *info)
 {
@@ -115,11 +137,11 @@ int os_get_timezone_info(struct os_tzinfo_t *info)
         /* check to see if standard/daylight change rules are present */
         if (tz.StandardDate.wMonth != 0)
         {
-            /*
-             *   We have both daylight and standard time.  Set the GMT
-             *   offset for each; Windows gives us to this as minutes west
-             *   of GMT, and we want seconds east, so negate it and
-             *   multiply by 60 seconds per minutes.
+            /* 
+             *   We have both daylight and standard time.  Set the GMT offset
+             *   for each; Windows gives us to this as minutes west of GMT,
+             *   and we want seconds east, so negate it and multiply by 60
+             *   seconds per minutes.
              */
             info->std_ofs = -(tz.Bias + tz.StandardBias) * 60;
             info->dst_ofs = -(tz.Bias + tz.DaylightBias) * 60;
@@ -134,7 +156,7 @@ int os_get_timezone_info(struct os_tzinfo_t *info)
             info->is_dst = FALSE;
         }
 
-        /*
+        /* 
          *   If we have recurring standard/daylight rules, set the rules.
          *   Recurring rules are indicated by wYear == 0; a non-zero wYear
          *   means that the rule occurs on that exact date only.  We have no
@@ -169,7 +191,7 @@ int os_get_timezone_info(struct os_tzinfo_t *info)
         }
         else
         {
-            /*
+            /* 
              *   we couldn't find a mapping; generate the abbreviation from
              *   the windows zone name by pulling out the initials (for
              *   example, "Pacific Standard Time" -> "PST")
@@ -189,3 +211,4 @@ int os_get_timezone_info(struct os_tzinfo_t *info)
         return FALSE;
     }
 }
+

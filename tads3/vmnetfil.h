@@ -202,12 +202,13 @@ public:
      *   combination of OSFMODE_xxx flags and returns true; returns false on
      *   failure.  
      */
-    int get_file_mode(VMG_ unsigned long *mode, int follow_links)
+    int get_file_mode(VMG_ unsigned long *mode, unsigned long *attrs,
+                      int follow_links)
 #ifdef TADSNET
         ;
 #else
     {
-        return osfmode(lclfname, follow_links, mode);
+        return osfmode(lclfname, follow_links, mode, attrs);
     }
 #endif
 

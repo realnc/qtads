@@ -31,7 +31,7 @@ Modified
  */
 #define MAKE_VERSION_NUMBER(major,minor,maint) \
     (((major) << 16) | ((minor) << 8) | (maint))
-#define T3VM_VSN_NUMBER  MAKE_VERSION_NUMBER(3,1,1)
+#define T3VM_VSN_NUMBER  MAKE_VERSION_NUMBER(3,1,2)
 
 /*
  *   The VM identification string 
@@ -42,7 +42,7 @@ Modified
  *   The VM short version string.  This contains merely the version number,
  *   in display format.  
  */
-#define T3VM_VSN_STRING "3.1.1"
+#define T3VM_VSN_STRING "3.1.2"
 
 /*
  *   The VM banner string.  A VM program can obtain this value through the

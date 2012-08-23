@@ -3729,14 +3729,6 @@ resume_execution:
                     if (halt_vm_)
                         err_throw(VMERR_DBG_HALT);
 
-      // old way: this had problems in certain cases with recursive invocations
-      // (such as via anonymous function callbacks invoked from native
-      // methods or functions)
-      //            {
-      //                done = TRUE;
-      //                goto skip_throw;
-      //            }
-                    
                     /* 
                      *   if they moved the execution pointer, resume
                      *   execution at the new point, discarding the

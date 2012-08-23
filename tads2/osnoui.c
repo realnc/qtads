@@ -34,8 +34,8 @@ Modified
 #include <time.h>
 #include <sys/stat.h>
 
-#ifdef __WIN32__
-#include <windows.h>
+#ifdef T_WIN32
+#include <Windows.h>
 #include <direct.h>
 #endif
 
@@ -1001,7 +1001,7 @@ int os_locate(const char *fname, int flen, const char *arg0,
  *   for equality.  For case-sensitive file systems, use memcmp(); for
  *   systems that ignore case, use memicmp().
  */
-#if defined(MSDOS) || defined(__WIN32__) || defined(DJGPP) || defined(MSOS2)
+#if defined(MSDOS) || defined(T_WIN32) || defined(DJGPP) || defined(MSOS2)
 # define fname_memcmp memicmp
 #endif
 #if defined(UNIX)
@@ -1166,7 +1166,7 @@ int os_file_names_equal(const char *a, const char *b)
  *   include ISAAC if we're using our generic temporary filename generator
  *   with long filenames, or we're using our generic os_gen_rand_bytes() 
  */
-#if !defined(OSNOUI_OMIT_TEMPFILE) && (defined(__WIN32__) || !defined(MSDOS))
+#if !defined(OSNOUI_OMIT_TEMPFILE) && (defined(T_WIN32) || !defined(MSDOS))
 #define INCLUDE_ISAAC
 #endif
 #ifdef USE_GENRAND
@@ -1535,7 +1535,7 @@ int osfdel_temp(const char *fname)
     return osfdel(fname);
 }
 
-#if defined(MSDOS) && !defined(__WIN32__)
+#if defined(MSDOS) && !defined(T_WIN32)
 #define SHORT_FILENAMES
 #endif
 
@@ -1596,7 +1596,7 @@ void os_fprint(osfildef *fp, const char *str, size_t len)
 
 /* ------------------------------------------------------------------------ */
 
-#ifdef __WIN32__
+#ifdef T_WIN32
 /*
  *   Windows implementation - get the temporary file path. 
  */
@@ -1606,7 +1606,7 @@ void os_get_tmp_path(char *buf)
 }
 #endif
 
-#if defined(MSDOS) && !defined(__WIN32__)
+#if defined(MSDOS) && !defined(T_WIN32)
 /*
  *   MS-DOS implementation - Get the temporary file path.  Tries getting
  *   the values of various environment variables that are typically used
@@ -2073,10 +2073,6 @@ int os_read_dir(osdirhdl_t hdl, char *buf, size_t buflen)
     /* cast the handle to our private structure */
     struct oss_find_ctx_t *ctx = (struct oss_find_ctx_t *)hdl;
     
-    /* skip system and hidden files */
-    while (ctx->found && (ctx->ff.ff_attrib & (FA_HIDDEN | FA_SYSTEM)) != 0)
-        ctx->found = (findnext(&ctx->ff) == 0);
-
     /* if we're out of files, return failure */
     if (!ctx->found)
         return FALSE;
@@ -2282,15 +2278,63 @@ void os_tzset()
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   Get file attributes 
+ */
+unsigned long oss_get_file_attrs(const char *fname)
+{
+    struct ffblk ff;
+    unsigned long attrs = 0;
+
+    /* look up the file */
+    if (!findfirst(fname, &ff, FA_DIREC))
+    {
+        /* translate the HIDDEN and SYSTEM bits */
+        if ((ff.ff_attrib & FA_HIDDEN) != 0)
+            attrs |= OSFATTR_HIDDEN;
+        if ((ff.ff_attrib & FA_SYSTEM) != 0)
+            attrs |= OSFATTR_SYSTEM;
+
+        /* if the RDONLY bit is set, it's readable, otherwise read/write */
+        attrs |= OSFATTR_READ;
+        if ((ff.ff_attrib & FA_RDONLY) == 0)
+            attrs |= OSFATTR_WRITE;
+    }
+
+    /* return the attributes */
+    return attrs;
+}
+
+/*
  *   Get file status information 
  */
 int os_file_stat(const char *fname, int follow_links, os_file_stat_t *s)
 {
     struct stat info;
+    struct ffblk ff;
 
     /* get the file information */
     if (stat(fname, &info))
+    {
+        /* 
+         *   stat() doesn't work for devices; try running through osfmode(),
+         *   which does special checks for reserved device names
+         */
+        if (osfmode(fname, follow_links, &s->mode, &s->attrs))
+        {
+            /* devices have no sizes or timestamps */
+            s->sizehi = 0;
+            s->sizelo = 0;
+            s->cre_time = 0;
+            s->mod_time = 0;
+            s->acc_time = 0;
+            
+            /* success */
+            return TRUE;
+        }
+
+        /* failed */
         return FALSE;
+    }
 
     /* translate the status fields */
     if (sizeof(info.st_size) <= 4)
@@ -2307,6 +2351,9 @@ int os_file_stat(const char *fname, int follow_links, os_file_stat_t *s)
     s->mod_time = info.st_mtime;
     s->acc_time = info.st_atime;
     s->mode = info.st_mode;
+
+    /* get the DOS mode information */
+    s->attrs = oss_get_file_attrs(fname);
 
     /* success */
     return TRUE;
@@ -2386,10 +2433,6 @@ int os_read_dir(osdirhdl_t hdl, char *buf, size_t buflen)
 {
     /* cast the handle to our private structure */
     struct oss_find_ctx_t *ctx = (struct oss_find_ctx_t *)hdl;
-
-    /* skip system and hidden files */
-    while (ctx->found && (ctx->data.attrib & (_A_HIDDEN | _A_SYSTEM)) != 0)
-        ctx->found = (_findnext(ctx->handle, &ctx->data) == 0);
 
     /* if we're out of files, return failure */
     if (!ctx->found)
@@ -2605,6 +2648,134 @@ void os_tzset()
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   Get the DOS attributes for a file
+ */
+unsigned long oss_get_file_attrs(const char *fname)
+{
+    unsigned long attrs = 0;
+    struct _finddata_t ff;
+    
+    /* get the DOS attribute flags */
+    ff.attrib = 0;
+#ifdef T_WIN32
+    ff.attrib = GetFileAttributes(fname);
+#else
+    {
+        long h = _findfirst(fname, &ff);
+        if (h != -1L)
+            _findclose(h);
+    }
+#endif
+
+    /* translate the HIDDEN and SYSTEM bits */
+    if ((ff.attrib & _A_HIDDEN) != 0)
+        attrs |= OSFATTR_HIDDEN;
+    if ((ff.attrib & _A_SYSTEM) != 0)
+        attrs |= OSFATTR_SYSTEM;
+
+    /* if the RDONLY bit is set, it's readable, otherwise read/write */
+    attrs |= OSFATTR_READ;
+    if ((ff.attrib & _A_RDONLY) == 0)
+        attrs |= OSFATTR_WRITE;
+
+#ifdef T_WIN32
+    /*
+     *   On Windows, attempt to do a full security manager check to determine
+     *   our actual access rights to the file.  If we fail to get the
+     *   security info, we'll give up and return the simple RDONLY
+     *   determination we just made above.  In most cases, failure to check
+     *   the security information will simply be because the file has no ACL,
+     *   which means that anyone can access it, hence our tentative result
+     *   from the RDONLY attribute is correct after all.
+     */
+    {
+        /* 
+         *   get the file's DACL and owner/group security info; first, ask
+         *   how much space we need to allocate for the returned information 
+         */
+        DWORD len = 0;
+        SECURITY_INFORMATION info = (SECURITY_INFORMATION)(
+            OWNER_SECURITY_INFORMATION
+            | GROUP_SECURITY_INFORMATION
+            | DACL_SECURITY_INFORMATION);
+        GetFileSecurity(fname, info, 0, 0, &len);
+        if (len != 0)
+        {
+            /* allocate a buffer for the security info */
+            SECURITY_DESCRIPTOR *sd = (SECURITY_DESCRIPTOR *)malloc(len);
+            if (sd != 0)
+            {
+                /* now actually retrieve the security info into our buffer */
+                if (GetFileSecurity(fname, info, sd, len, &len))
+                {
+                    HANDLE ttok;
+
+                    /* impersonate myself for security purposes */
+                    ImpersonateSelf(SecurityImpersonation);
+
+                    /* 
+                     *   get the security token for the current thread, which
+                     *   is the context in which the caller will presumably
+                     *   eventually attempt to access the file 
+                     */
+                    if (OpenThreadToken(
+                        GetCurrentThread(), TOKEN_ALL_ACCESS, TRUE, &ttok))
+                    {
+                        GENERIC_MAPPING genmap = {
+                            FILE_GENERIC_READ,
+                            FILE_GENERIC_WRITE,
+                            FILE_GENERIC_EXECUTE,
+                            FILE_ALL_ACCESS
+                        };
+                        PRIVILEGE_SET privs;
+                        DWORD privlen = sizeof(privs);
+                        BOOL granted = FALSE;
+                        DWORD desired;
+                        DWORD allowed;
+
+                        /* test read access */
+                        desired = GENERIC_READ;
+                        MapGenericMask(&desired, &genmap);
+                        if (AccessCheck(sd, ttok, desired, &genmap,
+                                        &privs, &privlen, &allowed, &granted))
+                        {
+                            /* clear the read bit if reading isn't allowed */
+                            if (allowed == 0)
+                                attrs &= ~OSFATTR_READ;
+                        }
+
+                        /* test write access */
+                        desired = GENERIC_WRITE;
+                        MapGenericMask(&desired, &genmap);
+                        if (AccessCheck(sd, ttok, desired, &genmap,
+                                        &privs, &privlen, &allowed, &granted))
+                        {
+                            /* clear the read bit if reading isn't allowed */
+                            if (allowed == 0)
+                                attrs &= ~OSFATTR_WRITE;
+                        }
+
+                        /* done with the thread token */
+                        CloseHandle(ttok);
+                    }
+
+                    /* terminate our security self-impersonation */
+                    RevertToSelf();
+                }
+
+                /* free the allocated security info buffer */
+                free(sd);
+            }
+        }
+    }
+#endif /* T_WIN32 */
+
+    /* return the attributes */
+    return attrs;
+}
+
+
+/*
  *   Get file status information 
  */
 int os_file_stat(const char *fname, int follow_links, os_file_stat_t *s)
@@ -2624,6 +2795,9 @@ int os_file_stat(const char *fname, int follow_links, os_file_stat_t *s)
     s->mod_time = (os_time_t)info.st_mtime;
     s->acc_time = (os_time_t)info.st_atime;
     s->mode = info.st_mode;
+
+    /* get the attributes */
+    s->attrs = oss_get_file_attrs(fname);
 
     /* success */
     return TRUE;
@@ -2770,13 +2944,6 @@ int os_read_dir(osdirhdl_t hdl, char *buf, size_t buflen)
 
     /* cast the handle to our private structure */
     struct oss_find_ctx_t *ctx = (oss_find_ctx_t *)hdl;
-
-    /* skip system and hidden files */
-    while (ctx->found && (ctx->ff.attrFile & (FILE_HIDDEN | FILE_SYSTEM)) != 0)
-    {
-        ctx->found = (DosFindNext(
-            HDIR_SYSTEM, &ctx->ff, sizeof(ctx->ff), &scnt) == 0);
-    }
 
     /* if we're out of files, return failure */
     if (!ctx->found)

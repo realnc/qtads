@@ -2284,23 +2284,42 @@ public:
 };
 
 /*
+ *   Inline object definition (defined within an expression)
+ */
+class CTPNInlineObject: public CTPNInlineObjectBase
+{
+public:
+    /* generate code */
+    virtual void gen_code(int discard, int for_condition);
+};
+
+
+/*
  *   Property Value list entry 
  */
 class CTPNObjProp: public CTPNObjPropBase
 {
 public:
-    CTPNObjProp(class CTPNStmObject *obj_stm, class CTcSymProp *prop_sym,
+    CTPNObjProp(class CTPNObjDef *objdef, class CTcSymProp *prop_sym,
                 class CTcPrsNode *expr, class CTPNCodeBody *code_body,
-                int is_static)
-        : CTPNObjPropBase(obj_stm, prop_sym, expr, code_body, is_static)
+                class CTPNAnonFunc *inline_method, int is_static)
+        : CTPNObjPropBase(
+            objdef, prop_sym, expr, code_body, inline_method, is_static)
     {
     }
     
     /* generate code */
     virtual void gen_code(int discard, int for_condition);
 
+    /* generate code for an inline object instantiation */
+    void gen_code_inline_obj();
+
     /* check locals */
     void check_locals();
+
+protected:
+    /* generate a setMethod() call for inline object creation */
+    void gen_setMethod();
 };
 
 /*

@@ -128,7 +128,7 @@ extern "C" {
 # include "oswin.h"
 #endif
 #ifdef __MSDOS__
-# ifdef __WIN32__
+# ifdef T_WIN32
 /* Windows-specific definitions are in oswin.h */
 #  include "oswin.h"
 # else

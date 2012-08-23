@@ -254,7 +254,7 @@ os_get_zoneinfo_key( char *buf, size_t buflen )
     unsigned long mode;
     char linkbuf[OSFNMAX];
     const char *zi;
-    if (osfmode(elt, FALSE, &mode)
+    if (osfmode(elt, FALSE, &mode, NULL)
         && (mode & OSFMODE_LINK) != 0
         && os_resolve_symlink(elt, linkbuf, sizeof(linkbuf))
         && (zi = strstr(linkbuf, "/zoneinfo/")) != 0)

@@ -501,39 +501,34 @@ vm_obj_id_t CVmObjTads::create(VMG_ int in_root_set,
 vm_obj_id_t CVmObjTads::create_from_stack_multi(
     VMG_ uint argc, int is_transient)
 {
-    vm_obj_id_t id;
-    CVmObjTads *obj;
-    ushort i;
-
     /* allocate an object ID */
-    id = vm_new_id(vmg_ FALSE, TRUE, FALSE);
+    vm_obj_id_t id = vm_new_id(vmg_ FALSE, TRUE, FALSE);
     if (is_transient)
         G_obj_table->set_obj_transient(id);
 
     /* create the new object */
-    obj = new (vmg_ id) CVmObjTads(vmg_ (ushort)argc, VMTOBJ_PROP_INIT);
+    CVmObjTads *obj = new (vmg_ id) CVmObjTads(
+        vmg_ (ushort)argc, VMTOBJ_PROP_INIT);
 
     /* push the new object, for garbage collector protection */
     G_interpreter->push_obj(vmg_ id);
 
     /* set the superclasses */
-    for (i = 0 ; i < argc ; ++i)
+    for (ushort i = 0 ; i < argc ; ++i)
     {
-        vm_val_t *arg;
-        vm_val_t sc;
-        const char *lstp;
-        
         /* 
          *   get this argument (it's at i+1 because of the extra item we
          *   pushed for gc protection) 
          */
-        arg = G_stk->get(i + 1);
+        vm_val_t *arg = G_stk->get(i + 1);
 
         /* 
          *   if it's a list, the superclass is the first element; otherwise,
          *   the argument is the superclass 
          */
-        if ((lstp = arg->get_as_list(vmg0_)) != 0)
+        vm_val_t sc;
+        const char *lstp = arg->get_as_list(vmg0_);
+        if (lstp != 0)
         {
             /* it's a list - the first element is the superclass */
             CVmObjList::index_list(vmg_ &sc, lstp, 1);
@@ -566,30 +561,25 @@ vm_obj_id_t CVmObjTads::create_from_stack_multi(
      *   the corresponding superclass, so run through the arguments and
      *   invoke each indicated constructor.  
      */
-    for (i = 0 ; i < argc ; ++i)
+    for (ushort i = 0 ; i < argc ; ++i)
     {    
-        vm_val_t *arg;
-        vm_val_t sc;
-        const char *lstp;
-        uint lst_cnt;
-        uint j;
-        vm_val_t new_obj_val;
-
         /* get the next argument */
-        arg = G_stk->get(i + 1);
+        vm_val_t *arg = G_stk->get(i + 1);
 
         /* if it's not a list, we don't want to invoke this constructor */
-        if ((lstp = arg->get_as_list(vmg0_)) == 0)
+        const char *lstp = arg->get_as_list(vmg0_);
+        if (lstp == 0)
         {
             /* no constructor call is wanted - just keep going */
             continue;
         }
 
         /* get the superclass from the list */
+        vm_val_t sc;
         CVmObjList::index_list(vmg_ &sc, lstp, 1);
 
         /* get the number of list elements */
-        lst_cnt = vmb_get_len(lstp);
+        uint lst_cnt = vmb_get_len(lstp);
 
         /* make sure we have room to push the arguments */
         if (!G_stk->check_space(lst_cnt - 1))
@@ -600,7 +590,7 @@ vm_obj_id_t CVmObjTads::create_from_stack_multi(
          *   element, since it's the superclass itself rather than an
          *   argument to the constructor 
          */
-        for (j = lst_cnt ; j > 1 ; --j)
+        for (uint j = lst_cnt ; j > 1 ; --j)
             CVmObjList::index_and_push(vmg_ lstp, j);
 
         /* 
@@ -609,6 +599,7 @@ vm_obj_id_t CVmObjTads::create_from_stack_multi(
          *   but the 'target' object is the superclass whose constructor
          *   we're invoking. 
          */
+        vm_val_t new_obj_val;
         new_obj_val.set_obj(id);
         G_interpreter->get_prop(vmg_ 0, &sc, G_predef->obj_construct,
                                 &new_obj_val, lst_cnt - 1, &rc);
@@ -2356,9 +2347,8 @@ int CVmObjTads::getp_get_method(VMG_ vm_obj_id_t self,
 int CVmObjTads::getp_set_method(VMG_ vm_obj_id_t self,
                                 vm_val_t *retval, uint *argc)
 {
-    static CVmNativeCodeDesc desc(2);
-
     /* check arguments: setMethod(&propid, val) */
+    static CVmNativeCodeDesc desc(2);
     if (get_prop_check_argc(retval, argc, &desc))
         return TRUE;
 

@@ -1320,7 +1320,7 @@ void t3_list_memory_blocks(void (*cb)(const char *))
 }
 
 
-#ifdef __WIN32__
+#ifdef T_WIN32
 /*
  *   Windows-specific additions to the memory header.  We'll track the first
  *   couple of return addresses from the stack, to make it easier to track
@@ -1346,7 +1346,7 @@ void os_mem_prefix_set(mem_prefix_t *mem)
         mem->stk[i].return_addr = ((DWORD *)bp_)[1];
 }
 
-#endif /* __WIN32__ */
+#endif /* T_WIN32 */
 
 
 #endif /* T3_DEBUG */

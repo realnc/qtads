@@ -1261,12 +1261,19 @@ void os_fprint(osfildef *fp, const char *str, size_t len);
 /* int osfacc(const char *fname) */
 
 /*
- *   Get a file's mode.  This retrieves information on the given file
- *   equivalent to the st_mode member of the 'struct stat' data returned by
- *   the Unix stat() family of functions.  On success, fills in *mode with
- *   the mode information as an OSFMODE_xxx value, and returns true; returns
- *   false on failure (e.g., the file doesn't exist or can't be accessed due
- *   to permissions).
+ *   Get a file's mode and attribute flags.  This retrieves information on
+ *   the given file equivalent to the st_mode member of the 'struct stat'
+ *   data returned by the Unix stat() family of functions, as well as some
+ *   extra system-specific attributes.  On success, fills in *mode (if mode
+ *   is non-null) with the mode information as a bitwise combination of
+ *   OSFMODE_xxx values, fills in *attr (if attr is non-null) with a
+ *   combination of OSFATTR_xxx attribute flags, and returns true; on
+ *   failure, simply returns false.  Failure can occur if the file doesn't
+ *   exist, can't be accessed due to permissions, etc.
+ *   
+ *   Note that 'mode' and/or 'attr' can be null if the caller doesn't need
+ *   that information.  Implementations must check these parameters for null
+ *   pointers and skip returning the corresponding information if null.
  *   
  *   If the file in 'fname' is a symbolic link, the behavior depends upon
  *   'follow_links'.  If 'follow_links' is true, the function should resolve
@@ -1281,14 +1288,15 @@ void os_fprint(osfildef *fp, const char *str, size_t len);
  *   generally indistinguishable from regular files, so this function isn't
  *   expected to do anything special with them.
  *   
- *   It's possible for the *mode value to contain a bitwise combination of
- *   more than one OSFMODE_xxx flag.  Most of the flags are mutually
- *   exclusive conceptually, so in most cases only one should be set.  For
- *   example, "file" and "directory" should never be combined.  It's also
- *   possible for *mode to be zero for a valid file - this means that the
- *   file is some exotic object that doesn't fit any of the OSFMODE_xxx
- *   types.  If necessary, we can extend the OSFMODE_xxx list in the future
- *   to accommodate such types.
+ *   The '*mode' value returned is a bitwise combination of OSFMODE_xxx flag.
+ *   Many of the flags are mutually exclusive; for example, "file" and
+ *   "directory" should never be combined.  It's also possible for '*mode' to
+ *   be zero for a valid file; this means that the file is of some special
+ *   type on the local system that doesn't fit any of the OSFMODE_xxx types.
+ *   (If any ports do encounter such cases, we can add OSFMODE_xxx types to
+ *   accommodate new types.  The list below isn't meant to be final; it's
+ *   just what we've encountered so far on the platforms where TADS has
+ *   already been ported.)
  *   
  *   The OSFMODE_xxx values are left for the OS to define so that they can be
  *   mapped directly to the OS API's equivalent constants, if desired.  This
@@ -1304,8 +1312,44 @@ void os_fprint(osfildef *fp, const char *str, size_t len);
  *   Obviously, a given OS might not have all of the file types listed here.
  *   If any OSFMODE_xxx values aren't applicable on the local OS, you can
  *   simply define them as zero since they'll never be returned.
+ *   
+ *   Notes on attribute flags:
+ *   
+ *   OSFATTR_HIDDEN means that the file is conventionally hidden by default
+ *   in user interface views or listings, but is still fully accessible to
+ *   the user.  Hidden files are also usually excluded by default from
+ *   wildcard patterns in commands ("rm *.*").  On Unix, a hidden file is one
+ *   whose name starts with "."; on Windows, it's a file with the HIDDEN bit
+ *   in its file attributes.  On systems where this concept exists, the user
+ *   can still manipulate these files as normal by naming them explicitly,
+ *   and can typically make them appear in UI views or directory listings via
+ *   a preference setting or command flag (e.g., "ls -a" on Unix).  The
+ *   "hidden" flag is explicitly NOT a security or permissions mechanism, and
+ *   it doesn't protect the file against intentional access by a user; it's
+ *   merely a convenience designed to reduce clutter by excluding files
+ *   maintained by the OS or by an application (such as preference files,
+ *   indices, caches, etc) from casual folder browsing, where a user is
+ *   typically only concerned with her own document files.  On systems where
+ *   there's no such naming convention or attribute metadata, this flag will
+ *   never appear.
+ *   
+ *   OSFATTR_SYSTEM is similar to 'hidden', but means that the file is
+ *   specially marked as an operating system file.  This is mostly a
+ *   DOS/Windows concept, where it corresponds to the SYSTEM bit in the file
+ *   attributes; this flag will probably never appear on other systems.  The
+ *   distinction between 'system' and 'hidden' is somewhat murky even on
+ *   Windows; most 'system' file are also marked as 'hidden', and in
+ *   practical terms in the user interface, 'system' files are treated the
+ *   same as 'hidden'.
+ *   
+ *   OSFATTR_READ means that the file is readable by this process.
+ *   
+ *   OSFATTR_WRITE means that the file is writable by this process.
  */
-/* int osfmode(const char *fname, int follow_links, unsigned long *mode); */
+/* int osfmode(const char *fname, int follow_links, */
+/*             unsigned long *mode, unsigned long *attr); */
+
+/* file mode/type constants */
 /* #define OSFMODE_FILE    - regular file */
 /* #define OSFMODE_DIR     - directory */
 /* #define OSFMODE_BLK     - block-mode device */
@@ -1314,6 +1358,11 @@ void os_fprint(osfildef *fp, const char *str, size_t len);
 /* #define OSFMODE_SOCKET  - network socket */
 /* #define OSFMODE_LINK    - symbolic link */
 
+/* file attribute constants */
+/* #define OSFATTR_HIDDEN  - hidden file */
+/* #define OSFATTR_SYSTEM  - system file */
+/* #define OSFATTR_READ    - the file is readable by this process */
+/* #define OSFATTR_WRITE   - the file is writable by this process */
 
 /*
  *   Get stat() information.  This fills in the portable os_file_stat
@@ -1350,16 +1399,19 @@ struct os_file_stat_t
 
     /* file mode, using the same flags as returned from osfmode() */
     unsigned long mode;
+
+    /* file attributes, using the same flags as returned from osfmode() */
+    unsigned long attrs;
 };
 
 /*
  *   Manually resolve a symbolic link.  If the local OS and file system
  *   support symbolic links, and the given filename is a symbolic link (in
- *   which case osfmode(fname, FALSE, &m) will set OSFMODE_LINK in the mode
- *   bits), this fills in 'target' with the name of the link target (i.e.,
- *   the object that the link in 'fname' points to).  This should return a
- *   fully qualified file system path.  Returns true on success, false on
- *   failure.
+ *   which case osfmode(fname, FALSE, &m, &a) will set OSFMODE_LINK in the
+ *   mode bits), this fills in 'target' with the name of the link target
+ *   (i.e., the object that the link in 'fname' points to).  This should
+ *   return a fully qualified file system path.  Returns true on success,
+ *   false on failure.
  *   
  *   This should only resolve a single level of indirection.  If the link
  *   target of 'fname' is itself a link to a second target, this should only
@@ -1435,10 +1487,30 @@ int os_open_dir(const char *dirname, /*OUT*/osdirhdl_t *handle);
  *   on until all files have been retrieved.  If an error occurs, or there
  *   are no more files in the directory, returns false.
  *   
- *   This filename returned is the root filename only, without the path.  The
+ *   The filename returned is the root filename only, without the path.  The
  *   caller can build the full path by calling os_build_full_path() or
  *   os_combine_paths() with the original directory name and the returned
  *   filename as parameters.
+ *   
+ *   This routine lists all objects in the directory that are visible to the
+ *   corresponding native API, and is non-recursive.  The listing should thus
+ *   include subdirectory objects, but not the contents of subdirectories.
+ *   Implementations are encouraged to simply return all objects returned
+ *   from the corresponding native directory scan API; there's no need to do
+ *   any filtering, except perhaps in cases where it's difficult or
+ *   impossible to represent an object in terms of the osifc APIs (e.g., it
+ *   might be reasonable to exclude files without names).  System relative
+ *   links, such as the Unix/DOS "." and "..", specifically should be
+ *   included in the listing.  For unusual objects that don't fit into the
+ *   os_file_stat() taxonomy or that otherwise might create confusion for a
+ *   caller, err on the side of full disclosure (i.e., just return everything
+ *   unfiltered); if necessary, we can extend the os_file_stat() taxonomy or
+ *   add new osifc APIs to create a portable abstraction to handle whatever
+ *   is unusual or potentially confusing about the native object.  For
+ *   example, Unix implementations should feel free to return symbolic link
+ *   objects, including dangling links, since we have the portable
+ *   os_resolve_symlink() that lets the caller examine the meaning of the
+ *   link object.
  */
 int os_read_dir(osdirhdl_t handle, char *fname, size_t fname_size);
 
@@ -2026,6 +2098,19 @@ int os_mkdir(const char *dir, int create_parents);
 
 /*
  *   Remove a directory.  Returns true on success, false on failure.
+ *   
+ *   If the directory isn't already empty, this routine fails.  That is, the
+ *   routine does NOT recursively delete the contents of a non-empty
+ *   directory.  It's up to the caller to delete any contents before removing
+ *   the directory, if that's the caller's intention.  (Note to implementors:
+ *   most native OS APIs to remove directories fail by default if the
+ *   directory isn't empty, so it's usually safe to implement this simply by
+ *   calling the native API.  However, if your system's version of this API
+ *   can remove a non-empty directory, you MUST add an extra test before
+ *   removing the directory to ensure it's empty, and return failure if it's
+ *   not.  For the purposes of this test, "empty" should of course ignore any
+ *   special objects that are automatically or implicitly present in all
+ *   directories, such as the Unix "." and ".." relative links.)
  */
 int os_rmdir(const char *dir);
 

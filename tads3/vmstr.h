@@ -558,6 +558,10 @@ public:
     static int getp_findAll(VMG_ vm_val_t *retval, const vm_val_t *self_val,
                             const char *str, uint *argc);
 
+    /* property evaluator - match */
+    static int getp_match(VMG_ vm_val_t *retval, const vm_val_t *self_val,
+                          const char *str, uint *argc);
+
 
 protected:
     /* create a string with no initial contents */
@@ -647,7 +651,7 @@ class CVmMetaclassString: public CVmMetaclass
 {
 public:
     /* get the global name */
-    const char *get_meta_name() const { return "string/030007"; }
+    const char *get_meta_name() const { return "string/030008"; }
     
     /* create from image file */
     void create_for_image_load(VMG_ vm_obj_id_t id)

@@ -189,31 +189,35 @@ static void empty_dir(VMG_ const char *dir)
                 char path[OSFNMAX];
                 os_build_full_path(path, sizeof(path), dir, fname);
 
-                /* check to see if this is a directory or an ordinary file */
+                /* get the mode */
                 unsigned long fmode;
-                if (osfmode(path, FALSE, &fmode)
-                    && (fmode & OSFMODE_DIR) != 0)
+                unsigned long fattr;
+                if (osfmode(path, FALSE, &fmode, &fattr))
                 {
-                    /* 
-                     *   directory - skip the special '.' and '..' links,
-                     *   since they'd get us stuck in a loop 
-                     */
-                    os_specfile_t st = os_is_special_file(fname);
-                    if (st != OS_SPECFILE_SELF && st != OS_SPECFILE_PARENT)
+                    /* check whether it's a directory or an ordinary file */
+                    if ((fmode & OSFMODE_DIR) != 0)
                     {
-                        /* recursively empty the directory */
-                        empty_dir(vmg_ path);
-                        
-                        /* remove this directory */
-                        if (!os_rmdir(path))
+                        /* 
+                         *   directory - skip the special '.' and '..' links,
+                         *   since they'd get us stuck in a loop 
+                         */
+                        os_specfile_t st = os_is_special_file(fname);
+                        if (st != OS_SPECFILE_SELF && st != OS_SPECFILE_PARENT)
+                        {
+                            /* recursively empty the directory */
+                            empty_dir(vmg_ path);
+                            
+                            /* remove this directory */
+                            if (!os_rmdir(path))
+                                err_throw(VMERR_DELETE_FILE);
+                        }
+                    }
+                    else
+                    {
+                        /* ordinary file - delete it */
+                        if (osfdel(path))
                             err_throw(VMERR_DELETE_FILE);
                     }
-                }
-                else
-                {
-                    /* ordinary file - delete it */
-                    if (osfdel(path))
-                        err_throw(VMERR_DELETE_FILE);
                 }
             }
         }
@@ -346,7 +350,8 @@ static int s_readdir_local(VMG_ const char *lclfname,
 
                     /* check to see if it's a directory */
                     unsigned long fmode;
-                    if (osfmode(fullname, FALSE, &fmode)
+                    unsigned long fattr;
+                    if (osfmode(fullname, FALSE, &fmode, &fattr)
                         && (fmode & OSFMODE_DIR) != 0)
                     {
                         /* get the combined path from the FileName object */
@@ -395,7 +400,9 @@ int CVmNetFile::readdir_local(VMG_ const char *nominal_path,
 {
     /* verify that the path exists and refers to a directory */
     unsigned long mode;
-    if (!osfmode(lclfname, TRUE, &mode) || (mode & OSFMODE_DIR) == 0)
+    unsigned long attr;
+    if (!osfmode(lclfname, TRUE, &mode, &attr)
+        || (mode & OSFMODE_DIR) == 0)
         return FALSE;
 
     /* 

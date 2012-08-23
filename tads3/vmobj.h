@@ -1245,11 +1245,11 @@ public:
 
     /* 
      *   Set a static property (for setprop ops on the class itself).
-     *   Returns true if the setprop succeeded, false if not.  Don't throw an
-     *   error if the property isn't settable on the class; simply return
-     *   false.  (It's okay to throw errors for other reasons, such as an
-     *   invalid type for a property that can be set.  But if it's not a
-     *   supported property at all, we want to continue on to check for
+     *   Returns true if the setprop succeeded, false if not.  This shouldn't
+     *   throw an error if the property isn't settable on the class; simply
+     *   return false instead.  (It's okay to throw errors for other reasons,
+     *   such as an invalid type for a property that can be set.  But if it's
+     *   not a supported property at all, we want to continue on to check for
      *   setting a modifier property rather than throwing an error at this
      *   phase.)
      *   

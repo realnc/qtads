@@ -30,7 +30,7 @@ Modified
 
 
 
-
+/* ------------------------------------------------------------------------ */
 /*
  *   Global error context pointer, and reference count for the error
  *   subsystem.
@@ -38,6 +38,7 @@ Modified
 OS_DECL_TLS(err_frame_t *, G_err_frame);
 static int G_err_refs = 0;
 
+/* ------------------------------------------------------------------------ */
 /*
  *   Initialize the global error context 
  */
@@ -54,6 +55,7 @@ void err_init(size_t /*param_stack_size*/)
     }
 }
 
+/* ------------------------------------------------------------------------ */
 /*
  *   Delete the global error context 
  */
@@ -75,6 +77,7 @@ void err_terminate()
     }
 }
 
+/* ------------------------------------------------------------------------ */
 /*
  *   Throw the error currently on the stack 
  */
@@ -101,6 +104,7 @@ static void err_throw_current()
     longjmp(os_tls_get(err_frame_t *, G_err_frame)->jmpbuf_, new_state);
 }
 
+/* ------------------------------------------------------------------------ */
 /*
  *   Throw an exception 
  */
@@ -110,7 +114,10 @@ void err_throw(err_id_t error_code)
     err_throw_a(error_code, 0);
 }
 
-/* store a string parameter */
+/* ------------------------------------------------------------------------ */
+/* 
+ *   store a string parameter 
+ */
 static char *err_store_str(char* &strspace, const char *str, size_t len)
 {
     /* remember the starting position of the stored string */
@@ -129,6 +136,7 @@ static char *err_store_str(char* &strspace, const char *str, size_t len)
     return ret;
 }
 
+/* ------------------------------------------------------------------------ */
 /*
  *   Throw an exception with parameters in va_list format
  */
@@ -364,6 +372,7 @@ static size_t err_throw_v(err_id_t error_code, int param_count, va_list va,
     }
 }
 
+/* ------------------------------------------------------------------------ */
 #ifdef MICROSOFT
 /*
  *   Microsoft Visual C++ optimizer workaround - not applicable to other
@@ -425,6 +434,8 @@ void err_throw_a(err_id_t error_code, int param_count, ...)
 #pragma warning(pop)
 #endif
 
+
+/* ------------------------------------------------------------------------ */
 /*
  *   Re-throw the current exception.  This is valid only from 'catch'
  *   blocks.  
@@ -435,6 +446,7 @@ void err_rethrow()
     err_throw_current();
 }
 
+/* ------------------------------------------------------------------------ */
 /*
  *   Abort the program with a serious, unrecoverable error
  */
@@ -443,6 +455,30 @@ void err_abort(const char *message)
     printf("%s\n", message);
     exit(2);
 }
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   Retrieve the current exception being handled in the nearest enclosing
+ *   err_catch frame. 
+ */
+CVmException *err_get_cur_exc()
+{
+    /* 
+     *   search the error frame stack for a frame in the 'caught exception'
+     *   state, starting at the current (innermost) frame 
+     */
+    for (err_frame_t *fr = os_tls_get(err_frame_t *, G_err_frame) ;
+         fr != 0 ; fr = fr->prv_)
+    {
+        /* if this frame is in the 'caught' state, return its exception */
+        if ((fr->state_ & ERR_STATE_CAUGHT) != 0)
+            return fr->exc_;
+    }
+
+    /* didn't find an exception */
+    return 0;
+}
+
 
 /* ------------------------------------------------------------------------ */
 /*

@@ -512,15 +512,16 @@ public:
      *   This imposes certain restrictions; in particular, we cannot modify
      *   a method defined in the native interface to the class.  
      */
-    class CTPNStmObject *parse_object_body(int *err, class CTcSymObj *obj_sym,
-                                           int is_class, int is_anon,
-                                           int is_grammar,
-                                           int is_nested, int modify,
-                                           class CTcSymObj *mod_orig_sym,
-                                           int plus_cnt,
-                                           class CTcSymMetaclass *meta_sym,
-                                           struct tcprs_term_info *term_info,
-                                           int is_transient);
+    class CTPNStmObject *parse_object_body(
+        int *err, class CTcSymObj *obj_sym,
+        int is_class, int is_anon, int is_grammar, int is_nested,
+        int modify, class CTcSymObj *mod_orig_sym,
+        int plus_cnt, class CTcSymMetaclass *meta_sym,
+        struct tcprs_term_info *term_info, int is_transient);
+
+    /* parse an object definition's superclass list */
+    void parse_superclass_list(
+        class CTcSymObj *obj_sym, class CTPNSuperclassList &sclist);
 
     /*
      *   Add a generated object.  This is used for objects created implicitly
@@ -542,7 +543,7 @@ public:
                           const CTcConstVal *val);
 
     /* parse an object template instance in an object body */
-    void parse_obj_template(int *err, class CTPNStmObject *obj_stm);
+    void parse_obj_template(int *err, class CTPNObjDef *objdef, int is_inline);
 
     /* search a superclass list for a template match */
     const class CTcObjTemplate
@@ -570,12 +571,19 @@ public:
     class CTcStrTemplate *get_str_template_head() const
         { return str_template_head_; }
 
+    /* parse an object's property list */
+    int parse_obj_prop_list(
+        int *err, class CTPNObjDef *objdef, class CTcSymMetaclass *meta_sym,
+        int modify, int is_nested, int braces, int is_inline,
+        struct tcprs_term_info *outer_term_info,
+        struct tcprs_term_info *term_info);
+
     /* parse property definition within an object */
-    void parse_obj_prop(int *err, class CTPNStmObject *obj_stm, int replace,
-                        class CTcSymMetaclass *meta_sym,
-                        struct tcprs_term_info *term_info,
-                        struct propset_def *propset_stack, int propset_depth,
-                        int enclosing_obj_is_nested);
+    void parse_obj_prop(
+        int *err, class CTPNObjDef *objdef, int replace,
+        class CTcSymMetaclass *meta_sym, struct tcprs_term_info *term_info,
+        struct propset_def *propset_stack, int propset_depth,
+        int enclosing_obj_is_nested, int is_inline);
 
     /* parse a class definition */
     class CTPNStmTop *parse_class(int *err);
@@ -937,8 +945,11 @@ public:
     /* get the local context variable number */
     int get_local_ctx_var() const { return local_ctx_var_num_; }
 
-    /* set up a local context */
+    /* set up a local context, in preparation for a nested code body */
     void init_local_ctx();
+
+    /* finish the local context, after parsing a nested code body */
+    void finish_local_ctx(CTPNCodeBody *cb, class CTcPrsSymtab *local_symtab);
 
     /* 
      *   allocate a context variable index - this assigns an array index
@@ -952,6 +963,10 @@ public:
 
     /* get the maximum number of locals required in the function */
     int get_max_local_cnt() const { return max_local_cnt_; }
+
+    /* get the lexicalParent property symbol */
+    class CTcSymProp *get_lexical_parent_sym() const
+        { return lexical_parent_sym_; }
 
     /* 
      *   find a grammar production symbol, adding a new one if needed,
@@ -1054,7 +1069,8 @@ private:
      *   begin a property expression, saving parser state for later
      *   restoration with finish_prop_expr 
      */
-    void begin_prop_expr(class CTcPrsPropExprSave *save_info);
+    void begin_prop_expr(
+        class CTcPrsPropExprSave *save_info, int is_static, int is_inline);
 
     /* 
      *   Finish a property expression, wrapping it in a code body if
@@ -1064,10 +1080,10 @@ private:
      *   wrapper if needed, in which case the original expression should be
      *   discarded in favor of the fully wrapped code body.  
      */
-    class CTPNCodeBody *finish_prop_expr(class CTcPrsPropExprSave *save_info,
-                                         class CTcPrsNode *expr,
-                                         int is_static,
-                                         class CTcSymProp *prop_sym);
+    void finish_prop_expr(
+        class CTcPrsPropExprSave *save_info, class CTcPrsNode* &expr,
+        class CTPNCodeBody* &code_body, class CTPNAnonFunc* &inline_method,
+        int is_static, int is_inline, class CTcSymProp *prop_sym);
     
     /* 
      *   callback for symbol table enumeration for writing a symbol export
@@ -1707,6 +1723,7 @@ public:
      */
     class CTcPrsNode *expr_;
     class CTPNCodeBody *code_body_;
+    class CTPNAnonFunc *inline_method_;
 
     /* 
      *   the introductory token of the parameter - if the parameter is
@@ -1726,6 +1743,95 @@ public:
      */
     class CTcSymProp *prop_;
 };
+
+/* ------------------------------------------------------------------------ */
+/*
+ *   'propertyset' definition structure.  Each property set defines a
+ *   property pattern and an optional argument list for the properties within
+ *   the propertyset group.  
+ */
+struct propset_def
+{
+    /* the property name pattern */
+    const char *prop_pattern;
+    size_t prop_pattern_len;
+
+    /* head of list of tokens in the parameter list */
+    struct propset_tok *param_tok_head;
+};
+
+/*
+ *   propertyset token list entry 
+ */
+struct propset_tok
+{
+    propset_tok(const CTcToken *t)
+    {
+        /* copy the token */
+        this->tok = *t;
+
+        /* we're not in a list yet */
+        nxt = 0;
+    }
+
+    /* the token */
+    CTcToken tok;
+
+    /* next token in the list */
+    propset_tok *nxt;
+};
+
+/*
+ *   Token source for parsing formal parameters using property set formal
+ *   lists.  This retrieves tokens from a propertyset stack.  
+ */
+class propset_token_source: public CTcTokenSource
+{
+public:
+    propset_token_source()
+    {
+        /* nothing in our list yet */
+        nxt_tok = last_tok = 0;
+    }
+
+    /* get the next token */
+    virtual const CTcToken *get_next_token()
+    {
+        /* if we have another entry in our list, retrieve it */
+        if (nxt_tok != 0)
+        {
+            /* remember the token to return */
+            CTcToken *ret = &nxt_tok->tok;
+
+            /* advance our internal position to the next token */
+            nxt_tok = nxt_tok->nxt;
+
+            /* return the token */
+            return ret;
+        }
+        else
+        {
+            /* we have nothing more to return */
+            return 0;
+        }
+    }
+
+    /* insert a token */
+    void insert_token(const CTcToken *tok);
+
+    /* insert a token based on type */
+    void insert_token(tc_toktyp_t typ, const char *txt, size_t len);
+
+    /* the next token we're to retrieve */
+    propset_tok *nxt_tok;
+
+    /* tail of our list */
+    propset_tok *last_tok;
+};
+
+/* maximum propertyset nesting depth */
+const size_t MAX_PROPSET_DEPTH = 10;
+
 
 
 /* ------------------------------------------------------------------------ */
@@ -1917,24 +2023,6 @@ public:
 protected:
     /* list of object/property associations with this word */
     struct CTcPrsDictItem *list_;
-};
-
-/* ------------------------------------------------------------------------ */
-/*
- *   State save structure for parsing property expressions 
- */
-class CTcPrsPropExprSave
-{
-public:
-    unsigned int has_local_ctx_ : 1;
-    int local_ctx_var_num_;
-    size_t ctx_var_props_used_;
-    int next_ctx_arr_idx_;
-    int self_referenced_;
-    int full_method_ctx_referenced_;
-    int local_ctx_needs_self_;
-    int local_ctx_needs_full_method_ctx_;
-    struct CTcCodeBodyRef *cur_code_body_;
 };
 
 /* ------------------------------------------------------------------------ */
@@ -3983,6 +4071,12 @@ public:
     /* parse a primary expression */
     static class CTcPrsNode *parse_primary();
 
+    /* parse an anonymous function */
+    static class CTPNAnonFunc *parse_anon_func(int short_form, int is_method);
+
+    /* parse an in-line object definition */
+    static class CTPNInlineObject *parse_inline_object(int has_colon);
+
 protected:
     /* embedded expression: parse an expression list */
     static CTcPrsNode *parse_embedding_list(
@@ -4025,9 +4119,6 @@ protected:
     static int parse_embedded_end_tok(struct CTcEmbedBuilder *b,
                                       struct CTcEmbedLevel *parent,
                                       const char **open_kw);
-
-    /* parse an anonymous function */
-    static class CTcPrsNode *parse_anon_func(int short_form);
 
     /* parse a logical NOT operator */
     static class CTcPrsNode *parse_not(CTcPrsNode *sub);
@@ -4077,12 +4168,6 @@ protected:
 
     /* parse a "delegated" expression */
     static class CTcPrsNode *parse_delegated();
-
-    /* local symbol enumeration callback for anonymous function setup */
-    static void enum_for_anon(void *ctx, class CTcSymbol *sym);
-
-    /* local symbol enumeration for anon function - follow-up */
-    static void enum_for_anon2(void *ctx, class CTcSymbol *sym);
 };
 
 /*

@@ -150,7 +150,7 @@ void os_init_ui_after_load(class CVmBifTable *bif_table,
 #endif
 
 /* for Windows debug builds, add stack trace info to allocation blocks */
-#if defined(T3_DEBUG) && defined(__WIN32__)
+#if defined(T3_DEBUG) && defined(T_WIN32)
 # define OS_MEM_PREFIX \
     struct { \
         DWORD return_addr; \
