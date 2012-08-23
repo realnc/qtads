@@ -191,6 +191,12 @@ typedef FILE osfildef;
     #define OSFMODE_SOCKET  S_IFSOCK
 #endif
 
+/* File attribute bits. */
+#define OSFATTR_HIDDEN  0x0001
+#define OSFATTR_SYSTEM  0x0002
+#define OSFATTR_READ    0x0004
+#define OSFATTR_WRITE   0x0008
+
 /* Directory enumerator handle.  This must be usable from C code, so we
  * use "struct" rather than "class".
  */
@@ -290,7 +296,8 @@ os_rename_file( const char* oldname, const char* newname );
 
 /* Get a file's mode. */
 int
-osfmode( const char* fname, int follow_links, unsigned long* mode );
+osfmode( const char* fname, int follow_links, unsigned long* mode,
+         unsigned long* attr );
 
 /* Get a character from a file. */
 #define osfgetc fgetc

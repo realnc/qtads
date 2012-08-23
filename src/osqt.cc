@@ -166,6 +166,11 @@ os_rename_file( const char* oldname, const char* newname )
 }
 
 
+// On Windows, we need to enable NTFS permission lookups.
+#ifdef Q_OS_WIN32
+extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
+#endif
+
 int
 os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
 {
@@ -185,35 +190,62 @@ os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
     s->mod_time = (os_time_t)info.st_mtime;
     s->acc_time = (os_time_t)info.st_atime;
     s->mode = info.st_mode;
-
-    /* success */
-    return TRUE;
 #else
-    struct stat info;
+    struct stat buf;
+    if ((follow_links ? stat(fname, &buf) : lstat(fname, &buf)) != 0)
+        return false;
 
-    /* get the file information */
-    if (follow_links ? stat(fname, &info) : lstat(fname, &info))
-        return FALSE;
-
-    /* translate the status fields */
-    if (sizeof(info.st_size) <= 4)
-    {
-        s->sizelo = info.st_size;
-        s->sizehi = 0;
-    }
-    else
-    {
-        s->sizelo = (uint32_t)(info.st_size & 0xFFFFFFFF);
-        s->sizehi = (uint32_t)(info.st_size >> 32);
-    }
-    s->cre_time = info.st_ctime;
-    s->mod_time = info.st_mtime;
-    s->acc_time = info.st_atime;
-    s->mode = info.st_mode;
-
-    /* success */
-    return TRUE;
+    s->sizelo = (uint32_t)(buf.st_size & 0xFFFFFFFF);
+    s->sizehi = sizeof(buf.st_size) > 4
+                ? (uint32_t)((buf.st_size >> 32) & 0xFFFFFFFF)
+                : 0;
+    s->cre_time = buf.st_ctime;
+    s->mod_time = buf.st_mtime;
+    s->acc_time = buf.st_atime;
+    s->mode = buf.st_mode;
 #endif
+    s->attrs = 0;
+
+    // QFileInfo::exists() cannot be trusted due to it's weird symlink
+    // handling.
+    if (osfacc(fname) != 0) {
+        return false;
+    }
+    QFileInfo inf(QString::fromLocal8Bit(fname));
+    bool isLink = inf.isSymLink();
+#ifdef Q_OS_WIN32
+    // Don't treat shortcut files as symlinks.
+    if (isLink and QString::compare(inf.suffix(), QLatin1String("lnk"), Qt::CaseInsensitive)) {
+        isLink = false;
+    }
+#endif
+
+    if (follow_links and isLink) {
+        if (inf.symLinkTarget().isEmpty()) {
+            return false;
+        }
+        inf.setFile(inf.symLinkTarget());
+    }
+
+    if (inf.isHidden()) {
+        s->attrs |= OSFATTR_HIDDEN;
+    }
+
+#ifdef Q_OS_WIN32
+    // Enable NTFS permissions.
+    ++qt_ntfs_permission_lookup;
+#endif
+    if (inf.isReadable()) {
+        s->attrs |= OSFATTR_READ;
+    }
+    if (inf.isReadable()) {
+        s->attrs |= OSFATTR_WRITE;
+    }
+#ifdef Q_OS_WIN32
+    // Disable NTFS permissions.
+    --qt_ntfs_permission_lookup;
+#endif
+    return true;
 }
 
 
@@ -296,12 +328,17 @@ os_close_dir( osdirhdl_t handle )
  * simply call that routine and return the value.
  */
 int
-osfmode( const char* fname, int follow_links, unsigned long* mode )
+osfmode( const char* fname, int follow_links, unsigned long* mode,
+         unsigned long* attr )
 {
     os_file_stat_t s;
     int ok;
-    if ((ok = os_file_stat(fname, follow_links, &s)) != false)
-        *mode = s.mode;
+    if ((ok = os_file_stat(fname, follow_links, &s)) != false) {
+        if (mode != NULL)
+            *mode = s.mode;
+        if (attr != NULL)
+            *attr = s.attrs;
+    }
     return ok;
 }
 
