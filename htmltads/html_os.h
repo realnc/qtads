@@ -53,7 +53,7 @@ Modified
 /* 
  *   Include definitions for 32-bit Windows
  */
-#ifdef __WIN32__
+#ifdef T_WIN32
 #include "hos_w32.h"
 #endif
 

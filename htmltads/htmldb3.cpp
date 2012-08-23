@@ -1032,8 +1032,8 @@ void CHtmlDebugHelper::vm_format_error(struct dbgcxdef *ctx, int err,
     }
     else
     {
-        /* format the message using the global error stack */
-        err_format_msg(buf, buflen, txt, G_err_frame->exc_);
+        /* format the message using the current exception being handled */
+        err_format_msg(buf, buflen, txt, err_get_cur_exc());
     }
 }
 
