@@ -55,11 +55,11 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
         return 0;
     }
 
-    CHtmlSysResource* image;
+    CHtmlSysResource* image = NULL;
     // Better get an error at compile-time using static_cast rather than an
     // abort at runtime using dynamic_cast.
-    QTadsImage* cast;
-    CHtmlSysImageMngQt* mngCast;
+    QTadsImage* cast = NULL;
+    CHtmlSysImageMngQt* mngCast = NULL;
 
     // Create an object of the appropriate class for the specified image type.
     // Also cast the object to a QTadsImage so we can loadFromData() later on.
