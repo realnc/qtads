@@ -202,8 +202,20 @@ typedef FILE osfildef;
  */
 typedef struct QDirIterator* osdirhdl_t;
 
+/* 64-bit time_t.  Only Windows supports this. */
+#ifdef Q_OS_WIN32
+    #define os_time_t __time64_t
+#endif
+
 
 /* ============= Functions follow ================ */
+
+/* 64-bit replacements for <time.h> routines.  Only Windows supports this. */
+#ifdef Q_OS_WIN32
+    #define os_gmtime    _gmtime64
+    #define os_localtime _localtime64
+    #define os_time      _time64
+#endif
 
 /* Allocate a block of memory of the given size in bytes. */
 #define osmalloc malloc
