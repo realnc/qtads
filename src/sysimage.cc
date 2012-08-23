@@ -73,8 +73,9 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
         image = new CHtmlSysImageMngQt;
         mngCast = static_cast<CHtmlSysImageMngQt*>(image);
     } else {
-        // TODO: Don't just abort but be graceful.
-        qFatal(Q_FUNC_INFO, "unknown image type.");
+        qWarning() << "ERROR: Unknown image type" << imageType;
+        file.close();
+        return NULL;
     }
 
     // Load the image data.
