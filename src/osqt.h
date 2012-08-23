@@ -163,7 +163,7 @@ typedef FILE osfildef;
 #define ERR_NO_MACRO
 
 /* Not really needed; just a dummy. */
-#define OS_TR_USAGE "usage: frob [options] file"
+#define OS_TR_USAGE "usage: qtads [options] file"
 
 /* These values are used for the "mode" parameter of osfseek() to
  * indicate where to seek in the file. */
