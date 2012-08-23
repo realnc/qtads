@@ -39,11 +39,11 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidg
       fBannerStyleAutoVScroll(true),
       fBannerStyleGrid(false),
       fBannerStyleBorder(0),
+      fBorderLine(qWinGroup->centralWidget()),
       fDontReformat(0),
       fInPagePauseMode(false),
       fParentBanner(0),
       fBgImage(0),
-      fBorderLine(qWinGroup->centralWidget()),
       lastInputHeight(0),
       margins(8, 2, 8, 2),
       bannerSize(0),
@@ -585,7 +585,7 @@ CHtmlSysWinQt::get_max_chars_in_width( CHtmlSysFont* font, const textchar_t* str
     // amount of characters that fit.
     int first = 1;
     int last = len;
-    long mid;
+    size_t mid = 0;
     int skippedBytes;
     while (first <= last) {
         skippedBytes = 1;
@@ -749,7 +749,7 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
     // ignore the presence or absence of a horizontal scrollbar, since it could
     // come or go while we're formatting; by assuming that it won't be there,
     // we'll be maximally conservative about redrawing the whole area.
-    unsigned long winBottom = qMax(static_cast<unsigned long>(this->height()), this->formatter_->get_max_y_pos());
+    //unsigned long winBottom = qMax(static_cast<unsigned long>(this->height()), this->formatter_->get_max_y_pos());
 
     // We don't have enough formatting done yet to draw the window.
     bool drawn = false;

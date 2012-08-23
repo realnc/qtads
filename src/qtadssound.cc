@@ -143,7 +143,7 @@ void
 QTadsSound::callback( int channel )
 {
     QTadsSound* mObj = 0;
-    int index;
+    int index = 0;
     // Find the object that uses the specified channel.
     for (int i = 0; i < fObjList.size() and mObj == 0; ++i) {
         if (fObjList.at(i)->fChannel == channel) {
@@ -441,7 +441,7 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
     // constructor; doing so would result in Qt deleting the sound object when
     // the parent object gets destroyed.  Therefore, we simply pass 0 to make
     // the sound object parentless.
-    CHtmlSysSound* sound;
+    CHtmlSysSound* sound = NULL;
     switch (type) {
       case WAV:
         //qDebug() << "Sound type: WAV";
