@@ -238,7 +238,7 @@ os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
     if (inf.isReadable()) {
         s->attrs |= OSFATTR_READ;
     }
-    if (inf.isReadable()) {
+    if (inf.isWritable()) {
         s->attrs |= OSFATTR_WRITE;
     }
 #ifdef Q_OS_WIN32
