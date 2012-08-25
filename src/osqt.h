@@ -149,9 +149,10 @@ extern "C++" {
 typedef FILE osfildef;
 
 /* The maximum width of a line of text.  We ignore this, but the base code
- * needs it defined.  We use a very large value to avoid drawing the text in
- * "steps" in Tads 3. */
-#define OS_MAXWIDTH 65535
+ * needs it defined.
+ *
+ * Note: this value must fit in a single byte, so the maximum is 255. */
+#define OS_MAXWIDTH 255
 
 /* Disable the Tads swap file; computers have plenty of RAM these days. */
 #define OS_DEFAULT_SWAP_ENABLED 0
