@@ -74,9 +74,6 @@ win32 {
 
 RESOURCES += resources.qrc
 
-#CONFIG += debug
-#CONFIG += release
-
 # We use warn_off to allow only default warnings, not to supress them all.
 QMAKE_CXXFLAGS_WARN_OFF =
 QMAKE_CFLAGS_WARN_OFF =
@@ -90,10 +87,6 @@ QMAKE_CFLAGS_WARN_OFF =
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter
     QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter
 }
-
-# This is just a hack to make code completion work OK in Qt Creator.
-#INCLUDEPATH += /usr/include/SDL /usr/include/smpeg
-#INCLUDEPATH -= /usr/include/SDL /usr/include/smpeg
 
 # Where to find the portable Tads sources.
 T2DIR = tads2
@@ -189,7 +182,6 @@ HEADERS += \
     src/dispwidgetinput.h \
     src/qtadshostifc.h \
     src/qtadstimer.h \
-    #src/vmuni.h \
     src/confdialog.h \
     src/settings.h \
     src/gameinfodialog.h \
