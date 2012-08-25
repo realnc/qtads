@@ -1055,7 +1055,7 @@ public:
         start_txtofs_ = 0;
         end_txtofs_ = 0;
         hover_link_ = FALSE;
-        use_hover_fg_ = use_hover_fg_ = hover_underline_ = FALSE;
+        use_hover_fg_ = use_hover_bg_ = hover_underline_ = FALSE;
     }
 
     HTML_TAG_MAP_NOCONSTRUCTOR(CHtmlTagDIV, "DIV");
