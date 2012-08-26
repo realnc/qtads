@@ -1954,9 +1954,10 @@ public:
     operator int32_t()
     {
         int ov;
-        CVmObjBigNum::ext_to_int(ext_, ov);
+        int32_t ret = CVmObjBigNum::ext_to_int(ext_, ov);
         if (ov)
             err_throw(VMERR_NUM_OVERFLOW);
+        return ret;
     }
     operator double()
     {
