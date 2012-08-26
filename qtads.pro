@@ -79,9 +79,10 @@ QMAKE_CXXFLAGS_WARN_OFF =
 QMAKE_CFLAGS_WARN_OFF =
 
 *-g++* {
-    # Tads 3 has problems with strict aliasing rules in GCC
-    QMAKE_CXXFLAGS_RELEASE += -fno-strict-aliasing
-    QMAKE_CXXFLAGS_DEBUG += -fno-strict-aliasing
+    # The code does a lot of type punning, which breaks ANSI/ISO strict
+    # aliasing rules.
+    QMAKE_CXXFLAGS += -fno-strict-aliasing
+    QMAKE_CFLAGS += -fno-strict-aliasing
 
     # Avoid a flood of "unused parameter" warnings.
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter
