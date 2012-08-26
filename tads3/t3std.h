@@ -112,6 +112,26 @@ Modified
 #define AFTER_OS_TERM(code)   code
 #endif
 
+/*
+ *   Some compilers (notably gcc >= 4.7.1) require that overloads for the
+ *   basic 'new' and 'delete' operators be declared with 'throw' clauses to
+ *   match the standard C++ library (that is, 'new' must be declared to throw
+ *   std::bad_alloc, and 'delete' must be declared to throw nothing).
+ *   Naturally, some other compilers (notably MSVC 2003) don't want the
+ *   'throw' clauses.  If your compiler wants the 'throw' declarations,
+ *   define NEW_DELETE_NEED_THROW in your makefile, otherwise omit it.  Note
+ *   that some compilers (notably gcc < 4.7.1) don't care one way or the
+ *   other, so if your compiler doesn't complain, you probably don't need to
+ *   worry about this setting.
+ */
+#ifndef SYSTHROW
+#ifdef NEW_DELETE_NEED_THROW
+#define SYSTHROW(exc) exc
+#else
+#define SYSTHROW(exc)
+#endif
+#endif
+
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -727,10 +747,10 @@ inline void *t3mallocnew(size_t siz)
 inline void t3free(void *ptr)
     { t3free(ptr, T3MALLOC_TYPE_MALLOC); }
 
-void *operator new(size_t siz);
-void *operator new[](size_t siz);
-void operator delete(void *ptr);
-void operator delete[](void *ptr);
+void *operator new(size_t siz) SYSTHROW(throw (std::bad_alloc));
+void *operator new[](size_t siz) SYSTHROW(throw (std::bad_alloc));
+void operator delete(void *ptr) SYSTHROW(throw ());
+void operator delete[](void *ptr) SYSTHROW(throw ());
 
 /*
  *   List all allocated memory blocks - displays heap information on stdout.
