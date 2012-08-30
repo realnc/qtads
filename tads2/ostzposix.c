@@ -6,6 +6,8 @@
 #include "lib.h"
 #include "osstzprs.h"
 
+void safe_strcpy(char *dst, size_t dstlen, const char *src);
+
 /* Get the local time zone name, as a zoneinfo database key.  Many
  * modern Unix systems use zoneinfo keys as they native timezone
  * setting, but there are several different ways of storing this on a
