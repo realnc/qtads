@@ -198,10 +198,11 @@ typedef FILE osfildef;
 #define OSFATTR_READ    0x0004
 #define OSFATTR_WRITE   0x0008
 
-/* Directory enumerator handle.  This must be usable from C code, so we
- * use "struct" rather than "class".
- */
+#ifdef __cplusplus
+typedef class QDirIterator* osdirhdl_t;
+#else
 typedef struct QDirIterator* osdirhdl_t;
+#endif
 
 /* 64-bit time_t.  Only Windows supports this. */
 #ifdef Q_OS_WIN32
