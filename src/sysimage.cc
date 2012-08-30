@@ -37,7 +37,7 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
     //      << "with size" << filesize << "url:" << url->get_url();
 
     // Check if the file exists and is readable.
-    QFileInfo inf(QString::fromLocal8Bit(filename));
+    QFileInfo inf(QFile::decodeName(filename));
     if (not inf.exists() or not inf.isReadable()) {
         qWarning() << "ERROR:" << inf.filePath() << "doesn't exist or is unreadable";
         return 0;

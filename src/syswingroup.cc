@@ -348,7 +348,7 @@ CHtmlSysWinGroupQt::fShowGameInfoDialog()
         this->fGameInfoDialog->raise();
         return;
     }
-    this->fGameInfoDialog = new GameInfoDialog(qFrame->gameFile().toLocal8Bit(), this);
+    this->fGameInfoDialog = new GameInfoDialog(QFile::encodeName(qFrame->gameFile()), this);
     this->fGameInfoDialog->setWindowTitle(tr("Game Information"));
     connect(this->fGameInfoDialog, SIGNAL(finished(int)), this, SLOT(fHideGameInfoDialog()));
     this->fGameInfoDialog->show();
@@ -522,7 +522,7 @@ void
 CHtmlSysWinGroupQt::fNotifyGameStarting()
 {
     this->fHideGameInfoDialog();
-    this->fGameInfoAction->setEnabled(GameInfoDialog::gameHasMetaInfo(qFrame->gameFile().toLocal8Bit()));
+    this->fGameInfoAction->setEnabled(GameInfoDialog::gameHasMetaInfo(QFile::encodeName(qFrame->gameFile())));
     this->fRestartCurrentGameAction->setEnabled(true);
     this->fEndCurrentGameAction->setEnabled(true);
 }
@@ -643,7 +643,7 @@ CHtmlSysWinGroupQt::updateRecentGames()
     // Populate it.
     const QStringList& list = qFrame->settings()->recentGamesList;
     for (int i = 0; i < list.size(); ++i) {
-        QString gameName = GameInfoDialog::getMetaInfo(list.at(i).toLocal8Bit()).plainGameName;
+        QString gameName = GameInfoDialog::getMetaInfo(QFile::encodeName(list.at(i))).plainGameName;
         if (gameName.isEmpty()) {
             gameName = QFileInfo(list.at(i)).fileName();
         }

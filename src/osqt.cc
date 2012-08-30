@@ -161,8 +161,8 @@ os_fprintz( osfildef* fp, const char* str )
 int
 os_rename_file( const char* oldname, const char* newname )
 {
-    return QFile::rename(QString::fromLocal8Bit(oldname),
-                         QString::fromLocal8Bit(newname));
+    return QFile::rename(QFile::decodeName(oldname),
+                         QFile::decodeName(newname));
 }
 
 
@@ -224,7 +224,7 @@ os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
     if (osfacc(fname) != 0) {
         return false;
     }
-    QFileInfo inf(QString::fromLocal8Bit(fname));
+    QFileInfo inf(QFile::decodeName(fname));
     bool isLink = inf.isSymLink();
 #ifdef Q_OS_WIN32
     // Don't treat shortcut files as symlinks.
@@ -267,7 +267,7 @@ os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
 int
 os_resolve_symlink( const char* fname, char* target, size_t target_size )
 {
-    const QByteArray& str(QFileInfo(QString::fromLocal8Bit(fname)).symLinkTarget().toLocal8Bit());
+    const QByteArray& str = QFile::encodeName(QFileInfo(QFile::decodeName(fname)).symLinkTarget());
     if (str.isEmpty() or str.size() >= target_size) {
         return false;
     }
@@ -306,7 +306,7 @@ os_get_root_dirs( char* buf, size_t buflen )
 int
 os_open_dir( const char* dirname, osdirhdl_t* handle )
 {
-    QDirIterator* d = new QDirIterator(QString::fromLocal8Bit(dirname),
+    QDirIterator* d = new QDirIterator(QFile::decodeName(dirname),
                                        QDir::Dirs | QDir::Files | QDir::Hidden | QDir::System);
     if (d->next().isEmpty()) {
         // We can't read anything.  Don't know why, don't care.
@@ -320,7 +320,7 @@ os_open_dir( const char* dirname, osdirhdl_t* handle )
 int
 os_read_dir( osdirhdl_t handle, char* fname, size_t fname_size )
 {
-    const QByteArray& str(handle->fileName().toLocal8Bit());
+    const QByteArray& str = QFile::encodeName(handle->fileName());
     if (str.isEmpty() or str.size() >= fname_size) {
         return false;
     }
@@ -417,7 +417,7 @@ os_exeseek( const char*, const char* )
 int
 os_get_exe_filename( char* buf, size_t buflen, const char* argv0 )
 {
-    QFileInfo file(QString::fromLocal8Bit(argv0));
+    QFileInfo file(QFile::decodeName(argv0));
     file.makeAbsolute();
     if (not file.exists() or not file.isReadable()) {
         return false;
@@ -434,7 +434,7 @@ os_get_exe_filename( char* buf, size_t buflen, const char* argv0 )
         }
     }
 
-    const QByteArray& result = file.filePath().toLocal8Bit();
+    const QByteArray& result = QFile::encodeName(file.filePath());
     if (result.length() + 1 > static_cast<int>(buflen)) {
         // The result would not fit in the buffer.
         return false;
@@ -469,19 +469,19 @@ os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
         if (not dir.exists() and not dir.mkpath(dirStr)) {
             // TODO: Error dialog.
             qWarning() << "Could not create directory path:" << dirStr;
-            Q_ASSERT(QDir::tempPath().toLocal8Bit().size() < static_cast<int>(buflen));
-            strncpy(buf, QDir::tempPath().toLocal8Bit().constData(), buflen);
+            Q_ASSERT(QFile::encodeName(QDir::tempPath()).size() < static_cast<int>(buflen));
+            strncpy(buf, QFile::encodeName(QDir::tempPath()).constData(), buflen);
             return;
         }
-        Q_ASSERT(dirStr.toLocal8Bit().size() < static_cast<int>(buflen));
-        strncpy(buf, dirStr.toLocal8Bit().constData(), buflen);
+        Q_ASSERT(QFile::encodeName(dirStr).size() < static_cast<int>(buflen));
+        strncpy(buf, QFile::encodeName(dirStr).constData(), buflen);
         buf[buflen - 1] = '\0';
         break;
       }
 
       case OS_GSP_LOGFILE: {
         // TODO: We'll just use the temp directory for now.
-        QByteArray res(QDir::tempPath().toLocal8Bit());
+        const QByteArray& res = QFile::encodeName(QDir::tempPath());
         Q_ASSERT(res.size() < static_cast<int>(buflen));
         qstrncpy(buf, res.constData(), buflen);
         break;
@@ -512,8 +512,8 @@ os_locate( const char* fname, int /*flen*/, const char* /*arg0*/, char* buf, siz
     Q_ASSERT(fname != 0);
     Q_ASSERT(buf != 0);
 
-    const QFileInfo& fileInfo = QFileInfo(QString::fromLocal8Bit(fname));
-    const QByteArray& result = fileInfo.absoluteFilePath().toLocal8Bit();
+    const QFileInfo& fileInfo = QFileInfo(QFile::decodeName(fname));
+    const QByteArray& result = QFile::encodeName(fileInfo.absoluteFilePath());
     if (bufsiz > result.length() and QFile::exists(fileInfo.absoluteFilePath())) {
         strcpy(buf, result.constData());
         return true;
@@ -552,7 +552,7 @@ osfdel_temp( const char* fname )
 {
     Q_ASSERT(fname != 0);
 
-    if (fname[0] == '\0' or QFile::remove(QString::fromLocal8Bit(fname))) {
+    if (fname[0] == '\0' or QFile::remove(QFile::decodeName(fname))) {
         // If fname was empty, it has been already deleted automatically by
         // fclose().  If fname was not empty, QFile::remove has taken care of
         // deleting the file.
@@ -574,7 +574,7 @@ os_gen_temp_filename( char* buf, size_t buflen )
     // before our caller gets the chance to re-create the file.
     tmpfile.setAutoRemove(false);
     tmpfile.open();
-    const QByteArray& data = tmpfile.fileName().toLocal8Bit();
+    const QByteArray& data = QFile::encodeName(tmpfile.fileName());
     tmpfile.close();
     if (data.length() >= buflen) {
         // 'buf' isn't big enough to hold the result, including the
@@ -596,9 +596,9 @@ int
 os_mkdir( const char* dir, int create_parents )
 {
     if (create_parents) {
-        return QDir().mkpath(QString::fromLocal8Bit(dir));
+        return QDir().mkpath(QFile::decodeName(dir));
     }
-    return QDir().mkdir(QString::fromLocal8Bit(dir));
+    return QDir().mkdir(QFile::decodeName(dir));
 }
 
 
@@ -607,7 +607,7 @@ os_mkdir( const char* dir, int create_parents )
 int
 os_rmdir( const char* dir )
 {
-    return QDir().rmdir(QString::fromLocal8Bit(dir));
+    return QDir().rmdir(QFile::decodeName(dir));
 }
 
 
@@ -624,7 +624,7 @@ os_defext( char* fn, const char* ext )
     Q_ASSERT(fn != 0);
     Q_ASSERT(ext != 0);
 
-    if (QFileInfo(QString::fromLocal8Bit(fn)).suffix().isEmpty()) {
+    if (QFileInfo(QFile::decodeName(fn)).suffix().isEmpty()) {
         os_addext(fn, ext);
     }
 }
@@ -653,11 +653,11 @@ os_remext( char* fn )
 {
     Q_ASSERT(fn != 0);
 
-    QFileInfo file(QString::fromLocal8Bit(fn));
+    QFileInfo file(QFile::decodeName(fn));
     if (file.suffix().isEmpty()) {
         return;
     }
-    std::strcpy(fn, file.completeBaseName().toLocal8Bit());
+    std::strcpy(fn, QFile::encodeName(file.completeBaseName()));
 }
 
 
@@ -690,8 +690,9 @@ os_build_full_path( char* fullpathbuf, size_t fullpathbuflen, const char* path, 
     Q_ASSERT(path != 0);
     Q_ASSERT(filename != 0);
 
-    std::strncpy(fullpathbuf, QFileInfo(QDir(QString::fromLocal8Bit(path)),
-                                        QString::fromLocal8Bit(filename)).filePath().toLocal8Bit(),
+    std::strncpy(fullpathbuf,
+                 QFile::encodeName(QFileInfo(QDir(QFile::decodeName(path)),
+                                             QFile::decodeName(filename)).filePath()),
                  fullpathbuflen);
     fullpathbuf[fullpathbuflen - 1] = '\0';
 }
@@ -702,7 +703,7 @@ os_build_full_path( char* fullpathbuf, size_t fullpathbuflen, const char* path, 
 void
 os_get_path_name( char* pathbuf, size_t pathbuflen, const char* fname )
 {
-    strncpy(pathbuf, QFileInfo(QString::fromLocal8Bit(fname)).path().toLocal8Bit().constData(), pathbuflen);
+    strncpy(pathbuf, QFile::encodeName(QFileInfo(QFile::decodeName(fname)).path()).constData(), pathbuflen);
     pathbuf[pathbuflen - 1] = '\0';
 }
 
@@ -712,11 +713,11 @@ os_get_path_name( char* pathbuf, size_t pathbuflen, const char* fname )
 void
 os_cvt_url_dir( char* result_buf, size_t result_buf_size, const char* src_url, int end_sep )
 {
-    QString result(QString::fromLocal8Bit(src_url));
+    QString result(QFile::decodeName(src_url));
     if (end_sep == true and not result.endsWith(QChar::fromAscii('/'))) {
         result.append(QChar::fromAscii('/'));
     }
-    strncpy(result_buf, result.toLocal8Bit().constData(), result_buf_size);
+    strncpy(result_buf, QFile::encodeName(result).constData(), result_buf_size);
     result_buf[result_buf_size - 1] = '\0';
 }
 
@@ -726,7 +727,7 @@ os_cvt_url_dir( char* result_buf, size_t result_buf_size, const char* src_url, i
 int
 os_is_file_absolute( const char* fname )
 {
-    return QFileInfo(QString::fromLocal8Bit(fname)).isAbsolute();
+    return QFileInfo(QFile::decodeName(fname)).isAbsolute();
 }
 #endif
 
@@ -737,7 +738,7 @@ int
 os_get_abs_filename( char* result_buf, size_t result_buf_size, const char* filename )
 {
     Q_ASSERT(result_buf != 0);
-    const QByteArray& data = QFileInfo(QString::fromLocal8Bit(filename)).absoluteFilePath().toLocal8Bit();
+    const QByteArray& data = QFile::encodeName(QFileInfo(QFile::decodeName(filename)).absoluteFilePath());
     if (data.length() >= result_buf_size) {
         // Result won't fit in 'result_buf'.
         qstrcpy(result_buf, filename);
@@ -759,7 +760,7 @@ canonicalize_path( char* path )
 {
     // We canonicalize only the path, in case the file doesn't actually exist.
     // QFileInfo::canonicalFilePath() doesn't work for non-existent files.
-    QFileInfo info(QString::fromLocal8Bit(path));
+    QFileInfo info(QFile::decodeName(path));
     QString cleanPath;
     if (info.isDir()) {
         cleanPath = info.filePath();
@@ -767,15 +768,15 @@ canonicalize_path( char* path )
         cleanPath = info.path();
     }
 
-    QByteArray canonPath(QDir(cleanPath).canonicalPath().toLocal8Bit());
+    QByteArray canonPath(QFile::encodeName(QDir(cleanPath).canonicalPath()));
     // Append the filename if we previously stripped it.
     if (not info.isDir()) {
-        QString cleanFilename(QString::fromLocal8Bit(path));
+        QString cleanFilename(QFile::decodeName(path));
         int i = cleanFilename.length();
         while (cleanFilename[i] != QChar::fromAscii('/') and i > 0) {
             --i;
         }
-        canonPath.append(cleanFilename.mid(i).toLocal8Bit());
+        canonPath.append(QFile::encodeName(cleanFilename.mid(i)));
     }
     qstrncpy(path, canonPath.constData(), OSFNMAX);
 }
@@ -893,8 +894,8 @@ os_is_file_in_dir( const char* filename, const char* path, int include_subdirs )
     Q_ASSERT(filename[0] != '\0');
     Q_ASSERT(filename[qstrlen(filename) - 1] != '/');
 
-    QFileInfo fileInf(QString::fromLocal8Bit(filename));
-    const QString& pathStr = QFileInfo(QString::fromLocal8Bit(path)).canonicalFilePath();
+    QFileInfo fileInf(QFile::decodeName(filename));
+    const QString& pathStr = QFileInfo(QFile::decodeName(path)).canonicalFilePath();
 
     // If the filename is absolute but the file doesn't exist, we know
     // that we're not going to find it anywhere, so report failure.
@@ -1077,7 +1078,7 @@ os_askfile( const char* prompt, char* fname_buf, int fname_buf_len, int prompt_t
         return OS_AFE_CANCEL;
     }
 
-    const QByteArray& result = filename.toLocal8Bit();
+    const QByteArray& result = QFile::encodeName(filename);
     if (fname_buf_len <= result.length()) {
         return OS_AFE_FAILURE;
     }
@@ -1085,7 +1086,7 @@ os_askfile( const char* prompt, char* fname_buf, int fname_buf_len, int prompt_t
     if (not ext.isEmpty()) {
         // Since `ext' is not empty, an extension should be
         // appended (if none exists already).
-        os_defext(fname_buf, ext.toLocal8Bit().constData());
+        os_defext(fname_buf, QFile::encodeName(ext).constData());
         fname_buf[fname_buf_len - 1] = '\0';
     }
     return OS_AFE_SUCCESS;
@@ -1336,8 +1337,8 @@ os_gen_charmap_filename( char* filename, char* internal_id, char* /*argv0*/ )
     qDebug() << Q_FUNC_INFO;
     Q_ASSERT(filename != 0);
 
-    strncpy(filename, QString(QString::fromAscii(internal_id)
-                              + QString::fromAscii(".tcp")).toLocal8Bit().constData(), OSFNMAX);
+    strncpy(filename, QFile::encodeName(QString::fromAscii(internal_id)
+                              + QString::fromAscii(".tcp")).constData(), OSFNMAX);
     filename[OSFNMAX - 1] = '\0';
 }
 
