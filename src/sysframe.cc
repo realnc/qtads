@@ -360,11 +360,12 @@ CHtmlSysFrameQt::main( QString gameFileName )
     this->fMainWin->show();
 
     // Do an online update check.
-    int daysRequired = -1;
+    int daysRequired;
     switch (this->fSettings->updateFreq) {
       case Settings::UpdateOnEveryStart: daysRequired = 0; break;
       case Settings::UpdateDaily:        daysRequired = 1; break;
       case Settings::UpdateWeekly:       daysRequired = 7; break;
+      default:                           daysRequired = -1;
     }
     if (not this->fSettings->lastUpdateDate.isValid()) {
         // Force update check.
