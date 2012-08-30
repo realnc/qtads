@@ -300,12 +300,9 @@ osfoprwb( const char* fname, os_filetype_t typ );
 int
 os_rename_file( const char* oldname, const char* newname );
 
-/* Access a file - determine if the file exists.
- *
- * We map this to the access() function.  It should be available in
- * virtually every system out there, as it appears in many standards
- * (SVID, AT&T, POSIX, X/OPEN, BSD 4.3, DOS, MS Windows, maybe more). */
-#define osfacc(fname) (access((fname), F_OK))
+/* Access a file - determine if the file exists. */
+int
+osfacc( const char* fname );
 
 /* Get a file's mode. */
 int

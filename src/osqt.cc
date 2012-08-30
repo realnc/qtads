@@ -166,6 +166,19 @@ os_rename_file( const char* oldname, const char* newname )
 }
 
 
+int
+osfacc( const char* fname )
+{
+    const QFileInfo info(QFile::decodeName(fname));
+    // Since exists() returns false for dangling symlinks, we need
+    // to explicitly check whether it's a symlink or not.
+    if (not info.exists() and not info.isSymLink()) {
+        return 1;
+    }
+    return 0;
+}
+
+
 // On Windows, we need to enable NTFS permission lookups.
 #ifdef Q_OS_WIN32
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
