@@ -228,7 +228,7 @@ os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
     bool isLink = inf.isSymLink();
 #ifdef Q_OS_WIN32
     // Don't treat shortcut files as symlinks.
-    if (isLink and QString::compare(inf.suffix(), QLatin1String("lnk"), Qt::CaseInsensitive)) {
+    if (isLink and (QString::compare(inf.suffix(), QLatin1String("lnk"), Qt::CaseInsensitive) == 0)) {
         isLink = false;
     }
 #endif
