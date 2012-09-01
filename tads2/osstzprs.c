@@ -219,7 +219,8 @@ int oss_parse_posix_tz(struct os_tzinfo_t *info, const char *tz, size_t len,
         return FALSE;
 
     /* parse the offset value */
-    if ((tz = parse_offset(&std_ofs, p = tz, &len)) == p)
+    p = tz;
+    if ((tz = parse_offset(&std_ofs, tz, &len)) == p)
         return FALSE;
 
     /* if we're using west-positive notation, convert to os_tzinfo_t specs */
@@ -227,7 +228,8 @@ int oss_parse_posix_tz(struct os_tzinfo_t *info, const char *tz, size_t len,
         std_ofs = -std_ofs;
 
     /* if we're not done, check for a daylight zone */
-    if (len != 0 && (tz = parse_zone_name(0, 0, p = tz, &len)) != p)
+    p = tz;
+    if (len != 0 && (tz = parse_zone_name(0, 0, tz, &len)) != p)
     {
         /* found a daylight zone name - note it */
         dst_name = p;
@@ -237,7 +239,8 @@ int oss_parse_posix_tz(struct os_tzinfo_t *info, const char *tz, size_t len,
          *   check for an optional offset value; if it's not present,
          *   daylight time is implicitly one hour ahead of standard time 
          */
-        if ((tz = parse_offset(&dst_ofs, p = tz, &len)) == p)
+        p = tz;
+        if ((tz = parse_offset(&dst_ofs, tz, &len)) == p)
             dst_ofs = std_ofs + 60*60;
         else if (west_is_positive)
             dst_ofs = -dst_ofs;
@@ -252,8 +255,9 @@ int oss_parse_posix_tz(struct os_tzinfo_t *info, const char *tz, size_t len,
     if (len != 0 && *tz == ',')
     {
         /* parse the start date */
-        ++tz, --len;
-        if ((tz = parse_dst_rule(&dst_start, p = tz, &len)) == p)
+        p = ++tz;
+        --len;
+        if ((tz = parse_dst_rule(&dst_start, tz, &len)) == p)
             return FALSE;
 
         /* if there's a start date, there has to be an end date */
@@ -261,8 +265,9 @@ int oss_parse_posix_tz(struct os_tzinfo_t *info, const char *tz, size_t len,
             return FALSE;
 
         /* parse the end date */
-        ++tz, --len;
-        if ((tz = parse_dst_rule(&dst_end, p = tz, &len)) == p)
+        p = ++tz;
+        --len;
+        if ((tz = parse_dst_rule(&dst_end, tz, &len)) == p)
             return FALSE;
     }
     

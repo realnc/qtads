@@ -1236,19 +1236,22 @@ resume_from_error:
 
         case OPCMUL:
             val.runstyp = DAT_NUMBER;
-            val.runsv.runsvnum = runpopnum(ctx) * runpopnum(ctx);
+            val.runsv.runsvnum = runpopnum(ctx);
+            val.runsv.runsvnum *= runpopnum(ctx);
             runrepush(ctx, &val);
             break;
             
         case OPCBAND:
             val.runstyp = DAT_NUMBER;
-            val.runsv.runsvnum = runpopnum(ctx) & runpopnum(ctx);
+            val.runsv.runsvnum = runpopnum(ctx);
+            val.runsv.runsvnum &= runpopnum(ctx);
             runrepush(ctx, &val);
             break;
             
         case OPCBOR:
             val.runstyp = DAT_NUMBER;
-            val.runsv.runsvnum = runpopnum(ctx) | runpopnum(ctx);
+            val.runsv.runsvnum = runpopnum(ctx);
+            val.runsv.runsvnum |= runpopnum(ctx);
             runrepush(ctx, &val);
             break;
 
@@ -1281,7 +1284,8 @@ resume_from_error:
             {
                 /* numeric value - return binary xor */
                 val.runstyp = DAT_NUMBER;
-                val.runsv.runsvnum = runpopnum(ctx) ^ runpopnum(ctx);
+                val.runsv.runsvnum = runpopnum(ctx);
+                val.runsv.runsvnum ^= runpopnum(ctx);
             }
             runrepush(ctx, &val);
             break;
@@ -1779,12 +1783,17 @@ resume_from_error:
                 };
                 int        fn;
                 runxdef   *ex;
+
+#if 0 // external functions are obsolete - no need to set up the context
                 runuxdef   ux;
                 
                 /* set up callback context */
                 ux.runuxctx  = ctx;
                 ux.runuxvec  = &uf;
                 ux.runuxargc = *p++;
+#else
+                ++p; // skip argc
+#endif
 
                 fn = osrp2(p);
                 p += 2;

@@ -1301,7 +1301,7 @@ static void outtab_stream(out_stream_info *stream)
             stream->linebuf[stream->linepos++] = ' ';
             ++(stream->linecol);
         } while (((stream->linecol + 1) & 3) != 0
-                 && stream->linecol < MAXWIDTH);
+                 && stream->linecol < maxcol);
     }
 }
 
@@ -1569,14 +1569,12 @@ static void outchar_noxlat_stream(out_stream_info *stream, char c)
     else
     {
         char brkchar;
-        int brkattr;
         char tmpbuf[MAXWIDTH];
         int tmpattr[MAXWIDTH];
         size_t tmpcnt;
 
-        /* remember word-break character */        
+        /* remember the word-break character */        
         brkchar = stream->linebuf[i];
-        brkattr = stream->attrbuf[i];
 
         /* null-terminate the line buffer */        
         stream->linebuf[stream->linepos] = '\0';
@@ -1598,7 +1596,7 @@ static void outchar_noxlat_stream(out_stream_info *stream, char c)
         /* write out everything up to the word break */
         out_flushline(stream, TRUE);
 
-        /* move next line into line buffer */
+        /* copy the next line into line buffer */
         memcpy(stream->linebuf, tmpbuf, tmpcnt + 1);
         memcpy(stream->attrbuf, tmpattr, tmpcnt * sizeof(tmpattr[0]));
         stream->linepos = tmpcnt;

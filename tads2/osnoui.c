@@ -1753,6 +1753,7 @@ void os_settype(const char *f, os_filetype_t t)
  *   URL/local path conversion 
  */
 
+#if defined(TURBO) || defined(DJGPP) || defined(MICROSOFT) || defined(MSOS2)
 /* length-protected character adder for os_cvt_xxx */
 static void cvtaddchar(char **dst, size_t *rem, char c)
 {
@@ -1768,6 +1769,7 @@ static void cvtaddchars(char **dst, size_t *rem, const char *src, size_t len)
     for ( ; len > 0 ; --len)
         cvtaddchar(dst, rem, *src++);
 }
+#endif
 
 /*
  *   Convert an OS filename path to a relative URL 
