@@ -4548,9 +4548,6 @@ void CTcParser::finish_prop_expr(
     cb = 0;
     inline_method = 0;
 
-    /* assume we'll need an anonymous function context for inline objects */
-    int need_anon_ctx = is_inline;
-
     /* 
      *   If we have a local context, we have to set up a code body in order
      *   to initialize the local context at run-time.  If this is an inline

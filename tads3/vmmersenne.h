@@ -88,7 +88,6 @@ public:
          *   seed value into the running LCG feedback register
          */
         int i = 1, j = 0, k = NMT > icnt ? NMT : icnt;
-        const unsigned char *u = (const unsigned char *)buf;
         for ( ; k != 0 ; --k)
         {
             /* get the current seed (the last one might be partial) */

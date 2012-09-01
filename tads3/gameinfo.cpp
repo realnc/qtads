@@ -492,9 +492,6 @@ const char *CTadsGameInfo::get_val(const char *name) const
     return 0;
 }
 
-/*
-Look up a value 
-
 /* ------------------------------------------------------------------------ */
 /*
  *   Enumerate all name/value pairs 

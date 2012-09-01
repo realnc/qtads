@@ -2416,9 +2416,6 @@ tc_toktyp_t CTcTokenizer::xlat_string_to(
         ec->end_expr();
     }
 
-    /* remember where the string's contents start */
-    utf8_ptr start = *p, end;
-
     /* scan the string and translate quotes */
     for (;;)
     {
@@ -2470,11 +2467,9 @@ tc_toktyp_t CTcTokenizer::xlat_string_to(
          */
         if (cur == '\0')
         {
-            /* note where the string ends */
-            end = dst;
-
             /* set the token's text pointer */
-            tok->set_text(dstp, end.getptr() - dstp);
+            size_t bytelen = dst.getptr() - dstp;
+            tok->set_text(dstp, bytelen);
 
             /* null-terminate the result string */
             dst.setch('\0');
@@ -2487,9 +2482,9 @@ tc_toktyp_t CTcTokenizer::xlat_string_to(
              *   huge 
              */
             utf8_ptr dp(dstp);
-            size_t len = dp.len(end.getptr() - dstp);
-            if (len > 20)
-                len = dp.bytelen(20);
+            size_t charlen = dp.len(bytelen);
+            if (charlen > 20)
+                bytelen = dp.bytelen(20);
 
             /*
              *   Check for a special heuristic case.  If the string was of
@@ -2538,7 +2533,7 @@ tc_toktyp_t CTcTokenizer::xlat_string_to(
 
             /* log the error */
             log_error(TCERR_UNTERM_STRING,
-                      (char)qu, (int)len, dstp, (char)qu);
+                      (char)qu, (int)bytelen, dstp, (char)qu);
 
             /* return the string type */
             return tok->gettyp();
@@ -2614,11 +2609,8 @@ tc_toktyp_t CTcTokenizer::xlat_string_to(
         p->inc();
     }
 
-    /* note where the string ends */
-    end = dst;
-    
     /* set the token's text pointer */
-    tok->set_text(dstp, end.getptr() - dstp);
+    tok->set_text(dstp, dst.getptr() - dstp);
 
     /* null-terminate the result string */
     dst.setch('\0');
@@ -4840,13 +4832,10 @@ tc_toktyp_t CTcTokenizer::
 /*
  *   Substitute the actual parameters in a macro's expansion 
  */
-int CTcTokenizer::substitute_macro_actuals(CTcMacroRsc *rsc,
-                                           CTcTokString *subexp,
-                                           CTcHashEntryPp *entry,
-                                           const CTcTokString *srcbuf,
-                                           const size_t *argofs,
-                                           const size_t *arglen,
-                                           int allow_defined)
+int CTcTokenizer::substitute_macro_actuals(
+    CTcMacroRsc *rsc, CTcTokString *subexp, CTcHashEntryPp *entry,
+    const CTcTokString *srcbuf, const size_t *argofs, const size_t *arglen,
+    int allow_defined)
 {
     const char *start;
     utf8_ptr expsrc;
@@ -4854,7 +4843,6 @@ int CTcTokenizer::substitute_macro_actuals(CTcMacroRsc *rsc,
     CTcToken prvprvtok;
     CTcToken tok;
     tc_toktyp_t typ;
-    const CVmHashTable *actuals;
     CTcTokString *actual_exp_buf;
     const size_t expand_max = 10;
     static struct expand_info_t
@@ -4883,9 +4871,6 @@ int CTcTokenizer::substitute_macro_actuals(CTcMacroRsc *rsc,
         int part;
     }
     expand_stack[expand_max], *expand_sp;
-
-    /* get the actuals table */
-    actuals = entry->get_params_table();
 
     /* get the actual expansion buffer from the resource object */
     actual_exp_buf = &rsc->actual_exp_buf_;
@@ -8300,10 +8285,10 @@ void CTcTokenizer::log_error_or_warning_with_tok(
 
                 default:
                     dst.setch('x');
-                    dst.setch('0' + (src.getch() >> 12) & 0xf);
-                    dst.setch('0' + (src.getch() >> 8) & 0xf);
-                    dst.setch('0' + (src.getch() >> 4) & 0xf);
-                    dst.setch('0' + (src.getch()) & 0xf);
+                    dst.setch('0' + int_to_xdigit((src.getch() >> 12) & 0xf));
+                    dst.setch('0' + int_to_xdigit((src.getch() >> 8) & 0xf));
+                    dst.setch('0' + int_to_xdigit((src.getch() >> 4) & 0xf));
+                    dst.setch('0' + int_to_xdigit((src.getch()) & 0xf));
                     break;
                 }
             }
@@ -8893,154 +8878,145 @@ void CTcHashEntryPpDefine::parse_expansion(const size_t *argvlen)
              */
             if (typ == TOKT_SYM)
             {
-                int i;
+                /* look up the symbol in our argument table */
+                CTcHashEntryPpArg *entry =
+                    (CTcHashEntryPpArg *)params_table_->find(
+                        tok.get_text(), tok.get_text_len());
 
-                /* find it in the table */
-                for (i = 0 ; i < argc_ ; ++i)
+                /* check if we found it */
+                if (entry != 0)
                 {
-                    /* does it match this argument name? */
-                    if (argvlen[i] == tok.get_text_len()
-                        && memcmp(argv_[i], tok.get_text(),
-                                  tok.get_text_len()) == 0)
+                    /* get the argument number from the entry */
+                    int i = entry->get_argnum();
+                    
+                    /* get the length of the formal name */
+                    size_t arg_len = argvlen[i];
+
+                    /* 
+                     *   the normal replacement length for a formal parameter
+                     *   is two bytes - one byte for the flag, and one for
+                     *   the formal parameter index 
+                     */
+                    size_t repl_len = 2;
+
+                    /* by default, the flag byte is the formal flag */
+                    char flag_byte = TOK_MACRO_FORMAL_FLAG;
+
+                    /*
+                     *   Check for special varargs control suffixes.  If we
+                     *   matched the last argument name, and this is a
+                     *   varargs macro, we might have a suffix.  
+                     */
+                    if (has_varargs_
+                        && i == argc_ - 1
+                        && src.getch() == '#')
                     {
-                        size_t new_len;
-                        size_t arg_len;
-                        size_t repl_len;
-                        char flag_byte;
-
-                        /* get the length of the formal name */
-                        arg_len = argvlen[i];
-
-                        /* 
-                         *   the normal replacement length for a formal
-                         *   parameter is two bytes - one byte for the flag,
-                         *   and one for the formal parameter index 
-                         */
-                        repl_len = 2;
-
-                        /* by default, the flag byte is the formal flag */
-                        flag_byte = TOK_MACRO_FORMAL_FLAG;
-
-                        /*
-                         *   Check for special varargs control suffixes.  If
-                         *   we matched the last argument name, and this is a
-                         *   varargs macro, we might have a suffix.  
-                         */
-                        if (has_varargs_
-                            && i == argc_ - 1
-                            && src.getch() == '#')
+                        /* check for the various suffixes */
+                        if (memcmp(src.getptr() + 1, "foreach", 7) == 0
+                            && !is_sym(src.getch_at(8)))
                         {
-                            /* check for the various suffixes */
-                            if (memcmp(src.getptr() + 1, "foreach", 7) == 0
-                                && !is_sym(src.getch_at(8)))
-                            {
-                                /* 
-                                 *   include the suffix length in the token
-                                 *   length 
-                                 */
-                                arg_len += 8;
-
-                                /* 
-                                 *   the flag byte is the #foreach flag,
-                                 *   which is a one-byte sequence 
-                                 */
-                                flag_byte = TOK_MACRO_FOREACH_FLAG;
-                                repl_len = 1;
-                            }
-                            else if (memcmp(src.getptr() + 1,
-                                            "argcount", 8) == 0
-                                     && !is_sym(src.getch_at(9)))
-                            {
-                                /* 
-                                 *   include the suffix length in the token
-                                 *   length 
-                                 */
-                                arg_len += 9;
-
-                                /* 
-                                 *   the flag byte is the #argcount flag,
-                                 *   which is a one-byte sequence 
-                                 */
-                                flag_byte = TOK_MACRO_ARGCOUNT_FLAG;
-                                repl_len = 1;
-                            }
-                            else if (memcmp(src.getptr() + 1,
-                                            "ifempty", 7) == 0
-                                     && !is_sym(src.getch_at(8)))
-                            {
-                                /* include the length */
-                                arg_len += 8;
-
-                                /* set the one-byte flag */
-                                flag_byte = TOK_MACRO_IFEMPTY_FLAG;
-                                repl_len = 1;
-                            }
-                            else if (memcmp(src.getptr() + 1,
-                                            "ifnempty", 8) == 0
-                                     && !is_sym(src.getch_at(9)))
-                            {
-                                /* include the length */
-                                arg_len += 9;
-
-                                /* set the one-byte flag */
-                                flag_byte = TOK_MACRO_IFNEMPTY_FLAG;
-                                repl_len = 1;
-                            }
+                            /* 
+                             *   include the suffix length in the token
+                             *   length 
+                             */
+                            arg_len += 8;
+                            
+                            /* 
+                             *   the flag byte is the #foreach flag, which is
+                             *   a one-byte sequence 
+                             */
+                            flag_byte = TOK_MACRO_FOREACH_FLAG;
+                            repl_len = 1;
                         }
-
-                        /* 
-                         *   calculate the new length - we're removing the
-                         *   argument name and adding the replacement string
-                         *   in its place 
-                         */
-                        new_len = expan_len + repl_len - arg_len;
-
-                        /* 
-                         *   we need two bytes for the replacement - if this
-                         *   is more than we're replacing, make sure we have
-                         *   room for the extra 
-                         */
-                        if (new_len > expan_len)
-                            defbuf->ensure_space(new_len);
-
-                        /* 
-                         *   copy everything up to but not including the
-                         *   formal name 
-                         */
-                        if (tok.get_text() > start)
+                        else if (memcmp(src.getptr() + 1,
+                                        "argcount", 8) == 0
+                                 && !is_sym(src.getch_at(9)))
                         {
-                            /* store the text */
-                            memcpy(defbuf->get_buf() + dstofs,
-                                   start, tok.get_text() - start);
-
-                            /* move past the stored text in the output */
-                            dstofs += tok.get_text() - start;
+                            /* 
+                             *   include the suffix length in the token
+                             *   length 
+                             */
+                            arg_len += 9;
+                            
+                            /* 
+                             *   the flag byte is the #argcount flag, which
+                             *   is a one-byte sequence 
+                             */
+                            flag_byte = TOK_MACRO_ARGCOUNT_FLAG;
+                            repl_len = 1;
                         }
-
-                        /* the next segment starts after this token */
-                        start = tok.get_text() + arg_len;
-
-                        /* store the flag byte */
-                        defbuf->get_buf()[dstofs++] = flag_byte;
-
-                        /* 
-                         *   If appropriate, store the argument index - this
-                         *   always fits in one byte because our hard limit
-                         *   on formal parameters is less than 128 per
-                         *   macro.  Note that we add one to the index so
-                         *   that we never store a zero byte, to avoid any
-                         *   potential confusion with a null terminator
-                         *   byte.  
-                         */
-                        if (repl_len > 1)
-                            defbuf->get_buf()[dstofs++] = (char)(i + 1);
-
-                        /* remember the new length */
-                        expan_len = new_len;
-
-                        /* no need to search further for it */
-                        break;
+                        else if (memcmp(src.getptr() + 1,
+                                        "ifempty", 7) == 0
+                                 && !is_sym(src.getch_at(8)))
+                        {
+                            /* include the length */
+                            arg_len += 8;
+                            
+                            /* set the one-byte flag */
+                            flag_byte = TOK_MACRO_IFEMPTY_FLAG;
+                            repl_len = 1;
+                        }
+                        else if (memcmp(src.getptr() + 1,
+                                        "ifnempty", 8) == 0
+                                 && !is_sym(src.getch_at(9)))
+                        {
+                            /* include the length */
+                            arg_len += 9;
+                            
+                            /* set the one-byte flag */
+                            flag_byte = TOK_MACRO_IFNEMPTY_FLAG;
+                            repl_len = 1;
+                        }
                     }
+                    
+                    /* 
+                     *   calculate the new length - we're removing the
+                     *   argument name and adding the replacement string in
+                     *   its place 
+                     */
+                    size_t new_len = expan_len + repl_len - arg_len;
+                    
+                    /* 
+                     *   we need two bytes for the replacement - if this is
+                     *   more than we're replacing, make sure we have room
+                     *   for the extra 
+                     */
+                    if (new_len > expan_len)
+                        defbuf->ensure_space(new_len);
+                    
+                    /* 
+                     *   copy everything up to but not including the formal
+                     *   name 
+                     */
+                    if (tok.get_text() > start)
+                    {
+                        /* store the text */
+                        memcpy(defbuf->get_buf() + dstofs,
+                               start, tok.get_text() - start);
+                        
+                        /* move past the stored text in the output */
+                        dstofs += tok.get_text() - start;
+                    }
+                    
+                    /* the next segment starts after this token */
+                    start = tok.get_text() + arg_len;
+                    
+                    /* store the flag byte */
+                    defbuf->get_buf()[dstofs++] = flag_byte;
+                    
+                    /* 
+                     *   If appropriate, store the argument index - this
+                     *   always fits in one byte because our hard limit on
+                     *   formal parameters is less than 128 per macro.  Note
+                     *   that we add one to the index so that we never store
+                     *   a zero byte, to avoid any potential confusion with a
+                     *   null terminator byte.  
+                     */
+                    if (repl_len > 1)
+                        defbuf->get_buf()[dstofs++] = (char)(i + 1);
+                    
+                    /* remember the new length */
+                    expan_len = new_len;
                 }
             }
         }

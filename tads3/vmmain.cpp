@@ -893,28 +893,20 @@ static void strcpy_limit(char *dst, const char *src, size_t limit)
 static int vm_get_game_file_from_savefile(const char *savefile,
                                           char *fname, size_t fnamelen)
 {
-    osfildef *fp;
-    char buf[128];
-    int ret;
-    size_t len;
 
     /* open the saved game file */
-    fp = osfoprb(savefile, OSFTBIN);
+    osfildef *fp = osfoprb(savefile, OSFTBIN);
 
     /* if that failed, there's no way to read the game file name */
     if (fp == 0)
         return FALSE;
 
+    /* presume failure */
+    int ret = FALSE;
+
     /* read the first few bytes */
-    if (osfrb(fp, buf, 16))
-    {
-        /* 
-         *   we couldn't even read that much, so it must not really be a
-         *   saved game file 
-         */
-        ret = FALSE;
-    }
-    else
+    char buf[128];
+    if (!osfrb(fp, buf, 16))
     {
         /* check for a saved game signature we recognize */
         if (memcmp(buf, "TADS2 save/g\012\015\032\000", 16) == 0)
@@ -925,20 +917,25 @@ static int vm_get_game_file_from_savefile(const char *savefile,
              *   (the 15 bytes we just matched), with a two-byte length
              *   prefix.  Seek to the length prefix and read it.  
              */
-            osfseek(fp, 16, OSFSK_SET);
-            osfrb(fp, buf, 2);
-            len = osrp2(buf);
+            size_t len;
+            if (!osfseek(fp, 16, OSFSK_SET) && !osfrb(fp, buf, 2))
+                len = osrp2(buf);
+            else
+                len = 0;
 
             /* limit the read length to our caller's available buffer */
             if (len > fnamelen - 1)
                 len = fnamelen - 1;
-
-            /* read the filename and null-terminate it */
-            osfrb(fp, fname, len);
-            fname[len] = '\0';
-
-            /* success */
-            ret = TRUE;
+            
+            /* read the filename */
+            if (!osfrb(fp, fname, len))
+            {
+                /* null-terminate it */
+                fname[len] = '\0';
+                
+                /* success */
+                ret = TRUE;
+            }
         }
         else if (memcmp(buf, "T3-state-v", 10) == 0)
         {
@@ -960,7 +957,6 @@ static int vm_get_game_file_from_savefile(const char *savefile,
              *   it's not a signature we know, so it must not be a saved
              *   state file (at least not one we can deal with)
              */
-            ret = FALSE;
         }
     }
 

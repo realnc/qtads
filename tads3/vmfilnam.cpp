@@ -517,7 +517,6 @@ char *CVmObjFileName::url_to_local(
     VMG_ const char *str, size_t len, int nullterm)
 {
     char *strz = 0, *buf = 0;
-    CVmObjFileName *fn = 0;
     err_try
     {
         /* 
@@ -1144,9 +1143,6 @@ int CVmObjFileName::getp_getRootName(VMG_ vm_obj_id_t self,
 
     /* presume we won't find a root name */
     retval->set_nil();
-
-    /* get our extension */
-    vm_filnam_ext *ext = get_ext();
 
     /* extract the root name from our filename string */
     const char *r = fn_get_root_name(vmg_ get_ext()->get_str());

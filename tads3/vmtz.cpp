@@ -426,7 +426,7 @@ CVmTimeZone *CVmTimeZoneCache::parse_zone_posixTZ(
     }
 
     /* it's not ours */
-    return NULL;
+    return 0;
 }
 
 /* 
@@ -1032,23 +1032,23 @@ int CVmTimeZoneCache::load_db_index(VMG0_)
     }
 
     /* if everything is working so far, read the link table */
-    uint32_t link_table_len = 0, link_cnt = 0;
+    uint32_t link_table_len = 0;
     if (ok && !osfrb(fp, buf, 8))
     {
         /* load the link table */
         link_table_len = osrp4(buf) - 4;
-        link_cnt = osrp4(buf + 4);
+        /* uint32_t link_cnt = osrp4(buf+4) - not currently needed */
         link_bytes_ = new char[link_table_len];
         ok = link_bytes_ != 0 && !osfrb(fp, link_bytes_, link_table_len);
     }
 
     /* if we're still good, read the abbreviation mappings */
-    uint32_t abbr_table_len = 0, abbr_cnt = 0;
+    uint32_t abbr_table_len = 0;
     if (ok && !osfrb(fp, buf, 8))
     {
         /* load the abbreviation table */
         abbr_table_len = osrp4(buf) - 4;
-        abbr_cnt = osrp4(buf + 4);
+        /* uint32_t abbr_cnt = osrp4(buf + 4) - not currently needed */
         abbr_bytes_ = new char[abbr_table_len];
         ok = abbr_bytes_ != 0 && !osfrb(fp, abbr_bytes_, abbr_table_len);
     }
@@ -1728,14 +1728,26 @@ vm_obj_id_t CVmTimeZone::get_rule_list(VMG0_) const
             "%.0s%02d", "last %.3s", "%.3s>=%d", "%.3s<=d"
         };
         if (r->when == 0 && r->dd > 31)
-            t3sprintf(buf, sizeof(buf), "DOY %d", r->dd);
-        else
         {
+            /* day of month past 31 -> it's actually a day of the year */
+            t3sprintf(buf, sizeof(buf), "DOY %d", r->dd);
+        }
+        else if (r->when >= 0 && r->when < countof(tpl)
+                 && r->weekday >= 1 && r->weekday <= 7)
+        {
+            /* valid 'when' code */
             memcpy(buf, mon + (r->mm - 1)*3, 3);
             buf[3] = ' ';
-            t3sprintf(buf+4, sizeof(buf)-4, tpl[r->when],
+            t3sprintf(buf+4, sizeof(buf)-4, tpl[(unsigned char)r->when],
                       wkdy + (r->weekday-1)*3, r->dd);
         }
+        else
+        {
+            /* invalid 'when' code */
+            t3sprintf(buf, sizeof(buf), "INVAL(when=%d, weekday=%d, dd=%d)",
+                      r->when, r->weekday, r->dd);
+        }
+            
         ele.set_obj(CVmObjString::create(vmg_ FALSE, buf, strlen(buf)));
         elst->cons_set_element(3, &ele);
 

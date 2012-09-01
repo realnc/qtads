@@ -122,6 +122,8 @@ Notes
      %B         matches except at a word boundary
      %s         <space>
      %S         <^space>
+     %v         <vspace>
+     %V         <^vspace>
      %d         <digit>
      %D         <^digit>
 

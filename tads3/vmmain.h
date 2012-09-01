@@ -370,7 +370,7 @@ char *vm_get_ifid(class CVmHostIfc *hostifc);
 class CVmMainClientIfc
 {
 public:
-    virtual ~CVmMainClientIfc() {}
+    virtual ~CVmMainClientIfc() { }
 
     /* 
      *   Set "plain" mode.  This should set the console to plain ASCII output

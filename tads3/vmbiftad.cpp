@@ -538,7 +538,7 @@ public:
          *   but it's harmless and is needed for machines with a larger word
          *   size.  
          */
-        *seedp = (int32_t)(((a * (uint32_t)*seedp) + 1) & 0xFFFFFFFF);
+        *seedp = (int32_t)(((a * (uint32_t)*seedp) + c) & 0xFFFFFFFF);
         return (uint32_t)*seedp;
     }
 

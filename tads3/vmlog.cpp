@@ -86,7 +86,7 @@ void vm_log(VMG_ const char *str, size_t len)
         else
         {
             /* write the message with no character set conversion */
-            osfwb(fp, msg, msglen);
+            (void)osfwb(fp, msg, msglen);
         }
 
         /* done with the formatted text string */

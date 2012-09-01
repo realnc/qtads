@@ -3431,9 +3431,8 @@ void CVmObjTable::pli_status_cb(void *ctx0, CVmHashEntry *entry0)
  */
 void CVmObjTable::pli_invoke_cb(void *ctx0, CVmHashEntry *entry0)
 {
-    pli_enum_ctx *ctx = (pli_enum_ctx *)ctx0;
     CVmHashEntryPLI *entry = (CVmHashEntryPLI *)entry0;
-    VMGLOB_PTR(ctx->globals);
+    VMGLOB_PTR(((pli_enum_ctx *)ctx0)->globals);
 
     /* invoke post-load initialization on the object */
     call_post_load_init(vmg_ entry);

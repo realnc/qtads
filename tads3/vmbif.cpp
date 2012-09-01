@@ -280,15 +280,12 @@ const vm_bif_entry_t *CVmBifTable::get_entry(const char *name)
  */
 int CVmBifTable::validate_entry(uint set_index, uint func_index)
 {
-    vm_bif_entry_t *entry;
-    vm_bif_desc *desc;
-    
     /* validate that the set index is in range */
     if (set_index >= count_)
         return FALSE;
 
     /* get the function set, and make sure it's valid */
-    entry = table_[set_index];
+    vm_bif_entry_t *entry = table_[set_index];
     if (entry == 0)
         return FALSE;
 
@@ -297,8 +294,8 @@ int CVmBifTable::validate_entry(uint set_index, uint func_index)
         return FALSE;
     
     /* make sure there's a function pointer in the descriptor */
-    desc = &entry->func[func_index];
-    if (entry->func[func_index].func == 0)
+    vm_bif_desc *desc = &entry->func[func_index];
+    if (desc->func == 0)
         return FALSE;
 
     /* it's a valid entry */

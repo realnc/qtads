@@ -1006,7 +1006,6 @@ void CVmBifTIO::askfile(VMG_ uint argc)
     char prompt[256];
     int dialog_type;
     os_filetype_t file_type;
-    long flags;
     int result;
     char fname[OSFNMAX*3 + 1];
     vm_obj_id_t lst_obj;
@@ -1026,8 +1025,13 @@ void CVmBifTIO::askfile(VMG_ uint argc)
     dialog_type = pop_int_val(vmg0_);
     file_type = (os_filetype_t)pop_int_val(vmg0_);
 
-    /* pop the flags */
-    flags = pop_long_val(vmg0_);
+    /* 
+     *   Pop and discard the flags.  (This argument isn't used currently;
+     *   it's just there in case we need some option flags in the future.
+     *   Pop it as an integer to ensure the caller specified the correct
+     *   type, but discard the value.)
+     */
+    (void)pop_long_val(vmg0_);
 
     /* check for a script response */
     static int filter[] = { VMCON_EVT_FILE };
