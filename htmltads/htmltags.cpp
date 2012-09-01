@@ -6876,14 +6876,11 @@ void CHtmlTagTR::format_exit(CHtmlFormatter *)
 void CHtmlTagTR::compute_max_cell_height(size_t rownum, size_t rowcnt,
                                          int pass)
 {
-    long max_height;
-    CHtmlTag *cur;
-
     /*
      *   Loop through my cells.  Ask each cell for its height, and find
      *   the largest. 
      */
-    for (max_height = 0, cur = get_contents() ; cur != 0 ;
+    for (CHtmlTag *cur = get_contents() ; cur != 0 ;
          cur = cur->get_next_tag())
     {
         CHtmlTagTableCell *cell;
@@ -7014,10 +7011,8 @@ void CHtmlTagTR::set_row_y_pos(CHtmlFormatter *formatter,
                                CHtmlTagTABLE *table,
                                long y_offset, long height)
 {
-    CHtmlTag *cur;
-
     /* loop through my cells and set each one's vertical position */
-    for (cur = get_contents() ; cur != 0 ; cur = cur->get_next_tag())
+    for (CHtmlTag *cur = get_contents() ; cur != 0 ; cur = cur->get_next_tag())
     {
         CHtmlTagTableCell *cell;
         CHtmlTag *nxt;

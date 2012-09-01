@@ -2770,7 +2770,6 @@ void CHtmlFormatter::inval_links_on_screen(const CHtmlRect *area)
 {
     CHtmlDisp *cur;
     CHtmlRect curpos;
-    long cur_ypos;
     long line_index;
 
     /* check line start records */
@@ -2779,14 +2778,12 @@ void CHtmlFormatter::inval_links_on_screen(const CHtmlRect *area)
         /* no line starts - start at beginning of list */
         line_index = 0;
         cur = disp_head_;
-        cur_ypos = 0;
     }
     else
     {
         /* start at the first line containing the top of the area to draw */
         line_index = line_starts_->find_by_ypos(area->top);
         cur = line_starts_->get(line_index);
-        cur_ypos = line_starts_->get_ypos(line_index);
     }
 
     /* invalidate links until we're out of view */
@@ -2818,7 +2815,6 @@ void CHtmlFormatter::inval_links_on_screen(const CHtmlRect *area)
 
         /* move on to the next line */
         ++line_index;
-        cur_ypos = nxt_ypos;
 
         /* if the next line isn't in view, don't display it */
         if (cur == 0 || nxt_ypos > area->bottom)

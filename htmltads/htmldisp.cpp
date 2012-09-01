@@ -1752,10 +1752,9 @@ long CHtmlDispText::measure_trailing_ws_width(CHtmlSysWin *win) const
 {
     const textchar_t *p;
     size_t rem;
-    const textchar_t *wspos;
 
     /* scan for whitespace */
-    for (p = txt_ + len_, rem = len_, wspos = 0 ; rem != 0 ; --rem)
+    for (p = txt_ + len_, rem = len_ ; rem != 0 ; --rem)
     {
         /* move to the next character */
         --p;
