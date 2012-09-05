@@ -2931,7 +2931,7 @@ void CVmBifTADS::save(VMG_ uint argc)
         delete file;
         file = 0;
     }
-    err_catch(exc)
+    err_catch_disc
     {
         /* close the file if it's still open */
         if (file != 0)

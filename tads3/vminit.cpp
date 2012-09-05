@@ -61,36 +61,34 @@ Modified
  */
 void vm_init_base(vm_globals **vmg, const vm_init_options *opts)
 {
-    vm_globals *vmg__;
-    char disp_mapname[32];
-    char filename_mapname[32];
-    char filecont_mapname[32];
-    CResLoader *map_loader;
-    int disp_map_err;
-    const char *charset = opts->charset;
-    
     /* 
      *   Allocate globals according to build-time configuration, then
      *   assign the global pointer to a local named vmg__.  This will
      *   ensure that the globals are accessible for all of the different
      *   build-time configurations.  
      */
-    vmg__ = *vmg = vmglob_alloc();
+    vm_globals *vmg__ = *vmg = vmglob_alloc();
+
+    /* 
+     *   in configurations where globals aren't passed as parameters, vmg__
+     *   will never be referenced; explicitly reference it so that the
+     *   compiler knows the assignment above is intentional even if it's not
+     *   ever used in this particular build configuration
+     */
+    (void)vmg__;
 
     /* initialize the error stack */
     err_init(VM_ERR_STACK_BYTES);
 
     /* get the system resource loader from the host interface */
-    map_loader = opts->hostifc->get_sys_res_loader();
+    CResLoader *map_loader = opts->hostifc->get_sys_res_loader();
 
     /* if an external message set hasn't been loaded, try loading one */
     if (!err_is_message_file_loaded() && map_loader != 0)
     {
-        osfildef *fp;
-        
         /* try finding a message file */
-        fp = map_loader->open_res_file(VM_ERR_MSG_FNAME, 0,
-                                       VM_ERR_MSG_RESTYPE);
+        osfildef *fp = map_loader->open_res_file(
+            VM_ERR_MSG_FNAME, 0, VM_ERR_MSG_RESTYPE);
         if (fp != 0)
         {
             /* 
@@ -181,6 +179,8 @@ void vm_init_base(vm_globals **vmg, const vm_init_options *opts)
      *   Otherwise, ask the OS layer for the default character set we
      *   should use. 
      */
+    char disp_mapname[32];
+    const char *charset = opts->charset;
     if (charset == 0)
     {
         /* the user did not specify a mapping - ask the OS for the default */
@@ -203,11 +203,13 @@ void vm_init_base(vm_globals **vmg, const vm_init_options *opts)
     G_cmap_to_ui = CCharmapToLocal::load(map_loader, charset);
 
     /* create the filename character maps */
+    char filename_mapname[32];
     os_get_charmap(filename_mapname, OS_CHARMAP_FILENAME);
     G_cmap_from_fname = CCharmapToUni::load(map_loader, filename_mapname);
     G_cmap_to_fname = CCharmapToLocal::load(map_loader, filename_mapname);
 
     /* create the file-contents character maps */
+    char filecont_mapname[32];
     os_get_charmap(filecont_mapname, OS_CHARMAP_FILECONTENTS);
     G_cmap_from_file = CCharmapToUni::load(map_loader, filecont_mapname);
     G_cmap_to_file = CCharmapToLocal::load(map_loader, filecont_mapname);
@@ -229,7 +231,7 @@ void vm_init_base(vm_globals **vmg, const vm_init_options *opts)
     }
 
     /* make a note of whether we had any problems loading the maps */
-    disp_map_err = (G_cmap_from_ui == 0 || G_cmap_to_ui == 0);
+    int disp_map_err = (G_cmap_from_ui == 0 || G_cmap_to_ui == 0);
 
     /* if we failed to create any of the maps, load defaults */
     if (G_cmap_from_ui == 0)

@@ -2469,7 +2469,7 @@ void CVmObjBigNum::compute_quotient_into(char *new_ext,
         /* make the additional allocation */
         alloc_temp_regs(dvs_prec, 1, &dvs_ext, &dvs_hdl);
     }
-    err_catch(exc)
+    err_catch_disc
     {
         /* delete the first group of registers we allocated */
         release_temp_regs(3, rem_hdl, rem_hdl2, dvs_hdl2);

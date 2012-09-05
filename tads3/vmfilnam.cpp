@@ -543,7 +543,7 @@ char *CVmObjFileName::url_to_local(
         /* convert the name */
         fn_cvt_url_dir(vmg_ buf, buflen, nullterm ? str : strz);
     }
-    err_catch(exc)
+    err_catch_disc
     {
         /* delete the buffer and re-throw the error */
         lib_free_str(buf);

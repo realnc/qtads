@@ -71,7 +71,7 @@ int CVmFormatterLog::open_log_file(VMG_ const char *fname)
         nf = CVmNetFile::open(
             vmg_ fname, 0, NETF_NEW, OSFTLOG, "text/plain");
     }
-    err_catch(exc)
+    err_catch_disc
     {
         nf = 0;
     }
@@ -94,7 +94,7 @@ int CVmFormatterLog::open_log_file(VMG_ const vm_val_t *filespec,
         /* validate file safety */
         CVmObjFile::check_safety_for_open(vmg_ nf, VMOBJFILE_ACCESS_WRITE);
     }
-    err_catch(exc)
+    err_catch_disc
     {
         /* if we got a file, it must be a safety exception - rethrow it */
         if (nf != 0)
@@ -200,7 +200,7 @@ int CVmFormatterLog::close_log_file(VMG0_)
         {
             lognf_->close(vmg0_);
         }
-        err_catch(exc)
+        err_catch_disc
         {
             /* flag the error, but otherwise discard the exception */
             err = TRUE;
@@ -2128,7 +2128,7 @@ int CVmConsole::open_script_file(VMG_ const char *fname,
         nf = CVmNetFile::open(
             vmg_ fname, 0, NETF_READ, OSFTCMD, "text/plain");
     }
-    err_catch(exc)
+    err_catch_disc
     {
         /* failed - no network file */
         nf = 0;
@@ -2153,7 +2153,7 @@ int CVmConsole::open_script_file(VMG_ const vm_val_t *filespec,
         /* validate file safety */
         CVmObjFile::check_safety_for_open(vmg_ nf, VMOBJFILE_ACCESS_READ);
     }
-    err_catch(exc)
+    err_catch_disc
     {
         /* if we got a file, it must be a safety exception - rethrow it */
         if (nf != 0)
@@ -2258,7 +2258,7 @@ int CVmConsole::close_script_file(VMG0_)
             /* close the network file */
             e->netfile->close(vmg0_);
         }
-        err_catch(exc)
+        err_catch_disc
         {
             /* 
              *   Ignore any error - since we're reading the file, the chances
@@ -2347,7 +2347,7 @@ int CVmConsole::open_command_log(VMG_ const char *fname, int event_script)
         /* create the network file descriptor */
         nf = CVmNetFile::open(vmg_ fname, 0, NETF_NEW, OSFTCMD, "text/plain");
     }
-    err_catch(exc)
+    err_catch_disc
     {
         /* failed - no network file */
         nf = 0;
@@ -2372,7 +2372,7 @@ int CVmConsole::open_command_log(VMG_ const vm_val_t *filespec,
         /* validate file safety */
         CVmObjFile::check_safety_for_open(vmg_ nf, VMOBJFILE_ACCESS_WRITE);
     }
-    err_catch(exc)
+    err_catch_disc
     {
         /* if we got a file, it must be a safety exception - rethrow it */
         if (nf != 0)
@@ -2454,7 +2454,7 @@ int CVmConsole::close_command_log(VMG0_)
         {
             command_nf_->close(vmg0_);
         }
-        err_catch(exc)
+        err_catch_disc
         {
             /* 
              *   ignore any errors - our interface doesn't give us any

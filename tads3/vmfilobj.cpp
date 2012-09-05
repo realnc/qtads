@@ -246,7 +246,7 @@ void CVmObjFile::notify_delete(VMG_ int /*in_root_set*/)
             if (get_ext()->netfile != 0)
                 get_ext()->netfile->close(vmg0_);
         }
-        err_catch(exc)
+        err_catch_disc
         {
             /* 
              *   Since we're being deleted by the garbage collector, there's
@@ -738,7 +738,7 @@ CVmNetFile *CVmObjFile::get_filename_arg(
         {
             check_safety_for_open(vmg_ netfile, access);
         }
-        err_catch(exc)
+        err_catch_disc
         {
             /* abandon the net file descriptor and bubble up the error */
             netfile->abandon(vmg0_);
@@ -1549,7 +1549,7 @@ int CVmObjFile::getp_close_file(VMG_ vm_obj_id_t self, vm_val_t *retval,
         /* flush buffers */
         get_ext()->fp->flush();
     }
-    err_catch(exc)
+    err_catch_disc
     {
         /* 
          *   The flush failed, so the close effectively failed.  Close the

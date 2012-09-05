@@ -569,7 +569,7 @@ void CVmImageLoader::load_resources_from_fp(osfildef *fp,
         /* load the resources */
         load_resources_from_fp(fp, fname, &res_ifc);
     }
-    err_catch(exc)
+    err_catch_disc
     {
         /* ignore the error */
     }

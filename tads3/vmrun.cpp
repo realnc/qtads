@@ -3900,7 +3900,7 @@ resume_execution:
             /* come here to skip throwing the exception */
             VM_IF_DEBUGGER(skip_throw: );
         }
-        err_catch(exc2)
+        err_catch_disc
         {
             /* 
              *   we got another exception trying to handle the first
