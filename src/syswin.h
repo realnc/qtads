@@ -25,6 +25,7 @@
 #include "sysfont.h"
 #include "sysframe.h"
 #include "syswingroup.h"
+#include "config.h"
 
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -96,29 +97,27 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
     // Our display widget.
     class DisplayWidget* dispWidget;
 
-    virtual void
-    keyPressEvent( QKeyEvent* event );
+    void
+    keyPressEvent( QKeyEvent* event ) override;
 
-    virtual void
-    inputMethodEvent( QInputMethodEvent* e );
+    void
+    inputMethodEvent( QInputMethodEvent* e ) override;
 
-    virtual void
-    scrollContentsBy(int dx, int dy);
+    void
+    scrollContentsBy(int dx, int dy) override;
 
-    virtual void
-    wheelEvent( QWheelEvent* e );
+    void
+    wheelEvent( QWheelEvent* e ) override;
 
-    virtual void
-    resizeEvent( QResizeEvent* e );
+    void
+    resizeEvent( QResizeEvent* e ) override;
 
-    virtual void
-    mousePressEvent( QMouseEvent* e );
+    void
+    mousePressEvent( QMouseEvent* e ) override;
 
   public:
     CHtmlSysWinQt( class CHtmlFormatter* formatter, class DisplayWidget* dispWidget, QWidget* parent );
-
-    virtual
-    ~CHtmlSysWinQt();
+    ~CHtmlSysWinQt() override;
 
     // Returns our display widget.
     class DisplayWidget*
@@ -154,77 +153,77 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
     //
     // CHtmlSysWin interface implementation.
     //
-    virtual CHtmlSysWinGroup*
-    get_win_group()
+    CHtmlSysWinGroup*
+    get_win_group() override
     { return qWinGroup; }
 
-    virtual void
-    notify_clear_contents();
+    void
+    notify_clear_contents() override;
 
-    virtual int
-    close_window( int force );
+    int
+    close_window( int force ) override;
 
-    virtual long
-    get_disp_width()
+    long
+    get_disp_width() override
     { return this->viewport()->width() - 3; }
 
-    virtual long
-    get_disp_height()
+    long
+    get_disp_height() override
     { return this->viewport()->height(); }
 
-    virtual long
-    get_pix_per_inch()
+    long
+    get_pix_per_inch() override
     { return QApplication::desktop()->logicalDpiX(); }
 
-    virtual CHtmlPoint
-    measure_text( class CHtmlSysFont* font, const textchar_t* str, size_t len, int *ascent );
+    CHtmlPoint
+    measure_text( class CHtmlSysFont* font, const textchar_t* str, size_t len, int *ascent ) override;
 
-    virtual CHtmlPoint
-    measure_dbgsrc_icon()
+    CHtmlPoint
+    measure_dbgsrc_icon() override
     { return CHtmlPoint(); }
 
-    virtual size_t
-    get_max_chars_in_width( CHtmlSysFont* font, const textchar_t* str, size_t len, long wid );
+    size_t
+    get_max_chars_in_width( CHtmlSysFont* font, const textchar_t* str, size_t len, long wid ) override;
 
-    virtual void
-    draw_text( int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str, size_t len );
+    void
+    draw_text( int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str, size_t len ) override;
 
-    virtual void
-    draw_text_space( int hilite, long x, long y, CHtmlSysFont* font, long wid );
+    void
+    draw_text_space( int hilite, long x, long y, CHtmlSysFont* font, long wid ) override;
 
-    virtual void
-    draw_bullet( int hilite, long x, long y, CHtmlSysFont* font, HTML_SysWin_Bullet_t style );
+    void
+    draw_bullet( int hilite, long x, long y, CHtmlSysFont* font, HTML_SysWin_Bullet_t style ) override;
 
-    virtual void
-    draw_hrule( const CHtmlRect* pos, int shade );
+    void
+    draw_hrule( const CHtmlRect* pos, int shade ) override;
 
-    virtual void
-    draw_table_border( const CHtmlRect* pos, int width, int cell );
+    void
+    draw_table_border( const CHtmlRect* pos, int width, int cell ) override;
 
-    virtual void
-    draw_table_bkg( const CHtmlRect* pos, HTML_color_t bgcolor );
+    void
+    draw_table_bkg( const CHtmlRect* pos, HTML_color_t bgcolor ) override;
 
-    virtual void
-    draw_dbgsrc_icon( const CHtmlRect* pos, unsigned int stat );
+    void
+    draw_dbgsrc_icon( const CHtmlRect* pos, unsigned int stat ) override;
 
-    virtual int
-    do_formatting( int show_status, int update_win, int freeze_display );
+    int
+    do_formatting( int show_status, int update_win, int freeze_display ) override;
 
     // We don't deal with palettes, so this is a no-op.
-    virtual void
-    recalc_palette()
+    void
+    recalc_palette() override
     { }
 
     // We don't deal with palettes, so always return false.
-    virtual int
-    get_use_palette()
+    int
+    get_use_palette() override
     { return false; }
 
-    virtual CHtmlSysFont*
-    get_default_font();
+    CHtmlSysFont*
+    get_default_font() override;
 
-    virtual CHtmlSysFont*
-    get_font( const CHtmlFontDesc* font_desc )
+    CHtmlSysFont*
+    get_font( const CHtmlFontDesc* font_desc ) override
     {
         if (this->fBannerStyleGrid) {
             // We're a text grid banner; use our internal font face,
@@ -238,104 +237,104 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
         return qFrame->createFont(font_desc);
     }
 
-    virtual CHtmlSysFont*
-    get_bullet_font( CHtmlSysFont* current_font )
+    CHtmlSysFont*
+    get_bullet_font( CHtmlSysFont* current_font ) override
     { return current_font; }
 
-    virtual void
-    register_timer_func( void (*timer_func)( void* ), void* func_ctx );
+    void
+    register_timer_func( void (*timer_func)( void* ), void* func_ctx ) override;
 
-    virtual void
-    unregister_timer_func( void (*timer_func)( void * ), void* func_ctx );
+    void
+    unregister_timer_func( void (*timer_func)( void * ), void* func_ctx ) override;
 
-    virtual CHtmlSysTimer*
-    create_timer( void (*timer_func)( void* ), void *func_ctx );
+    CHtmlSysTimer*
+    create_timer( void (*timer_func)( void* ), void *func_ctx ) override;
 
-    virtual void
-    set_timer( CHtmlSysTimer* timer, long interval_ms, int repeat );
+    void
+    set_timer( CHtmlSysTimer* timer, long interval_ms, int repeat ) override;
 
-    virtual void
-    cancel_timer( CHtmlSysTimer* timer );
+    void
+    cancel_timer( CHtmlSysTimer* timer ) override;
 
-    virtual void
-    delete_timer( CHtmlSysTimer* timer );
+    void
+    delete_timer( CHtmlSysTimer* timer ) override;
 
-    virtual void
-    fmt_adjust_hscroll();
+    void
+    fmt_adjust_hscroll() override;
 
-    virtual void
-    fmt_adjust_vscroll();
+    void
+    fmt_adjust_vscroll() override;
 
-    virtual void
-    inval_doc_coords( const CHtmlRect* area );
+    void
+    inval_doc_coords( const CHtmlRect* area ) override;
 
-    virtual void
-    advise_clearing_disp_list();
+    void
+    advise_clearing_disp_list() override;
 
-    virtual void
-    scroll_to_doc_coords( const CHtmlRect* pos );
+    void
+    scroll_to_doc_coords( const CHtmlRect* pos ) override;
 
-    virtual void
-    get_scroll_doc_coords( CHtmlRect* pos );
+    void
+    get_scroll_doc_coords( CHtmlRect* pos ) override;
 
-    virtual void
-    set_window_title( const textchar_t* title );
+    void
+    set_window_title( const textchar_t* title ) override;
 
-    virtual void
-    set_html_bg_color( HTML_color_t color, int use_default );
+    void
+    set_html_bg_color( HTML_color_t color, int use_default ) override;
 
-    virtual void
-    set_html_text_color( HTML_color_t color, int use_default );
+    void
+    set_html_text_color( HTML_color_t color, int use_default ) override;
 
-    virtual void
-    set_html_input_color( HTML_color_t, int )
+    void
+    set_html_input_color( HTML_color_t, int ) override
     // We don't provide input, so we don't deal with this.
     { }
 
-    virtual void
+    void
     set_html_link_colors( HTML_color_t link_color, int link_use_default, HTML_color_t vlink_color,
                           int vlink_use_default, HTML_color_t alink_color, int alink_use_default,
-                          HTML_color_t hlink_color, int hlink_use_default );
+                          HTML_color_t hlink_color, int hlink_use_default ) override;
 
-    virtual HTML_color_t
-    map_system_color( HTML_color_t color );
+    HTML_color_t
+    map_system_color( HTML_color_t color ) override;
 
-    virtual HTML_color_t
-    get_html_link_color() const;
+    HTML_color_t
+    get_html_link_color() const override;
 
-    virtual HTML_color_t
-    get_html_alink_color() const;
+    HTML_color_t
+    get_html_alink_color() const override;
 
-    virtual HTML_color_t
-    get_html_vlink_color() const;
+    HTML_color_t
+    get_html_vlink_color() const override;
 
-    virtual HTML_color_t
-    get_html_hlink_color() const;
+    HTML_color_t
+    get_html_hlink_color() const override;
 
-    virtual int
-    get_html_link_underline() const;
+    int
+    get_html_link_underline() const override;
 
-    virtual int
-    get_html_show_links() const;
+    int
+    get_html_show_links() const override;
 
-    virtual int
-    get_html_show_graphics() const;
+    int
+    get_html_show_graphics() const override;
 
-    virtual void
-    set_html_bg_image( class CHtmlResCacheObject* image );
+    void
+    set_html_bg_image( class CHtmlResCacheObject* image ) override;
 
-    virtual void
-    inval_html_bg_image( unsigned int x, unsigned int y, unsigned int wid, unsigned int ht );
+    void
+    inval_html_bg_image( unsigned int x, unsigned int y, unsigned int wid, unsigned int ht ) override;
 
-    virtual void
+    void
     set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width, long height,
-                     HTML_BannerWin_Units_t height_units, int use_height );
+                     HTML_BannerWin_Units_t height_units, int use_height ) override;
 
-    virtual void
-    set_banner_info( HTML_BannerWin_Pos_t pos, unsigned long style );
+    void
+    set_banner_info( HTML_BannerWin_Pos_t pos, unsigned long style ) override;
 
-    virtual void
-    get_banner_info( HTML_BannerWin_Pos_t* pos, unsigned long* style );
+    void
+    get_banner_info( HTML_BannerWin_Pos_t* pos, unsigned long* style ) override;
 };
 
 

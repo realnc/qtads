@@ -21,6 +21,7 @@
 #include <QMovie>
 
 #include "qtadsimage.h"
+#include "config.h"
 
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -52,44 +53,44 @@ class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
     //
     // CHtmlSysImageMng interface implementation.
     //
-    virtual void
-    set_display_site ( CHtmlSysImageDisplaySite* dispSite )
+    void
+    set_display_site ( CHtmlSysImageDisplaySite* dispSite ) override
     { this->fDispSite = dispSite; }
 
-    virtual void
-    cancel_playback()
+    void
+    cancel_playback() override
     { this->stop(); }
 
-    virtual void
-    pause_playback()
+    void
+    pause_playback() override
     { this->setPaused(true); }
 
-    virtual void
-    resume_playback()
+    void
+    resume_playback() override
     { this->setPaused(false); }
 
-    virtual void
-    draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
+    void
+    draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode ) override
     { QTadsImage(this->currentImage()).drawFromPaintEvent(win, pos, mode); }
 
-    virtual unsigned long
-    get_width() const
+    unsigned long
+    get_width() const override
     { return this->frameRect().width(); }
 
-    virtual unsigned long
-    get_height() const
+    unsigned long
+    get_height() const override
     { return this->frameRect().height(); }
 
-    virtual int
-    map_palette( CHtmlSysWin* win, int foreground )
+    int
+    map_palette( CHtmlSysWin* win, int foreground ) override
     { return false; }
 
-    virtual void
-    notify_timer()
+    void
+    notify_timer() override
     { qDebug() << Q_FUNC_INFO; }
 
-    virtual void
-    notify_image_change( int x, int y, int wid, int ht )
+    void
+    notify_image_change( int x, int y, int wid, int ht ) override
     { qDebug() << Q_FUNC_INFO; }
 };
 

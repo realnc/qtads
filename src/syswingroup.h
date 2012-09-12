@@ -22,14 +22,15 @@
 #include <QNetworkReply>
 
 #include "htmlsys.h"
+#include "config.h"
 
 
 class QTadsFrame: public QFrame {
     Q_OBJECT
 
   protected:
-    virtual void
-    resizeEvent( QResizeEvent* e );
+    void
+    resizeEvent( QResizeEvent* e ) override;
 
   public:
     QTadsFrame( QWidget* parent )
@@ -130,20 +131,18 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     fRunDropEventFile();
 
   protected:
-    virtual void
-    closeEvent( QCloseEvent* e );
+    void
+    closeEvent( QCloseEvent* e ) override;
 
-    virtual void
-    dragEnterEvent( QDragEnterEvent* e );
+    void
+    dragEnterEvent( QDragEnterEvent* e ) override;
 
-    virtual void
-    dropEvent( QDropEvent* e );
+    void
+    dropEvent( QDropEvent* e ) override;
 
   public:
     CHtmlSysWinGroupQt();
-
-    virtual
-    ~CHtmlSysWinGroupQt();
+    ~CHtmlSysWinGroupQt() override;
 
     CHtmlSysWinAboutBoxQt*
     createAboutBox( class CHtmlFormatter* formatter );
@@ -170,12 +169,12 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     //
     // CHtmlSysWinGroup interface implementation.
     //
-    virtual oshtml_charset_id_t
-    get_default_win_charset() const;
+    oshtml_charset_id_t
+    get_default_win_charset() const override;
 
-    virtual size_t
-    xlat_html4_entity( textchar_t* result, size_t result_size, unsigned int charval, oshtml_charset_id_t* charset,
-                       int* changed_charset );
+    size_t
+    xlat_html4_entity( textchar_t* result, size_t result_size, unsigned int charval,
+                       oshtml_charset_id_t* charset, int* changed_charset ) override;
 };
 
 

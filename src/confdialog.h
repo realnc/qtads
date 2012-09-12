@@ -19,6 +19,8 @@
 
 #include <QDialog>
 
+#include "config.h"
+
 
 namespace Ui {
     class ConfDialog;
@@ -29,11 +31,11 @@ class ConfDialog: public QDialog {
 
   public:
     ConfDialog( class CHtmlSysWinGroupQt* parent = 0 );
-    ~ConfDialog();
+    ~ConfDialog() override;
 
   protected:
     void
-    changeEvent( QEvent* e );
+    changeEvent( QEvent* e ) override;
 
   private:
     Ui::ConfDialog* ui;

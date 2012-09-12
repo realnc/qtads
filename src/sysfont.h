@@ -22,6 +22,7 @@
 #include <QColor>
 
 #include "htmlsys.h"
+#include "config.h"
 
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -88,8 +89,8 @@ class CHtmlSysFontQt: public QFont, public CHtmlSysFont {
     //
     // CHtmlSysFont interface implementation.
     //
-    virtual void
-    get_font_metrics( CHtmlFontMetrics* m )
+    void
+    get_font_metrics( CHtmlFontMetrics* m ) override
     {
         //qDebug() << Q_FUNC_INFO << "called";
 
@@ -100,12 +101,12 @@ class CHtmlSysFontQt: public QFont, public CHtmlSysFont {
         m->total_height = tmp.height();
     }
 
-    virtual int
-    is_fixed_pitch()
+    int
+    is_fixed_pitch() override
     { return QFontInfo(*this).fixedPitch(); }
 
-    virtual int
-    get_em_size()
+    int
+    get_em_size() override
     { return QFontInfo(*this).pixelSize(); }
 };
 

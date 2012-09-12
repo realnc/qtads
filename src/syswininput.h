@@ -17,9 +17,10 @@
 #ifndef SYSWININPUT_H
 #define SYSWININPUT_H
 
-#include "syswin.h"
-
 #include <QQueue>
+
+#include "syswin.h"
+#include "config.h"
 
 
 /* An input-capable CHtmlSysWinQt.
@@ -93,14 +94,14 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
     fProcessPagePauseQueue();
 
   protected:
-    virtual void
-    resizeEvent( QResizeEvent* event );
+    void
+    resizeEvent( QResizeEvent* event ) override;
 
-    virtual void
-    keyPressEvent( QKeyEvent* e );
+    void
+    keyPressEvent( QKeyEvent* e ) override;
 
-    virtual void
-    inputMethodEvent( QInputMethodEvent* e );
+    void
+    inputMethodEvent( QInputMethodEvent* e ) override;
 
     void
     singleKeyPressEvent( QKeyEvent* event );
@@ -111,9 +112,7 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 
   public:
     CHtmlSysWinInputQt( class CHtmlFormatter* formatter, QWidget* parent );
-
-    virtual
-    ~CHtmlSysWinInputQt();
+    ~CHtmlSysWinInputQt() override;
 
     // Change the height of the text cursor.
     void
@@ -166,8 +165,8 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
     //
     // CHtmlSysWin interface implementation.
     //
-    virtual void
-    set_html_input_color( HTML_color_t clr, int use_default );
+    void
+    set_html_input_color( HTML_color_t clr, int use_default ) override;
 };
 
 

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "gameinfo.h"
+#include "config.h"
 
 /* Implementation of the game information enumerator callback interface.
  * See tads3/gameinfo.h for details.
@@ -29,8 +30,8 @@ class QTadsGameInfoEnum: public CTadsGameInfo_enum {
     QString copyRules;
     QString ifid;
 
-    virtual void
-    tads_enum_game_info( const char* name, const char* val );
+    void
+    tads_enum_game_info( const char* name, const char* val ) override;
 };
 
 
@@ -43,7 +44,7 @@ class GameInfoDialog: public QDialog {
 
   public:
     explicit GameInfoDialog( const QByteArray& fname, QWidget* parent = 0 );
-    ~GameInfoDialog();
+    ~GameInfoDialog() override;
 
     // Checks whether a game file contains any embedded meta information.
     static bool

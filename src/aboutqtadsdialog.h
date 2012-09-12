@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "config.h"
+
 namespace Ui {
     class AboutQtadsDialog;
 }
@@ -12,7 +14,7 @@ class AboutQtadsDialog: public QDialog {
 
   public:
     explicit AboutQtadsDialog(QWidget *parent = 0);
-    ~AboutQtadsDialog();
+    ~AboutQtadsDialog() override;
 
   private:
     Ui::AboutQtadsDialog *ui;

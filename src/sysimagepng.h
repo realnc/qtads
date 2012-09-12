@@ -18,6 +18,7 @@
 #define SYSIMAGEPNG_H
 
 #include "qtadsimage.h"
+#include "config.h"
 
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -31,20 +32,20 @@ class CHtmlSysImagePngQt: public QTadsImage, public CHtmlSysImagePng {
     //
     // CHtmlSysImagePng interface implementation.
     //
-    virtual void
-    draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode )
+    void
+    draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode ) override
     { QTadsImage::drawFromPaintEvent(win, pos, mode); }
 
-    virtual unsigned long
-    get_width() const
+    unsigned long
+    get_width() const override
     { return QTadsImage::width(); }
 
-    virtual unsigned long
-    get_height() const
+    unsigned long
+    get_height() const override
     { return QTadsImage::height(); }
 
-    virtual int
-    map_palette( CHtmlSysWin* win, int foreground )
+    int
+    map_palette( CHtmlSysWin* win, int foreground ) override
     { return false; }
 };
 

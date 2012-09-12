@@ -20,6 +20,8 @@
 #include <QDebug>
 #include <QWidget>
 
+#include "config.h"
+
 
 /* The widget where CHtmlSysWin* performs actual paint operations.  It also
  * handles mouse events.
@@ -44,20 +46,20 @@ class DisplayWidget: public QWidget {
     // Our parent's formatter, for easy access.
     class CHtmlFormatter* formatter;
 
-    virtual void
-    paintEvent( QPaintEvent* e );
+    void
+    paintEvent( QPaintEvent* e ) override;
 
-    virtual void
-    mouseMoveEvent( QMouseEvent* e );
+    void
+    mouseMoveEvent( QMouseEvent* e ) override;
 
-    virtual void
-    leaveEvent( QEvent* e );
+    void
+    leaveEvent( QEvent* e ) override;
 
-    virtual void
-    mousePressEvent( QMouseEvent* e );
+    void
+    mousePressEvent( QMouseEvent* e ) override;
 
-    virtual void
-    mouseReleaseEvent( QMouseEvent* e );
+    void
+    mouseReleaseEvent( QMouseEvent* e ) override;
 
   public:
     DisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );

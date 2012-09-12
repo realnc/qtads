@@ -188,7 +188,8 @@ HEADERS += \
     src/settings.h \
     src/gameinfodialog.h \
     src/kcolorbutton.h \
-    src/aboutqtadsdialog.h
+    src/aboutqtadsdialog.h \
+    src/config.h
 
 # QTads sources.
 SOURCES += \

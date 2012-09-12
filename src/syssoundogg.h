@@ -19,6 +19,7 @@
 
 #include "qtadssound.h"
 #include "htmlsys.h"
+#include "config.h"
 
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -40,24 +41,24 @@ class CHtmlSysSoundOggQt: public QTadsSound, public CHtmlSysSoundOgg {
     //
     // CHtmlSysSoundOgg interface implementation.
     //
-    virtual int
+    int
     play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
-                const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade );
+                const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade ) override;
 
-    virtual void
-    add_crossfade( CHtmlSysWin* win, long ms );
+    void
+    add_crossfade( CHtmlSysWin* win, long ms ) override;
 
-    virtual void
-    cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg );
+    void
+    cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg ) override;
 
-    virtual int
-    maybe_suspend( CHtmlSysSound* )
+    int
+    maybe_suspend( CHtmlSysSound* ) override
     // We always return false since we have no limitation regarding the amount
     // of sounds we can play simultaneously.
     { return false; }
 
-    virtual void
-    resume();
+    void
+    resume() override;
 };
 
 

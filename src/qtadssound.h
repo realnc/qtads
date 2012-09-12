@@ -21,6 +21,7 @@
 #include <QTime>
 
 #include "tadshtml.h"
+#include "config.h"
 
 
 /* Provides the common code for all three types of digitized sound (WAV,
@@ -99,9 +100,7 @@ class QTadsSound: public QObject {
 
   public:
     QTadsSound( QObject* parent, struct Mix_Chunk* chunk, SoundType type );
-
-    virtual
-    ~QTadsSound();
+    ~QTadsSound() override;
 #endif
 
     // The SDL_Mixer callback for when a sound finished playing.

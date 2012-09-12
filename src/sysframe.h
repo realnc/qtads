@@ -20,6 +20,7 @@
 #include <QApplication>
 
 #include "htmlsys.h"
+#include "config.h"
 
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -102,8 +103,8 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
   protected:
     // On the Mac, dropping a file on our application icon will generate a
     // FileOpen event, so we override this to be able to handle it.
-    virtual bool
-    event( QEvent* );
+    bool
+    event( QEvent* ) override;
 #endif
 
     // appctx callback for getting the current I/O safety level.
@@ -132,9 +133,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
   public:
     CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
                      const char* orgDomain );
-
-    virtual
-    ~CHtmlSysFrameQt();
+    ~CHtmlSysFrameQt() override;
 
     class Settings*
     settings()
@@ -270,66 +269,66 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
     //
     // CHtmlSysFrame interface implementation.
     //
-    virtual void
-    flush_txtbuf( int fmt, int immediate_redraw );
+    void
+    flush_txtbuf( int fmt, int immediate_redraw ) override;
 
-    virtual class CHtmlParser*
-    get_parser()
+    class CHtmlParser*
+    get_parser() override
     { return this->fParser; }
 
-    virtual void
-    start_new_page();
+    void
+    start_new_page() override;
 
-    virtual void
-    set_nonstop_mode( int flag );
+    void
+    set_nonstop_mode( int flag ) override;
 
-    virtual void
-    display_output( const textchar_t* buf, size_t len );
+    void
+    display_output( const textchar_t* buf, size_t len ) override;
 
-    virtual int
-    check_break_key();
+    int
+    check_break_key() override;
 
-    virtual int
-    get_input( textchar_t* buf, size_t bufsiz );
+    int
+    get_input( textchar_t* buf, size_t bufsiz ) override;
 
-    virtual int
-    get_input_timeout( textchar_t* buf, size_t buflen, unsigned long timeout, int use_timeout );
+    int
+    get_input_timeout( textchar_t* buf, size_t buflen, unsigned long timeout, int use_timeout ) override;
 
-    virtual void
-    get_input_cancel( int reset );
+    void
+    get_input_cancel( int reset ) override;
 
-    virtual int
-    get_input_event( unsigned long ms, int use_timeout, os_event_info_t* info );
+    int
+    get_input_event( unsigned long ms, int use_timeout, os_event_info_t* info ) override;
 
-    virtual textchar_t
-    wait_for_keystroke( int pause_only );
+    textchar_t
+    wait_for_keystroke( int pause_only ) override;
 
-    virtual void
-    pause_for_exit();
+    void
+    pause_for_exit() override;
 
-    virtual void
-    pause_for_more();
+    void
+    pause_for_more() override;
 
-    virtual void
-    dbg_print( const char* msg );
+    void
+    dbg_print( const char* msg ) override;
 
-    virtual class CHtmlSysWin*
+    class CHtmlSysWin*
     create_banner_window( class CHtmlSysWin* parent, HTML_BannerWin_Type_t window_type,
                           class CHtmlFormatter* formatter, int where, class CHtmlSysWin* other,
-                          HTML_BannerWin_Pos_t pos, unsigned long style );
+                          HTML_BannerWin_Pos_t pos, unsigned long style ) override;
 
-    virtual void
-    orphan_banner_window( class CHtmlFormatterBannerExt* banner );
+    void
+    orphan_banner_window( class CHtmlFormatterBannerExt* banner ) override;
 
-    virtual CHtmlSysWin*
-    create_aboutbox_window( class CHtmlFormatter* formatter );
+    CHtmlSysWin*
+    create_aboutbox_window( class CHtmlFormatter* formatter ) override;
 
-    virtual void
-    remove_banner_window( CHtmlSysWin* win );
+    void
+    remove_banner_window( CHtmlSysWin* win ) override;
 
-    virtual int
+    int
     get_exe_resource( const textchar_t* resname, size_t resnamelen, textchar_t* fname_buf, size_t fname_buf_len,
-                      unsigned long* seek_pos, unsigned long* siz );
+                      unsigned long* seek_pos, unsigned long* siz ) override;
 };
 
 

@@ -18,6 +18,7 @@
 #define DISPWIDGETINPUT_H
 
 #include "dispwidget.h"
+#include "config.h"
 
 
 class DisplayWidgetInput: public DisplayWidget {
@@ -54,8 +55,8 @@ class DisplayWidgetInput: public DisplayWidget {
     fHandleFocusChange( QWidget* old, QWidget* now );
 
   protected:
-    virtual void
-    paintEvent( QPaintEvent* e );
+    void
+    paintEvent( QPaintEvent* e ) override;
 
   public:
     DisplayWidgetInput( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
