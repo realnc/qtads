@@ -17,7 +17,7 @@
 #include <QMetaType>
 #include <QFileDialog>
 
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <SDL_sound.h>
@@ -80,7 +80,7 @@ int main( int argc, char** argv )
                                                     + QString::fromAscii("(*.gam *.Gam *.GAM *.t3 *.T3)"));
     }
 
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
     if (SDL_Init(SDL_INIT_AUDIO) != 0) {
         qWarning("Unable to initialize sound system: %s", SDL_GetError());
         return 1;
@@ -147,7 +147,7 @@ int main( int argc, char** argv )
     int ret = app->exec();
 
     delete app;
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
     Mix_ChannelFinished(0);
     Mix_HookMusicFinished(0);
     // Close the audio device as many times as it was opened.

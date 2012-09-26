@@ -31,7 +31,7 @@ Settings::loadFromDisk()
 
     sett.beginGroup(QString::fromAscii("media"));
     this->enableGraphics = sett.value(QString::fromAscii("graphics"), true).toBool();
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
     this->enableSoundEffects = sett.value(QString::fromAscii("sounds"), true).toBool();
     this->enableMusic = sett.value(QString::fromAscii("music"), true).toBool();
 #else
@@ -67,7 +67,7 @@ Settings::loadFromDisk()
     const QString& DEFAULT_MONO = QString::fromAscii("Courier New,12");
     const QString& DEFAULT_SCRIPT = QString::fromAscii("Comic Sans MS,12");
 #else
-#ifdef Q_WS_ANDROID
+#ifdef Q_OS_ANDROID
     const QString& DEFAULT_SERIF = QString::fromAscii("Droid Serif");
     const QString& DEFAULT_SANS = QString::fromAscii("Droid Sans");
     const QString& DEFAULT_MONO = QString::fromAscii("Droid Sans Mono");

@@ -18,7 +18,7 @@
 #include <QFileInfo>
 #include <QTimer>
 
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
 #include <SDL_mixer.h>
 #include <SDL_sound.h>
 #endif
@@ -32,7 +32,7 @@
 #include "syssoundmpeg.h"
 
 
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
 QList<QTadsSound*> QTadsSound::fObjList;
 
 
@@ -289,7 +289,7 @@ QTadsSound::addCrossFade( int ms )
 CHtmlSysSound*
 QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
                          unsigned long filesize, CHtmlSysWin* win, SoundType type )
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
 {
     //qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
     //      << "url:" << url->get_url();

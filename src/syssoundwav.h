@@ -31,7 +31,7 @@ class CHtmlSysSoundWavQt: public QTadsSound, public CHtmlSysSoundWav {
     Q_OBJECT
 
   public:
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
     CHtmlSysSoundWavQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
     : QTadsSound(parent, chunk, type)
     { }

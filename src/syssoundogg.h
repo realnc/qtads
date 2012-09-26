@@ -32,7 +32,7 @@ class CHtmlSysSoundOggQt: public QTadsSound, public CHtmlSysSoundOgg {
     Q_OBJECT
 
   public:
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
     CHtmlSysSoundOggQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
     : QTadsSound(parent, chunk, type)
     { }

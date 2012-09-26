@@ -28,9 +28,11 @@
 /* Most systems have typedefs for ushort, uint and ulong.  If not, the
  * qtads.pro project file should be modified to define OS_NO_TYPES_DEFINED. */
 #ifndef OS_NO_TYPES_DEFINED
-#define OS_USHORT_DEFINED
-#define OS_UINT_DEFINED
-#define OS_ULONG_DEFINED
+    #define OS_UINT_DEFINED
+    #ifndef Q_OS_ANDROID
+        #define OS_USHORT_DEFINED
+        #define OS_ULONG_DEFINED
+    #endif
 #endif
 
 #define USE_DOSEXT

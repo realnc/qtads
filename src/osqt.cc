@@ -1395,7 +1395,7 @@ os_get_sysinfo( int code, void* /*param*/, long* result )
       case SYSINFO_MPEG1:
       case SYSINFO_MPEG2:
       case SYSINFO_MPEG3:
-#ifndef Q_WS_ANDROID
+#ifndef Q_OS_ANDROID
         *result = 1;
 #else
         *result = 0;
