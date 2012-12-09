@@ -460,6 +460,8 @@ os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
         // We can safely ignore those. They're needed only by the compiler.
         // OS_GSP_T3_RES is only needed by the base code implementation of
         // charmap.cc (tads3/charmap.cpp) which we don't use.
+
+        // FIXME: We do use tads3/charmap.cpp, so this needs to be handled.
         return;
 
       case OS_GSP_T3_APP_DATA: {
