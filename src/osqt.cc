@@ -617,7 +617,6 @@ os_rmdir( const char* dir )
  * Filename manipulation routines.
  */
 
-#if 0
 /* Apply a default extension to a filename, if it doesn't already have one.
  */
 void
@@ -692,11 +691,35 @@ os_build_full_path( char* fullpathbuf, size_t fullpathbuflen, const char* path, 
     Q_ASSERT(path != 0);
     Q_ASSERT(filename != 0);
 
-    std::strncpy(fullpathbuf,
-                 QFile::encodeName(QFileInfo(QDir(QFile::decodeName(path)),
-                                             QFile::decodeName(filename)).filePath()),
-                 fullpathbuflen);
-    fullpathbuf[fullpathbuflen - 1] = '\0';
+    qstrncpy(fullpathbuf, QFile::encodeName(QFileInfo(QDir(QFile::decodeName(path)),
+                                                      QFile::decodeName(filename)).filePath()),
+             fullpathbuflen);
+}
+
+
+void
+os_combine_paths( char* fullpathbuf, size_t fullpathbuflen, const char* path, const char* filename )
+{
+    Q_ASSERT(fullpathbuf != 0);
+    Q_ASSERT(path != 0);
+    Q_ASSERT(filename != 0);
+
+    bool filenameIsDot = false;
+    bool filenameIsDotDot = false;
+    if (qstrcmp(filename, "..") == 0 or qstrcmp(filename, "../") == 0)
+        filenameIsDotDot = true;
+    else if (qstrcmp(filename, ".") == 0 or qstrcmp(filename, "./") == 0) {
+        filenameIsDot = true;
+    }
+
+    if (filenameIsDot or filenameIsDotDot) {
+        os_build_full_path(fullpathbuf, fullpathbuflen, path, "");
+        if (qstrlen(fullpathbuf) + 3 <= fullpathbuflen) {
+            strcat(fullpathbuf, filenameIsDot ? "." : "..");
+        }
+    } else {
+        os_build_full_path(fullpathbuf, fullpathbuflen, path, filename);
+    }
 }
 
 
@@ -705,22 +728,24 @@ os_build_full_path( char* fullpathbuf, size_t fullpathbuflen, const char* path, 
 void
 os_get_path_name( char* pathbuf, size_t pathbuflen, const char* fname )
 {
-    strncpy(pathbuf, QFile::encodeName(QFileInfo(QFile::decodeName(fname)).path()).constData(), pathbuflen);
-    pathbuf[pathbuflen - 1] = '\0';
+    Q_ASSERT(pathbuf != 0);
+    Q_ASSERT(fname != 0);
+
+    qstrncpy(pathbuf, QFile::encodeName(QFileInfo(QFile::decodeName(fname)).path()).constData(),
+             pathbuflen);
 }
 
 
 /* Convert a relative URL into a relative filename path.
  */
 void
-os_cvt_url_dir( char* result_buf, size_t result_buf_size, const char* src_url, int end_sep )
+os_cvt_url_dir( char* result_buf, size_t result_buf_size, const char* src_url )
 {
+    Q_ASSERT(result_buf != 0);
+    Q_ASSERT(src_url != 0);
+
     QString result(QFile::decodeName(src_url));
-    if (end_sep == true and not result.endsWith(QChar::fromAscii('/'))) {
-        result.append(QChar::fromAscii('/'));
-    }
-    strncpy(result_buf, QFile::encodeName(result).constData(), result_buf_size);
-    result_buf[result_buf_size - 1] = '\0';
+    qstrncpy(result_buf, QFile::encodeName(result).constData(), result_buf_size);
 }
 
 
@@ -729,9 +754,10 @@ os_cvt_url_dir( char* result_buf, size_t result_buf_size, const char* src_url, i
 int
 os_is_file_absolute( const char* fname )
 {
+    Q_ASSERT(fname != 0);
+
     return QFileInfo(QFile::decodeName(fname)).isAbsolute();
 }
-#endif
 
 
 /* Get the absolute, fully qualified filename for a file.
@@ -740,15 +766,37 @@ int
 os_get_abs_filename( char* result_buf, size_t result_buf_size, const char* filename )
 {
     Q_ASSERT(result_buf != 0);
+
     const QByteArray& data = QFile::encodeName(QFileInfo(QFile::decodeName(filename)).absoluteFilePath());
+    qstrncpy(result_buf, data.constData(), result_buf_size);
     if (data.length() >= result_buf_size) {
-        // Result won't fit in 'result_buf'.
-        qstrcpy(result_buf, filename);
+        // Result didn't fit in 'result_buf'.
         return false;
     }
-    qstrcpy(result_buf, data.constData());
     return true;
 }
+
+
+// This is only used by the HTML TADS debugger, which we don't include
+// in our build.
+#if 0
+int
+os_get_rel_path( char* result_buf, size_t result_buf_size, const char* basepath, const char* filename)
+{
+    Q_ASSERT(result_buf != 0);
+    Q_ASSERT(basepath != 0);
+    Q_ASSERT(filename != 0);
+
+    QDir baseDir(QFile::decodeName(basepath));
+    const QString& result = baseDir.relativeFilePath(QFile::decodeName(filename));
+    if (result.isEmpty()) {
+        qstrncpy(result_buf, filename, result_buf_size);
+        return false;
+    }
+    qstrncpy(result_buf, QFile::encodeName(result), result_buf_size);
+    return true;
+}
+#endif
 
 
 /* Determine if the given file is in the given directory.

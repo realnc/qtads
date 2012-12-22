@@ -106,6 +106,7 @@ void safe_strcpy(char *dst, size_t dstlen, const char *src)
  *   filename at fn, no action should be taken.  On systems without an
  *   analogue of extensions, this routine should do nothing.  
  */
+#ifndef OSNOUI_OMIT_OS_DEFEXT
 void os_defext(char *fn, const char *ext)
 {
     char *p;
@@ -141,15 +142,18 @@ void os_defext(char *fn, const char *ext)
     strcat(fn, ".");
     strcat(fn, ext);
 }
+#endif
 
 /*
  *   Add an extension, even if the filename currently has one 
  */
+#ifndef OSNOUI_OMIT_OS_ADDEXT
 void os_addext(char *fn, const char *ext)
 {
     strcat(fn, ".");
     strcat(fn, ext);
 }
+#endif
 
 /* 
  *   os_remext(fn) removes the extension from fn, if present.  The buffer
@@ -157,6 +161,7 @@ void os_addext(char *fn, const char *ext)
  *   action should be taken.  For systems without an analogue of
  *   extensions, this routine should do nothing.  
  */
+#ifndef OSNOUI_OMIT_OS_REMEXT
 void os_remext(char *fn)
 {
     char *p;
@@ -186,6 +191,7 @@ void os_remext(char *fn)
             return;
     }
 }
+#endif
 
 /*
  *   Get a pointer to the root name portion of a filename.  Note that this
@@ -194,6 +200,7 @@ void os_remext(char *fn)
  *   sufficiently DOS-like for the extension parsing routines, the same
  *   will be true of path parsing.  
  */
+#ifndef OSNOUI_OMIT_OS_GET_ROOTNAME
 char *os_get_root_name(const char *buf)
 {
     const char *rootname;
@@ -235,10 +242,12 @@ char *os_get_root_name(const char *buf)
      */
     return (char *)rootname;
 }
+#endif
 
 /*
  *   Extract the path from a filename 
  */
+#ifndef OSNOUI_OMIT_OS_GET_PATH_NAME
 void os_get_path_name(char *pathbuf, size_t pathbuflen, const char *fname)
 {
     const char *lastsep;
@@ -361,11 +370,13 @@ void os_get_path_name(char *pathbuf, size_t pathbuflen, const char *fname)
     }
 #endif
 }
+#endif
 
 /*
  *   Canonicalize a path: remove ".." and "." relative elements 
  */
-void canonicalize_path(char *path)
+#if !defined(OSNOUI_OMIT_OS_BUILD_FULL_PATH) && !defined(OSNOUI_OMIT_OS_COMBINE_PATHS)
+static void canonicalize_path(char *path)
 {
     char *orig = path;
     char *p;
@@ -515,6 +526,7 @@ void canonicalize_path(char *path)
         orig[1] = '\0';
     }
 }
+#endif
 
 /*
  *   General path builder for os_build_full_path() and os_combine_paths().
@@ -522,6 +534,7 @@ void canonicalize_path(char *path)
  *   the result (resolving "." and ".." in the last element, for example),
  *   while the latter just builds the combined path literally.
  */
+#if !defined(OSNOUI_OMIT_OS_BUILD_FULL_PATH) && !defined(OSNOUI_OMIT_OS_COMBINE_PATHS)
 static void build_path(char *fullpathbuf, size_t fullpathbuflen,
                        const char *path, const char *filename, int canon)
 {
@@ -632,28 +645,33 @@ static void build_path(char *fullpathbuf, size_t fullpathbuflen,
     if (canon)
         canonicalize_path(fullpathbuf);
 }
+#endif
 
 /*
  *   Build a full path out of path and filename components, returning the
  *   result in canonical form (e.g., with '.' and '..' resolved).
  */
+#ifndef OSNOUI_OMIT_OS_BUILD_FULL_PATH
 void os_build_full_path(char *fullpathbuf, size_t fullpathbuflen,
                         const char *path, const char *filename)
 {
     /* build the combined path, and canonicalize the result */
     build_path(fullpathbuf, fullpathbuflen, path, filename, TRUE);
 }
+#endif
 
 /*
  *   Build a combined path, returning the literal combination without
  *   resolving any relative links. 
  */
+#ifndef OSNOUI_OMIT_OS_COMBINE_PATHS
 void os_combine_paths(char *fullpathbuf, size_t fullpathbuflen,
                       const char *path, const char *filename)
 {
     /* build the path, without any canonicalization */
     build_path(fullpathbuf, fullpathbuflen, path, filename, FALSE);
 }
+#endif
 
 /*
  *   Determine if a path is absolute or relative.  If the path starts with
@@ -664,6 +682,7 @@ void os_combine_paths(char *fullpathbuf, size_t fullpathbuflen,
  *   So, if the path contains a letter followed by a colon, we'll consider
  *   the path to be absolute. 
  */
+#ifndef OSNOUI_OMIT_IS_FILE_ABSOLUTE
 int os_is_file_absolute(const char *fname)
 {
 #ifdef MSDOS
@@ -701,6 +720,7 @@ int os_is_file_absolute(const char *fname)
     /* the path is relative */
     return FALSE;
 }
+#endif
 
 
 /* 
@@ -742,6 +762,7 @@ static const char *oss_parse_volume(const char *path)
  *   are on different drives, there's no way to express the filename in
  *   relative terms, so we'll return it unchanged.
  */
+#ifndef OSNOUI_OMIT_OS_GET_REL_PATH
 int os_get_rel_path(char *result, size_t result_len,
                     const char *basepath, const char *filename)
 {
@@ -887,6 +908,7 @@ int os_get_rel_path(char *result, size_t result_len,
     /* success */
     return TRUE;
 }
+#endif
 
 
 #endif /* USE_DOSEXT */
@@ -1863,6 +1885,7 @@ void os_cvt_dir_url(char *result_buf, size_t result_buf_size,
 /*
  *   Convert a relative URL to a relative file system path name 
  */
+#ifndef OSNOUI_OMIT_OS_CVT_URL_DIR
 void os_cvt_url_dir(char *result_buf, size_t result_buf_size,
                     const char *src_url)
 {
@@ -1986,6 +2009,7 @@ void os_cvt_url_dir(char *result_buf, size_t result_buf_size,
     /* add a null terminator and we're done */
     *dst = '\0';
 }
+#endif
 
 
 /* ------------------------------------------------------------------------ */
