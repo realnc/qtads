@@ -1019,10 +1019,33 @@ os_rand( long* val )
 /* Generate random bytes for use in seeding a PRNG (pseudo-random number
  * generator).
  */
-// FIXME: Implement this.
 void
-os_gen_rand_bytes( unsigned char *buf, size_t len )
+os_gen_rand_bytes( unsigned char* buf, size_t len )
 {
+#ifdef Q_OS_UNIX
+    QFile rdev(QString::fromLatin1("/dev/urandom"));
+    if (rdev.open(QFile::ReadOnly)) {
+        qint64 bytesRead = rdev.read(reinterpret_cast<char*>(buf), len);
+        if (bytesRead >= len)
+            return;
+        if (bytesRead > 0) {
+            // For whatever reason, we couldn't read the requested amount of
+            // bytes from the device. We'll fill the rest with the generic
+            // generator below.
+            buf += bytesRead;
+            len -= bytesRead;
+        }
+    }
+#endif
+
+    static bool initialized = false;
+    if (not initialized) {
+        qsrand(QDateTime::currentDateTime().toTime_t());
+        initialized = true;
+    }
+    for (size_t i = 0; i < len; ++i) {
+        buf[i] = qrand() % 256;
+    }
 }
 
 
