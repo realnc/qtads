@@ -995,24 +995,12 @@ os_rand( long* val )
 {
     Q_ASSERT(val != 0);
 
-    // Is this the first call to os_rand()?
-    static bool initial = true;
-
-    if (initial) {
-        // It's the first time we're called.  Initialize the random number
-        // generator.
-        initial = false;
-        time_t t = time(0);
-        if (t == static_cast<time_t>(-1)) {
-            std::srand(std::rand());
-        } else {
-            std::srand(static_cast<unsigned int>(t));
-        }
+    static bool initialized = false;
+    if (not initialized) {
+        qsrand(QDateTime::currentDateTime().toTime_t());
+        initialized = true;
     }
-
-    // Generate a random number by using high-order bits, because on some
-    // systems the low-order bits aren't very random.
-    *val = 1 + static_cast<long>(static_cast<long double>(65535) * std::rand() / (RAND_MAX + 1.0));
+    *val = qrand();
 }
 
 
