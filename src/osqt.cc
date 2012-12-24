@@ -449,7 +449,8 @@ os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
         // FIXME: We do use tads3/charmap.cpp, so this needs to be handled.
         return;
 
-      case OS_GSP_T3_APP_DATA: {
+      case OS_GSP_T3_APP_DATA:
+      case OS_GSP_LOGFILE: {
         const QString& dirStr =
         #if QT_VERSION < 0x050000
                 QDesktopServices::storageLocation(QDesktopServices::DataLocation);
@@ -468,14 +469,6 @@ os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
         Q_ASSERT(QFile::encodeName(dirStr).size() < static_cast<int>(buflen));
         strncpy(buf, QFile::encodeName(dirStr).constData(), buflen);
         buf[buflen - 1] = '\0';
-        break;
-      }
-
-      case OS_GSP_LOGFILE: {
-        // TODO: We'll just use the temp directory for now.
-        const QByteArray& res = QFile::encodeName(QDir::tempPath());
-        Q_ASSERT(res.size() < static_cast<int>(buflen));
-        qstrncpy(buf, res.constData(), buflen);
         break;
       }
 
