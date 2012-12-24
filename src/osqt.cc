@@ -409,41 +409,22 @@ os_exeseek( const char*, const char* )
 
 /* Get the full filename (including directory path) to the executable
  * file.
- *
- * The implementation provided here can handle links.  (Both Unix-links
- * as well as Windows-shortcuts, since Qt supports then both; I don't
- * know how a link looks like on a Mac, but Qt should support that
- * too.)
- *
- * TODO: Search through the PATH env. variable.  Find out how this is
- * supposed to work on OS X.
  */
 int
-os_get_exe_filename( char* buf, size_t buflen, const char* argv0 )
+os_get_exe_filename( char* buf, size_t buflen, const char* )
 {
-    QFileInfo file(QFile::decodeName(argv0));
-    file.makeAbsolute();
-    if (not file.exists() or not file.isReadable()) {
+    QFileInfo inf(QApplication::applicationFilePath());
+
+    if (not inf.exists() or not inf.isReadable()) {
         return false;
     }
 
-    // If the file is some form of link, find out where it points to.
-    if (file.isSymLink()) {
-        while (not file.readLink().isEmpty()) {
-            file.setFile(file.readLink());
-        }
-        file.makeAbsolute();
-        if (not file.exists() or not file.isReadable()) {
-            return false;
-        }
-    }
-
-    const QByteArray& result = QFile::encodeName(file.filePath());
-    if (result.length() + 1 > static_cast<int>(buflen)) {
+    const QByteArray& encodedFilename = QFile::encodeName(inf.filePath());
+    if (encodedFilename.length() + 1 > static_cast<int>(buflen)) {
         // The result would not fit in the buffer.
         return false;
     }
-    strcpy(buf, result.constData());
+    qstrcpy(buf, encodedFilename.constData());
     return true;
 }
 
