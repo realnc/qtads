@@ -230,13 +230,13 @@ win32:SOURCES += \
 # Portable Tads headers.  We simply include every header from the Tads
 # directories.  It's sub-optimal, but the safest solution.
 # Tads 2 headers.
-HEADERS += $$T2DIR/*.h
+HEADERS += $$PWD/$$T2DIR/*.h
 
 # Tads 3 headers.
-HEADERS += $$T3DIR/*.h
+HEADERS += $$PWD/$$T3DIR/*.h
 
 # HTML TADS headers.
-HEADERS += $$HTDIR/*.h
+HEADERS += $$PWD/$$HTDIR/*.h
 
 # Portable Tads sources.  We always know which are needed.
 # HTML Tads sources.
