@@ -141,7 +141,7 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
         // If the HREF string is empty, use a single space so that we know that
         // an HREF event actually occured.
         if (cmd[0] == '\0') {
-            this->fHrefEvent = QChar::fromAscii(' ');
+            this->fHrefEvent = QChar::fromLatin1(' ');
         } else {
             this->fHrefEvent = QString::fromUtf8(cmd);
         }

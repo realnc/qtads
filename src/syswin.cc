@@ -634,10 +634,10 @@ CHtmlSysWinQt::draw_text_space( int hilite, long x, long y, CHtmlSysFont* font, 
     this->fSetupPainterForFont(painter, hilite, font);
 
     // Construct a string of spaces that's at least 'width' pixels wide.
-    QString str(QChar::fromAscii(' '));
+    QString str(QChar::fromLatin1(' '));
     const QFontMetrics& metr = painter.fontMetrics();
     while (metr.width(str) < wid) {
-        str.append(QChar::fromAscii(' '));
+        str.append(QChar::fromLatin1(' '));
     }
 
     painter.drawText(x, y, wid, metr.height(), Qt::AlignLeft, str);

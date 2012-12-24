@@ -135,11 +135,11 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
     }
     qSort(codecs);
     for (int i = 0; i < codecs.size(); ++i) {
-        if (ui->encodingComboBox->findText(QString::fromAscii(codecs.at(i))) == -1) {
-            ui->encodingComboBox->addItem(QString::fromAscii(codecs.at(i)));
+        if (ui->encodingComboBox->findText(QString::fromLatin1(codecs.at(i))) == -1) {
+            ui->encodingComboBox->addItem(QString::fromLatin1(codecs.at(i)));
         }
     }
-    ui->encodingComboBox->setCurrentIndex(ui->encodingComboBox->findText(QString::fromAscii(sett->tads2Encoding)));
+    ui->encodingComboBox->setCurrentIndex(ui->encodingComboBox->findText(QString::fromLatin1(sett->tads2Encoding)));
 
     ui->softScrollCheckBox->setChecked(sett->softScrolling);
     ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
@@ -321,7 +321,7 @@ ConfDialog::fApplySettings()
     } else if (ui->safetyWrite4RadioButton->isChecked()) {
         sett->ioSafetyLevelWrite = 4;
     }
-    sett->tads2Encoding = ui->encodingComboBox->currentText().toAscii();
+    sett->tads2Encoding = ui->encodingComboBox->currentText().toLatin1();
     sett->softScrolling = ui->softScrollCheckBox->isChecked();
     sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
     sett->confirmRestartGame = ui->confirmRestartCheckBox->isChecked();

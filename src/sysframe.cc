@@ -60,10 +60,10 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
     //qDebug() << Q_FUNC_INFO;
     Q_ASSERT(qFrame == 0);
 
-    this->setApplicationName(QString::fromAscii(appName));
-    this->setApplicationVersion(QString::fromAscii(appVersion));
-    this->setOrganizationName(QString::fromAscii(orgName));
-    this->setOrganizationDomain(QString::fromAscii(orgDomain));
+    this->setApplicationName(QString::fromLatin1(appName));
+    this->setApplicationVersion(QString::fromLatin1(appVersion));
+    this->setOrganizationName(QString::fromLatin1(orgName));
+    this->setOrganizationDomain(QString::fromLatin1(orgDomain));
 
     // Load our persistent settings.
     this->fSettings = new Settings;
@@ -90,7 +90,7 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 
     // Create our main application window.
     this->fMainWin = new CHtmlSysWinGroupQt;
-    this->fMainWin->setWindowTitle(QString::fromAscii(appName));
+    this->fMainWin->setWindowTitle(QString::fromLatin1(appName));
     this->fMainWin->updateRecentGames();
 
     // Automatically quit the application when the last window has closed.
@@ -102,7 +102,7 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
     // Set application window icon, unless we're on OS X where the bundle
     // icon is used.
 #ifndef Q_WS_MAC
-    this->setWindowIcon(QIcon(QString::fromAscii(":/qtads_48x48.png")));
+    this->setWindowIcon(QIcon(QString::fromLatin1(":/qtads_48x48.png")));
 #endif
 }
 
@@ -229,7 +229,7 @@ CHtmlSysFrameQt::fRunGame()
                 qWinGroup->setWindowTitle(finfo.fileName());
 #else
                 // On all other systems, also append the application name.
-                qWinGroup->setWindowTitle(finfo.fileName() + QString::fromAscii(" - ") + qFrame->applicationName());
+                qWinGroup->setWindowTitle(finfo.fileName() + QString::fromLatin1(" - ") + qFrame->applicationName());
 #endif
             } else {
                 qWinGroup->setWindowTitle(titleStr.trimmed());
@@ -290,7 +290,7 @@ CHtmlSysFrameQt::fRunGame()
             // Display a "game has ended" message. We use HTML, so Make sure
             // the parser is in markup mode.
             this->fParser->obey_markups(true);
-            QString endMsg(QString::fromAscii("<p><br><font face=tads-serif size=-1>(The game has ended.)</font></p>"));
+            QString endMsg(QString::fromLatin1("<p><br><font face=tads-serif size=-1>(The game has ended.)</font></p>"));
             this->display_output(endMsg.toUtf8().constData(), endMsg.length());
             this->flush_txtbuf(true, false);
         } else {
@@ -475,27 +475,27 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
         // The face name field can contain multiple face names separated by
         // commas.  We split them into a list and try each one individualy.
         bool matchFound = false;
-        const QStringList& strList = QString(QString::fromAscii(newFontDesc.face))
-                                     .split(QChar::fromAscii(','), QString::SkipEmptyParts);
+        const QStringList& strList = QString(QString::fromLatin1(newFontDesc.face))
+                                     .split(QChar::fromLatin1(','), QString::SkipEmptyParts);
         for (int i = 0; i < strList.size() and not matchFound; ++i) {
             const QString& s = strList.at(i).simplified().toLower();
-            if (s == QString::fromAscii(HTMLFONT_TADS_SERIF).toLower()) {
+            if (s == QString::fromLatin1(HTMLFONT_TADS_SERIF).toLower()) {
                 fontName = this->fSettings->serifFont.family();
                 base_point_size = this->fSettings->serifFont.pointSize();
                 matchFound = true;
-            } else if (s == QString::fromAscii(HTMLFONT_TADS_SANS).toLower()) {
+            } else if (s == QString::fromLatin1(HTMLFONT_TADS_SANS).toLower()) {
                 fontName = this->fSettings->sansFont.family();
                 base_point_size = this->fSettings->sansFont.pointSize();
                 matchFound = true;
-            } else if (s == QString::fromAscii(HTMLFONT_TADS_SCRIPT).toLower()) {
+            } else if (s == QString::fromLatin1(HTMLFONT_TADS_SCRIPT).toLower()) {
                 fontName = this->fSettings->scriptFont.family();
                 base_point_size = this->fSettings->scriptFont.pointSize();
                 matchFound = true;
-            } else if (s == QString::fromAscii(HTMLFONT_TADS_TYPEWRITER).toLower()) {
+            } else if (s == QString::fromLatin1(HTMLFONT_TADS_TYPEWRITER).toLower()) {
                 fontName = this->fSettings->writerFont.family();
                 base_point_size = this->fSettings->writerFont.pointSize();
                 matchFound = true;
-            } else if (s == QString::fromAscii(HTMLFONT_TADS_INPUT).toLower()) {
+            } else if (s == QString::fromLatin1(HTMLFONT_TADS_INPUT).toLower()) {
                 fontName = this->fSettings->inputFont.family();
                 base_point_size = this->fSettings->inputFont.pointSize();
                 if (newFontDesc.face_set_explicitly) {
@@ -508,7 +508,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
                     newFont.color(HTML_COLOR_INPUT);
                 }
                 matchFound = true;
-            } else if (s == QString::fromAscii("qtads-grid")) {
+            } else if (s == QString::fromLatin1("qtads-grid")) {
                 // "qtads-grid" is an internal face name; it means we should
                 // return a font suitable for a text grid banner.
                 fontName = this->fSettings->fixedFont.family();

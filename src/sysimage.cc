@@ -63,13 +63,13 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
 
     // Create an object of the appropriate class for the specified image type.
     // Also cast the object to a QTadsImage so we can loadFromData() later on.
-    if (imageType == QString::fromAscii("JPG") or imageType == QString::fromAscii("JPEG")) {
+    if (imageType == QString::fromLatin1("JPG") or imageType == QString::fromLatin1("JPEG")) {
         image = new CHtmlSysImageJpegQt;
         cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImageJpegQt*>(image));
-    } else if (imageType == QString::fromAscii("PNG")) {
+    } else if (imageType == QString::fromLatin1("PNG")) {
         image = new CHtmlSysImagePngQt;
         cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImagePngQt*>(image));
-    } else if (imageType == QString::fromAscii("MNG")) {
+    } else if (imageType == QString::fromLatin1("MNG")) {
         image = new CHtmlSysImageMngQt;
         mngCast = static_cast<CHtmlSysImageMngQt*>(image);
     } else {
@@ -87,14 +87,14 @@ createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned l
         return 0;
     }
 
-    if (imageType == QString::fromAscii("MNG")) {
+    if (imageType == QString::fromLatin1("MNG")) {
         QBuffer* buf = new QBuffer(mngCast);
         buf->setData(data);
         buf->open(QBuffer::ReadOnly);
         mngCast->setFormat("MNG");
         mngCast->setDevice(buf);
         mngCast->start();
-    } else if (not cast->loadFromData(data, imageType.toAscii())) {
+    } else if (not cast->loadFromData(data, imageType.toLatin1())) {
         qWarning() << "ERROR: Could not parse image data";
         delete image;
         return 0;
@@ -107,7 +107,7 @@ CHtmlSysResource*
 CHtmlSysImageJpeg::create_jpeg( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
                                 unsigned long filesize, CHtmlSysWin* win )
 {
-    return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("JPG"));
+    return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromLatin1("JPG"));
 }
 
 
@@ -115,7 +115,7 @@ CHtmlSysResource*
 CHtmlSysImagePng::create_png( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
                               unsigned long filesize, CHtmlSysWin* win )
 {
-    return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("PNG"));
+    return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromLatin1("PNG"));
 }
 
 
@@ -123,5 +123,5 @@ CHtmlSysResource*
 CHtmlSysImageMng::create_mng( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
                               unsigned long filesize, CHtmlSysWin* win )
 {
-    return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromAscii("MNG"));
+    return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromLatin1("MNG"));
 }

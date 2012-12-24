@@ -23,21 +23,21 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget *parent)
 
     // Construct a string holding all version info.
     QString str;
-    str += QString::fromAscii("<table border=\"0\" width=\"100%\"><tr><td>");
-    str += tr("QTads version:") + QString::fromAscii("</td><td>") + QString::fromAscii(QTADS_VERSION)
-           + QString::fromAscii("<br></td></tr><tr><td>")
-           + tr("HTML TADS version:") + QString::fromAscii("</td><td>\t")
-           + QString::fromAscii(HTMLTADS_VERSION) + QString::fromAscii("</td></tr><tr><td>")
-           + tr("TADS 2 virtual machine:") + QString::fromAscii("</td><td>\t")
-           + QString::fromAscii(TADS_RUNTIME_VERSION) + QString::fromAscii("</td></tr><tr><td>")
-           + tr("TADS 3 virtual machine:") + QString::fromAscii("</td><td>\t")
-           + QString::fromAscii(T3VM_VSN_STRING) + QString::fromAscii(" (")
-           + QString::fromAscii(T3VM_IDENTIFICATION)
-           + QString::fromAscii(")<br></td></tr><tr><td>")
-           + tr("Qt build version:") + QString::fromAscii("</td><td>") + QString::fromAscii(QT_VERSION_STR)
-           + QString::fromAscii("</td></tr><tr><td>")
-           + tr("Qt runtime version:") + QString::fromAscii("</td><td>") + QString::fromAscii(qVersion())
-           + QString::fromAscii("</td></tr></table>");
+    str += QString::fromLatin1("<table border=\"0\" width=\"100%\"><tr><td>");
+    str += tr("QTads version:") + QString::fromLatin1("</td><td>") + QString::fromLatin1(QTADS_VERSION)
+           + QString::fromLatin1("<br></td></tr><tr><td>")
+           + tr("HTML TADS version:") + QString::fromLatin1("</td><td>\t")
+           + QString::fromLatin1(HTMLTADS_VERSION) + QString::fromLatin1("</td></tr><tr><td>")
+           + tr("TADS 2 virtual machine:") + QString::fromLatin1("</td><td>\t")
+           + QString::fromLatin1(TADS_RUNTIME_VERSION) + QString::fromLatin1("</td></tr><tr><td>")
+           + tr("TADS 3 virtual machine:") + QString::fromLatin1("</td><td>\t")
+           + QString::fromLatin1(T3VM_VSN_STRING) + QString::fromLatin1(" (")
+           + QString::fromLatin1(T3VM_IDENTIFICATION)
+           + QString::fromLatin1(")<br></td></tr><tr><td>")
+           + tr("Qt build version:") + QString::fromLatin1("</td><td>") + QString::fromLatin1(QT_VERSION_STR)
+           + QString::fromLatin1("</td></tr><tr><td>")
+           + tr("Qt runtime version:") + QString::fromLatin1("</td><td>") + QString::fromLatin1(qVersion())
+           + QString::fromLatin1("</td></tr></table>");
     ui->versionInfoLabel->setText(str);
 }
 

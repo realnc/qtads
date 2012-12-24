@@ -64,10 +64,10 @@ int main( int argc, char** argv )
     if (args.size() == 2) {
         if (QFile::exists(args.at(1))) {
             gameFileName = args.at(1);
-        } else if (QFile::exists(args.at(1) + QString::fromAscii(".gam"))) {
-            gameFileName = args.at(1) + QString::fromAscii(".gam");
-        } else if (QFile::exists(args.at(1) + QString::fromAscii(".t3"))) {
-            gameFileName = args.at(1) + QString::fromAscii(".t3");
+        } else if (QFile::exists(args.at(1) + QString::fromLatin1(".gam"))) {
+            gameFileName = args.at(1) + QString::fromLatin1(".gam");
+        } else if (QFile::exists(args.at(1) + QString::fromLatin1(".t3"))) {
+            gameFileName = args.at(1) + QString::fromLatin1(".t3");
         } else {
             qWarning() << "File" << args.at(1) << "not found.";
         }
@@ -75,9 +75,9 @@ int main( int argc, char** argv )
 
     if (gameFileName.isEmpty() and app->settings()->askForGameFile) {
         gameFileName = QFileDialog::getOpenFileName(0, QObject::tr("Choose the TADS game you wish to run"),
-                                                    QString::fromAscii(""),
+                                                    QString::fromLatin1(""),
                                                     QObject::tr("TADS Games")
-                                                    + QString::fromAscii("(*.gam *.Gam *.GAM *.t3 *.T3)"));
+                                                    + QString::fromLatin1("(*.gam *.Gam *.GAM *.t3 *.T3)"));
     }
 
 #ifndef Q_OS_ANDROID

@@ -25,7 +25,11 @@
  */
 
 #include <QApplication>
-#include <QDesktopServices>
+#if QT_VERSION < 0x050000
+    #include <QDesktopServices>
+#else
+    #include <QStandardPaths>
+#endif
 #include <QDir>
 #include <QDateTime>
 #include <QTimer>
@@ -465,7 +469,12 @@ os_get_special_path( char* buf, size_t buflen, const char* /*argv0*/, int id )
         return;
 
       case OS_GSP_T3_APP_DATA: {
-        const QString& dirStr = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+        const QString& dirStr =
+        #if QT_VERSION < 0x050000
+                QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+        #else
+                QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+        #endif
         QDir dir(dirStr);
         // Create the directory if it doesn't exist.
         if (not dir.exists() and not dir.mkpath(dirStr)) {
@@ -570,7 +579,7 @@ osfdel_temp( const char* fname )
 int
 os_gen_temp_filename( char* buf, size_t buflen )
 {
-    QTemporaryFile tmpfile(QDir::tempPath() + QString::fromAscii("/qtads_XXXXXX"));
+    QTemporaryFile tmpfile(QDir::tempPath() + QString::fromLatin1("/qtads_XXXXXX"));
     // Don't automatically delete the file from disk. This is safer,
     // since another process could create a file with the same name
     // before our caller gets the chance to re-create the file.
@@ -823,7 +832,7 @@ canonicalize_path( char* path )
     if (not info.isDir()) {
         QString cleanFilename(QFile::decodeName(path));
         int i = cleanFilename.length();
-        while (cleanFilename[i] != QChar::fromAscii('/') and i > 0) {
+        while (cleanFilename[i] != QChar::fromLatin1('/') and i > 0) {
             --i;
         }
         canonPath.append(QFile::encodeName(cleanFilename.mid(i)));
@@ -1092,29 +1101,29 @@ os_askfile( const char* prompt, char* fname_buf, int fname_buf_len, int prompt_t
 
     switch (file_type) {
       case OSFTGAME:
-        filter = QObject::tr("TADS 2 Games") + QString::fromAscii(" (*.gam *.Gam *.GAM)");
+        filter = QObject::tr("TADS 2 Games") + QString::fromLatin1(" (*.gam *.Gam *.GAM)");
         break;
       case OSFTSAVE:
-        filter = QObject::tr("TADS 2 Saved Games") + QString::fromAscii(" (*.sav *.Sav *.SAV)");
+        filter = QObject::tr("TADS 2 Saved Games") + QString::fromLatin1(" (*.sav *.Sav *.SAV)");
         break;
       case OSFTLOG:
-        filter = QObject::tr("Game Transcripts") + QString::fromAscii(" (*.txt *.Txt *.TXT)");
+        filter = QObject::tr("Game Transcripts") + QString::fromLatin1(" (*.txt *.Txt *.TXT)");
         break;
       case OSFTT3IMG:
         Q_ASSERT(qFrame->tads3());
-        filter = QObject::tr("TADS 3 Games") + QString::fromAscii(" (*.t3 *.T3)");
+        filter = QObject::tr("TADS 3 Games") + QString::fromLatin1(" (*.t3 *.T3)");
         break;
       case OSFTT3SAV:
         Q_ASSERT(qFrame->tads3());
-        filter = QObject::tr("TADS 3 Saved Games") + QString::fromAscii(" (*.t3v *.T3v *.T3V)");
-        ext = QString::fromAscii("t3v");
+        filter = QObject::tr("TADS 3 Saved Games") + QString::fromLatin1(" (*.t3v *.T3v *.T3V)");
+        ext = QString::fromLatin1("t3v");
         break;
     }
 
     // Always provide an "All Files" filter.
     if (not filter.isEmpty()) {
-        filter.append(QString::fromAscii(";;"));
-        filter.append(QObject::tr("All Files") + QString::fromAscii(" (*)"));
+        filter.append(QString::fromLatin1(";;"));
+        filter.append(QObject::tr("All Files") + QString::fromLatin1(" (*)"));
     }
 
     QString promptStr;
@@ -1232,7 +1241,7 @@ os_input_dialog( int icon_id, const char* prompt, int standard_button_set, const
     }
     // We append a space to the window title to avoid the "<2>" that would
     // otherwise be appended automatically by some window managers (like KDE.)
-    dialog.setWindowTitle(qWinGroup->windowTitle() + QChar::fromAscii(' '));
+    dialog.setWindowTitle(qWinGroup->windowTitle() + QChar::fromLatin1(' '));
     dialog.exec();
     QAbstractButton* result = dialog.clickedButton();
     if (result == 0) {
@@ -1398,8 +1407,8 @@ os_gen_charmap_filename( char* filename, char* internal_id, char* /*argv0*/ )
     qDebug() << Q_FUNC_INFO;
     Q_ASSERT(filename != 0);
 
-    strncpy(filename, QFile::encodeName(QString::fromAscii(internal_id)
-                              + QString::fromAscii(".tcp")).constData(), OSFNMAX);
+    strncpy(filename, QFile::encodeName(QString::fromLatin1(internal_id)
+                              + QString::fromLatin1(".tcp")).constData(), OSFNMAX);
     filename[OSFNMAX - 1] = '\0';
 }
 
