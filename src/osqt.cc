@@ -1346,6 +1346,8 @@ os_set_save_ext( const char* )
 
 /* Generate the name of the character set mapping table for Unicode
  * characters to and from the given local character set.
+ *
+ * We use UTF-8 for everything, which should work on all platforms.
  */
 void
 os_get_charmap( char* mapname, int charmap_id )
@@ -1356,19 +1358,13 @@ os_get_charmap( char* mapname, int charmap_id )
 
     switch(charmap_id) {
       case OS_CHARMAP_DISPLAY:
-        // Always use UTF-8 for the display, regardless of the
-        // local charset; Qt uses Unicode for the display on
-        // every system.
-        strcpy(mapname, "utf8");
-        break;
       case OS_CHARMAP_FILENAME:
       case OS_CHARMAP_FILECONTENTS:
-        strcpy(mapname, QTextCodec::codecForLocale()->name());
+        strcpy(mapname, "utf-8");
         break;
       default:
         qWarning("os_get_charmap() got an unknown charmap id");
-        strcpy(mapname, QTextCodec::codecForLocale()->name());
-        break;
+        strcpy(mapname, "utf-8");
     }
 }
 
