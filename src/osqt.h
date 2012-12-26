@@ -35,6 +35,8 @@
     #endif
 #endif
 
+#define OSNOUI_OMIT_OS_FPRINTZ
+#define OSNOUI_OMIT_OS_FPRINT
 #define OSNOUI_OMIT_OS_CVT_URL_DIR
 #define OSNOUI_OMIT_TEMPFILE
 #define fname_memcmp memcmp
@@ -148,7 +150,11 @@ extern "C++" {
 #endif
 
 /* File handle structure for osfxxx functions. */
-typedef FILE osfildef;
+#ifdef __cplusplus
+typedef class QFile osfildef;
+#else
+typedef struct QFile osfildef;
+#endif
 
 /* The maximum width of a line of text.  We ignore this, but the base code
  * needs it defined.
@@ -170,9 +176,9 @@ typedef FILE osfildef;
 
 /* These values are used for the "mode" parameter of osfseek() to
  * indicate where to seek in the file. */
-#define OSFSK_SET SEEK_SET /* Set position relative to the start of the file. */
-#define OSFSK_CUR SEEK_CUR /* Set position relative to the current file position. */
-#define OSFSK_END SEEK_END /* Set position relative to the end of the file. */
+#define OSFSK_SET 0 /* Set position relative to the start of the file. */
+#define OSFSK_CUR 1 /* Set position relative to the current file position. */
+#define OSFSK_END 2 /* Set position relative to the end of the file. */
 
 /* File modes.  On Windows, we do the Microsoft thing.  Everywhere else, we
  * assume POSIX stat(2). */
@@ -232,31 +238,36 @@ typedef struct QDirIterator* osdirhdl_t;
 #define osrealloc realloc
 
 /* Open text file for reading. */
-#define osfoprt(fname,typ) (fopen((fname),"r"))
+osfildef*
+osfoprt( const char* fname, os_filetype_t );
 
 /* Open text file for writing. */
-#define osfopwt(fname,typ) (fopen((fname),"w"))
+osfildef*
+osfopwt( const char* fname, os_filetype_t );
 
 /* Open text file for reading and writing, keeping the file's existing
  * contents if the file already exists or creating a new file if no
  * such file exists. */
 osfildef*
-osfoprwt( const char* fname, os_filetype_t typ );
+osfoprwt( const char* fname, os_filetype_t );
 
 /* Open text file for reading/writing.  If the file already exists,
  * truncate the existing contents.  Create a new file if it doesn't
  * already exist. */
-#define osfoprwtt(fname,typ) (fopen((fname),"w+"))
+osfildef*
+osfoprwtt( const char* fname, os_filetype_t );
 
 /* Open binary file for writing. */
-#define osfopwb(fname,typ) (fopen((fname),"wb"))
+osfildef*
+osfopwb( const char* fname, os_filetype_t );
 
 /* Open source file for reading - use the appropriate text or binary
  * mode. */
 #define osfoprs osfoprt
 
 /* Open binary file for reading. */
-#define osfoprb(fname,typ) (fopen((fname),"rb"))
+osfildef*
+osfoprb( const char* fname, os_filetype_t );
 
 /* Open binary file for reading/writing.  If the file already exists,
  * keep the existing contents.  Create a new file if it doesn't already
@@ -267,37 +278,53 @@ osfoprwb( const char* fname, os_filetype_t typ );
 /* Open binary file for reading/writing.  If the file already exists,
  * truncate the existing contents.  Create a new file if it doesn't
  * already exist. */
-#define osfoprwtb(fname,typ) (fopen((fname),"w+b"))
+osfildef*
+osfoprwtb( const char* fname, os_filetype_t );
 
 /* Get a line of text from a text file. */
-#define osfgets fgets
+char*
+osfgets( char* buf, size_t len, osfildef* fp );
 
 /* Write a line of text to a text file. */
-#define osfputs fputs
+int
+osfputs( const char* buf, osfildef* fp );
 
 /* Write bytes to file. */
-#define osfwb(fp,buf,bufl) (fwrite((buf),(bufl),1,(fp))!=1)
+int
+osfwb( osfildef* fp, const void* buf, int bufl );
 
 /* Flush buffered writes to a file. */
-#define osfflush fflush
+int
+osfflush( osfildef* fp );
+
+/* Get a character from a file. */
+int
+osfgetc( osfildef* fp );
 
 /* Read bytes from file. */
-#define osfrb(fp,buf,bufl) (fread((buf),(bufl),1,(fp))!=1)
+int
+osfrb( osfildef* fp, void* buf, int bufl );
 
 /* Read bytes from file and return the number of bytes read. */
-#define osfrbc(fp,buf,bufl) (fread((buf),1,(bufl),(fp)))
+size_t
+osfrbc( osfildef* fp, void* buf, size_t bufl );
 
 /* Get the current seek location in the file. */
-#define osfpos ftell
+//#define osfpos ftell
+long
+osfpos( osfildef* fp );
 
 /* Seek to a location in the file. */
-#define osfseek fseek
+int
+osfseek( osfildef* fp, long pos, int mode );
 
 /* Close a file. */
-#define osfcls fclose
+void
+osfcls( osfildef* fp );
 
 /* Delete a file. */
-#define osfdel remove
+int
+osfdel( const char* fname );
 
 /* Rename a file. */
 int
@@ -311,9 +338,6 @@ osfacc( const char* fname );
 int
 osfmode( const char* fname, int follow_links, unsigned long* mode,
          unsigned long* attr );
-
-/* Get a character from a file. */
-#define osfgetc fgetc
 
 /* Allocating sprintf and vsprintf. */
 #define os_asprintf asprintf

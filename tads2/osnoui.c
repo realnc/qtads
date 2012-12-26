@@ -1602,19 +1602,23 @@ int os_gen_temp_filename(char *buf, size_t buflen)
 /*
  *   print a null-terminated string to osfildef* file 
  */
+#ifndef OSNOUI_OMIT_OS_FPRINTZ
 void os_fprintz(osfildef *fp, const char *str)
 {
     fprintf(fp, "%s", str);
 }
+#endif
 
 /* 
  *   print a counted-length string (which might not be null-terminated) to a
  *   file 
  */
+#ifndef OSNOUI_OMIT_OS_FPRINT
 void os_fprint(osfildef *fp, const char *str, size_t len)
 {
     fprintf(fp, "%.*s", (int)len, str);
 }
+#endif
 
 /* ------------------------------------------------------------------------ */
 

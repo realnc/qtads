@@ -3384,7 +3384,7 @@ void outflushn(int nl)
     if (logfp != 0)
     {
         outflushn_stream(&G_log_disp, nl);
-        fflush(logfp);
+        osfflush(logfp);
     }
 }
 

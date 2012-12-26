@@ -55,45 +55,91 @@
 
 /* --------------------------------------------------------------------
  * Basic file I/O interface.
- *
- * There's no need to implement this in a Qt-specific way, since we use only
- * portable functions from the standard C-library.  Qt is only used when it
- * makes things simpler or no Standard C alternative exists.
- *
- * Note that the code doesn't care if the system distinguishes between text and
- * binary files, since (as far as I know) the standard functions always do the
- * right thing; a "b" in the mode string is ignored on systems that treat text
- * and binary files the same (like most/all POSIX-systems).
  */
 
-/* Open text file for reading and writing.
- */
-osfildef*
-osfoprwt( const char* fname, os_filetype_t /*filetype*/ )
+static osfildef*
+createQFile( const char* fname, QFile::OpenMode mode )
 {
     Q_ASSERT(fname != 0);
 
-    // Try opening the file in read/write mode.
-    osfildef* fp = std::fopen(fname, "r+");
-
-    // If opening the file failed, it probably means that it doesn't exist.  In
-    // that case, create a new file in read/write mode.
-    if (fp == 0) fp = std::fopen(fname, "w+");
-    return fp;
+    QFile* file = new QFile(QString::fromUtf8(fname));
+    if (not file->open(mode)) {
+        delete file;
+        return 0;
+    }
+    return file;
 }
 
 
-/* Open binary file for reading/writing.
+/* Open text file for reading.
+ */
+osfildef*
+osfoprt( const char* fname, os_filetype_t )
+{
+    return createQFile(fname, QFile::ReadOnly | QFile::Text);
+}
+
+
+/* Open text file for writing.
+ */
+osfildef*
+osfopwt( const char* fname, os_filetype_t )
+{
+    return createQFile(fname, QFile::WriteOnly | QFile::Truncate | QFile::Text);
+}
+
+
+/* Open text file for reading and writing, keeping existing contents.
+ */
+osfildef*
+osfoprwt( const char* fname, os_filetype_t )
+{
+    return createQFile(fname, QFile::ReadWrite | QFile::Text);
+}
+
+
+/* Open text file for reading and writing, truncating existing contents.
+ */
+osfildef*
+osfoprwtt( const char* fname, os_filetype_t )
+{
+    return createQFile(fname, QFile::ReadWrite | QFile::Truncate | QFile::Text);
+}
+
+
+/* Open binary file for writing.
+ */
+osfildef*
+osfopwb( const char* fname, os_filetype_t )
+{
+    return createQFile(fname, QFile::WriteOnly | QFile::Truncate);
+}
+
+
+/* Open binary file for reading.
+ */
+osfildef*
+osfoprb( const char* fname, os_filetype_t )
+{
+    return createQFile(fname, QFile::ReadOnly);
+}
+
+
+/* Open binary file for reading and writing, keeping any existing contents.
  */
 osfildef*
 osfoprwb( const char* fname, os_filetype_t filetype )
 {
-    Q_ASSERT(fname != 0);
-    Q_ASSERT(filetype != OSFTLOG);
+    return createQFile(fname, QFile::ReadWrite);
+}
 
-    osfildef* fp = std::fopen(fname, "r+b");
-    if (fp == 0) fp = std::fopen(fname, "w+b");
-    return fp;
+
+/* Open binary file for reading and writing, truncating existing contents.
+ */
+osfildef*
+osfoprwtb( const char* fname, os_filetype_t )
+{
+    return createQFile(fname, QFile::ReadWrite | QFile::Truncate);
 }
 
 
@@ -102,50 +148,68 @@ osfoprwb( const char* fname, os_filetype_t filetype )
 osfildef*
 osfdup( osfildef* orig, const char* mode )
 {
-    char realmode[5];
-    char *p = realmode;
-    const char *m;
+    Q_ASSERT(orig != 0);
+    Q_ASSERT(mode != 0);
+    Q_ASSERT(mode[0] != '\0');
 
-    /* verify that there aren't any unrecognized mode flags */
-    for (m = mode ; *m != '\0' ; ++m)
-    {
-        if (strchr("rw+bst", *m) == 0)
-            return 0;
+    QFile::OpenMode qMode = 0;
+    size_t i = 0;
+
+    if (mode[i] == 'r') {
+        ++i;
+        if (mode[i] == '+') {
+            qMode = QFile::ReadWrite;
+            ++i;
+        } else {
+            qMode = QFile::ReadOnly;
+        }
+    } else if (mode[0] == 'w') {
+        ++i;
+        qMode = QFile::WriteOnly;
+    } else {
+        return 0;
     }
 
-    /* figure the read/write mode - translate r+ and w+ to r+ */
-    if ((mode[0] == 'r' || mode[0] == 'w') && mode[1] == '+')
-        *p++ = 'r', *p++ = '+';
-    else if (mode[0] == 'r')
-        *p++ = 'r';
-    else if (mode[0] == 'w')
-        *p++ = 'w';
-    else
+    if (mode[i] == 't' or mode[i] == 's' or mode[i] == '\0') {
+        qMode |= QFile::Text;
+    } else if (mode[i] == 'b') {
+        // Binary mode is the default; there's no explicit flag for it.
+    } else {
         return 0;
+    }
 
-    /* end the mode string */
-    *p = '\0';
-
-    /* duplicate the handle in the given mode */
-#ifdef Q_OS_WIN32
-    return _fdopen(_dup(_fileno(orig)), mode);
-#else
-    return fdopen(dup(fileno(orig)), mode);
-#endif
+    QFile* file = new QFile(0);
+    if (not file->open(orig->handle(), qMode)) {
+        delete file;
+        return 0;
+    }
+    return file;
 }
 
 
-#if 0
-/* Print a counted-length string (which might not be null-terminated)
- * to a file.
+/* Get a line of text from a text file.
  */
-void
-os_fprint( osfildef* fp, const char* str, size_t len )
+char*
+osfgets( char* buf, size_t len, osfildef* fp )
 {
+    Q_ASSERT(buf != 0);
     Q_ASSERT(fp != 0);
-    Q_ASSERT(str != 0);
 
-    std::fprintf(fp, "%.*s", static_cast<unsigned>(len), str);
+    if (fp->readLine(buf, len) != len) {
+        return 0;
+    }
+    return buf;
+}
+
+
+/* Write a line of text to a text file.
+ */
+int
+osfputs( const char* buf, osfildef* fp )
+{
+    if (fp->write(buf, qstrlen(buf)) < 1)
+        return EOF;
+    return 1;
 }
 
 
@@ -157,23 +221,151 @@ os_fprintz( osfildef* fp, const char* str )
     Q_ASSERT(fp != 0);
     Q_ASSERT(str != 0);
 
-    std::fprintf(fp, "%s", str);
+    fp->write(str, qstrlen(str));
 }
-#endif
 
 
+/* Print a counted-length string (which might not be null-terminated)
+ * to a file.
+ */
+void
+os_fprint( osfildef* fp, const char* str, size_t len )
+{
+    Q_ASSERT(fp != 0);
+    Q_ASSERT(str != 0);
+
+    fp->write(str, len);
+}
+
+
+/* Write bytes to file.
+ */
+int
+osfwb( osfildef* fp, const void* buf, int bufl )
+{
+    Q_ASSERT(fp != 0);
+    Q_ASSERT(buf != 0);
+
+    if (fp->write(static_cast<const char*>(buf), bufl) < 1)
+        return 1;
+    return 0;
+}
+
+
+/* Flush buffered writes to a file.
+ */
+int
+osfflush( osfildef* fp )
+{
+    Q_ASSERT(fp != 0);
+
+    if (not fp->flush())
+        return EOF;
+    return 0;
+}
+
+
+/* Get a character from a file.
+ */
+int
+osfgetc( osfildef* fp )
+{
+    Q_ASSERT(fp != 0);
+
+    char c;
+    if (not fp->getChar(&c))
+        return EOF;
+    return c;
+}
+
+
+/* Read bytes from file.
+ */
+int
+osfrb( osfildef* fp, void* buf, int bufl )
+{
+    Q_ASSERT(fp != 0);
+    Q_ASSERT(buf != 0);
+
+    return fp->read(static_cast<char*>(buf), bufl) != bufl;
+}
+
+
+/* Read bytes from file and return the number of bytes read.
+ */
+size_t
+osfrbc( osfildef* fp, void* buf, size_t bufl )
+{
+    Q_ASSERT(fp != 0);
+    Q_ASSERT(buf != 0);
+
+    int bytesRead = fp->read(static_cast<char*>(buf), bufl);
+    if (bytesRead < 0)
+        return 0;
+    return bytesRead;
+}
+
+
+/* Get the current seek location in the file.
+ */
+long
+osfpos( osfildef* fp )
+{
+    Q_ASSERT(fp != 0);
+
+    return fp->pos();
+}
+
+
+/* Seek to a location in the file.
+ */
+int
+osfseek( osfildef* fp, long pos, int mode )
+{
+    Q_ASSERT(fp != 0);
+
+    if (mode == OSFSK_CUR)
+        pos += fp->pos();
+    else if (mode == OSFSK_END)
+        pos += fp->size();
+    return not fp->seek(pos);
+}
+
+
+/* Close a file.
+ */
+void
+osfcls( osfildef* fp )
+{
+    delete fp;
+}
+
+
+/* Delete a file.
+ */
+int
+osfdel( const char* fname )
+{
+    return not QFile::remove(QString::fromUtf8(fname));
+}
+
+
+/* Rename a file.
+ */
 int
 os_rename_file( const char* oldname, const char* newname )
 {
-    return QFile::rename(QFile::decodeName(oldname),
-                         QFile::decodeName(newname));
+    return QFile::rename(QString::fromUtf8(oldname),
+                         QString::fromUtf8(newname));
 }
 
 
+/* Access a file - determine if the file exists.
+ */
 int
 osfacc( const char* fname )
 {
-    const QFileInfo info(QFile::decodeName(fname));
+    const QFileInfo info(QString::fromUtf8(fname));
     // Since exists() returns false for dangling symlinks, we need
     // to explicitly check whether it's a symlink or not.
     if (not info.exists() and not info.isSymLink()) {
@@ -519,14 +711,19 @@ os_create_tempfile( const char* fname, char* buf )
 {
     if (fname != 0 and fname[0] != '\0') {
         // A filename has been specified; use it.
-        return std::fopen(fname, "w+b");
+        return createQFile(fname, QFile::ReadWrite | QFile::Truncate);
     }
 
     Q_ASSERT(buf != 0);
 
-    // No filename needed; create a nameless temp-file.
+    // No filename was given; create a temporary file.
     buf[0] = '\0';
-    return std::tmpfile();
+    QTemporaryFile* file = new QTemporaryFile(QString::fromLatin1("/qtads_XXXXXX"));
+    if (not file->open()) {
+        delete file;
+        return 0;
+    }
+    return file;
 }
 
 
@@ -537,9 +734,9 @@ osfdel_temp( const char* fname )
 {
     Q_ASSERT(fname != 0);
 
-    if (fname[0] == '\0' or QFile::remove(QFile::decodeName(fname))) {
+    if (fname[0] == '\0' or QFile::remove(QString::fromUtf8(fname))) {
         // If fname was empty, it has been already deleted automatically by
-        // fclose().  If fname was not empty, QFile::remove has taken care of
+        // osfcls().  If fname was not empty, QFile::remove has taken care of
         // deleting the file.
         return 0;
     }
@@ -548,19 +745,32 @@ osfdel_temp( const char* fname )
 }
 
 
+/* This isn't actually used by the basecode.
+ */
+#if 0
+void
+os_get_tmp_path( char* buf )
+{
+}
+#endif
+
+
 /* Generate a name for a temporary file.
  */
 int
 os_gen_temp_filename( char* buf, size_t buflen )
 {
     QTemporaryFile tmpfile(QDir::tempPath() + QString::fromLatin1("/qtads_XXXXXX"));
+    if (not tmpfile.open()) {
+        return false;
+    }
+
     // Don't automatically delete the file from disk. This is safer,
     // since another process could create a file with the same name
     // before our caller gets the chance to re-create the file.
     tmpfile.setAutoRemove(false);
-    tmpfile.open();
-    const QByteArray& data = QFile::encodeName(tmpfile.fileName());
-    tmpfile.close();
+
+    const QByteArray& data = tmpfile.fileName().toUtf8();
     if (data.length() >= buflen) {
         // 'buf' isn't big enough to hold the result, including the
         // terminating '\0'.
