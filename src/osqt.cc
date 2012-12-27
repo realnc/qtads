@@ -434,7 +434,12 @@ os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
     s->mode = info.st_mode;
 #else
     struct stat buf;
-    if ((follow_links ? stat(fname, &buf) : lstat(fname, &buf)) != 0)
+    int statRet;
+    if (follow_links)
+        statRet = stat(QFile::encodeName(fnameStr).constData(), &buf);
+    else
+        statRet = lstat(QFile::encodeName(fnameStr).constData(), &buf);
+    if (statRet != 0)
         return false;
 
     s->sizelo = (uint32_t)(buf.st_size & 0xFFFFFFFF);
