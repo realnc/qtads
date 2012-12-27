@@ -717,7 +717,7 @@ CHtmlSysWinQt::draw_table_bkg( const CHtmlRect* pos, HTML_color_t bgcolor )
 
 
 void
-CHtmlSysWinQt::draw_dbgsrc_icon( const CHtmlRect* pos, unsigned int stat )
+CHtmlSysWinQt::draw_dbgsrc_icon( const CHtmlRect*, unsigned int )
 {
     qDebug() << Q_FUNC_INFO;
 }
@@ -846,7 +846,7 @@ CHtmlSysWinQt::register_timer_func( void (*timer_func)(void*), void* func_ctx )
 
 
 void
-CHtmlSysWinQt::unregister_timer_func( void (*timer_func)( void * ), void* func_ctx )
+CHtmlSysWinQt::unregister_timer_func( void (*timer_func)( void * ), void* )
 {
     for (int i = 0; i < this->fTimerList.size(); ++i) {
         if (this->fTimerList.at(i)->func_ == timer_func) {
@@ -968,7 +968,7 @@ CHtmlSysWinQt::advise_clearing_disp_list()
 
 
 void
-CHtmlSysWinQt::scroll_to_doc_coords( const CHtmlRect* pos )
+CHtmlSysWinQt::scroll_to_doc_coords( const CHtmlRect* )
 {
     qDebug() << Q_FUNC_INFO;
 
@@ -977,7 +977,7 @@ CHtmlSysWinQt::scroll_to_doc_coords( const CHtmlRect* pos )
 
 
 void
-CHtmlSysWinQt::get_scroll_doc_coords( CHtmlRect* pos )
+CHtmlSysWinQt::get_scroll_doc_coords( CHtmlRect* )
 {
     qDebug() << Q_FUNC_INFO;
 }
@@ -1044,10 +1044,10 @@ CHtmlSysWinQt::set_html_text_color( HTML_color_t color, int use_default )
 
 
 void
-CHtmlSysWinQt::set_html_link_colors( HTML_color_t link_color, int link_use_default,
-                     HTML_color_t vlink_color, int vlink_use_default,
-                     HTML_color_t alink_color, int alink_use_default,
-                     HTML_color_t hlink_color, int hlink_use_default )
+CHtmlSysWinQt::set_html_link_colors( HTML_color_t, int,
+                     HTML_color_t, int,
+                     HTML_color_t, int,
+                     HTML_color_t, int )
 {
     //qDebug() << Q_FUNC_INFO;
 }
@@ -1216,7 +1216,7 @@ CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
 
 
 void
-CHtmlSysWinQt::inval_html_bg_image( unsigned int x, unsigned int y, unsigned int wid, unsigned int ht )
+CHtmlSysWinQt::inval_html_bg_image( unsigned int, unsigned int, unsigned int, unsigned int )
 {
     //qDebug() << Q_FUNC_INFO;
 }

@@ -35,7 +35,7 @@
 
 
 void
-QTadsFrame::resizeEvent( QResizeEvent* e )
+QTadsFrame::resizeEvent( QResizeEvent* )
 {
     qFrame->reformatBanners(true, true, false);
 }
@@ -325,7 +325,7 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
 }
 
 void
-CHtmlSysWinGroupQt::fErrorOccurred( QNetworkReply::NetworkError code )
+CHtmlSysWinGroupQt::fErrorOccurred( QNetworkReply::NetworkError )
 {
     QMessageBox* msg = new QMessageBox(QMessageBox::Critical, tr("Check for Updates - Error"),
                                        tr("It was not possible to retrieve update information. Please try again later,"
@@ -690,7 +690,7 @@ CHtmlSysWinGroupQt::get_default_win_charset() const
 
 size_t
 CHtmlSysWinGroupQt::xlat_html4_entity( textchar_t* result, size_t result_size, unsigned int charval,
-                                       oshtml_charset_id_t* charset, int* changed_charset )
+                                       oshtml_charset_id_t*, int* changed_charset )
 {
     //qDebug() << Q_FUNC_INFO << "called";
     Q_ASSERT(result != 0);

@@ -48,8 +48,8 @@ CHtmlSysWinAboutBoxQt::sizeHint() const
 
 
 void
-CHtmlSysWinAboutBoxQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,
-                                        long height, HTML_BannerWin_Units_t height_units, int use_height )
+CHtmlSysWinAboutBoxQt::set_banner_size( long width, HTML_BannerWin_Units_t, int,
+                                        long height, HTML_BannerWin_Units_t height_units, int )
 {
     this->bannerSize = height;
     this->bannerSizeUnits = height_units;

@@ -153,7 +153,7 @@ osfoprb( const char* fname, os_filetype_t )
 /* Open binary file for reading and writing, keeping any existing contents.
  */
 osfildef*
-osfoprwb( const char* fname, os_filetype_t filetype )
+osfoprwb( const char* fname, os_filetype_t )
 {
     return createQFile(fname, QFile::ReadWrite);
 }
@@ -220,7 +220,7 @@ osfgets( char* buf, size_t len, osfildef* fp )
     Q_ASSERT(buf != 0);
     Q_ASSERT(fp != 0);
 
-    if (fp->readLine(buf, len) != len) {
+    if (fp->readLine(buf, len) != static_cast<qint64>(len)) {
         return 0;
     }
     return buf;
@@ -488,7 +488,7 @@ int
 os_resolve_symlink( const char* fname, char* target, size_t target_size )
 {
     const QByteArray& str = qStrToFname(QFileInfo(fnameToQStr(fname)).symLinkTarget());
-    if (str.isEmpty() or str.size() >= target_size) {
+    if (str.isEmpty() or str.size() >= static_cast<int>(target_size)) {
         return false;
     }
     qstrcpy(target, str.constData());
@@ -516,7 +516,7 @@ os_get_root_dirs( char* buf, size_t buflen )
     // The whole result must end with two NULL bytes.
     str += '\0';
 
-    if (buf != 0 and buflen >= str.size()) {
+    if (buf != 0 and static_cast<int>(buflen) >= str.size()) {
         memcpy(buf, str.constData(), str.size());
     }
     return str.size();
@@ -541,7 +541,7 @@ int
 os_read_dir( osdirhdl_t handle, char* fname, size_t fname_size )
 {
     const QByteArray& str = qStrToFname(handle->fileName());
-    if (str.isEmpty() or str.size() >= fname_size) {
+    if (str.isEmpty() or str.size() >= static_cast<int>(fname_size)) {
         return false;
     }
     qstrcpy(fname, str.constData());
@@ -795,7 +795,7 @@ os_gen_temp_filename( char* buf, size_t buflen )
     tmpfile.setAutoRemove(false);
 
     const QByteArray& data = qStrToFname(tmpfile.fileName());
-    if (data.length() >= buflen) {
+    if (data.length() >= static_cast<int>(buflen)) {
         // 'buf' isn't big enough to hold the result, including the
         // terminating '\0'.
         return false;
@@ -988,7 +988,7 @@ os_get_abs_filename( char* result_buf, size_t result_buf_size, const char* filen
 
     const QByteArray& data = qStrToFname(QFileInfo(fnameToQStr(filename)).absoluteFilePath());
     qstrncpy(result_buf, data.constData(), result_buf_size);
-    if (data.length() >= result_buf_size) {
+    if (data.length() >= static_cast<int>(result_buf_size)) {
         // Result didn't fit in 'result_buf'.
         return false;
     }
@@ -1234,7 +1234,7 @@ os_gen_rand_bytes( unsigned char* buf, size_t len )
     QFile rdev(QString::fromLatin1("/dev/urandom"));
     if (rdev.open(QFile::ReadOnly)) {
         qint64 bytesRead = rdev.read(reinterpret_cast<char*>(buf), len);
-        if (bytesRead >= len)
+        if (bytesRead >= static_cast<qint64>(len))
             return;
         if (bytesRead > 0) {
             // For whatever reason, we couldn't read the requested amount of
@@ -1743,7 +1743,8 @@ os_get_sysinfo( int code, void* /*param*/, long* result )
  */
 // FIXME: Just a dummy implementation for now.
 int
-os_show_popup_menu( int default_pos, int x, int y, const char* txt, size_t txtlen, union os_event_info_t* evt )
+os_show_popup_menu( int /*default_pos*/, int /*x*/, int /*y*/, const char* /*txt*/,
+                    size_t /*txtlen*/, union os_event_info_t* /*evt*/ )
 {
     if (qFrame->gameRunning()) {
         return OSPOP_FAIL;
@@ -1756,12 +1757,12 @@ os_show_popup_menu( int default_pos, int x, int y, const char* txt, size_t txtle
  */
 // FIXME: Just a dummy implementation for now.
 void
-os_enable_cmd_event( int id, unsigned int status )
+os_enable_cmd_event( int /*id*/, unsigned int /*status*/ )
 {
 }
 
 
 void
-os_init_ui_after_load( class CVmBifTable* bif_table, class CVmMetaTable* meta_table)
+os_init_ui_after_load( class CVmBifTable* /*bif_table*/, class CVmMetaTable* /*meta_table*/)
 {
 }

@@ -83,14 +83,14 @@ DisplayWidget::mouseMoveEvent( QMouseEvent* e )
 
 
 void
-DisplayWidget::leaveEvent( QEvent* e )
+DisplayWidget::leaveEvent( QEvent* )
 {
     this->fInvalidateLinkTracking();
 }
 
 
 void
-DisplayWidget::mousePressEvent( QMouseEvent* e )
+DisplayWidget::mousePressEvent( QMouseEvent* )
 {
     if (this->fHoverLink == 0) {
         // We're not hover-tracking a link; there's nothing to do here.
@@ -107,7 +107,7 @@ DisplayWidget::mousePressEvent( QMouseEvent* e )
 
 
 void
-DisplayWidget::mouseReleaseEvent( QMouseEvent* e )
+DisplayWidget::mouseReleaseEvent( QMouseEvent* )
 {
     if (this->fClickedLink == 0) {
         // We're not click-tracking a link; there's nothing to do here.

@@ -288,7 +288,7 @@ osfoprb( const char* fname, os_filetype_t );
  * keep the existing contents.  Create a new file if it doesn't already
  * exist. */
 osfildef*
-osfoprwb( const char* fname, os_filetype_t typ );
+osfoprwb( const char* fname, os_filetype_t );
 
 /* Open binary file for reading/writing.  If the file already exists,
  * truncate the existing contents.  Create a new file if it doesn't

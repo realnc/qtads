@@ -70,7 +70,7 @@ class CHtmlSysSoundMidiQt: public CHtmlSysSoundMidi {
                 const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade ) override;
 
     void
-    add_crossfade( CHtmlSysWin* win, long ms ) override
+    add_crossfade( CHtmlSysWin*, long ) override
     { qDebug() << Q_FUNC_INFO; }
 
     void

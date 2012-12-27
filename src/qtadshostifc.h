@@ -108,7 +108,7 @@ class QTadsHostIfc: public CVmHostIfc {
 
     // FIXME: Implement
     void
-    set_net_safety( int client_level, int server_level ) override
+    set_net_safety( int /*client_level*/, int /*server_level*/ ) override
     {
     }
 

@@ -45,7 +45,7 @@ class CHtmlSysImageJpegQt: public QTadsImage, public CHtmlSysImageJpeg {
     { return QTadsImage::height(); }
 
     int
-    map_palette( CHtmlSysWin* win, int foreground ) override
+    map_palette( CHtmlSysWin*, int ) override
     { return false; }
 };
 

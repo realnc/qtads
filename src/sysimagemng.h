@@ -82,7 +82,7 @@ class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
     { return this->frameRect().height(); }
 
     int
-    map_palette( CHtmlSysWin* win, int foreground ) override
+    map_palette( CHtmlSysWin*, int ) override
     { return false; }
 
     void
@@ -90,7 +90,7 @@ class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
     { qDebug() << Q_FUNC_INFO; }
 
     void
-    notify_image_change( int x, int y, int wid, int ht ) override
+    notify_image_change( int, int, int, int ) override
     { qDebug() << Q_FUNC_INFO; }
 };
 

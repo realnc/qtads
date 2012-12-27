@@ -92,9 +92,9 @@ CHtmlSysSoundMidiQt::callback()
 
 
 int
-CHtmlSysSoundMidiQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count),
-                                 void* done_func_ctx, int repeat, const textchar_t* url, int vol,
-                                 long fade_in, long fade_out, int crossfade )
+CHtmlSysSoundMidiQt::play_sound( CHtmlSysWin*, void (*done_func)(void*, int repeat_count),
+                                 void* done_func_ctx, int repeat, const textchar_t* /*url*/, int vol,
+                                 long /*fade_in*/, long /*fade_out*/, int /*crossfade*/ )
 #ifndef Q_OS_ANDROID
 {
     //qDebug() << "play_sound url:" << url << "repeat:" << repeat;
@@ -143,7 +143,7 @@ CHtmlSysSoundMidiQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 
 
 void
-CHtmlSysSoundMidiQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
+CHtmlSysSoundMidiQt::cancel_sound( CHtmlSysWin*, int, long, int )
 #ifndef Q_OS_ANDROID
 {
     //qDebug() << Q_FUNC_INFO;
@@ -163,8 +163,8 @@ CHtmlSysSoundMidiQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms,
 
 
 CHtmlSysResource*
-CHtmlSysSoundMidi::create_midi( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-                                unsigned long filesize, CHtmlSysWin* win )
+CHtmlSysSoundMidi::create_midi( const CHtmlUrl* /*url*/, const textchar_t* filename, unsigned long seekpos,
+                                unsigned long filesize, CHtmlSysWin* )
 #ifndef Q_OS_ANDROID
 {
     //qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
@@ -207,8 +207,8 @@ CHtmlSysSoundMidi::create_midi( const CHtmlUrl* url, const textchar_t* filename,
  * CHtmlSysSoundWavQt
  */
 int
-CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count),
-                                void* done_func_ctx, int repeat, const textchar_t* url, int vol,
+CHtmlSysSoundWavQt::play_sound( CHtmlSysWin*, void (*done_func)(void*, int repeat_count),
+                                void* done_func_ctx, int repeat, const textchar_t* /*url*/, int vol,
                                 long fade_in, long fade_out, int crossfade )
 #ifndef Q_OS_ANDROID
 {
@@ -223,7 +223,7 @@ CHtmlSysSoundWavQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 
 
 void
-CHtmlSysSoundWavQt::add_crossfade( CHtmlSysWin* win, long ms )
+CHtmlSysSoundWavQt::add_crossfade( CHtmlSysWin*, long ms )
 #ifndef Q_OS_ANDROID
 {
     this->addCrossFade(ms);
@@ -235,7 +235,7 @@ CHtmlSysSoundWavQt::add_crossfade( CHtmlSysWin* win, long ms )
 
 
 void
-CHtmlSysSoundWavQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
+CHtmlSysSoundWavQt::cancel_sound( CHtmlSysWin*, int sync, long fade_out_ms, int fade_in_bg )
 #ifndef Q_OS_ANDROID
 {
     //qDebug() << Q_FUNC_INFO;
@@ -259,8 +259,8 @@ CHtmlSysSoundWavQt::resume()
  * CHtmlSysSoundOggQt
  */
 int
-CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count),
-                                void* done_func_ctx, int repeat, const textchar_t* url, int vol,
+CHtmlSysSoundOggQt::play_sound( CHtmlSysWin*, void (*done_func)(void*, int repeat_count),
+                                void* done_func_ctx, int repeat, const textchar_t*, int vol,
                                 long fade_in, long fade_out, int crossfade )
 {
     //qDebug() << "play_sound url:" << url << "repeat:" << repeat;
@@ -273,7 +273,7 @@ CHtmlSysSoundOggQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int r
 
 
 void
-CHtmlSysSoundOggQt::add_crossfade( CHtmlSysWin* win, long ms )
+CHtmlSysSoundOggQt::add_crossfade( CHtmlSysWin*, long ms )
 {
 #ifndef Q_OS_ANDROID
     this->addCrossFade(ms);
@@ -282,7 +282,7 @@ CHtmlSysSoundOggQt::add_crossfade( CHtmlSysWin* win, long ms )
 
 
 void
-CHtmlSysSoundOggQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
+CHtmlSysSoundOggQt::cancel_sound( CHtmlSysWin*, int sync, long fade_out_ms, int fade_in_bg )
 {
     //qDebug() << Q_FUNC_INFO;
 
@@ -303,8 +303,8 @@ CHtmlSysSoundOggQt::resume()
  * CHtmlSysSoundMpegQt
  */
 int
-CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count),
-                                 void* done_func_ctx, int repeat, const textchar_t* url, int vol,
+CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin*, void (*done_func)(void*, int repeat_count),
+                                 void* done_func_ctx, int repeat, const textchar_t* /*url*/, int vol,
                                  long fade_in, long fade_out, int crossfade )
 {
     //qDebug() << "play_sound url:" << url << "repeat:" << repeat;
@@ -317,7 +317,7 @@ CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin* win, void (*done_func)(void*, int 
 
 
 void
-CHtmlSysSoundMpegQt::add_crossfade( CHtmlSysWin* win, long ms )
+CHtmlSysSoundMpegQt::add_crossfade( CHtmlSysWin*, long ms )
 {
 #ifndef Q_OS_ANDROID
     this->addCrossFade(ms);
@@ -326,7 +326,7 @@ CHtmlSysSoundMpegQt::add_crossfade( CHtmlSysWin* win, long ms )
 
 
 void
-CHtmlSysSoundMpegQt::cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg )
+CHtmlSysSoundMpegQt::cancel_sound( CHtmlSysWin*, int sync, long fade_out_ms, int fade_in_bg )
 {
     //qDebug() << Q_FUNC_INFO;
 

@@ -30,8 +30,8 @@
  * QImageReader::supportedImageFormats() (like "JPG", "PNG", etc.)
  */
 static CHtmlSysResource*
-createImageFromFile( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-                     unsigned long filesize, CHtmlSysWin* win, const QString& imageType )
+createImageFromFile( const CHtmlUrl* /*url*/, const textchar_t* filename, unsigned long seekpos,
+                     unsigned long filesize, CHtmlSysWin* /*win*/, const QString& imageType )
 {
     //qDebug() << "Loading" << imageType << "image from" << filename << "at offset" << seekpos
     //      << "with size" << filesize << "url:" << url->get_url();
