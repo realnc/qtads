@@ -13,7 +13,7 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     // On Mac OS X, the dialog should not have any buttons.
     ui->buttonBox->setStandardButtons(QDialogButtonBox::NoButton);
 #else

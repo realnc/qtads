@@ -41,7 +41,7 @@
 
 // Static OS X builds need the Qt codec plugins.
 #ifndef NO_STATIC_TEXTCODEC_PLUGINS
-#  if defined(Q_WS_MAC)
+#  if defined(Q_OS_MAC)
 #    include <QtPlugin>
      Q_IMPORT_PLUGIN(qcncodecs)
      Q_IMPORT_PLUGIN(qjpcodecs)

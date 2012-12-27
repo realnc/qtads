@@ -160,7 +160,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     void
     checkForUpdates();
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     // Handler for FileOpen events.  They only occur in OS X.
     bool
     handleFileOpenEvent( class QFileOpenEvent* e );

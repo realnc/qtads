@@ -101,7 +101,7 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 
     // Set application window icon, unless we're on OS X where the bundle
     // icon is used.
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MAC
     this->setWindowIcon(QIcon(QString::fromLatin1(":/qtads_48x48.png")));
 #endif
 }
@@ -224,7 +224,7 @@ CHtmlSysFrameQt::fRunGame()
                     = GameInfoDialog::getMetaInfo(qStrToFname(finfo.absoluteFilePath())).plainGameName;
             if (titleStr.simplified().isEmpty()) {
                 // The game doesn't provide a game name.  Just use the filename.
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
                 // Just use the filename on OS X.  Seems to be the norm there.
                 qWinGroup->setWindowTitle(finfo.fileName());
 #else
@@ -338,7 +338,7 @@ CHtmlSysFrameQt::fRunT3Game( const QString& fname )
 }
 
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 #include <QFileOpenEvent>
 bool
 CHtmlSysFrameQt::event( QEvent* e )

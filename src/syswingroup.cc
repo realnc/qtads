@@ -190,7 +190,7 @@ CHtmlSysWinGroupQt::fAskQuitGameDialog()
     msgBox->setInformativeText(tr("This action will try to forcibly quit the game. Some games do not properly"
                                   " support this and can leave a stale process running in the background."
                                   " You should issue an in-game \"quit\" command in such cases."));
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
     // This presents the dialog as a sheet in OS X.
     msgBox->setWindowModality(Qt::WindowModal);
@@ -220,7 +220,7 @@ CHtmlSysWinGroupQt::fAskRestartGameDialog()
     msgBox->setInformativeText(tr("This action will try to forcibly quit and then restart the game. Some games"
                                   " do not properly support this and can leave a stale process running in the"
                                   " background. You should issue an in-game \"restart\" command in such cases."));
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
     // This presents the dialog as a sheet in OS X.
     msgBox->setWindowModality(Qt::WindowModal);
@@ -295,7 +295,7 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
         if (text.length() > 2) {
             msgBox->setDetailedText(text);
         }
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
         msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
 #else
         msgBox->setIcon(QMessageBox::Question);
@@ -309,7 +309,7 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
             QDesktopServices::openUrl(QUrl(QString::fromLatin1("http://qtads.sourceforge.net/downloads.shtml")));
         }
     } else if (not this->fSilentIfNoUpdates) {
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
         msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
 #else
         msgBox->setIcon(QMessageBox::Information);
@@ -377,7 +377,7 @@ CHtmlSysWinGroupQt::fShowConfDialog()
     this->fConfDialog = new ConfDialog(this);
     this->fConfDialog->setWindowTitle(tr("QTads Preferences"));
     connect(this->fConfDialog, SIGNAL(finished(int)), this, SLOT(fHideConfDialog()));
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     // There's a bug in Qt for OS X that results in a visual glitch with
     // QFontComboBox widgets inside QFormLayouts.  Making the dialog 4 pixels
     // higher fixes it.
@@ -449,7 +449,7 @@ CHtmlSysWinGroupQt::fShowAboutQtads()
 
     this->fAboutQtadsDialog = new AboutQtadsDialog(this);
     connect(this->fAboutQtadsDialog, SIGNAL(finished(int)), this, SLOT(fHideAboutQtads()));
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     // Similar bug to the config dialog one.  Again, 4 pixels higher fixes it.
     this->fAboutQtadsDialog->layout()->activate();
     this->fAboutQtadsDialog->setMinimumHeight(this->fAboutQtadsDialog->minimumHeight() + 4);
@@ -543,7 +543,7 @@ CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
     msgBox->setInformativeText(tr("This action will try to forcibly quit the game. Some games do not properly"
                                   " support this and can leave a stale process running in the background."
                                   " You should issue an in-game \"quit\" command first in such cases."));
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
     // This presents the dialog as a sheet in OS X.
     msgBox->setWindowModality(Qt::WindowModal);
@@ -663,7 +663,7 @@ CHtmlSysWinGroupQt::checkForUpdates()
 }
 
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 bool
 CHtmlSysWinGroupQt::handleFileOpenEvent( class QFileOpenEvent* e )
 {

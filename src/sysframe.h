@@ -99,7 +99,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
     void
     fRunT3Game( const QString& fname );
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
   protected:
     // On the Mac, dropping a file on our application icon will generate a
     // FileOpen event, so we override this to be able to handle it.
@@ -234,7 +234,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 
         // DeferredDelete events need to be dispatched manually, since we don't
         // return to the main event loop while a game is running.
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MAC
         // On OS X, this causes CPU utilization to go through the roof.  Not
         // sure why.  Disable this for now on OS X until further information
         // is available on this.
@@ -257,7 +257,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
         }
         working = true;
 
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MAC
         this->sendPostedEvents(0, QEvent::DeferredDelete);
 #endif
         this->sendPostedEvents();
