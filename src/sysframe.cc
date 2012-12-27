@@ -176,7 +176,7 @@ CHtmlSysFrameQt::fRunGame()
         QDir::setCurrent(finfo.absolutePath());
 
         // Run the appropriate TADS VM.
-        int vmType = vm_get_game_type(QFile::encodeName(finfo.absoluteFilePath()).constData(), 0, 0, 0, 0);
+        int vmType = vm_get_game_type(qStrToFname(finfo.absoluteFilePath()).constData(), 0, 0, 0, 0);
         if (vmType == VM_GGT_TADS2 or vmType == VM_GGT_TADS3) {
             // Delete all HTML and orphaned banners.
             while (not this->fOrhpanBannerList.isEmpty()) {
@@ -221,7 +221,7 @@ CHtmlSysFrameQt::fRunGame()
             // the game we're running or the game's name as at appears in the
             // gameinfo. The game is free to change that later on.
             const QString& titleStr
-                    = GameInfoDialog::getMetaInfo(QFile::encodeName(finfo.absoluteFilePath())).plainGameName;
+                    = GameInfoDialog::getMetaInfo(qStrToFname(finfo.absoluteFilePath())).plainGameName;
             if (titleStr.simplified().isEmpty()) {
                 // The game doesn't provide a game name.  Just use the filename.
 #ifdef Q_WS_MAC
@@ -311,8 +311,8 @@ CHtmlSysFrameQt::fRunT2Game( const QString& fname )
 
     // T2 requires argc/argv style arguments.
     char argv0[] = "qtads";
-    char* argv1 = new char[QFile::encodeName(fname).size() + 1];
-    strcpy(argv1, QFile::encodeName(fname).constData());
+    char* argv1 = new char[qStrToFname(fname).size() + 1];
+    strcpy(argv1, qStrToFname(fname).constData());
     char* argv[2] = {argv0, argv1};
 
     // We always use .sav as the extension for T2 save files.
@@ -331,7 +331,7 @@ CHtmlSysFrameQt::fRunT3Game( const QString& fname )
     // vm_run_image_params doesn't copy the filename string but stores
     // the pointer directly.  We therefore need to hold a reference to
     // the data so that it won't go out of scope.
-    const QByteArray& fnameData = QFile::encodeName(fname);
+    const QByteArray& fnameData = qStrToFname(fname);
     vm_run_image_params params(this->fClientifc, this->fHostifc, fnameData.constData());
     this->fTads3 = true;
     vm_run_image(&params);

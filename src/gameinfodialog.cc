@@ -114,7 +114,7 @@ loadCoverArtImage()
                              &offset, &size);
 
     // Check if the file exists and is readable.
-    QFileInfo inf(QFile::decodeName(strBuf.get()));
+    QFileInfo inf(fnameToQStr(strBuf.get()));
     if (not inf.exists() or not inf.isReadable()) {
         qWarning() << "ERROR:" << inf.filePath() << "doesn't exist or is unreadable";
         return QImage();

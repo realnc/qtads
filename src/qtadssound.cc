@@ -295,7 +295,7 @@ QTadsSound::createSound( const CHtmlUrl* url, const textchar_t* filename, unsign
     //      << "url:" << url->get_url();
 
     // Check if the file exists and is readable.
-    QFileInfo inf(QFile::decodeName(filename));
+    QFileInfo inf(fnameToQStr(filename));
     if (not inf.exists() or not inf.isReadable()) {
         qWarning() << "ERROR:" << inf.filePath() << "doesn't exist or is unreadable";
         return 0;
