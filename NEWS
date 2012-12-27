@@ -6,7 +6,16 @@ Git
     general affected all systems where it's possible to have absolute paths
     that don't start with a path seperator ('/' or '\').
 
-  - The TADS 3 VM no longer produces the same sequence of random numbers.
+  - File handling should now be fully internationalized. File paths and
+    filenames (saved games, transcripts, game files, etc.) should now work in
+    any language on all systems.
+
+  - The TADS 3 VM no longer produces the same sequence of random numbers every
+    time the interpreter is launched.
+
+  - For those of you who like to build QTads from source, you now build it
+    against Qt 5. The released binaries will still be using Qt 4 though, since
+    it's well tested.
 
 
 2.1.5 - 2012/09/02
