@@ -407,13 +407,22 @@ extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 int
 os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
 {
+    Q_ASSERT(fname != 0);
+    Q_ASSERT(s != 0);
+
+    const QString& fnameStr = fnameToQStr(fname);
+
 #ifdef Q_OS_WIN32
     struct __stat64 info;
 
-    // $$$ we should support Windows symlinks and junction points
+    // Get a UTF-16 version of the filename and NULL-terminate it.
+    wchar_t* wFname = new wchar_t[fnameStr.length() + 1];
+    wFname[fnameStr.toWCharArray(wFname)] = L'\0';
 
-    /* get the file information */
-    if (_stat64(fname, &info))
+    // Get the file information.
+    int statRet = _wstat64(wFname, &info);
+    delete[] wFname;
+    if (statRet != 0)
         return FALSE;
 
     /* translate the status fields */
@@ -444,7 +453,7 @@ os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
     if (osfacc(fname) != 0) {
         return false;
     }
-    QFileInfo inf(fnameToQStr(fname));
+    QFileInfo inf(fnameStr);
     bool isLink = inf.isSymLink();
 #ifdef Q_OS_WIN32
     // Don't treat shortcut files as symlinks.
