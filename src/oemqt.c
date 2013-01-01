@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 Nikos Chantziaras.
+/* Copyright (C) 2013 Nikos Chantziaras.
  *
  * This file is part of the QTads program.  This program is free software; you
  * can redistribute it and/or modify it under the terms of the GNU General
@@ -26,5 +26,5 @@ char G_tads_oem_app_name[] = "QTads "QTADS_VERSION;
 char G_tads_oem_dbg_name[] = ""; /* No debugger for Qt (yet). */
 char G_tads_oem_display_mode[] = "multimedia";
 char G_tads_oem_author[] =
-    "QTads copyright (c) 2003, 2012 by Nikos Chantziaras <realnc@gmail.com>\n";
+    "QTads copyright (C) 2013 by Nikos Chantziaras <realnc@gmail.com>\n";
 int G_tads_oem_copyright_prefix = TRUE;

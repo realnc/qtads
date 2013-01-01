@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 Nikos Chantziaras.
+/* Copyright (C) 2013 Nikos Chantziaras.
  *
  * This file is part of the QTads program.  This program is free software; you
  * can redistribute it and/or modify it under the terms of the GNU General

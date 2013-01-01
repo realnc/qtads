@@ -28,7 +28,7 @@ VS_VERSION_INFO VERSIONINFO
 				VALUE "FileDescription", "QTads - A TADS Interpreter"
 				VALUE "FileVersion", QTADS_VERSION
 				VALUE "ProductVersion", QTADS_VERSION
-				VALUE "LegalCopyright", "Copyright 2012, Michael J. Roberts; 2012, Nikos Chantziaras"
+				VALUE "LegalCopyright", "Copyright 2013, Michael J. Roberts; 2013, Nikos Chantziaras"
 				VALUE "OriginalFilename", "QTads.exe"
 				VALUE "ProductName", "QTads"
 			END
