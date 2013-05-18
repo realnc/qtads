@@ -1766,7 +1766,7 @@ void CVmObjTads::restore_from_file(VMG_ vm_obj_id_t self,
      *   saved again, even if we're not modified between now and the next
      *   save.
      */
-    hdr->intern_obj_flags |= VMTO_OBJ_MOD;
+    get_hdr()->intern_obj_flags |= VMTO_OBJ_MOD;
 }
 
 /* ------------------------------------------------------------------------ */

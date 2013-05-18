@@ -377,7 +377,7 @@ public:
         case OSFSK_SET:
         do_set:
             /* check that 'ofs' is in range */
-            if (ofs < 0 || (unsigned long)ofs > end)
+            if (ofs < 0 || (unsigned long)ofs > end - start)
                 return 1;
 
             /* seek to the offset */

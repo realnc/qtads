@@ -888,26 +888,68 @@ int CHtmlTagCharset::add_attrs(class CHtmlFormatter *,
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   Entity character inserter 
+ */
+void CHtmlTagEntityInserter::on_parse(
+    CHtmlParser *parser, int charcode, const char *fallback)
+{
+    /* translate the entity */
+    len_ = parser->get_sys_frame()->xlat_html4_entity(
+        txt_, sizeof(txt_), charcode, &charset_, &has_charset_);
+
+    /* if it was too long, use the fallback */
+    if (len_ > sizeof(txt_))
+    {
+        len_ = strlen(fallback);
+        if (len_ > sizeof(txt_))
+            len_ = sizeof(txt_);
+        memcpy(txt_, fallback, len_);
+    }
+
+    /* add the text to the text array */
+    txtofs_ = parser->get_text_array()->append_text(txt_, len_);
+}
+        
+void CHtmlTagEntityInserter::format(CHtmlSysWin *win, CHtmlFormatter *fmt)
+{
+    /* if necessary, change character sets before inserting our text */
+    CHtmlSysFont *old_font = 0;
+    if (has_charset_)
+    {
+        /* get the old font and its description */
+        CHtmlFontDesc font_desc;
+        old_font = fmt->get_font();
+        old_font->get_font_desc(&font_desc);
+
+        /* create a new font for the new character set */
+        font_desc.default_charset = FALSE;
+        font_desc.charset = charset_;
+        CHtmlSysFont *new_font = win->get_font(&font_desc);
+
+        /* install the new font */
+        fmt->set_font(new_font);
+    }
+
+    /* add our text */
+    fmt->add_disp_item(fmt->get_disp_factory()->
+                       new_disp_text(win, fmt->get_font(),
+                                     txt_, len_, txtofs_));
+
+    /* restore the old font, if we changed it */
+    if (old_font != 0)
+        fmt->set_font(old_font);
+}
+
+void CHtmlTagEntityInserter::prune_pre_delete(CHtmlTextArray *arr)
+{
+    arr->delete_text(txtofs_, len_);
+}
+
+
+/* ------------------------------------------------------------------------ */
+/*
  *   CREDIT 
  */
-CHtmlTagCREDIT::CHtmlTagCREDIT(CHtmlParser *parser)
-{
-    /* add our prefix to the text buffer */
-    txtofs_ = parser->get_text_array()->append_text("---", 3);
-}
-
-/*
- *   pre-delete for pruning the tree - delete my text from the text array 
- */
-void CHtmlTagCREDIT::prune_pre_delete(CHtmlTextArray *arr)
-{
-    /* tell the text array to delete my text */
-    arr->delete_text(txtofs_, 3);
-
-    /* inherit the default behavior */
-    CHtmlTagFontCont::prune_pre_delete(arr);
-}
-
 
 void CHtmlTagCREDIT::format(CHtmlSysWin *win, CHtmlFormatter *formatter)
 {
@@ -918,15 +960,21 @@ void CHtmlTagCREDIT::format(CHtmlSysWin *win, CHtmlFormatter *formatter)
     formatter->add_line_spacing(break_ht);
 
     /* right-align text in the credit */
+    old_align_ = formatter->get_blk_alignment();
     formatter->set_blk_alignment(HTML_Attrib_right);
 
     /* inherit default handling to set font attributes */
     CHtmlTagFontCont::format(win, formatter);
 
-    /* add a text tag with an em dash */
-    formatter->add_disp_item(formatter->get_disp_factory()->
-                             new_disp_text(win, formatter->get_font(),
-                                           "---", 3, txtofs_));
+    /* add the emdash */
+    emdash_.format(win, formatter);
+}
+
+void CHtmlTagCREDIT::format_exit(CHtmlFormatter *formatter)
+{
+    formatter->add_line_spacing(0);
+    formatter->set_blk_alignment(old_align_);
+    CHtmlTagFontCont::format_exit(formatter);
 }
 
 int CHtmlTagCREDIT::add_attrs(CHtmlFormatter *, CHtmlFontDesc *desc)
@@ -4613,35 +4661,20 @@ void CHtmlTagTAB::format(CHtmlSysWin *, CHtmlFormatter *formatter)
  */
 
 /*
- *   pre-delete for pruning the tree - delete my text from the text array 
- */
-void CHtmlTagQ::prune_pre_delete(CHtmlTextArray *arr)
-{
-    /* tell the text array to delete my text */
-    arr->delete_text(open_ofs_, 1);
-    arr->delete_text(close_ofs_, 1);
-
-    /* inherit the default behavior */
-    CHtmlTagContainer::prune_pre_delete(arr);
-}
-
-/*
  *   open parsing - add my open quote to the text array 
  */
 void CHtmlTagQ::on_parse(CHtmlParser *parser)
 {
     int level;
-    unsigned int html_open, html_close;
-    textchar_t ascii_quote;
-    oshtml_charset_id_t charset;
-    int charset_changed;
-    textchar_t result[10];
+    unsigned int html_open;
+    const textchar_t *ascii_quote;
     
     /* inherit default */
     CHtmlTagContainer::on_parse(parser);
 
     /* figure out what kind of quotes to use, based on our nesting level */
     level = get_quote_nesting_level();
+
     if ((level & 1) == 0)
     {
         /* 
@@ -4649,8 +4682,7 @@ void CHtmlTagQ::on_parse(CHtmlParser *parser)
          *   fourth quote in, and so on - use double quotes 
          */
         html_open = 8220;
-        html_close = 8221;
-        ascii_quote = '"';
+        ascii_quote = "\"";
     }
     else
     {
@@ -4659,36 +4691,11 @@ void CHtmlTagQ::on_parse(CHtmlParser *parser)
          *   single quotes 
          */
         html_open = 8216;
-        html_close = 8217;
-        ascii_quote = '\'';
+        ascii_quote = "'";
     }
 
-    /* translate the HTML open quote */
-    open_q_len_ = parser->get_sys_frame()->
-                  xlat_html4_entity(result, sizeof(result), html_open,
-                                    &charset, &charset_changed);
-    if (charset_changed || open_q_len_ > sizeof(open_q_))
-    {
-        open_q_[0] = ascii_quote;
-        open_q_len_ = 1;
-    }
-    else
-        memcpy(open_q_, result, open_q_len_);
-
-    /* translate the HTML close quote */
-    close_q_len_ = parser->get_sys_frame()->
-                   xlat_html4_entity(result, sizeof(result), html_close,
-                                     &charset, &charset_changed);
-    if (charset_changed || close_q_len_ > sizeof(close_q_))
-    {
-        close_q_[0] = ascii_quote;
-        close_q_len_ = 1;
-    }
-    else
-        memcpy(close_q_, result, close_q_len_);
-
-    /* add my open quote */
-    open_ofs_ = parser->get_text_array()->append_text(open_q_, open_q_len_);
+    /* set up our open quote */
+    openq_.on_parse(parser, html_open, ascii_quote);
 
     /* we effectively insert text, so keep adjacent source whitespace */
     parser->end_skip_sp();
@@ -4699,11 +4706,37 @@ void CHtmlTagQ::on_parse(CHtmlParser *parser)
  */
 void CHtmlTagQ::on_close(CHtmlParser *parser)
 {
+    int level;
+    unsigned int html_close;
+    const textchar_t *ascii_quote;
+
     /* inherit default */
     CHtmlTagContainer::on_close(parser);
-    
+
+    /* figure out what kind of quotes to use, based on our nesting level */
+    level = get_quote_nesting_level();
+
+    if ((level & 1) == 0)
+    {
+        /* 
+         *   I'm the outermost quote, or the second quote in, or the fourth
+         *   quote in, and so on - use double quotes 
+         */
+        html_close = 8221;
+        ascii_quote = "\"";
+    }
+    else
+    {
+        /* 
+         *   I'm the first one in, or the third one in, and so on - use
+         *   single quotes 
+         */
+        html_close = 8217;
+        ascii_quote = "'";
+    }
+
     /* add my close quote */
-    close_ofs_ = parser->get_text_array()->append_text(close_q_, close_q_len_);
+    closeq_.on_parse(parser, html_close, ascii_quote);
 
     /* we effectively insert text, so keep adjacent source whitespace */
     parser->end_skip_sp();
@@ -4715,10 +4748,7 @@ void CHtmlTagQ::on_close(CHtmlParser *parser)
 void CHtmlTagQ::format(CHtmlSysWin *win, CHtmlFormatter *formatter)
 {
     /* add a display item for my quote */
-    formatter->add_disp_item(formatter->get_disp_factory()->
-                             new_disp_text(win, formatter->get_font(),
-                                           open_q_, open_q_len_,
-                                           open_ofs_));
+    openq_.format(win, formatter);
 }
 
 /* 
@@ -4727,11 +4757,7 @@ void CHtmlTagQ::format(CHtmlSysWin *win, CHtmlFormatter *formatter)
 void CHtmlTagQ::format_exit(CHtmlFormatter *formatter)
 {
     /* add a display item for my quote */
-    formatter->add_disp_item(formatter->get_disp_factory()->
-                             new_disp_text(formatter->get_win(),
-                                           formatter->get_font(),
-                                           close_q_, close_q_len_,
-                                           close_ofs_));
+    closeq_.format(formatter->get_win(), formatter);
 }
 
 /* ------------------------------------------------------------------------ */

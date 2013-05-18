@@ -6,7 +6,7 @@
  */
 /*
 Name
-  vmconnoh.cpp - T3 VM Console - HTML mini-parser
+  vmconhmp.cpp - T3 VM Console - HTML mini-parser
 Function
   This is the console HTML "mini-parser," which provides some minimal
   interpretation of HTML markups for text-only underlying output streams.
@@ -1702,6 +1702,19 @@ wchar_t CVmFormatter::parse_html_markup(VMG_ wchar_t c,
             /* note that we have a 'wrap' tag to process */
             if (!html_in_ignore_)
                 html_in_wrap_ = TRUE;
+        }
+        else if (CVmCaseFoldStr::wstreq(tagbuf, L"pre"))
+        {
+            /* count the nesting level if starting PRE mode */
+            if (!is_end_tag)
+                ++html_pre_level_;
+
+            /* surround the PRE block with blank lines */
+            write_blank_line(vmg0_);
+
+            /* count the nesting level if ending PRE mode */
+            if (is_end_tag && html_pre_level_ != 0)
+                --html_pre_level_;
         }
 
         /* suppress everything up to the next '>' */

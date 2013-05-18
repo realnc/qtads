@@ -460,6 +460,23 @@ const err_msg_t tc_messages_english[] =
     "invalid backslash escape sequence \\%c in string",
     "The backslash sequence \\%c is not valid." },
 
+    { TCERR_NON_ASCII_SYMBOL,
+    "symbol \"%~.*s\" contains non-ASCII character (U+%04x)",
+    "The symbol \"%~.*s\" contains one or more non-ASCII characters (the "
+    "first is [Unicode] character U+%04x). Only plain ASCII characters "
+    "can be used in symbols; accented letters and other non-ASCII "
+    "characters aren't allowed." },
+
+    { TCERR_EMBEDDING_TOO_DEEP,
+    "embedded expressions in strings are nested too deeply",
+    "The embedded \"<< >>\" expressions in this string are nested too "
+    "deeply.  A nested embedding is a \"<< >>\" expression within "
+    "a string that iself contains another string that has its own "
+    "\"<< >>\" embedding, which in turn has another string with its "
+    "own embedding, and so on.  This is allowed, but only to a limited "
+    "nesting depth.  You will need to simplify the strings to reduce "
+    "the depth." },
+
     { TCERR_INTERNAL_EXPLAN,
     "Please report this error to the compiler's maintainer.",
     "This indicates a problem within the compiler itself.  Please report "

@@ -106,7 +106,7 @@ int os_get_zoneinfo_key(char *name, size_t namelen)
     const win_zone_map_t *z;
 
     /* get the Windows time zone information */
-    if (GetTimeZoneInformation(&tz)
+    if (GetTimeZoneInformation(&tz) != TIME_ZONE_ID_INVALID
         && (z = win_to_zoneinfo(tz.StandardName)) != 0)
     {
         /* success - return the zoneinfo name mapping */
@@ -130,12 +130,12 @@ int os_get_timezone_info(struct os_tzinfo_t *info)
     memset(info, 0, sizeof(*info));
 
     /* get the Windows time zone information */
-    if ((mode = GetTimeZoneInformation(&tz)) != TIME_ZONE_ID_UNKNOWN)
+    if ((mode = GetTimeZoneInformation(&tz)) != TIME_ZONE_ID_INVALID)
     {
         const win_zone_map_t *z;
 
         /* check to see if standard/daylight change rules are present */
-        if (tz.StandardDate.wMonth != 0)
+        if (mode != TIME_ZONE_ID_UNKNOWN && tz.StandardDate.wMonth != 0)
         {
             /* 
              *   We have both daylight and standard time.  Set the GMT offset
@@ -163,7 +163,8 @@ int os_get_timezone_info(struct os_tzinfo_t *info)
          *   way to represent once-only rules, so we ignore them and indicate
          *   that no rules are available.
          */
-        if (tz.StandardDate.wMonth != 0
+        if (mode != TIME_ZONE_ID_UNKNOWN
+            && tz.StandardDate.wMonth != 0
             && tz.StandardDate.wYear == 0
             && tz.DaylightDate.wYear == 0)
         {

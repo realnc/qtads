@@ -77,6 +77,76 @@ what has changed since the last version you installed.
 
 <!------------------------------------------------------------------------>
 <p>
+<h3>Changes in Release HT-24 (Windows build Win121; TADS 2.5.16/3.1.3)</h3>
+<i>Released May 16, 2013</i>
+
+<ul>
+
+<li>Workbench for Windows has a new setting, in the Program Arguments
+dialog (accessible via the Debug menu), that lets you set the file
+safety setting when running the program in the debugger.  The default
+setting is "Use interpreter settings", which uses the file safety
+level set through the interpreter preferences dialog (accessed via the
+interpreter's Edit/Options menu command).  The interpreter's factory
+setting is local read/write access, which allows reading and writing
+files in the directory containing the .t3 file being executed, but not
+in any outside folders.  This is intended to protect your system
+against malicious or errant software when running .gam/.t3 files you
+download from the Internet, by preventing access to any files outside
+of the folder where you downloaded the game.  However, this can be too
+restrictive if you're using TADS to write your own tools for file
+manipulation.  The new setting lets you set less restrictive file
+safety levels when running your own tools, without affecting the
+default interpreter settings when you're running other games you've
+downloaded.
+
+<li>The &lt;BLOCKQUOTE&gt;...&lt;CREDITS&gt; tag incorrectly left
+subsequent text right-aligned; this has been corrected.  In addition,
+the dash shown before the credit text is a typographical em-dash,
+if the local character set supports it, rather than a series of three
+hyphens as in the past.  
+
+(<a href="http://bugdb.tads.org/view.php?id=0000184">bugdb.tads.org
+#0000184</a>)
+
+<li>The "Build Web Page Package" command failed due to a naming conflict
+in the web builder script with a built-in function.  This is now fixed.
+
+(<a href="http://bugdb.tads.org/view.php?id=0000167">bugdb.tads.org
+#0000167</a>)
+
+<li>&lt;IMG&gt; tags and other tags referencing external files
+sometimes couldn't find files whose names contained non-ASCII
+characters, such as accented letters.  The HTML parser internally
+didn't accept non-ASCII characters in external filenames, so it
+converted them to underscore "_" characters when searching for the
+files.  The HTML parser now accepts non-ASCII characters and passes
+them through to the file system.  Note that non-ASCII filenames might
+still be problematic on some operating systems, since the HTML parser
+simply uses the filenames as rendered in the local display character
+set, which on some systems might not always match the file system
+character set.  When the two character sets differ, the HTML layer
+might not be able to find &lt;IMG&gt; and similar file references with
+non-ASCII names.  It's safest to use filenames containing only ASCII
+characters for these resources whenever possible.
+
+(<a href="http://bugdb.tads.org/view.php?id=0000170">bugdb.tads.org
+#0000170</a>)
+
+<li>Starting in version Windows build 116 (TADS 3.1.0), TADS Workbench
+didn't run under Windows 2000 or earlier versions of Windows, due to a
+dependency on a newer Windows feature that didn't exist until Windows
+XP SP1.  The dependency has been removed and replaced with code that
+should work on Win 2K as well as newer systems, so Workbench should
+once again be able to run on Win 2K.
+
+(<a href="http://bugdb.tads.org/view.php?id=0000186">bugdb.tads.org #0000186</a>)
+
+</ul>
+
+
+<!------------------------------------------------------------------------>
+<p>
 <h3>Changes in Release HT-23 (Windows build Win120; TADS 2.5.16/3.1.2)</h3>
 <i>Released August 30, 2012</i>
 

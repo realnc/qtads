@@ -223,6 +223,35 @@ int func_called_from_external_interface(my_context_def *ctx, int x, int y)
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   Conditional access to globals.
+ *   
+ *   Some code that accesses global variables might need to be able to run
+ *   during startup or shutdown.  On platforms where the globals are
+ *   dynamically allocated, such code might need to test to see not only
+ *   whether or not particular global variable has been allocated, but also
+ *   whether or not the memory containing the global variables themselves
+ *   exists.  E.g., if you want to access the console object in code that
+ *   might be called during early startup or late termination, it's not good
+ *   enough to test if G_console constains a non-null object pointer, since
+ *   merely accessing G_console itself will dereference the global variable
+ *   structure pointer, and this pointer might be null on platforms where the
+ *   globals are allocated.
+ *   
+ *   For such situations, use VMGLOB_IF_AVAIL(varname) to cover the global
+ *   variable name.  On platforms where the globals are allocated, this will
+ *   return null if the globals themselves aren't yet allocated or have
+ *   already been freed, otherwise it'll return the variable's value.
+ */
+#if 0
+
+/* EXAMPLE ONLY - THIS CODE IS FOR DOCUMENTATION PURPOSES */
+CVmConsole *con = VMGLOB_IF_AVAIL(G_console);
+
+#endif
+
+
+/* ------------------------------------------------------------------------ */
+/*
  *   Set up to define the global variables.  For the POINTER and PARAM
  *   configurations, put pointers to the global structures in a structure.
  *   For the static STRUCT configuration, actually allocate all of the
@@ -338,6 +367,9 @@ inline void vmglob_delete(vm_globals *) { }
 /* declare a local variable to access the globals */
 #define VMGLOB_PTR(x)
 
+/* global variables are statically declared so they're always available */
+#define VMGLOB_IF_AVAIL(x) x
+
 /* we access globals directly as individual statics */
 #define VMGLOB_ACCESS(var) (G_##var##_X)
 #define VMGLOB_PREACCESS(var) (&G_##var##_X)
@@ -386,6 +418,9 @@ inline void vmglob_delete(vm_globals *) { }
 
 /* declare a local variable to access the globals */
 #define VMGLOB_PTR(x)
+
+/* global variables are statically declared so they're always available */
+#define VMGLOB_IF_AVAIL(x) x
 
 /* we access globals directly as individual statics */
 #define VMGLOB_ACCESS(var)    (G_vmglobals.var)
@@ -436,6 +471,9 @@ inline void vmglob_delete(vm_globals *glob) { delete glob; }
 /* declare a local variable to access the globals */
 #define VMGLOB_PTR(x)
 
+/* test to see if a global variable is available */
+#define VMGLOB_IF_AVAIL(x) (G_vmglobals != 0 ? x : 0)
+
 /* accessing a global requires dereferencing the global pointer */
 #define VMGLOB_ACCESS(var) (G_vmglobals->var)
 #define VMGLOB_PREACCESS(var) (G_vmglobals_var)
@@ -476,6 +514,9 @@ inline void vmglob_delete(vm_globals *glob) { delete glob; }
 
 /* declare a local variable to access the globals */
 #define VMGLOB_PTR(x) vm_globals *vmg__ = x
+
+/* test to see if a global variable is available */
+#define VMGLOB_IF_AVAIL(x) (vmg__ != 0 ? x : 0)
 
 /* accessing a global variable requires dereferencing the parameter */
 #define VMGLOB_ACCESS(var) (vmg__->var)

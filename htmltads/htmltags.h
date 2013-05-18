@@ -1769,25 +1769,66 @@ private:
 };
 
 /*
+ *   Entity inserter.  This is an add-in for tags like CREDIT and Q that
+ *   insert special character entities.
+ */
+class CHtmlTagEntityInserter
+{
+public:
+    void on_parse(class CHtmlParser *parser,
+                  int charcode, const char *fallback);
+
+    void prune_pre_delete(class CHtmlTextArray *arr);
+
+    void format(class CHtmlSysWin *win, class CHtmlFormatter *formatter);
+
+private:
+    /* text offset of our translation */
+    unsigned long txtofs_;
+
+    /* expansion of our translation */
+    char txt_[32];
+    size_t len_;
+
+    /* character set of translation */
+    oshtml_charset_id_t charset_;
+    int has_charset_;
+};
+
+/*
  *   CREDIT - HTML 3.0 
  */
 class CHtmlTagCREDIT: public CHtmlTagFontCont
 {
 public:
-    HTML_TAG_MAP_NOCONSTRUCTOR(CHtmlTagCREDIT, "CREDIT");
+    HTML_TAG_MAP(CHtmlTagCREDIT, "CREDIT");
+
+    /* add my emdash while parsing */
+    void on_parse(class CHtmlParser *parser)
+    {
+        emdash_.on_parse(parser, 8212, "---");
+        CHtmlTagFontCont::on_parse(parser);
+    }
 
     /* delete my text when pruning the tree */
-    void prune_pre_delete(class CHtmlTextArray *arr);
-
-    CHtmlTagCREDIT(class CHtmlParser *parser);
+    void prune_pre_delete(class CHtmlTextArray *arr)
+    {
+        emdash_.prune_pre_delete(arr);
+        CHtmlTagFontCont::prune_pre_delete(arr);
+    }
 
     void format(class CHtmlSysWin *win, class CHtmlFormatter *formatter);
+    void format_exit(class CHtmlFormatter *formatter);
 
     /* add font attributes */
     int add_attrs(class CHtmlFormatter *fmt, class CHtmlFontDesc *desc);
 
 private:
-    unsigned long txtofs_;
+    /* our em-dash */
+    CHtmlTagEntityInserter emdash_;
+
+    /* alignment in effect immediately before this division started */
+    HTML_Attrib_id_t old_align_;
 };
 
 
@@ -2248,7 +2289,12 @@ public:
     HTML_TAG_MAP(CHtmlTagQ, "Q");
 
     /* delete my quote text when pruning the tree */
-    void prune_pre_delete(class CHtmlTextArray *arr);
+    void prune_pre_delete(class CHtmlTextArray *arr)
+    {
+        openq_.prune_pre_delete(arr);
+        closeq_.prune_pre_delete(arr);
+        CHtmlTagContainer::prune_pre_delete(arr);
+    }
 
     void on_parse(class CHtmlParser *parser);
     void on_close(class CHtmlParser *parser);
@@ -2272,16 +2318,8 @@ public:
     }
 
 private:
-    /* offset in text array of open and close quotes */
-    unsigned long open_ofs_;
-    unsigned long close_ofs_;
-
-    /* strings to use for open and close quotes */
-    textchar_t open_q_[8];
-    size_t open_q_len_;
-    
-    textchar_t close_q_[8];
-    size_t close_q_len_;
+    CHtmlTagEntityInserter openq_;
+    CHtmlTagEntityInserter closeq_;
 };
 
 class CHtmlTagBR: public CHtmlTag

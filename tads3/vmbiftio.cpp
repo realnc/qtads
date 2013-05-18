@@ -2519,8 +2519,18 @@ void CVmBifTIO::log_input_event(VMG_ uint argc)
         vm_val_t ele2;
         lst->ll_index(vmg_ &ele2, 2);
 
-        /* get its string value */
-        if ((param = ele2.get_as_string(vmg0_)) == 0)
+        /* 
+         *   Get its string value.  If it's a filename object, use the
+         *   filename path string. 
+         */
+        CVmObjFileName *fname_param = vm_val_cast(CVmObjFileName, &ele2);
+        if (fname_param != 0)
+            param = fname_param->get_path_string();
+        else
+            param = ele2.get_as_string(vmg0_);
+
+        /* if we didn't get a parameter string value, it's an error */
+        if (param == 0)
             err_throw(VMERR_BAD_VAL_BIF);
 
         /* get the parameter length and buffer pointer */

@@ -767,7 +767,7 @@ CVmTimeZone *CVmTimeZoneCache::get_local_zone(VMG0_)
         /* we found a database entry - load a separate copy */
         local_zone_ = CVmTimeZone::load(vmg_ entry);
     }
-    
+
     /* if we didn't find it, try the lower-level timezone description */
     os_tzinfo_t info;
     if (local_zone_ == 0 && os_get_timezone_info(&info))
@@ -937,6 +937,8 @@ ZoneHashEntry *CVmTimeZoneCache::search(
         /* look up this abbreviation */
         AbbrHashEntry *e = (AbbrHashEntry *)abbr_tab_->find(
             specs[0].abbr, strlen(specs[0].abbr));
+        if (e == 0)
+            return 0;
 
         /* return the first entry that matches the spec */
         return e->search(0, specs);

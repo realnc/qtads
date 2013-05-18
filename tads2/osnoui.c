@@ -150,8 +150,11 @@ void os_defext(char *fn, const char *ext)
 #ifndef OSNOUI_OMIT_OS_ADDEXT
 void os_addext(char *fn, const char *ext)
 {
-    strcat(fn, ".");
-    strcat(fn, ext);
+    if (strlen(fn) + 1 + strlen(ext) + 1 < OSFNMAX)
+    {
+        strcat(fn, ".");
+        strcat(fn, ext);
+    }
 }
 #endif
 
@@ -304,7 +307,7 @@ void os_get_path_name(char *pathbuf, size_t pathbuflen, const char *fname)
      *   string.  So, we need to check to see if the file is in a root path,
      *   and if so, include the final path separator character in the path.  
      */
-    for (p = fname, root_path = FALSE ; p != lastsep ; ++p)
+    for (p = fname, root_path = TRUE ; p != lastsep ; ++p)
     {
         /*
          *   if this is NOT a path separator character, we don't have all
@@ -322,7 +325,7 @@ void os_get_path_name(char *pathbuf, size_t pathbuflen, const char *fname)
     }
 
     /* if we have a root path, keep the final path separator in the path */
-    if (root_path)
+    if (root_path && ispathchar(fname[len]))
         ++len;
 
 #ifdef MSDOS
@@ -376,7 +379,7 @@ void os_get_path_name(char *pathbuf, size_t pathbuflen, const char *fname)
  *   Canonicalize a path: remove ".." and "." relative elements 
  */
 #if !defined(OSNOUI_OMIT_OS_BUILD_FULL_PATH) && !defined(OSNOUI_OMIT_OS_COMBINE_PATHS)
-static void canonicalize_path(char *path)
+void canonicalize_path(char *path)
 {
     char *orig = path;
     char *p;
@@ -1995,7 +1998,7 @@ void os_cvt_url_dir(char *result_buf, size_t result_buf_size,
             /* change '/' to the local path separator */
             *dst = OSPATHCHAR;
         }
-        else if (*src < 32
+        else if ((unsigned char)*src < 32
 #if defined(TURBO) || defined(DJGPP) || defined(MICROSOFT) || defined(MSOS2)
                  || strchr("*+?=[]\\&|\":<>", *src) != 0
 #endif

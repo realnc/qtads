@@ -1775,6 +1775,7 @@ resume_from_error:
             
         case OPCCALLEXT:
             {
+#if 0 // external functions are now obsolete
                 static runufdef uf =
                 {
                     runuftyp,  runufnpo,  runufspo,  runufdsc,
@@ -1784,25 +1785,17 @@ resume_from_error:
                 int        fn;
                 runxdef   *ex;
 
-#if 0 // external functions are obsolete - no need to set up the context
                 runuxdef   ux;
                 
                 /* set up callback context */
                 ux.runuxctx  = ctx;
                 ux.runuxvec  = &uf;
                 ux.runuxargc = *p++;
-#else
-                ++p; // skip argc
-#endif
 
                 fn = osrp2(p);
                 p += 2;
                 ex = &ctx->runcxext[fn];
                 
-#if 0
-/*
- *   External functions are now obsolete - do not attempt to call 
- */
                 if (!ex->runxptr)
                 {
                     if ((ex->runxptr = os_exfil(ex->runxnam)) == 0)
@@ -1812,6 +1805,10 @@ resume_from_error:
                     runsig1(ctx, ERR_EXTRUN, ERRTSTR, ex->runxnam);
 #else
                 /* external functions are obsolete - throw an error */
+                runxdef *ex;
+                p += 1;
+                ex = &ctx->runcxext[osrp2(p)];
+                p += 2;
                 runsig1(ctx, ERR_EXTRUN, ERRTSTR, ex->runxnam);
 #endif
             }

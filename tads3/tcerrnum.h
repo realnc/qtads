@@ -231,6 +231,12 @@ Modified
 /* unrecognized escape sequence \%c in string */
 #define TCERR_BACKSLASH_SEQ       10066
 
+/* non-ASCII character in symbol */
+#define TCERR_NON_ASCII_SYMBOL    10067
+
+/* embedded expressions in string nested too deeply */
+#define TCERR_EMBEDDING_TOO_DEEP  10068
+
 
 /* ------------------------------------------------------------------------ */
 /*

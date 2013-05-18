@@ -129,7 +129,7 @@ public:
         VMGLOB_PTR(vmg);
 
         /* if we have globals, get the console */
-        con = (vmg != 0 ? G_console : 0);
+        con = VMGLOB_IF_AVAIL(G_console);
             
         /* if we have a console, write to it */
         if (con != 0)

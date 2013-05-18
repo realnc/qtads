@@ -75,6 +75,25 @@ private:
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   string embedded expression context 
+ */
+void tok_embed_ctx::start_expr(wchar_t qu, int triple, int report)
+{
+    if (level < countof(stk))
+    {
+        s = stk + level;
+        s->enter(qu, triple);
+    }
+    else if (report)
+    {
+        G_tok->log_error(TCERR_EMBEDDING_TOO_DEEP);
+    }
+    ++level;
+}
+
+
+/* ------------------------------------------------------------------------ */
+/*
  *   Initialize the tokenizer 
  */
 CTcTokenizer::CTcTokenizer(CResLoader *res_loader,
@@ -221,8 +240,8 @@ CTcTokenizer::CTcTokenizer(CResLoader *res_loader,
     /* there are no previously-included files yet */
     prev_includes_ = 0;
 
-    /* presume we'll convert newlines in strings to whitespace */
-    string_newline_spacing_ = TRUE;
+    /* by default, use the "collapse" mode for newlines in strings */
+    string_newline_spacing_ = NEWLINE_SPACING_COLLAPSE;
 
     /* start out with ALL_ONCE mode off */
     all_once_ = FALSE;
@@ -1653,18 +1672,18 @@ tc_toktyp_t CTcTokenizer::next_on_line(utf8_ptr *p, CTcToken *tok,
     case '"':
     case '\'':
         *p = start;
-        return tokenize_string(p, tok, ec);
+        return tokenize_string(p, tok, ec, expanding);
 
     case '(':
         typ = TOKT_LPAR;
-        if (ec != 0 && ec->in_expr)
-            ec->parens += 1;
+        if (ec != 0)
+            ec->parens(1);
         break;
 
     case ')':
         typ = TOKT_RPAR;
-        if (ec != 0 && ec->in_expr)
-            ec->parens -= 1;
+        if (ec != 0)
+            ec->parens(-1);
         break;
 
     case ',':
@@ -1696,26 +1715,26 @@ tc_toktyp_t CTcTokenizer::next_on_line(utf8_ptr *p, CTcToken *tok,
 
     case '{':
         typ = TOKT_LBRACE;
-        if (ec != 0 && ec->in_expr)
-            ec->parens += 1;
+        if (ec != 0)
+            ec->parens(1);
         break;
 
     case '}':
         typ = TOKT_RBRACE;
-        if (ec != 0 && ec->in_expr)
-            ec->parens -= 1;
+        if (ec != 0)
+            ec->parens(-1);
         break;
 
     case '[':
         typ = TOKT_LBRACK;
-        if (ec != 0 && ec->in_expr)
-            ec->parens += 1;
+        if (ec != 0)
+            ec->parens(1);
         break;
 
     case ']':
         typ = TOKT_RBRACK;
-        if (ec != 0 && ec->in_expr)
-            ec->parens -= 1;
+        if (ec != 0)
+            ec->parens(-1);
         break;
 
     case '=':
@@ -1831,10 +1850,10 @@ tc_toktyp_t CTcTokenizer::next_on_line(utf8_ptr *p, CTcToken *tok,
         else if (p->getch() == '>')
         {
             /* check for the end of an embedded expression */
-            if (ec != 0 && ec->in_expr && ec->parens == 0)
+            if (ec != 0 && ec->in_expr() && ec->parens() == 0)
             {
                 *p = start;
-                return tokenize_string(p, tok, ec);
+                return tokenize_string(p, tok, ec, expanding);
             }
 
             /* check for '>>>' and '>>=' */
@@ -1990,40 +2009,69 @@ tc_toktyp_t CTcTokenizer::next_on_line(utf8_ptr *p, CTcToken *tok,
              *   a regular string. 
              */
             *p = start;
-            return tokenize_string(p, tok, ec);
+            return tokenize_string(p, tok, ec, expanding);
         }
         /* not a regex string - fall through to default case */
 
     default:        
         /* check to see if it's a symbol */
-        if (is_syminit(cur))
+        if (is_syminit(cur) || !is_ascii(cur))
         {
-            size_t len, full_len;
+        tokenize_symbol:
+            wchar_t non_ascii = 0;
+            const char *stop = 0;
+
+            /* note if we're starting with a non-ASCII character */
+            if (!is_ascii(cur))
+                non_ascii = cur;
 
             /* 
              *   scan the identifier (note that we've already skipped the
              *   first character, so we start out at length = 1) 
              */
-        tokenize_symbol:
-            for (len = full_len = 1 ; is_sym(p->getch()) ; p->inc())
+            for (;;)
             {
-                /* count the full length */
-                ++full_len;
-
                 /* 
-                 *   count this character if we're not over the maximum
-                 *   length 
+                 *   If it's a non-ASCII character, assume it's an accented
+                 *   character that's meant (erroneously) to be part of the
+                 *   symbol name; note the error, but keep the character in
+                 *   the symbol even though it's illegal, since this is more
+                 *   likely to keep us synchronized with the intended token
+                 *   structure of the source.
+                 *   
+                 *   Otherwise, stop on any non-symbol character.
                  */
-                if (len < TOK_SYM_MAX_LEN)
-                    ++len;
+                wchar_t ch = p->getch();
+                if (!is_ascii(ch))
+                {
+                    if (non_ascii == 0)
+                        non_ascii = ch;
+                }
+                else if (!is_sym(ch))
+                    break;
+
+                /* skip this character */
+                const char *prv = p->getptr();
+                p->inc();
+
+                /* if this character would push us over the limit, end here */
+                if (stop == 0
+                    && p->getptr() - start.getptr() >= TOK_SYM_MAX_LEN)
+                    stop = prv;
             }
 
+            /* if we found any non-ASCII characters, flag an error */
+            if (non_ascii != 0)
+                log_error(TCERR_NON_ASCII_SYMBOL,
+                          (int)(p->getptr() - start.getptr()), start.getptr(),
+                          (int)non_ascii);
+            
             /* if we truncated the symbol, issue a warning */
-            if (full_len != len && !expanding)
+            if (stop != 0 && !expanding)
                 log_warning(TCERR_SYMBOL_TRUNCATED,
-                            (int)full_len, start.getptr(),
-                            (int)len, start.getptr());
-
+                            (int)(p->getptr() - start.getptr()), start.getptr(),
+                            (int)(stop - start.getptr()), start.getptr());
+            
             /* it's a symbol */
             typ = TOKT_SYM;
         }
@@ -2053,6 +2101,12 @@ tc_toktyp_t CTcTokenizer::next_on_line(const CTcTokString *srcbuf,
                                        utf8_ptr *p, CTcToken *tok,
                                        tok_embed_ctx *ec, int expanding)
 {
+    /* 
+     *   save the embedding context, in case the next token isn't part of the
+     *   narrowed section of the buffer we're scanning 
+     */
+    tok_embed_ctx oldec = *ec;
+
     /* get the next token */
     next_on_line(p, tok, ec, expanding);
     
@@ -2064,6 +2118,9 @@ tc_toktyp_t CTcTokenizer::next_on_line(const CTcTokString *srcbuf,
 
         /* set the token to point to the end of the buffer */
         tok->set_text(srcbuf->get_text_end(), 0);
+
+        /* restore the embedding context */
+        *ec = oldec;
     }
     
     /* return the token type */
@@ -2091,8 +2148,10 @@ tc_toktyp_t CTcTokenizer::next_on_line_xlat(utf8_ptr *p, CTcToken *tok,
 
     case '>':
         /* if we're in an embedding, check for '>>' */
-        if (ec != 0 && ec->in_expr && ec->parens == 0 && p->getch_at(1) == '>')
-            return tokenize_string(p, tok, ec);
+        if (ec != 0 && ec->in_expr()
+            && ec->parens() == 0
+            && p->getch_at(1) == '>')
+            return tokenize_string(p, tok, ec, FALSE);
 
         /* use the default case */
         goto do_normal;
@@ -2100,7 +2159,7 @@ tc_toktyp_t CTcTokenizer::next_on_line_xlat(utf8_ptr *p, CTcToken *tok,
     case 'R':
         /* check for a regex string */
         if (p->getch_at(1) == '"' || p->getch_at(1) == '\'')
-            return tokenize_string(p, tok, ec);
+            return tokenize_string(p, tok, ec, FALSE);
 
         /* not a regex string - fall through to the default handling */
         
@@ -2160,8 +2219,8 @@ tc_toktyp_t CTcTokenizer::next_on_line_xlat_keep()
 
         case '>':
             /* if we're in an embedding, this is the end of it */
-            if (main_in_embedding_.in_expr
-                && main_in_embedding_.parens == 0
+            if (main_in_embedding_.in_expr()
+                && main_in_embedding_.parens() == 0
                 && p_.getch_at(1) == '>')
                 return xlat_string_to_src(&main_in_embedding_, FALSE);
 
@@ -2350,7 +2409,7 @@ tc_toktyp_t CTcTokenizer::xlat_string_to(
     tok->settyp(qu == '"' ? TOKT_DSTR :
                 qu == '\'' ? TOKT_SSTR :
                 qu == 'R' ? TOKT_RESTR :
-                ec != 0 ? ec->endtok :
+                ec != 0 ? ec->endtok() :
                 TOKT_INVALID);
 
     /* if it's a regex string, skip the 'R' and note the actual quote type */
@@ -2396,21 +2455,21 @@ tc_toktyp_t CTcTokenizer::xlat_string_to(
         p->dec();
 
         /* restore the enclosing string context */
-        qu = ec->qu;
-        triple = ec->triple;
-        tok->settyp(ec->endtok);
+        qu = ec->qu();
+        triple = ec->triple();
+        tok->settyp(ec->endtok());
 
         /* clear the caller's in-embedding status */
         ec->end_expr();
     }
-    else if (qu == '>' && ec->parens == 0)
+    else if (qu == '>' && ec->parens() == 0)
     {
         /* skip the second '>' */
         p->inc();
 
         /* restore the enclosing string context */
-        qu = ec->qu;
-        triple = ec->triple;
+        qu = ec->qu();
+        triple = ec->triple();
 
         /* end the expression */
         ec->end_expr();
@@ -2546,7 +2605,7 @@ tc_toktyp_t CTcTokenizer::xlat_string_to(
             xlat_escape(&dst, p, qu, triple);
             continue;
         }
-        else if (ec != 0 && !ec->in_expr
+        else if (ec != 0
                  && tok->gettyp() != TOKT_RESTR
                  && cur == '<' && p->getch_at(1) == '<')
         {
@@ -2596,7 +2655,7 @@ tc_toktyp_t CTcTokenizer::xlat_string_to(
             }
 
             /* tell the caller we're in an embedding */
-            ec->start_expr(qu, triple);
+            ec->start_expr(qu, triple, TRUE);
 
             /* stop scanning */
             break;
@@ -2916,8 +2975,8 @@ void CTcTokenizer::scan_sprintf_spec(utf8_ptr *p)
  *   routine only parses to the end of the line; if the line ends with the
  *   string unterminated, we'll flag an error.
  */
-tc_toktyp_t CTcTokenizer::tokenize_string(utf8_ptr *p, CTcToken *tok,
-                                          tok_embed_ctx *ec)
+tc_toktyp_t CTcTokenizer::tokenize_string(
+    utf8_ptr *p, CTcToken *tok, tok_embed_ctx *ec, int expanding)
 {
     /* remember where the text starts */
     const char *start = p->getptr();
@@ -2967,9 +3026,9 @@ tc_toktyp_t CTcTokenizer::tokenize_string(utf8_ptr *p, CTcToken *tok,
         if (ec != 0)
         {
             /* return to the enclosing string context */
-            typ = ec->endtok;
-            qu = ec->qu;
-            triple = ec->triple;
+            typ = ec->endtok();
+            qu = ec->qu();
+            triple = ec->triple();
 
             /* allow more embeddings */
             allow_embedding = TRUE;
@@ -3051,7 +3110,7 @@ tc_toktyp_t CTcTokenizer::tokenize_string(utf8_ptr *p, CTcToken *tok,
                    typ);
 
             /* remember that we're in an embedding in the token stream */
-            ec->start_expr(qu, triple);
+            ec->start_expr(qu, triple, !expanding);
 
             /* this is where the contents end */
             contents_end = p->getptr();
@@ -3129,7 +3188,7 @@ tc_toktyp_t CTcTokenizer::tokenize_string(utf8_ptr *p, CTcToken *tok,
             break;
         }
 
-        /* skip this charater of input */
+        /* skip this character of input */
         p->inc();
     }
 
@@ -4790,9 +4849,8 @@ int CTcTokenizer::parse_macro_actuals(const CTcTokString *srcbuf,
  *   end of the input.  If this returns EOF, it indicates that we've
  *   reached the end of the entire input.  
  */
-tc_toktyp_t CTcTokenizer::
-   actual_splice_next_line(const CTcTokString *srcbuf,
-                           utf8_ptr *src, CTcToken *tok)
+tc_toktyp_t CTcTokenizer::actual_splice_next_line(
+    const CTcTokString *srcbuf, utf8_ptr *src, CTcToken *tok)
 {
     /* add a space onto the end of the current line */
     linebuf_.append(" ", 1);
@@ -6076,8 +6134,7 @@ void CTcTokenizer::process_comments(size_t start_ofs)
                     in_quote_ = '\0';
                 }
             }
-            else if (!comment_in_embedding_.in_expr
-                     && cur == '<' && src.getch_at(1) == '<')
+            else if (cur == '<' && src.getch_at(1) == '<')
             {
                 /* 
                  *   it's an embedded expression starting point - skip the
@@ -6087,7 +6144,7 @@ void CTcTokenizer::process_comments(size_t start_ofs)
                 src.inc();
 
                 /* we're in an embedding now */
-                comment_in_embedding_.start_expr(in_quote_, in_triple_);
+                comment_in_embedding_.start_expr(in_quote_, in_triple_, FALSE);
 
                 /* the string is done for now */
                 in_quote_ = '\0';
@@ -6170,19 +6227,19 @@ void CTcTokenizer::process_comments(size_t start_ofs)
                  */
                 cur = ' ';
             }
-            else if (comment_in_embedding_.in_expr
+            else if (comment_in_embedding_.in_expr()
                      && (cur == '(' || cur == ')'))
             {
                 /* adjust the paren level in an embedded expression */
-                comment_in_embedding_.parens += (cur == '(' ? 1 : -1);
+                comment_in_embedding_.parens(cur == '(' ? 1 : -1);
             }
-            else if (comment_in_embedding_.in_expr
-                     && comment_in_embedding_.parens == 0
+            else if (comment_in_embedding_.in_expr()
+                     && comment_in_embedding_.parens() == 0
                      && cur == '>' && src.getch_at(1) == '>')
             {
                 /* it's the end of an embedded expression */
-                in_quote_ = comment_in_embedding_.qu;
-                in_triple_ = comment_in_embedding_.triple;
+                in_quote_ = comment_in_embedding_.qu();
+                in_triple_ = comment_in_embedding_.triple();
                 comment_in_embedding_.end_expr();
 
                 /* skip the extra '>' and copy it to the output */
@@ -6226,17 +6283,42 @@ void CTcTokenizer::splice_string()
     wchar_t in_quote = in_quote_;
     int in_triple = in_triple_;
     tok_embed_ctx old_ec = comment_in_embedding_;
+
+    /* note if the previous line ended with an explicit \n sequence */
+    int explicit_nl = (linebuf_.get_text_len() >= 2
+                       && memcmp(linebuf_.get_text_end() - 2, "\\n", 2) == 0);
         
     /* keep going until we find the end of the string */
     utf8_ptr p((char *)0);
     for (;;)
     {
-        /* 
-         *   append a space at the end of the line, to replace the newline
-         *   that we've eliminated
-         */
-        if (string_newline_spacing_)
-            linebuf_.append(" ", 1);
+        /* apply the newline spacing mode */
+        switch (string_newline_spacing_)
+        {
+        case NEWLINE_SPACING_COLLAPSE:
+            /* 
+             *   Replace the newline and any subsequent run of whitespace
+             *   characters with a single space, unless the last line ended
+             *   with an explicit newline.
+             */
+            if (!explicit_nl)
+                linebuf_.append(" ", 1);
+            break;
+
+        case NEWLINE_SPACING_DELETE:
+            /* delete the newline and subsequent whitespace */
+            break;
+
+        case NEWLINE_SPACING_PRESERVE:
+            /* 
+             *   preserve the newline and subsequent whitespace exactly as
+             *   written in the source code, so convert the newline to an
+             *   explicit \n sequence (in source form, since we're building a
+             *   source line at this point)
+             */
+            linebuf_.append("\\n", 2);
+            break;
+        }
 
         /* splice another line */
         int new_line_ofs = read_line(TRUE);
@@ -6247,22 +6329,32 @@ void CTcTokenizer::splice_string()
 
         /* get a pointer to the new text */
         char *new_line_p = (char *)linebuf_.get_text() + new_line_ofs;
-
-        /* skip leading spaces in the new line */
         p.set(new_line_p);
-        for (p.set(new_line_p) ; is_space(p.getch()) ; p.inc()) ;
+
+        /* 
+         *   If we're in COLLAPSE or DELETE mode for newline spacing, skip
+         *   leading spaces in the new line.  However, override this if the
+         *   previous line ended with an explicit \n sequence; this tells us
+         *   that the line break is explicitly part of the string and that
+         *   the subsequent whitespace is to be preserved.
+         */
+        if (string_newline_spacing_ != NEWLINE_SPACING_PRESERVE
+            && !explicit_nl)
+            for ( ; is_space(p.getch()) ; p.inc()) ;
+
+        /* check to see if the newly spliced text ends in an explicit \n */
+        explicit_nl = (linebuf_.get_text_len() - new_line_ofs >= 2
+                       && memcmp(linebuf_.get_text_end() - 2, "\\n", 2) == 0);
 
         /* if we skipped any spaces, remove them from the text */
         if (p.getptr() > new_line_p)
         {
-            size_t rem;
-            size_t new_len;
-
             /* calculate the length of the rest of the line */
-            rem = linebuf_.get_text_len() - (p.getptr() - linebuf_.get_buf());
+            size_t rem = linebuf_.get_text_len()
+                         - (p.getptr() - linebuf_.get_buf());
 
             /* calculate the new length of the line */
-            new_len = (new_line_p - linebuf_.get_buf()) + rem;
+            size_t new_len = (new_line_p - linebuf_.get_buf()) + rem;
 
             /* move the rest of the line down over the spaces */
             memmove(new_line_p, p.getptr(), rem);
@@ -6363,7 +6455,7 @@ void CTcTokenizer::splice_string()
                     goto done;
                 }
             }
-            else if (!old_ec.in_expr && cur == '<' && p.getch_at(1) == '<')
+            else if (cur == '<' && p.getch_at(1) == '<')
             {
                 /* 
                  *   it's an embedded expression starter - skip the '<<'
@@ -6619,7 +6711,7 @@ void CTcTokenizer::pragma_message()
  */
 void CTcTokenizer::pragma_newline_spacing()
 {
-    int f;
+    newline_spacing_mode_t f;
 
     /* if we're in preprocess-only mode, just pass the pragma through */
     if (pp_only_mode_)
@@ -6636,14 +6728,29 @@ void CTcTokenizer::pragma_newline_spacing()
     if (curtok_.get_text_len() == 2
         && memcmp(curtok_.get_text(), "on", 2) == 0)
     {
-        /* it's 'on' */
-        f = TRUE;
+        /* 'on' - this is the old version of 'collapse' */
+        f = NEWLINE_SPACING_COLLAPSE;
+    }
+    else if (curtok_.get_text_len() == 8
+             && memcmp(curtok_.get_text(), "collapse", 8) == 0)
+    {
+        f = NEWLINE_SPACING_COLLAPSE;
     }
     else if (curtok_.get_text_len() == 3
              && memcmp(curtok_.get_text(), "off", 3) == 0)
     {
-        /* it's 'off' */
-        f = FALSE;
+        /* 'off' - the old version of 'delete' */
+        f = NEWLINE_SPACING_DELETE;
+    }
+    else if (curtok_.get_text_len() == 6
+             && memcmp(curtok_.get_text(), "delete", 6) == 0)
+    {
+        f = NEWLINE_SPACING_DELETE;
+    }
+    else if (curtok_.get_text_len() == 8
+             && memcmp(curtok_.get_text(), "preserve", 8) == 0)
+    {
+        f = NEWLINE_SPACING_PRESERVE;
     }
     else
     {
