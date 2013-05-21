@@ -40,6 +40,14 @@
 extern "C" {
 #endif
 
+/* Define CPU_IS_BIGENDIAN to the appropriate value for this platform.
+ * Needed by tads3/sha2.cpp. */
+#if Q_BYTE_ORDER == Q_BIG_ENDIAN
+    #define CPU_IS_BIGENDIAN 1
+#else
+    #define CPU_IS_BIGENDIAN 0
+#endif
+
 /* Most systems have typedefs for ushort, uint and ulong.  If not, the
  * qtads.pro project file should be modified to define OS_NO_TYPES_DEFINED. */
 #ifndef OS_NO_TYPES_DEFINED
