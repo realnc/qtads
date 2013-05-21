@@ -48,6 +48,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
       fAboutBox(0),
       fAboutQtadsDialog(0),
       fNetManager(0),
+      fWantsToQuit(false),
       fSilentIfNoUpdates(false)
 {
     //qDebug() << Q_FUNC_INFO << "called";
@@ -551,6 +552,8 @@ CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
 
     if (not qFrame->settings()->confirmQuitGame or msgBox->exec() == QMessageBox::Yes) {
         qFrame->setGameRunning(false);
+        // Make sure the VM knows that we're closing.
+        this->fWantsToQuit = true;
         e->accept();
     } else {
         e->ignore();

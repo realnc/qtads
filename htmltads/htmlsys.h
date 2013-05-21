@@ -572,13 +572,25 @@ public:
     static CHtmlSysFrame *get_frame_obj() { return app_frame_; }
 
     /*
+     *   Indicate that the process wants to quit when the program is stuck in
+     *   an input EOF loop.  This is a static function that must be
+     *   implemented by the port-specific code.
+     *
+     *   This is called by the input layer (in oshtml.cpp) when it tries to
+     *   detect whether the program is looping on input after EOF.  This
+     *   should return true if kill_process() should be called in such cases,
+     *   false otherwise.
+     */
+    static int quit_on_eof_loop();
+
+    /*
      *   Kill the process.  This is a static function that must be
      *   implemented by the port-specific code.
      *   
      *   This is called when the input layer (in oshtml.cpp) finds that the
-     *   program is looping on input after EOF.  This routine should force
-     *   the program to terminate, by explicitly killing the process via the
-     *   OS API if possible.
+     *   program is looping on input after EOF and quit_on_eof_loop() returns
+     *   true.  This routine should force the program to terminate, by
+     *   explicitly killing the process via the OS API if possible.
      */
     static void kill_process();
 

@@ -22,6 +22,7 @@
 #include <QDir>
 #include <QTextCodec>
 #include <QMessageBox>
+#include <cstdlib>
 
 #include "qtadshostifc.h"
 #include "settings.h"
@@ -748,7 +749,14 @@ CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
 void
 CHtmlSysFrame::kill_process()
 {
-    QApplication::exit(0);
+    delete qFrame;
+    ::exit(0);
+}
+
+
+int CHtmlSysFrame::quit_on_eof_loop()
+{
+    return qWinGroup->wantsToQuit();
 }
 
 

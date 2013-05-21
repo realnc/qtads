@@ -65,6 +65,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     class QNetworkReply* fReply;
     QString fGameFileFromDropEvent;
 
+    // Are we trying to quit the application?
+    bool fWantsToQuit;
+
     // If this is set, we won't bother the user with a dialog if the
     // update checker finds no available updates.
     bool fSilentIfNoUpdates;
@@ -159,6 +162,10 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
     void
     checkForUpdates();
+
+    bool
+    wantsToQuit() const
+    { return this->fWantsToQuit; }
 
 #ifdef Q_OS_MAC
     // Handler for FileOpen events.  They only occur in OS X.

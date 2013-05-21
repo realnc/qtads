@@ -380,7 +380,7 @@ int os_gets_timeout(unsigned char *buf, size_t bufl,
     CHtmlSysFrame *app_frame = CHtmlSysFrame::get_frame_obj();
     
     /* if app frame, we can't get input */
-    if (app_frame == 0)
+    if (app_frame == 0 || CHtmlSysFrame::quit_on_eof_loop())
     {
         /* check for an input loop at EOF */
         check_eof_loop();
@@ -448,7 +448,7 @@ int os_getc()
     CHtmlSysFrame *app_frame = CHtmlSysFrame::get_frame_obj();
 
     /* if the app frame is missing, we can't get input - indicate EOF */
-    if (app_frame == 0)
+    if (app_frame == 0 || CHtmlSysFrame::quit_on_eof_loop())
     {
         static int eof_cmd;
 
@@ -498,7 +498,7 @@ int os_get_event(unsigned long timeout_in_milliseconds, int use_timeout,
     CHtmlSysFrame *app_frame = CHtmlSysFrame::get_frame_obj();
 
     /* if there's no app frame, we can't get an event */
-    if (app_frame == 0)
+    if (app_frame == 0 || CHtmlSysFrame::quit_on_eof_loop())
     {
         /* check for an input loop at EOF */
         check_eof_loop();
