@@ -29,6 +29,7 @@
 #include "syswinaboutbox.h"
 #include "syswininput.h"
 #include "gameinfodialog.h"
+#include "qtadssound.h"
 
 #include "htmlprs.h"
 #include "htmlfmt.h"
@@ -749,6 +750,7 @@ CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
 void
 CHtmlSysFrame::kill_process()
 {
+    quitSound();
     delete qFrame;
     ::exit(0);
 }
