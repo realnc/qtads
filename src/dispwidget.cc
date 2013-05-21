@@ -32,6 +32,7 @@ DisplayWidget::DisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
     : QWidget(parent),
       fHoverLink(0),
       fClickedLink(0),
+      fInSelectMode(false),
       parentSysWin(parent),
       formatter(formatter)
 {
@@ -77,7 +78,19 @@ DisplayWidget::paintEvent( QPaintEvent* e )
 
 void
 DisplayWidget::mouseMoveEvent( QMouseEvent* e )
-{
+{   
+    // If the button is pressed and we're in selection mode, update the
+    // selection range.
+    if ((e->buttons() & Qt::LeftButton) and this->fInSelectMode) {
+        CHtmlPoint htmlPos(this->fSelectOrigin.x(), this->fSelectOrigin.y());
+        unsigned long startOfs = this->formatter->find_textofs_by_pos(htmlPos);
+        htmlPos.set(e->pos().x(), e->pos().y());
+        unsigned long endOfs = this->formatter->find_textofs_by_pos(htmlPos);
+        this->formatter->set_sel_range(startOfs, endOfs);
+        return;
+    }
+
+    // This wasn't a selection event. Just update link tracking.
     this->updateLinkTracking(e->pos());
 }
 
@@ -90,14 +103,24 @@ DisplayWidget::leaveEvent( QEvent* )
 
 
 void
-DisplayWidget::mousePressEvent( QMouseEvent* )
+DisplayWidget::mousePressEvent( QMouseEvent* e )
 {
     if (this->fHoverLink == 0) {
-        // We're not hover-tracking a link; there's nothing to do here.
+        // We're not hover-tracking a link. If the left mouse button is pressed,
+        // start selection mode if we're not already in that mode.
+        if ((e->buttons() & Qt::LeftButton) and not this->fInSelectMode) {
+            this->fInSelectMode = true;
+            this->fSelectOrigin = e->pos();
+            // Clear the selection range in the formatter by setting both ends
+            // of the range to the maximum text offset in the formatter's
+            // display list.
+            unsigned long start = this->formatter->get_text_ofs_max();
+            this->formatter->set_sel_range(start, start);
+        }
         return;
     }
 
-    // If we're hover-tracking a clickable link here, also click-track it.
+    // We're hover-tracking a link. Click-track it if it's clickable.
     if (this->fHoverLink->is_clickable_link() and qFrame->settings()->enableLinks) {
         // Draw all of the items involved in the link in the hilited state.
         this->fHoverLink->set_clicked(this->parentSysWin, CHtmlDispLink_clicked);
@@ -109,8 +132,14 @@ DisplayWidget::mousePressEvent( QMouseEvent* )
 void
 DisplayWidget::mouseReleaseEvent( QMouseEvent* )
 {
+    if (this->fInSelectMode) {
+        // Releasing the button ends selection mode.
+        this->fInSelectMode = false;
+        return;
+    }
+
     if (this->fClickedLink == 0) {
-        // We're not click-tracking a link; there's nothing to do here.
+        // We're not click-tracking a link; there's nothing else to do here.
         return;
     }
 

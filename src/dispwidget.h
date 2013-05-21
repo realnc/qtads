@@ -35,6 +35,12 @@ class DisplayWidget: public QWidget {
     class CHtmlDispLink* fHoverLink;
     class CHtmlDispLink* fClickedLink;
 
+    // Are we in text selection mode?
+    bool fInSelectMode;
+
+    // Origin of current selection range.
+    QPoint fSelectOrigin;
+
     // Stop tracking links.
     void
     fInvalidateLinkTracking();
