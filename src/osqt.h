@@ -23,7 +23,22 @@
 #ifndef OSQT_H
 #define OSQT_H
 
+/* The system headers should never be included from inside an extern "C" block.
+ * However, we are included from tads2/os.h from inside such a block ourselves,
+ * so everything we include will be extern "C" too.  We need to reverse this or
+ * some compilers will bark (Sun C++ 5.9 on Linux, for example.) */
+#ifdef __cplusplus
+}
+#endif
 #include <QtGlobal>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Most systems have typedefs for ushort, uint and ulong.  If not, the
  * qtads.pro project file should be modified to define OS_NO_TYPES_DEFINED. */
@@ -54,22 +69,6 @@ typedef quint32 uint32_t;
  */
 #define OS_DECLARATIVE_TLS
 #define OS_DECL_TLS(t, v) t v
-
-/* Standard C headers should never be included from inside an extern "C" block.
- * However, we are included from tads2/os.h from inside such a block ourselves,
- * so everything we include will be extern "C" too.  We need to reverse this or
- * some compilers will bark (Sun C++ 5.9 on Linux, for example.) */
-#ifdef __cplusplus
-extern "C++" {
-#endif
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#ifdef __cplusplus
-}
-#endif
 
 /* We don't support the Atari 2600. */
 #include "osbigmem.h"
