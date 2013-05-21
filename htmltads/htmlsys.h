@@ -572,28 +572,68 @@ public:
     static CHtmlSysFrame *get_frame_obj() { return app_frame_; }
 
     /*
-     *   Indicate that the process wants to quit when the program is stuck in
-     *   an input EOF loop.  This is a static function that must be
-     *   implemented by the port-specific code.
-     *
-     *   This is called by the input layer (in oshtml.cpp) when it tries to
-     *   detect whether the program is looping on input after EOF.  This
-     *   should return true if kill_process() should be called in such cases,
-     *   false otherwise.
+     *   Check for end-of-file on the console.  Returns true on EOF, false if
+     *   not.
+     *   
+     *   End-of-file in this context means that no more user input events are
+     *   forthcoming.  In a graphical environment, this happens when the user
+     *   closes the main UI window, selects a Quit menu command, or takes
+     *   some similar action that's intended to terminate the session.
+     *   
+     *   Console EOF detection is important because TADS doesn't immediately
+     *   terminate the byte code program when the user closes the UI.  The
+     *   byte code program might have work to perform before it exits, such
+     *   as saving current state for later restoration, so TADS allows it to
+     *   continue running even after the UI has been closed.  However, if the
+     *   program makes any calls to read input from the console after the UI
+     *   has been closed, the input reader functions must immediately return
+     *   an EOF indication.  That's where this method comes in: the input
+     *   reader functions call this to check for EOF, and immediately return
+     *   an EOF indication to their callers if this method returns true.
      */
-    static int quit_on_eof_loop();
+    static int eof_on_console();
 
     /*
-     *   Kill the process.  This is a static function that must be
+     *   Kill the current process.  This is a static function that must be
      *   implemented by the port-specific code.
      *   
      *   This is called when the input layer (in oshtml.cpp) finds that the
-     *   program is looping on input after EOF and quit_on_eof_loop() returns
-     *   true.  This routine should force the program to terminate, by
-     *   explicitly killing the process via the OS API if possible.
+     *   program is looping on input after the console has been closed.  This
+     *   routine should force the program to terminate.  The simplest way to
+     *   implement this is usually via an OS API that explicitly terminates
+     *   the current process.  If that's not possible, an alternative might
+     *   be to use longjmp() to jump to a setjmp() point that's initialized
+     *   in the OS-specific main startup code, allowing the program to jump
+     *   out of any nested loops and return from its main entrypoint.  The
+     *   process termination doesn't need to be particularly graceful, since
+     *   the whole point is to terminate an errant byte code program, so it's
+     *   fine to use a heavy-handed approach that unceremoniously kills the
+     *   whole process.
+     *   
+     *   As explained above in the eof_on_console() notes, TADS allows a byte
+     *   code program to continue running after the UI has been closed.  If
+     *   the program makes any calls to read input from the console after the
+     *   UI has closed, the input functions will return EOF errors.  Byte
+     *   code programs are meant to recognize these errors and handle them
+     *   gracefully, by performing any final tasks they need to perform and
+     *   then exiting.  However, it's possible to write errant programs that
+     *   ignore the EOF errors and continue polling for input indefinitely.
+     *   (Examples of TADS 2 programs that do this actually exist in the
+     *   wild, in part because the EOF condition wasn't well defined in TADS
+     *   2 releases that predated HTML TADS.  But since it's up to the byte
+     *   code program to properly interpret and handle EOF errors, it's
+     *   readily possible to write programs that don't exit properly on EOF
+     *   even with the most recent versions of the system.)  This method is
+     *   part of a mechanism that's designed to detect and handle such
+     *   programs.  The input reader functions (in oshtml.cpp) monitor for
+     *   repeated calls after an EOF condition occurs; if the byte code
+     *   program makes a large number of input calls that result in EOF
+     *   errors, the input readers assume that the program is stuck in an
+     *   infinite loop as a consequence of ignoring or mishandling EOF
+     *   errors, and explicitly terminate the program by calling this method.
      */
-    static void kill_process();
-
+     static void kill_process();
+ 
     /* 
      *   Flush the text output buffer.
      *   

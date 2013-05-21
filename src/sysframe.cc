@@ -758,7 +758,7 @@ CHtmlSysFrame::kill_process()
 
 
 int
-CHtmlSysFrame::quit_on_eof_loop()
+CHtmlSysFrame::eof_on_console()
 {
     return qWinGroup->wantsToQuit();
 }
