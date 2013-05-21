@@ -680,7 +680,8 @@ CHtmlSysFrameQt::reformatBanners( bool showStatus, bool freezeDisplay, bool rese
 }
 
 
-void CHtmlSysFrameQt::pruneParseTree()
+void
+CHtmlSysFrameQt::pruneParseTree()
 {
     static int checkCount = 0;
 
@@ -756,7 +757,8 @@ CHtmlSysFrame::kill_process()
 }
 
 
-int CHtmlSysFrame::quit_on_eof_loop()
+int
+CHtmlSysFrame::quit_on_eof_loop()
 {
     return qWinGroup->wantsToQuit();
 }
