@@ -24,6 +24,11 @@
 #include "config.h"
 
 
+bool initSound();
+
+void quitSound();
+
+
 /* Provides the common code for all three types of digitized sound (WAV,
  * Ogg Vorbis and MP3).
  */
