@@ -282,8 +282,16 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
         this->fTadsBuffer->backspace();
     } else {
         QString strToAdd = e->text();
+        // If we're pasting, replace tabs and newlines with spaces.
         if (e->matches(QKeySequence::Paste)) {
             strToAdd = QApplication::clipboard()->text();
+            for (int i = 0; i < strToAdd.length(); ++i) {
+                if (strToAdd[i] == QChar::fromLatin1('\t')
+                    or strToAdd[i] == QChar::fromLatin1('\n'))
+                {
+                    strToAdd[i] = QChar::fromLatin1(' ');
+                }
+            }
         } else if (strToAdd.isEmpty() or not strToAdd.at(0).isPrint()) {
             QScrollArea::keyPressEvent(e);
             return;
