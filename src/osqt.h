@@ -228,6 +228,8 @@ typedef struct QDirIterator* osdirhdl_t;
 /* ============= Functions follow ================ */
 
 #ifdef __cplusplus
+} // extern "C"
+
 /* Helper routine. Translates a local filename to a unicode QString. In
  * Tads 3, we use UTF-8 for everything. In Tads 2, we need to use the
  * local character set for filenames.
@@ -240,6 +242,8 @@ fnameToQStr( const char* fname );
  */
 QByteArray
 qStrToFname( const QString& fnameStr );
+
+extern "C" {
 #endif
 
 /* 64-bit replacements for <time.h> routines.  Only Windows supports this. */
