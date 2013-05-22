@@ -28,6 +28,9 @@
 #include "syswininput.h"
 
 
+DisplayWidget* DisplayWidget::curSelWidget = 0;
+
+
 DisplayWidget::DisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
     : QWidget(parent),
       fHoverLink(0),
@@ -111,11 +114,14 @@ DisplayWidget::mousePressEvent( QMouseEvent* e )
         if ((e->buttons() & Qt::LeftButton) and not this->fInSelectMode) {
             this->fInSelectMode = true;
             this->fSelectOrigin = e->pos();
-            // Clear the selection range in the formatter by setting both ends
-            // of the range to the maximum text offset in the formatter's
-            // display list.
-            unsigned long start = this->formatter->get_text_ofs_max();
-            this->formatter->set_sel_range(start, start);
+            // Just in case we had a selection previously, clear it.
+            this->clearSelection();
+            // If another widget also has an active selection, clear it.
+            if (curSelWidget != 0 and curSelWidget != this) {
+                curSelWidget->clearSelection();
+            }
+            // Remember that we're the widget with an active selection.
+            curSelWidget = this;
         }
         return;
     }
@@ -158,6 +164,17 @@ DisplayWidget::mouseReleaseEvent( QMouseEvent* )
     }
     // Stop click-tracking it.
     this->fClickedLink = 0;
+}
+
+
+void
+DisplayWidget::clearSelection()
+{
+    // Clear the selection range in the formatter by setting both ends
+    // of the range to the maximum text offset in the formatter's
+    // display list.
+    unsigned long start = this->formatter->get_text_ofs_max();
+    this->formatter->set_sel_range(start, start);
 }
 
 

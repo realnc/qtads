@@ -52,6 +52,10 @@ class DisplayWidget: public QWidget {
     // Our parent's formatter, for easy access.
     class CHtmlFormatter* formatter;
 
+    // Holds the widget that currently has an active selection range, or null
+    // if there's no active selection.
+    static DisplayWidget* curSelWidget;
+
     void
     paintEvent( QPaintEvent* e ) override;
 
@@ -80,6 +84,10 @@ class DisplayWidget: public QWidget {
         this->fClickedLink = this->fHoverLink = 0;
         this->fInvalidateLinkTracking();
     }
+
+    // Clear the selection range.
+    void
+    clearSelection();
 
     // Update link tracking for specified mouse position.  If the specified
     // position isNull(), it will be autodetected.

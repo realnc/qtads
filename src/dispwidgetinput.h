@@ -63,8 +63,7 @@ class DisplayWidgetInput: public DisplayWidget {
 
     // Change the text cursor position.
     void
-    moveCursorPos( const QPoint& pos )
-    { this->fCursorPos = pos; }
+    moveCursorPos( const QPoint& pos );
 
     // Set the height of the text cursor in pixels.
     void

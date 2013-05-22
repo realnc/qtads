@@ -51,6 +51,19 @@ DisplayWidgetInput::DisplayWidgetInput( CHtmlSysWinQt* parent, CHtmlFormatter* f
 
 
 void
+DisplayWidgetInput::moveCursorPos(const QPoint& pos)
+{
+    this->fCursorPos = pos;
+
+    // Moving the cursor should also clear any current selection.
+    if (DisplayWidget::curSelWidget) {
+        DisplayWidget::curSelWidget->clearSelection();
+        DisplayWidget::curSelWidget = 0;
+    }
+}
+
+
+void
 DisplayWidgetInput::paintEvent( QPaintEvent* e )
 {
     //qDebug() << Q_FUNC_INFO << "called";
