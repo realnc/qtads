@@ -73,6 +73,7 @@ class DisplayWidget: public QWidget {
 
   public:
     DisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
+    ~DisplayWidget() override;
 
     // When our parent's notify_clear_contents() is called, we need to know
     // about it so we can perform link tracking invalidation.

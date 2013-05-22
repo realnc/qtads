@@ -48,6 +48,16 @@ DisplayWidget::DisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
 }
 
 
+DisplayWidget::~DisplayWidget()
+{
+    // If we currently have an active selection, make sure no one tries to
+    // access it anymore.
+    if (DisplayWidget::curSelWidget == this) {
+        DisplayWidget::curSelWidget = 0;
+    }
+}
+
+
 void
 DisplayWidget::fInvalidateLinkTracking()
 {
