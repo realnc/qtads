@@ -37,16 +37,20 @@
 
 
 CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* parent )
-    : CHtmlSysWinQt(formatter, 0, parent),
+    : CHtmlSysWinQt(formatter, parent),
       fInputMode(NoInput),
       fInputReady(false),
       fRestoreFromCancel(false),
       fLastKeyEvent(Qt::Key_Any),
       fTag(0)
 {
+    // Replace the default display widget with an input display widget.
+    this->formatter_->unset_win();
+    delete this->dispWidget;
     this->dispWidget = new DisplayWidgetInput(this, formatter);
     this->fCastDispWidget = static_cast<DisplayWidgetInput*>(this->dispWidget);
     this->setWidget(this->dispWidget);
+    this->formatter_->set_win(this, &margins);
 
     this->fInputBuffer = new textchar_t[1024];
     this->fInputBufferSize = 1024;

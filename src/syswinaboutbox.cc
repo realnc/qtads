@@ -21,7 +21,7 @@
 
 
 CHtmlSysWinAboutBoxQt::CHtmlSysWinAboutBoxQt( class CHtmlFormatter* formatter, QWidget* parent )
-    : CHtmlSysWinQt(formatter, 0, parent)
+    : CHtmlSysWinQt(formatter, parent)
 {
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

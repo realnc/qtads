@@ -31,7 +31,7 @@
 #include "htmlrc.h"
 
 
-CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidget, QWidget* parent )
+CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QWidget* parent )
     : QScrollArea(parent),
       CHtmlSysWin(formatter),
       fBannerPos(HTML_BANNERWIN_POS_TOP),
@@ -49,10 +49,8 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, DisplayWidget* dispWidg
       bannerSize(0),
       bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
 {
-    if (dispWidget == 0) {
-        this->dispWidget = new DisplayWidget(this, formatter);
-        this->setWidget(this->dispWidget);
-    }
+    this->dispWidget = new DisplayWidget(this, formatter);
+    this->setWidget(this->dispWidget);
     this->formatter_->set_win(this, &margins);
     this->viewport()->setForegroundRole(QPalette::Text);
     this->viewport()->setBackgroundRole(QPalette::Base);

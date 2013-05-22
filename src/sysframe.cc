@@ -1047,7 +1047,7 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
     //      << "other:" << other << "pos:" << pos << "style:" << style;
 
     // Create the banner window.
-    CHtmlSysWinQt* banner = new CHtmlSysWinQt(formatter, 0, qWinGroup->centralWidget());
+    CHtmlSysWinQt* banner = new CHtmlSysWinQt(formatter, qWinGroup->centralWidget());
     CHtmlSysWinQt* castParent = static_cast<CHtmlSysWinQt*>(parent);
     CHtmlSysWinQt* castOther = static_cast<CHtmlSysWinQt*>(other);
 

@@ -116,7 +116,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
     mousePressEvent( QMouseEvent* e ) override;
 
   public:
-    CHtmlSysWinQt( class CHtmlFormatter* formatter, class DisplayWidget* dispWidget, QWidget* parent );
+    CHtmlSysWinQt( class CHtmlFormatter* formatter, QWidget* parent );
     ~CHtmlSysWinQt() override;
 
     // Returns our display widget.
