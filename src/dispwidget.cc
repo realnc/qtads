@@ -178,6 +178,33 @@ DisplayWidget::clearSelection()
 }
 
 
+QString
+DisplayWidget::selectedText()
+{
+    if (DisplayWidget::curSelWidget == 0) {
+        // There's no active selection.
+        return QString();
+    }
+
+    CHtmlFormatter* fmt = DisplayWidget::curSelWidget->formatter;
+    unsigned long startOfs, endOfs;
+    fmt->get_sel_range(&startOfs, &endOfs);
+
+    if (startOfs == endOfs) {
+        // There's nothing selected.
+        return QString();
+    }
+
+    // Figure out how much space we need.
+    unsigned long len = fmt->get_chars_in_ofs_range(startOfs, endOfs);
+
+    // Get the text in the internal format.
+    CStringBuf buf(len);
+    fmt->extract_text(&buf, startOfs, endOfs);
+    return QString::fromUtf8(buf.get(), len);
+}
+
+
 void
 DisplayWidget::updateLinkTracking( const QPoint& mousePos )
 {

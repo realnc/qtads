@@ -89,6 +89,12 @@ class DisplayWidget: public QWidget {
     void
     clearSelection();
 
+    // Get the text contained in the currently active selection. Returns a
+    // null string is there's currently no display widget with an active
+    // selection.
+    static QString
+    selectedText();
+
     // Update link tracking for specified mouse position.  If the specified
     // position isNull(), it will be autodetected.
     //

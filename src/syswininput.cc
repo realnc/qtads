@@ -273,22 +273,10 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
     } else if (e->matches(QKeySequence::Undo)) {
         this->fTadsBuffer->undo();
     } else if (e->matches(QKeySequence::Copy)) {
-        // Get the current selection.
-        unsigned long startOfs, endOfs;
-        this->formatter_->get_sel_range(&startOfs, &endOfs);
-
-        // If there's nothing selected, there's nothing to do.
-        if (startOfs == endOfs) {
-            return;
+        const QString& selectedText = DisplayWidget::selectedText();
+        if (not selectedText.isEmpty()) {
+            QApplication::clipboard()->setText(selectedText);
         }
-
-        // Figure out how much space we need.
-        unsigned long len = this->formatter_->get_chars_in_ofs_range(startOfs, endOfs);
-
-        // Get the text in the internal format and update the clipboard.
-        CStringBuf buf(len);
-        this->formatter_->extract_text(&buf, startOfs, endOfs);
-        QApplication::clipboard()->setText(QString::fromUtf8(buf.get(), len));
         return;
     } else if (e->key() == Qt::Key_Backspace) {
         this->fTadsBuffer->backspace();
