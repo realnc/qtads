@@ -59,7 +59,6 @@ QString
 fnameToQStr( const char* fname )
 {
     Q_ASSERT(qFrame != 0);
-    Q_ASSERT(fname != 0);
 
     if (qFrame->tads3())
         return QString::fromUtf8(fname);
