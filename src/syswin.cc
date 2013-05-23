@@ -581,21 +581,20 @@ CHtmlSysWinQt::get_max_chars_in_width( CHtmlSysFont* font, const textchar_t* str
 {
     // We do a binary search on the results of measure_text() until we find an
     // amount of characters that fit.
-    int first = 1;
-    int last = len;
-    size_t mid = 0;
-    int skippedBytes;
+    int first = 0;
+    int last = len - 1;
+    int mid = 0;
     while (first <= last) {
-        skippedBytes = 1;
+        int skippedBytes = 1;
         // New mid point.
         mid = (first + last) / 2;
         // We might have landed inside a UTF-8 continuation byte. In that case,
         // adjust mid until we have a complete UTF character.
-        while ((str[mid-1] & 0xC0) == 0x80 and mid < len) {
+        while ((str[mid] & 0xC0) == 0x80 and mid < len) {
             ++mid;
             ++skippedBytes;
         }
-        long bestFit = this->measure_text(font, str, mid, 0).x;
+        long bestFit = this->measure_text(font, str, mid + 1, 0).x;
         if (bestFit < wid) {
             first = mid + skippedBytes;
         } else if (bestFit > wid) {
@@ -607,7 +606,10 @@ CHtmlSysWinQt::get_max_chars_in_width( CHtmlSysFont* font, const textchar_t* str
     }
     // We didn't find an exact match, which means one less than the result we
     // got will fit.
-    return mid - 1;
+    while (mid > 0 and (str[mid] & 0xC0) == 0x80) {
+        --mid;
+    }
+    return mid + 1;
 }
 
 
