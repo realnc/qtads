@@ -36,11 +36,17 @@ os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/ )
     // We always use UTF-8, so we only need to figure out how many bytes to
     // skip by looking at the first byte. We don't need to actually iterate
     // over them.
-    switch (0xF0 & *p) {
-      case 0xF0: p += 4; break;
-      case 0xE0: p += 3; break;
-      case 0xC0: p += 2; break;
-      default:   p += 1; break;
+    if ((0x80 & *p) == 0x00) {
+        p += 1;
+    } else if ((0xE0 & *p) == 0xC0) {
+        p += 2;
+    } else if ((0xF0 & *p) == 0xE0) {
+        p += 3;
+    } else if ((0xF8 & *p) == 0xF0) {
+        p += 4;
+    } else {
+        qWarning() << Q_FUNC_INFO << "corrupt UTF-8 sequence";
+        p += 1;
     }
     return const_cast<textchar_t*>(p);
 }
