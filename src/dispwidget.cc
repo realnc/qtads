@@ -95,14 +95,10 @@ DisplayWidget::mouseMoveEvent( QMouseEvent* e )
     // If the button is pressed and we're in selection mode, update the
     // selection range.
     if ((e->buttons() & Qt::LeftButton) and this->fInSelectMode) {
-        CHtmlPoint htmlPos(this->fSelectOrigin.x(), this->fSelectOrigin.y());
-        unsigned long startOfs = this->formatter->find_textofs_by_pos(htmlPos);
-        htmlPos.set(e->pos().x(), e->pos().y());
-        unsigned long endOfs = this->formatter->find_textofs_by_pos(htmlPos);
-        this->formatter->set_sel_range(startOfs, endOfs);
+        this->formatter->set_sel_range(CHtmlPoint(this->fSelectOrigin.x(), this->fSelectOrigin.y()),
+                                       CHtmlPoint(e->pos().x(), e->pos().y()), 0, 0);
         return;
     }
-
     // This wasn't a selection event. Just update link tracking.
     this->updateLinkTracking(e->pos());
 }
