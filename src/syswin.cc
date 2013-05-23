@@ -579,37 +579,38 @@ CHtmlSysWinQt::measure_text( CHtmlSysFont* font, const textchar_t* str, size_t l
 size_t
 CHtmlSysWinQt::get_max_chars_in_width( CHtmlSysFont* font, const textchar_t* str, size_t len, long wid )
 {
-    // We do a binary search on the results of measure_text() until we find an
-    // amount of characters that fit.
-    int first = 0;
-    int last = len - 1;
-    int mid = 0;
-    while (first <= last) {
-        int skippedBytes = 1;
-        // New mid point.
-        mid = (first + last) / 2;
+    // We bisect the results of measure_text() for the maximum amount of
+    // characters that fit.
+    int begin = 1;
+    int end = len;
+    int mid = (begin + end) / 2;
+
+    while (end >= begin) {
+        mid = (begin + end) / 2;
         // We might have landed inside a UTF-8 continuation byte. In that case,
         // adjust mid until we have a complete UTF character.
-        while ((str[mid] & 0xC0) == 0x80 and mid < len) {
+        while ((str[mid] & 0xC0) == 0x80 and mid > begin and mid < end) {
             ++mid;
-            ++skippedBytes;
         }
-        long bestFit = this->measure_text(font, str, mid + 1, 0).x;
-        if (bestFit < wid) {
-            first = mid + skippedBytes;
-        } else if (bestFit > wid) {
-            last = mid - skippedBytes;
+        long bestFit = this->measure_text(font, str, mid, 0).x;
+        if (bestFit > wid) {
+            end = mid - 1;
+        } else if (bestFit < wid) {
+            begin = mid + 1;
         } else {
-            // Exact match.
             return mid;
         }
     }
+
     // We didn't find an exact match, which means one less than the result we
     // got will fit.
+    --mid;
+    // If that got us inside a UTF-8 sequence, skip to the character's first
+    // byte.
     while (mid > 0 and (str[mid] & 0xC0) == 0x80) {
         --mid;
     }
-    return mid + 1;
+    return mid > 0 ? mid : 0;
 }
 
 
