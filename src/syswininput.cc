@@ -106,6 +106,17 @@ CHtmlSysWinInputQt::fProcessPagePauseQueue()
 }
 
 
+void CHtmlSysWinInputQt::fUpdateInputFormatter()
+{
+    this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
+    if (this->fTag->ready_to_format()) {
+        this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
+        this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+    }
+    this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
+}
+
+
 void
 CHtmlSysWinInputQt::setCursorHeight( unsigned height )
 {
@@ -272,52 +283,17 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
         this->fTadsBuffer->end_of_line(true);
     } else if (e->matches(QKeySequence::Undo)) {
         this->fTadsBuffer->undo();
-    } else if (e->matches(QKeySequence::Copy)) {
-        const QString& selectedText = DisplayWidget::selectedText();
-        if (not selectedText.isEmpty()) {
-            QApplication::clipboard()->setText(selectedText);
-        }
-        return;
     } else if (e->key() == Qt::Key_Backspace) {
         this->fTadsBuffer->backspace();
     } else {
         QString strToAdd = e->text();
-        // If we're pasting, replace tabs and newlines with spaces.
-        if (e->matches(QKeySequence::Paste)) {
-            strToAdd = QApplication::clipboard()->text();
-            for (int i = 0; i < strToAdd.length(); ++i) {
-                if (strToAdd[i] == QChar::fromLatin1('\t')
-                    or strToAdd[i] == QChar::fromLatin1('\n'))
-                {
-                    strToAdd[i] = QChar::fromLatin1(' ');
-                }
-            }
-        } else if (strToAdd.isEmpty() or not strToAdd.at(0).isPrint()) {
+        if (strToAdd.isEmpty() or not strToAdd.at(0).isPrint()) {
             QScrollArea::keyPressEvent(e);
             return;
         }
-        const QByteArray& utfTxt = strToAdd.toUtf8();
-        // Try to add it to the input buffer. Do not allow truncation; it
-        // won't work with UTF-8 strings and we'll crash if it doesn't fit.
-        if (not this->fTadsBuffer->add_string(utfTxt.constData(), utfTxt.length(), false)) {
-            // It didn't fit.  Try to add the largest part of it that fits.
-            int i = strToAdd.length();
-            QString subStr;
-            QByteArray subUtf;
-            do {
-                --i;
-                subStr = strToAdd.left(i);
-                subUtf = subStr.toUtf8();
-            } while (not this->fTadsBuffer->add_string(subUtf.constData(), subUtf.length(), false) and i > 1);
-        }
+        this->insertText(strToAdd);
     }
-
-    this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
-    if (this->fTag->ready_to_format()) {
-        this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
-        this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
-    }
-    this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
+    this->fUpdateInputFormatter();
 }
 
 
@@ -346,15 +322,8 @@ CHtmlSysWinInputQt::inputMethodEvent( QInputMethodEvent* e )
         emit inputReady();
         return;
     }
-
-    this->fTadsBuffer->add_string(e->commitString().toUtf8().constData(),
-                                  e->commitString().toUtf8().length(), true);
-    this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
-    if (this->fTag->ready_to_format()) {
-        this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
-        this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
-    }
-    this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
+    this->insertText(e->commitString());
+    this->fUpdateInputFormatter();
 }
 
 
@@ -687,6 +656,36 @@ CHtmlSysWinInputQt::removeFromPagePauseQueue( CHtmlSysWinQt* banner )
     if (this->fPagePauseQueue.isEmpty() and this->fInputMode == PagePauseInput) {
         this->fInputMode = NoInput;
     }
+}
+
+
+void
+CHtmlSysWinInputQt::insertText( QString str )
+{
+    if (str.isEmpty() or not qFrame->gameRunning()) {
+        return;
+    }
+    // Replace tabs and newlines with spaces.
+    for (int i = 0; i < str.length(); ++i) {
+        if (str.at(i) == QChar::fromLatin1('\t') or str.at(i) == QChar::fromLatin1('\n')) {
+            str[i] = QChar::fromLatin1(' ');
+        }
+    }
+    const QByteArray& utfTxt = str.toUtf8();
+    // Try to add it to the input buffer. Do not allow truncation; it
+    // won't work with UTF-8 strings and we'll crash if it doesn't fit.
+    if (not this->fTadsBuffer->add_string(utfTxt.constData(), utfTxt.length(), false)) {
+        // It didn't fit.  Try to add the largest part of it that fits.
+        int i = str.length();
+        QString subStr;
+        QByteArray subUtf;
+        do {
+            --i;
+            subStr = str.left(i);
+            subUtf = subStr.toUtf8();
+        } while (not this->fTadsBuffer->add_string(subUtf.constData(), subUtf.length(), false) and i > 1);
+    }
+    this->fUpdateInputFormatter();
 }
 
 

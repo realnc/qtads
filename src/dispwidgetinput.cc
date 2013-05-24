@@ -54,11 +54,9 @@ void
 DisplayWidgetInput::moveCursorPos(const QPoint& pos)
 {
     this->fCursorPos = pos;
-
     // Moving the cursor should also clear any current selection.
     if (DisplayWidget::curSelWidget) {
         DisplayWidget::curSelWidget->clearSelection();
-        DisplayWidget::curSelWidget = 0;
     }
 }
 
@@ -137,6 +135,17 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* t
     unsigned long inp_txt_ofs = tag->get_text_ofs();
     tadsBuffer->get_sel_range(&start, &end, &caret);
     formatter->set_sel_range(start + inp_txt_ofs, end + inp_txt_ofs);
+
+    // If there's actually any text selected, then mark us as the active
+    // selection widget. Otherwise, if nothing is selected remove the
+    // reference. Also enable or disable the "Copy" action as needed.
+    if (start != end) {
+        DisplayWidget::curSelWidget = this;
+        qWinGroup->enableCopyAction(true);
+    } else {
+        qWinGroup->enableCopyAction(false);
+        DisplayWidget::curSelWidget = 0;
+    }
 
     // Blink-in.
     if (not this->fBlinkVisible) {

@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QUrl>
 #include <QDesktopServices>
+#include <QClipboard>
 #include <QMimeData>
 
 #include "syswininput.h"
@@ -32,6 +33,7 @@
 #include "settings.h"
 #include "gameinfodialog.h"
 #include "aboutqtadsdialog.h"
+#include "dispwidget.h"
 
 
 void
@@ -120,6 +122,24 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
     // "Edit" menu.
     menu = menuBar->addMenu(tr("&Edit"));
+    this->fCopyAction = new QAction(tr("&Copy"), this);
+#if QT_VERSION >= 0x040600
+    this->fCopyAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-copy")));
+    this->fCopyAction->setShortcuts(QKeySequence::Copy);
+#endif
+    this->fCopyAction->setEnabled(false);
+    menu->addAction(this->fCopyAction);
+    connect(this->fCopyAction, SIGNAL(triggered()), SLOT(copyToClipboard()));
+    this->fPasteAction = new QAction(tr("&Paste"), this);
+#if QT_VERSION >= 0x040600
+    this->fPasteAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-paste")));
+    this->fPasteAction->setShortcuts(QKeySequence::Paste);
+#endif
+    this->fPasteAction->setDisabled(QApplication::clipboard()->text().isEmpty());
+    menu->addAction(this->fPasteAction);
+    connect(this->fPasteAction, SIGNAL(triggered()), SLOT(pasteFromClipboard()));
+    connect(QApplication::clipboard(), SIGNAL(dataChanged()), SLOT(fUpdatePasteAction()));
+    menu->addSeparator();
     act = new QAction(tr("&Preferences..."), this);
 #if QT_VERSION >= 0x040600
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("configure")));
@@ -575,11 +595,35 @@ CHtmlSysWinGroupQt::dropEvent( QDropEvent* e )
 
 
 void
+CHtmlSysWinGroupQt::copyToClipboard()
+{
+    const QString& selectedText = DisplayWidget::selectedText();
+    if (not selectedText.isEmpty()) {
+        QApplication::clipboard()->setText(selectedText);
+    }
+}
+
+
+void
+CHtmlSysWinGroupQt::pasteFromClipboard()
+{
+    qFrame->gameWindow()->insertText(QApplication::clipboard()->text());
+}
+
+
+void
 CHtmlSysWinGroupQt::fRunDropEventFile()
 {
     if (this->fAskQuitGameDialog()) {
         qFrame->setNextGame(this->fGameFileFromDropEvent);
     }
+}
+
+
+void
+CHtmlSysWinGroupQt::fUpdatePasteAction()
+{
+    this->fPasteAction->setDisabled(QApplication::clipboard()->text().isEmpty());
 }
 
 
@@ -654,6 +698,13 @@ CHtmlSysWinGroupQt::checkForUpdates()
 {
     this->fSilentIfNoUpdates = true;
     this->fCheckForUpdates();
+}
+
+
+void
+CHtmlSysWinGroupQt::enableCopyAction( bool f )
+{
+    this->fCopyAction->setEnabled(f);
 }
 
 

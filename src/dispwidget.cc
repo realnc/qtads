@@ -53,6 +53,7 @@ DisplayWidget::~DisplayWidget()
     // If we currently have an active selection, make sure no one tries to
     // access it anymore.
     if (DisplayWidget::curSelWidget == this) {
+        qWinGroup->enableCopyAction(false);
         DisplayWidget::curSelWidget = 0;
     }
 }
@@ -128,6 +129,7 @@ DisplayWidget::mousePressEvent( QMouseEvent* e )
             }
             // Remember that we're the widget with an active selection.
             curSelWidget = this;
+            qWinGroup->enableCopyAction(true);
         }
         return;
     }
@@ -147,6 +149,10 @@ DisplayWidget::mouseReleaseEvent( QMouseEvent* )
     if (this->fInSelectMode) {
         // Releasing the button ends selection mode.
         this->fInSelectMode = false;
+        // If the selection is empty, there would be nothing to copy.
+        if (DisplayWidget::selectedText().isEmpty()) {
+            qWinGroup->enableCopyAction(false);
+        }
         return;
     }
 

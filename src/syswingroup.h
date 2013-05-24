@@ -61,6 +61,8 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     class QAction* fRestartCurrentGameAction;
     class QAction* fGameInfoAction;
     class QAction* fAboutQtadsAction;
+    class QAction* fCopyAction;
+    class QAction* fPasteAction;
     class QNetworkAccessManager* fNetManager;
     class QNetworkReply* fReply;
     QString fGameFileFromDropEvent;
@@ -133,6 +135,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     void
     fRunDropEventFile();
 
+    void
+    fUpdatePasteAction();
+
   protected:
     void
     closeEvent( QCloseEvent* e ) override;
@@ -142,6 +147,18 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
     void
     dropEvent( QDropEvent* e ) override;
+
+  public slots:
+    // Copy the current selection to the clipboard. No action is performed if
+    // there's no selection in any of the game windows.
+    void
+    copyToClipboard();
+
+    // Paste the current contents of the clipboard into the input window's
+    // editor. Does nothing if the input window is not currently in line input
+    // mode.
+    void
+    pasteFromClipboard();
 
   public:
     CHtmlSysWinGroupQt();
@@ -166,6 +183,9 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     bool
     wantsToQuit() const
     { return this->fWantsToQuit; }
+
+    void
+    enableCopyAction( bool f );
 
 #ifdef Q_OS_MAC
     // Handler for FileOpen events.  They only occur in OS X.

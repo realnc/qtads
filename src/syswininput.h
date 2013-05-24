@@ -93,6 +93,9 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
     void
     fProcessPagePauseQueue();
 
+    void
+    fUpdateInputFormatter();
+
   protected:
     void
     resizeEvent( QResizeEvent* event ) override;
@@ -161,6 +164,11 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
         this->fHrefEvent.clear();
         return ret;
     }
+
+    // Insert text into the current input editor position. Does nothing if line
+    // input mode is not currently active.
+    void
+    insertText( QString str );
 
     //
     // CHtmlSysWin interface implementation.
