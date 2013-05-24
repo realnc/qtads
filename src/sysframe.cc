@@ -56,6 +56,7 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
     : QApplication(argc, argv),
       fGameWin(0),
       fGameRunning(false),
+      fTads3(true),
       fReformatPending(false),
       fNonStopMode(false)
 {
