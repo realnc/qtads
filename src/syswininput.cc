@@ -234,8 +234,10 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
 
     if (e->matches(QKeySequence::MoveToStartOfLine) or e->matches(QKeySequence::MoveToStartOfBlock)) {
         this->fTadsBuffer->start_of_line(false);
+        this->fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToEndOfLine) or e->matches(QKeySequence::MoveToEndOfBlock)) {
         this->fTadsBuffer->end_of_line(false);
+        this->fCastDispWidget->clearSelection();
 #if QT_VERSION >= 0x040500
     } else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
 #else
@@ -244,47 +246,82 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
         this->fInputReady = true;
         this->fInputMode = NoInput;
         this->fTadsBuffer->add_hist();
+        this->fCastDispWidget->clearSelection();
         emit inputReady();
         return;
     } else if (e->matches(QKeySequence::Delete)) {
         this->fTadsBuffer->del_right();
+        this->fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::DeleteEndOfWord)) {
         this->fTadsBuffer->move_right(true, true);
         this->fTadsBuffer->del_selection();
+        this->fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::DeleteStartOfWord)) {
         this->fTadsBuffer->move_left(true, true);
         this->fTadsBuffer->del_selection();
+        this->fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToPreviousChar)) {
         this->fTadsBuffer->move_left(false, false);
+        this->fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToNextChar)) {
         this->fTadsBuffer->move_right(false, false);
+        this->fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToPreviousWord)) {
         this->fTadsBuffer->move_left(false, true);
+        this->fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToNextWord)) {
         this->fTadsBuffer->move_right(false, true);
+        this->fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToPreviousLine)) {
         this->fTadsBuffer->select_prev_hist();
+        this->fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToNextLine)) {
         this->fTadsBuffer->select_next_hist();
+        this->fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::SelectPreviousChar)) {
+        if (not this->fTadsBuffer->has_sel_range()) {
+            this->fCastDispWidget->clearSelection();
+        }
         this->fTadsBuffer->move_left(true, false);
     } else if (e->matches(QKeySequence::SelectNextChar)) {
+        if (not this->fTadsBuffer->has_sel_range()) {
+            this->fCastDispWidget->clearSelection();
+        }
         this->fTadsBuffer->move_right(true, false);
     } else if (e->matches(QKeySequence::SelectPreviousWord)) {
+        if (not this->fTadsBuffer->has_sel_range()) {
+            this->fCastDispWidget->clearSelection();
+        }
         this->fTadsBuffer->move_left(true, true);
     } else if (e->matches(QKeySequence::SelectNextWord)) {
+        if (not this->fTadsBuffer->has_sel_range()) {
+            this->fCastDispWidget->clearSelection();
+        }
         this->fTadsBuffer->move_right(true, true);
     } else if (e->matches(QKeySequence::SelectStartOfLine) or e->matches(QKeySequence::SelectStartOfBlock)) {
+        if (not this->fTadsBuffer->has_sel_range()) {
+            this->fCastDispWidget->clearSelection();
+        }
         this->fTadsBuffer->start_of_line(true);
     } else if (e->matches(QKeySequence::SelectEndOfLine) or e->matches(QKeySequence::SelectEndOfBlock)) {
+        if (not this->fTadsBuffer->has_sel_range()) {
+            this->fCastDispWidget->clearSelection();
+        }
         this->fTadsBuffer->end_of_line(true);
     } else if (e->matches(QKeySequence::SelectAll)) {
+        if (not this->fTadsBuffer->has_sel_range()) {
+            this->fCastDispWidget->clearSelection();
+        }
         this->fTadsBuffer->start_of_line(false);
         this->fTadsBuffer->end_of_line(true);
     } else if (e->matches(QKeySequence::Undo)) {
+        if (not this->fTadsBuffer->has_sel_range()) {
+            this->fCastDispWidget->clearSelection();
+        }
         this->fTadsBuffer->undo();
     } else if (e->key() == Qt::Key_Backspace) {
         this->fTadsBuffer->backspace();
+        this->fCastDispWidget->clearSelection();
     } else {
         QString strToAdd = e->text();
         if (strToAdd.isEmpty() or not strToAdd.at(0).isPrint()) {
@@ -687,6 +724,7 @@ CHtmlSysWinInputQt::insertText( QString str )
             subUtf = subStr.toUtf8();
         } while (not this->fTadsBuffer->add_string(subUtf.constData(), subUtf.length(), false) and i > 1);
     }
+    this->fCastDispWidget->clearSelection();
     this->fUpdateInputFormatter();
 }
 

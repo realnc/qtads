@@ -154,6 +154,11 @@ public:
         *caret = caret_;
     }
 
+    bool has_sel_range()
+    {
+        return sel_start_ != sel_end_;
+    }
+
     /* show or hide the caret */
     void show_caret() { caret_vis_ = TRUE; }
     void hide_caret() { caret_vis_ = FALSE; }

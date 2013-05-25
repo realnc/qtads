@@ -54,17 +54,6 @@ DisplayWidgetInput::DisplayWidgetInput(CHtmlSysWinQt* parent, CHtmlFormatter* fo
 
 
 void
-DisplayWidgetInput::moveCursorPos(const QPoint& pos)
-{
-    this->fCursorPos = pos;
-    // Moving the cursor should also clear any current selection.
-    if (DisplayWidget::curSelWidget) {
-        DisplayWidget::curSelWidget->clearSelection();
-    }
-}
-
-
-void
 DisplayWidgetInput::paintEvent( QPaintEvent* e )
 {
     //qDebug() << Q_FUNC_INFO << "called";
@@ -148,20 +137,24 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter )
         this->fBlinkCursor();
     }
 
-    CHtmlPoint cursorPos = formatter->get_text_pos(this->fInpTag->get_text_ofs()
-                                                   + this->fTadsBuffer->get_caret());
-    this->moveCursorPos(QPoint(cursorPos.x, cursorPos.y));
+    const CHtmlPoint& cursorPos = formatter->get_text_pos(this->fInpTag->get_text_ofs()
+                                                          + this->fTadsBuffer->get_caret());
+    this->fCursorPos = QPoint(cursorPos.x, cursorPos.y);
+    // If there's another window with an active selection, moving the cursor
+    // must clear it.
+    if (DisplayWidget::curSelWidget and DisplayWidget::curSelWidget != this) {
+        DisplayWidget::curSelWidget->clearSelection();
+    }
 
-    // Update the selection range in the formatter.
+    // Update the selection range in the formatter. If there's actually any
+    // text selected, then mark us as the active selection widget. Otherwise,
+    // if nothing is selected remove the reference. Also enable or disable the
+    // "Copy" action as needed.
     size_t start, end, caret;
     unsigned long inp_txt_ofs = this->fInpTag->get_text_ofs();
     this->fTadsBuffer->get_sel_range(&start, &end, &caret);
-    formatter->set_sel_range(start + inp_txt_ofs, end + inp_txt_ofs);
-
-    // If there's actually any text selected, then mark us as the active
-    // selection widget. Otherwise, if nothing is selected remove the
-    // reference. Also enable or disable the "Copy" action as needed.
     if (start != end) {
+        formatter->set_sel_range(start + inp_txt_ofs, end + inp_txt_ofs);
         DisplayWidget::curSelWidget = this;
         qWinGroup->enableCopyAction(true);
     } else {
@@ -182,5 +175,15 @@ DisplayWidgetInput::resetCursorBlinking()
     // Start the timer unless cursor blinking is disabled.
     if (QApplication::cursorFlashTime() > 1) {
         this->fBlinkTimer->start(QApplication::cursorFlashTime() / 2);
+    }
+}
+
+
+void
+DisplayWidgetInput::clearSelection()
+{
+    DisplayWidget::clearSelection();
+    if (this->fTadsBuffer->has_sel_range()) {
+        this->fTadsBuffer->set_sel_range(0, 0, this->fTadsBuffer->get_caret());
     }
 }

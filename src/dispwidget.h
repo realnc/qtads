@@ -87,7 +87,7 @@ class DisplayWidget: public QWidget {
     }
 
     // Clear the selection range.
-    void
+    virtual void
     clearSelection();
 
     // Get the text contained in the currently active selection. Returns a

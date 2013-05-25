@@ -71,10 +71,6 @@ class DisplayWidgetInput: public DisplayWidget {
     DisplayWidgetInput( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter,
                         CHtmlInputBuf* tadsBuffer );
 
-    // Change the text cursor position.
-    void
-    moveCursorPos( const QPoint& pos );
-
     // Set the height of the text cursor in pixels.
     void
     setCursorHeight( unsigned height )
@@ -101,6 +97,9 @@ class DisplayWidgetInput: public DisplayWidget {
     void
     setInputTag( CHtmlTagTextInput* inputTag )
     { this->fInpTag = inputTag; }
+
+    void
+    clearSelection() override;
 };
 
 
