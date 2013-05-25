@@ -137,6 +137,7 @@ DisplayWidget::mouseMoveEvent( QMouseEvent* e )
             mime->setText(this->fMySelectedText());
             drag->setMimeData(mime);
             drag->exec(Qt::CopyAction);
+            this->fInvalidateLinkTracking();
             return;
         }
     }
