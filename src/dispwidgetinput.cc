@@ -89,8 +89,8 @@ void
 DisplayWidgetInput::fBlinkCursor()
 {
     this->fBlinkVisible = not this->fBlinkVisible;
-    this->update(this->fCursorPos.x(), this->fCursorPos.y(), this->fCursorPos.x() + 1,
-                 this->fCursorPos.y() + this->fHeight);
+    this->update(this->fCursorPos.x() - 5, this->fCursorPos.y() - 5,
+                 this->fCursorPos.x() + 5, this->fCursorPos.y() + this->fHeight + 5);
 }
 
 
