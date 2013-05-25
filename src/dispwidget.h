@@ -44,6 +44,9 @@ class DisplayWidget: public QWidget {
     // Do we currently have a selection?
     bool fHasSelection;
 
+    // Drag start position.
+    QPoint fDragStartPos;
+
     // Stop tracking links.
     void
     fInvalidateLinkTracking();

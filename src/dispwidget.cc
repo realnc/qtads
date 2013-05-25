@@ -116,23 +116,29 @@ DisplayWidget::paintEvent( QPaintEvent* e )
 void
 DisplayWidget::mouseMoveEvent( QMouseEvent* e )
 {   
-    // If the left button is pressed and we're in selection mode, update the
-    // selection range.
-    if ((e->buttons() & Qt::LeftButton) and this->fInSelectMode) {
-        this->formatter->set_sel_range(CHtmlPoint(this->fSelectOrigin.x(), this->fSelectOrigin.y()),
-                                       CHtmlPoint(e->pos().x(), e->pos().y()), 0, 0);
-        return;
-    }
-
-    // We're not tracking a selection, but the mouse is inside of one. Start
-    // a drag event containing the selected text.
-    if ((e->buttons() & Qt::LeftButton) and this->fHasSelection) {
-        QDrag* drag = new QDrag(this);
-        QMimeData* mime = new QMimeData;
-        mime->setText(this->fMySelectedText());
-        drag->setMimeData(mime);
-        drag->exec(Qt::CopyAction);
-        return;
+    if (e->buttons() & Qt::LeftButton) {
+        // If we're tracking a selection, update the selection range.
+        if (this->fInSelectMode) {
+            this->formatter->set_sel_range(CHtmlPoint(this->fSelectOrigin.x(),
+                                                      this->fSelectOrigin.y()),
+                                           CHtmlPoint(e->pos().x(), e->pos().y()),
+                                           0, 0);
+            return;
+        }
+        // We're not tracking a selection, but the mouse is inside of one.
+        // If there's enough distance since the start of the drag, start a
+        // drag event containing the selected text.
+        if (this->fHasSelection
+            and (e->pos() - this->fDragStartPos).manhattanLength()
+                > QApplication::startDragDistance())
+        {
+            QDrag* drag = new QDrag(this);
+            QMimeData* mime = new QMimeData;
+            mime->setText(this->fMySelectedText());
+            drag->setMimeData(mime);
+            drag->exec(Qt::CopyAction);
+            return;
+        }
     }
 
     // This wasn't a selection event. Just update link tracking.
@@ -162,11 +168,14 @@ DisplayWidget::mousePressEvent( QMouseEvent* e )
             return;
         }
 
+        // We're not tracking a selection, but if we have a selection and the
+        // mouse was inside it, then prepare for a drag start operation.
         unsigned long selStart, selEnd;
         this->formatter->get_sel_range(&selStart, &selEnd);
         unsigned long mousePos = this->formatter->find_textofs_by_pos(CHtmlPoint(e->pos().x(),
                                                                                  e->pos().y()));
         if (mousePos >= selStart and mousePos <= selEnd) {
+            this->fDragStartPos = e->pos();
             return;
         }
 
