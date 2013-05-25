@@ -71,7 +71,7 @@ void
 DisplayWidgetInput::mousePressEvent( QMouseEvent* e )
 {
     DisplayWidget::mousePressEvent(e);
-    if (not this->fInpTag) {
+    if (not this->fInpTag or not e->isAccepted()) {
         return;
     }
 

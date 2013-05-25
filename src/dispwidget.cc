@@ -93,7 +93,7 @@ DisplayWidget::paintEvent( QPaintEvent* e )
 void
 DisplayWidget::mouseMoveEvent( QMouseEvent* e )
 {   
-    // If the button is pressed and we're in selection mode, update the
+    // If the left button is pressed and we're in selection mode, update the
     // selection range.
     if ((e->buttons() & Qt::LeftButton) and this->fInSelectMode) {
         this->formatter->set_sel_range(CHtmlPoint(this->fSelectOrigin.x(), this->fSelectOrigin.y()),
@@ -115,22 +115,28 @@ DisplayWidget::leaveEvent( QEvent* )
 void
 DisplayWidget::mousePressEvent( QMouseEvent* e )
 {
+    if (e->button() != Qt::LeftButton) {
+        e->ignore();
+        return;
+    }
+
     if (this->fHoverLink == 0) {
-        // We're not hover-tracking a link. If the left mouse button is pressed,
-        // start selection mode if we're not already in that mode.
-        if ((e->buttons() & Qt::LeftButton) and not this->fInSelectMode) {
-            this->fInSelectMode = true;
-            this->fSelectOrigin = e->pos();
-            // Just in case we had a selection previously, clear it.
-            this->clearSelection();
-            // If another widget also has an active selection, clear it.
-            if (curSelWidget != 0 and curSelWidget != this) {
-                curSelWidget->clearSelection();
-            }
-            // Remember that we're the widget with an active selection.
-            curSelWidget = this;
-            qWinGroup->enableCopyAction(true);
+        // We're not hover-tracking a link. Start selection mode if we're not
+        // already in that mode.
+        if (this->fInSelectMode) {
+            return;
         }
+        this->fInSelectMode = true;
+        this->fSelectOrigin = e->pos();
+        // Just in case we had a selection previously, clear it.
+        this->clearSelection();
+        // If another widget also has an active selection, clear it.
+        if (curSelWidget != 0 and curSelWidget != this) {
+            curSelWidget->clearSelection();
+        }
+        // Remember that we're the widget with an active selection.
+        curSelWidget = this;
+        qWinGroup->enableCopyAction(true);
         return;
     }
 
@@ -144,8 +150,13 @@ DisplayWidget::mousePressEvent( QMouseEvent* e )
 
 
 void
-DisplayWidget::mouseReleaseEvent( QMouseEvent* )
+DisplayWidget::mouseReleaseEvent( QMouseEvent* e )
 {
+    if (e->button() != Qt::LeftButton) {
+        e->ignore();
+        return;
+    }
+
     if (this->fInSelectMode) {
         // Releasing the button ends selection mode.
         this->fInSelectMode = false;
