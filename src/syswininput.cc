@@ -108,6 +108,9 @@ CHtmlSysWinInputQt::fProcessPagePauseQueue()
 
 void CHtmlSysWinInputQt::fUpdateInputFormatter()
 {
+    if (this->fTag == 0) {
+        return;
+    }
     this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
     if (this->fTag->ready_to_format()) {
         this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
