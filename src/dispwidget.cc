@@ -213,6 +213,12 @@ DisplayWidget::mouseReleaseEvent( QMouseEvent* e )
         return;
     }
 
+    // We're not tracking a selection but if we do have selected text, clear
+    // it.
+    if (this->fHasSelection) {
+        this->clearSelection();
+    }
+
     if (this->fClickedLink == 0) {
         // We're not click-tracking a link; there's nothing else to do here.
         return;
