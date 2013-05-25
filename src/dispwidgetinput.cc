@@ -31,13 +31,16 @@
 #include "dispwidgetinput.h"
 
 
-DisplayWidgetInput::DisplayWidgetInput( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
+DisplayWidgetInput::DisplayWidgetInput(CHtmlSysWinQt* parent, CHtmlFormatter* formatter,
+                                       CHtmlInputBuf* tadsBuffer )
     : DisplayWidget(parent, formatter),
       fCursorPos(0, 0),
       fLastCursorPos(0, 0),
       fCursorVisible(false),
       fBlinkVisible(false),
-      fBlinkTimer(new QTimer(this))
+      fBlinkTimer(new QTimer(this)),
+      fInpTag(0),
+      fTadsBuffer(tadsBuffer)
 {
     connect(this->fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
     this->resetCursorBlinking();
@@ -76,6 +79,24 @@ DisplayWidgetInput::paintEvent( QPaintEvent* e )
 
 
 void
+DisplayWidgetInput::mousePressEvent( QMouseEvent* e )
+{
+    DisplayWidget::mousePressEvent(e);
+    if (not this->fInpTag) {
+        return;
+    }
+
+    // We have a current input tag. If the mouse press was inside it, update
+    // the input caret position.
+    unsigned long offs = formatter->find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
+    if (offs >= this->fInpTag->get_text_ofs()) {
+        fTadsBuffer->set_caret(offs - this->fInpTag->get_text_ofs());
+        updateCursorPos(formatter);
+    }
+}
+
+
+void
 DisplayWidgetInput::fBlinkCursor()
 {
     this->fBlinkVisible = not this->fBlinkVisible;
@@ -109,10 +130,10 @@ DisplayWidgetInput::fHandleFocusChange( QWidget* old, QWidget* now )
 
 
 void
-DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* tadsBuffer, CHtmlTagTextInput* tag )
+DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter )
 {
     // Ignore the call if there's currently no active tag.
-    if (tag == 0) {
+    if (this->fInpTag == 0) {
         return;
     }
 
@@ -127,13 +148,14 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter, CHtmlInputBuf* t
         this->fBlinkCursor();
     }
 
-    CHtmlPoint cursorPos = formatter->get_text_pos(tag->get_text_ofs() + tadsBuffer->get_caret());
+    CHtmlPoint cursorPos = formatter->get_text_pos(this->fInpTag->get_text_ofs()
+                                                   + this->fTadsBuffer->get_caret());
     this->moveCursorPos(QPoint(cursorPos.x, cursorPos.y));
 
     // Update the selection range in the formatter.
     size_t start, end, caret;
-    unsigned long inp_txt_ofs = tag->get_text_ofs();
-    tadsBuffer->get_sel_range(&start, &end, &caret);
+    unsigned long inp_txt_ofs = this->fInpTag->get_text_ofs();
+    this->fTadsBuffer->get_sel_range(&start, &end, &caret);
     formatter->set_sel_range(start + inp_txt_ofs, end + inp_txt_ofs);
 
     // If there's actually any text selected, then mark us as the active

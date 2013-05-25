@@ -44,6 +44,12 @@ class DisplayWidgetInput: public DisplayWidget {
     // Text cursor blink timer.
     class QTimer* fBlinkTimer;
 
+    // Current input tag, if there is one (null if there isn't.)
+    class CHtmlTagTextInput* fInpTag;
+
+    // The TADS input buffer we're working with.
+    class CHtmlInputBuf* fTadsBuffer;
+
   private slots:
     // Called by the timer to blink the text cursor.
     void
@@ -58,8 +64,12 @@ class DisplayWidgetInput: public DisplayWidget {
     void
     paintEvent( QPaintEvent* e ) override;
 
+    void
+    mousePressEvent( QMouseEvent* e ) override;
+
   public:
-    DisplayWidgetInput( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
+    DisplayWidgetInput( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter,
+                        CHtmlInputBuf* tadsBuffer );
 
     // Change the text cursor position.
     void
@@ -80,13 +90,17 @@ class DisplayWidgetInput: public DisplayWidget {
     { return this->fCursorVisible; }
 
     void
-    updateCursorPos( class CHtmlFormatter* formatter, class CHtmlInputBuf* tadsBuffer,
-                     class CHtmlTagTextInput* tag );
+    updateCursorPos( class CHtmlFormatter* formatter );
 
     // Reset cursor blink timer.  This will read the blinking rate from the
     // desktop environment and ajust the blink timer as needed.
     void
     resetCursorBlinking();
+
+    // Set the current input tag.
+    void
+    setInputTag( CHtmlTagTextInput* inputTag )
+    { this->fInpTag = inputTag; }
 };
 
 

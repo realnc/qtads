@@ -44,18 +44,18 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
       fLastKeyEvent(Qt::Key_Any),
       fTag(0)
 {
-    // Replace the default display widget with an input display widget.
-    this->formatter_->unset_win();
-    delete this->dispWidget;
-    this->dispWidget = new DisplayWidgetInput(this, formatter);
-    this->fCastDispWidget = static_cast<DisplayWidgetInput*>(this->dispWidget);
-    this->setWidget(this->dispWidget);
-    this->formatter_->set_win(this, &margins);
-
     this->fInputBuffer = new textchar_t[1024];
     this->fInputBufferSize = 1024;
     this->fTadsBuffer = new CHtmlInputBuf(this->fInputBuffer, 1024, 100);
     this->fTadsBuffer->set_utf8_mode(true);
+
+    // Replace the default display widget with an input display widget.
+    this->formatter_->unset_win();
+    delete this->dispWidget;
+    this->dispWidget = new DisplayWidgetInput(this, formatter, this->fTadsBuffer);
+    this->fCastDispWidget = static_cast<DisplayWidgetInput*>(this->dispWidget);
+    this->setWidget(this->dispWidget);
+    this->formatter_->set_win(this, &margins);
 
     QPalette p(this->palette());
     p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
@@ -113,7 +113,7 @@ void CHtmlSysWinInputQt::fUpdateInputFormatter()
         this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
         this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
     }
-    this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
+    this->fCastDispWidget->updateCursorPos(this->formatter_);
 }
 
 
@@ -121,7 +121,7 @@ void
 CHtmlSysWinInputQt::setCursorHeight( unsigned height )
 {
     this->fCastDispWidget->setCursorHeight(height);
-    this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
+    this->fCastDispWidget->updateCursorPos(this->formatter_);
 }
 
 
@@ -177,7 +177,7 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
     if (this->fTag->ready_to_format()) {
         this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
     }
-    this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
+    this->fCastDispWidget->updateCursorPos(this->formatter_);
 
     // If 'enter' is true, indicate that we've finished reading the command, so
     // that getInput() will return the new command as its result; otherwise,
@@ -195,7 +195,7 @@ CHtmlSysWinInputQt::resizeEvent( QResizeEvent* event )
 {
     CHtmlSysWinQt::resizeEvent(event);
     if (this->fCastDispWidget->isCursorVisible()) {
-        this->fCastDispWidget->updateCursorPos(this->formatter_, this->fTadsBuffer, this->fTag);
+        this->fCastDispWidget->updateCursorPos(this->formatter_);
     }
 }
 
@@ -407,7 +407,7 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
         // The difference is that in that case, we need to restore the cursor.
         if (this->fRestoreFromCancel) {
             this->fCastDispWidget->setCursorVisible(true);
-            this->fCastDispWidget->updateCursorPos(formatter, this->fTadsBuffer, this->fTag);
+            this->fCastDispWidget->updateCursorPos(formatter);
             this->fRestoreFromCancel = false;
         }
     } else {
@@ -421,12 +421,13 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
                                   0);
         CHtmlTagTextInput* tag = formatter->begin_input(this->fTadsBuffer->getbuf(), 0);
         this->fTag = tag;
+        this->fCastDispWidget->setInputTag(tag);
         if (tag->ready_to_format()) {
             tag->format(this, this->formatter_);
         }
         this->fTadsBuffer->show_caret();
         this->fCastDispWidget->setCursorVisible(true);
-        this->fCastDispWidget->updateCursorPos(formatter, this->fTadsBuffer, tag);
+        this->fCastDispWidget->updateCursorPos(formatter);
         this->fTadsBuffer->set_sel_range(0, 0, 0);
     }
 
@@ -517,6 +518,7 @@ CHtmlSysWinInputQt::cancelInput( bool reset )
     // Done with the tag.
     if (reset) {
         this->fTag = 0;
+        this->fCastDispWidget->setInputTag(0);
         this->fRestoreFromCancel = false;
     } else {
         this->fRestoreFromCancel = true;
