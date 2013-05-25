@@ -32,10 +32,16 @@ class QTadsFrame: public QFrame {
     void
     resizeEvent( QResizeEvent* e ) override;
 
+    void
+    dragEnterEvent( QDragEnterEvent* e ) override;
+
+    void
+    dropEvent( QDropEvent* e ) override;
+
   public:
     QTadsFrame( QWidget* parent )
     : QFrame(parent)
-    { }
+    { this->setAcceptDrops(true); }
 };
 
 

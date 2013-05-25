@@ -18,6 +18,7 @@
 #include <QDebug>
 #include <QPaintEvent>
 #include <QStatusBar>
+#include <QDrag>
 
 #include "htmlattr.h"
 #include "htmlfmt.h"
@@ -36,6 +37,7 @@ DisplayWidget::DisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
       fHoverLink(0),
       fClickedLink(0),
       fInSelectMode(false),
+      fHasSelection(false),
       parentSysWin(parent),
       formatter(formatter)
 {
@@ -78,6 +80,27 @@ DisplayWidget::fInvalidateLinkTracking()
 }
 
 
+QString
+DisplayWidget::fMySelectedText()
+{
+    unsigned long startOfs, endOfs;
+    this->formatter->get_sel_range(&startOfs, &endOfs);
+
+    if (startOfs == endOfs) {
+        // There's nothing selected.
+        return QString();
+    }
+
+    // Figure out how much space we need.
+    unsigned long len = this->formatter->get_chars_in_ofs_range(startOfs, endOfs);
+
+    // Get the text in the internal format.
+    CStringBuf buf(len);
+    this->formatter->extract_text(&buf, startOfs, endOfs);
+    return QString::fromUtf8(buf.get(), len);
+}
+
+
 void
 DisplayWidget::paintEvent( QPaintEvent* e )
 {
@@ -100,6 +123,18 @@ DisplayWidget::mouseMoveEvent( QMouseEvent* e )
                                        CHtmlPoint(e->pos().x(), e->pos().y()), 0, 0);
         return;
     }
+
+    // We're not tracking a selection, but the mouse is inside of one. Start
+    // a drag event containing the selected text.
+    if ((e->buttons() & Qt::LeftButton) and this->fHasSelection) {
+        QDrag* drag = new QDrag(this);
+        QMimeData* mime = new QMimeData;
+        mime->setText(this->fMySelectedText());
+        drag->setMimeData(mime);
+        drag->exec(Qt::CopyAction);
+        return;
+    }
+
     // This wasn't a selection event. Just update link tracking.
     this->updateLinkTracking(e->pos());
 }
@@ -126,6 +161,15 @@ DisplayWidget::mousePressEvent( QMouseEvent* e )
         if (this->fInSelectMode) {
             return;
         }
+
+        unsigned long selStart, selEnd;
+        this->formatter->get_sel_range(&selStart, &selEnd);
+        unsigned long mousePos = this->formatter->find_textofs_by_pos(CHtmlPoint(e->pos().x(),
+                                                                                 e->pos().y()));
+        if (mousePos >= selStart and mousePos <= selEnd) {
+            return;
+        }
+
         this->fInSelectMode = true;
         this->fSelectOrigin = e->pos();
         // Just in case we had a selection previously, clear it.
@@ -163,6 +207,8 @@ DisplayWidget::mouseReleaseEvent( QMouseEvent* e )
         // If the selection is empty, there would be nothing to copy.
         if (DisplayWidget::selectedText().isEmpty()) {
             qWinGroup->enableCopyAction(false);
+        } else {
+            this->fHasSelection = true;
         }
         return;
     }
@@ -196,6 +242,7 @@ DisplayWidget::clearSelection()
     // Clear the selection range in the formatter by setting both ends
     // of the range to the maximum text offset in the formatter's
     // display list.
+    this->fHasSelection = false;
     unsigned long start = this->formatter->get_text_ofs_max();
     this->formatter->set_sel_range(start, start);
 }
@@ -208,23 +255,7 @@ DisplayWidget::selectedText()
         // There's no active selection.
         return QString();
     }
-
-    CHtmlFormatter* fmt = DisplayWidget::curSelWidget->formatter;
-    unsigned long startOfs, endOfs;
-    fmt->get_sel_range(&startOfs, &endOfs);
-
-    if (startOfs == endOfs) {
-        // There's nothing selected.
-        return QString();
-    }
-
-    // Figure out how much space we need.
-    unsigned long len = fmt->get_chars_in_ofs_range(startOfs, endOfs);
-
-    // Get the text in the internal format.
-    CStringBuf buf(len);
-    fmt->extract_text(&buf, startOfs, endOfs);
-    return QString::fromUtf8(buf.get(), len);
+    return DisplayWidget::curSelWidget->fMySelectedText();
 }
 
 

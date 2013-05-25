@@ -170,6 +170,11 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
     void
     insertText( QString str );
 
+    // Do we currently accept text insertion?
+    bool
+    acceptsText()
+    { return this->fInputMode == NormalInput; }
+
     //
     // CHtmlSysWin interface implementation.
     //

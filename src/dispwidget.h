@@ -41,9 +41,16 @@ class DisplayWidget: public QWidget {
     // Origin of current selection range.
     QPoint fSelectOrigin;
 
+    // Do we currently have a selection?
+    bool fHasSelection;
+
     // Stop tracking links.
     void
     fInvalidateLinkTracking();
+
+    // Returns the text currently selected in this window.
+    QString
+    fMySelectedText();
 
   protected:
     // The window we're embeded in.

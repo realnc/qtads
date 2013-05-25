@@ -43,6 +43,26 @@ QTadsFrame::resizeEvent( QResizeEvent* )
 }
 
 
+void
+QTadsFrame::dragEnterEvent( QDragEnterEvent* e )
+{
+    // Only accept text. URLs are handled by the main window instead, for
+    // opening game files through drag&drop.
+    if (e->mimeData()->hasText() and not e->mimeData()->hasUrls()
+        and qFrame->gameWindow()->acceptsText())
+    {
+        e->acceptProposedAction();
+    }
+}
+
+
+void
+QTadsFrame::dropEvent( QDropEvent* e )
+{
+    qFrame->gameWindow()->insertText(e->mimeData()->text());
+}
+
+
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     : fConfDialog(0),
       fGameInfoDialog(0),
