@@ -81,6 +81,9 @@ class DisplayWidget: public QWidget {
     void
     mouseReleaseEvent( QMouseEvent* e ) override;
 
+    void
+    mouseDoubleClickEvent( QMouseEvent* e );
+
   public:
     DisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
     ~DisplayWidget() override;

@@ -253,6 +253,25 @@ DisplayWidget::mouseReleaseEvent( QMouseEvent* e )
 
 
 void
+DisplayWidget::mouseDoubleClickEvent( QMouseEvent* e )
+{
+    if (e->button() != Qt::LeftButton) {
+        e->ignore();
+        return;
+    }
+
+    // Select the current word.
+    unsigned long start, end, offs;
+    offs = this->formatter->find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
+    this->formatter->get_word_limits(&start, &end, offs);
+    this->formatter->set_sel_range(start, end);
+    qWinGroup->enableCopyAction(true);
+    this->fInSelectMode = true;
+    this->fHasSelection = true;
+}
+
+
+void
 DisplayWidget::clearSelection()
 {
     // Clear the selection range in the formatter by setting both ends
@@ -261,6 +280,11 @@ DisplayWidget::clearSelection()
     this->fHasSelection = false;
     unsigned long start = this->formatter->get_text_ofs_max();
     this->formatter->set_sel_range(start, start);
+    // If we're the widget with the active selection, also disable the copy
+    // action, since clearing the selection means there's nothing to copy.
+    if (DisplayWidget::curSelWidget == this) {
+        qWinGroup->enableCopyAction(false);
+    }
 }
 
 
