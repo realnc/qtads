@@ -177,6 +177,10 @@ CHtmlSysWinQt::resizeEvent( QResizeEvent* e )
 {
     QScrollArea::resizeEvent(e);
 
+    // Make sure our display widget is at least the same size as us, so that
+    // it gets mouse events from the entire area of the window.
+    this->dispWidget->setMinimumSize(e->size());
+
     // If we reached the bottom, clear page-pause mode.
     if (this->fInPagePauseMode and this->verticalScrollBar()->value() == this->verticalScrollBar()->maximum()) {
         this->fInPagePauseMode = false;
