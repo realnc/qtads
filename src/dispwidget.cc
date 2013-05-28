@@ -175,7 +175,7 @@ DisplayWidget::mousePressEvent( QMouseEvent* e )
         this->formatter->get_sel_range(&selStart, &selEnd);
         unsigned long mousePos = this->formatter->find_textofs_by_pos(CHtmlPoint(e->pos().x(),
                                                                                  e->pos().y()));
-        if (mousePos >= selStart and mousePos <= selEnd) {
+        if (mousePos > selStart and mousePos < selEnd) {
             this->fDragStartPos = e->pos();
             return;
         }
