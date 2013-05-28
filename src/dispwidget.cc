@@ -215,7 +215,7 @@ DisplayWidget::mouseReleaseEvent( QMouseEvent* e )
         // Releasing the button ends selection mode.
         this->fInSelectMode = false;
         // If the selection is empty, there would be nothing to copy.
-        if (DisplayWidget::selectedText().isEmpty()) {
+        if (this->fMySelectedText().isEmpty()) {
             qWinGroup->enableCopyAction(false);
         } else {
             this->fHasSelection = true;

@@ -157,7 +157,9 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter )
         formatter->set_sel_range(start + inp_txt_ofs, end + inp_txt_ofs);
         DisplayWidget::curSelWidget = this;
         qWinGroup->enableCopyAction(true);
-    } else {
+    } else if (DisplayWidget::curSelWidget == this
+               and not DisplayWidget::curSelWidget->selectedText().isEmpty())
+    {
         qWinGroup->enableCopyAction(false);
         DisplayWidget::curSelWidget = 0;
     }
