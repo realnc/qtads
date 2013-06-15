@@ -37,8 +37,8 @@ DisplayWidget::DisplayWidget( CHtmlSysWinQt* parent, CHtmlFormatter* formatter )
     : QWidget(parent),
       fHoverLink(0),
       fClickedLink(0),
-      fInSelectMode(false),
       fHasSelection(false),
+      inSelectMode(false),
       parentSysWin(parent),
       formatter(formatter)
 {
@@ -131,7 +131,7 @@ DisplayWidget::fHandleDoubleOrTripleClick( QMouseEvent* e, bool tripleClick )
     } else if (~QApplication::keyboardModifiers() & Qt::ControlModifier) {
         this->formatter->set_sel_range(start, end);
         qWinGroup->enableCopyAction(true);
-        this->fInSelectMode = true;
+        this->inSelectMode = true;
         this->fHasSelection = true;
     }
 }
@@ -157,7 +157,7 @@ DisplayWidget::mouseMoveEvent( QMouseEvent* e )
 
     if (e->buttons() & Qt::LeftButton) {
         // If we're tracking a selection, update the selection range.
-        if (this->fInSelectMode) {
+        if (this->inSelectMode) {
             this->formatter->set_sel_range(CHtmlPoint(this->fSelectOrigin.x(),
                                                       this->fSelectOrigin.y()),
                                            CHtmlPoint(e->pos().x(), e->pos().y()),
@@ -204,7 +204,7 @@ DisplayWidget::mousePressEvent( QMouseEvent* e )
     if (this->fHoverLink == 0) {
         // We're not hover-tracking a link. Start selection mode if we're not
         // already in that mode.
-        if (this->fInSelectMode) {
+        if (this->inSelectMode) {
             return;
         }
 
@@ -229,7 +229,7 @@ DisplayWidget::mousePressEvent( QMouseEvent* e )
             return;
         }
 
-        this->fInSelectMode = true;
+        this->inSelectMode = true;
         this->fSelectOrigin = e->pos();
         // Just in case we had a selection previously, clear it.
         this->clearSelection();
@@ -260,9 +260,9 @@ DisplayWidget::mouseReleaseEvent( QMouseEvent* e )
         return;
     }
 
-    if (this->fInSelectMode) {
+    if (this->inSelectMode) {
         // Releasing the button ends selection mode.
-        this->fInSelectMode = false;
+        this->inSelectMode = false;
         // If the selection is empty, there would be nothing to copy.
         if (this->fMySelectedText().isEmpty()) {
             qWinGroup->enableCopyAction(false);

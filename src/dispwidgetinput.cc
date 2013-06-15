@@ -90,7 +90,9 @@ DisplayWidgetInput::mouseMoveEvent( QMouseEvent* e )
 {
     DisplayWidget::mouseMoveEvent(e);
 
-    if ((~e->buttons() & Qt::LeftButton) or not fInpTag or not fTadsBuffer) {
+    if (not this->inSelectMode or (~e->buttons() & Qt::LeftButton)
+        or not fInpTag or not fTadsBuffer)
+    {
         return;
     }
 

@@ -36,9 +36,6 @@ class DisplayWidget: public QWidget {
     class CHtmlDispLink* fHoverLink;
     class CHtmlDispLink* fClickedLink;
 
-    // Are we in text selection mode?
-    bool fInSelectMode;
-
     // Origin of current selection range.
     QPoint fSelectOrigin;
 
@@ -63,6 +60,9 @@ class DisplayWidget: public QWidget {
     fHandleDoubleOrTripleClick( QMouseEvent* e, bool tripleClick );
 
   protected:
+    // Are we in text selection mode?
+    bool inSelectMode;
+
     // The window we're embeded in.
     class CHtmlSysWinQt* parentSysWin;
 
