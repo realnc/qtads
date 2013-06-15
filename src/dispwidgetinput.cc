@@ -80,7 +80,7 @@ DisplayWidgetInput::mousePressEvent( QMouseEvent* e )
     unsigned long offs = formatter->find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
     if (offs >= this->fInpTag->get_text_ofs()) {
         fTadsBuffer->set_caret(offs - this->fInpTag->get_text_ofs());
-        updateCursorPos(formatter);
+        updateCursorPos(formatter, false);
     }
 }
 
@@ -119,7 +119,7 @@ DisplayWidgetInput::fHandleFocusChange( QWidget* old, QWidget* now )
 
 
 void
-DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter )
+DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter , bool keepSelection )
 {
     // Ignore the call if there's currently no active tag.
     if (this->fInpTag == 0) {
@@ -141,15 +141,14 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter )
                                                           + this->fTadsBuffer->get_caret());
     this->fCursorPos = QPoint(cursorPos.x, cursorPos.y);
     // If there's another window with an active selection, moving the cursor
-    // must clear it.
-    if (DisplayWidget::curSelWidget and DisplayWidget::curSelWidget != this) {
+    // must clear it, unless we've been explicitly told otherwise.
+    if (not keepSelection and DisplayWidget::curSelWidget and DisplayWidget::curSelWidget != this) {
         DisplayWidget::curSelWidget->clearSelection();
     }
 
     // Update the selection range in the formatter. If there's actually any
-    // text selected, then mark us as the active selection widget. Otherwise,
-    // if nothing is selected remove the reference. Also enable or disable the
-    // "Copy" action as needed.
+    // text selected, then mark us as the active selection widget and enable
+    // the "Copy" action.
     size_t start, end, caret;
     unsigned long inp_txt_ofs = this->fInpTag->get_text_ofs();
     this->fTadsBuffer->get_sel_range(&start, &end, &caret);
@@ -157,11 +156,6 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter )
         formatter->set_sel_range(start + inp_txt_ofs, end + inp_txt_ofs);
         DisplayWidget::curSelWidget = this;
         qWinGroup->enableCopyAction(true);
-    } else if (DisplayWidget::curSelWidget == this
-               and not DisplayWidget::curSelWidget->selectedText().isEmpty())
-    {
-        qWinGroup->enableCopyAction(false);
-        DisplayWidget::curSelWidget = 0;
     }
 
     // Blink-in.

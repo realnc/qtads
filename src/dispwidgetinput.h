@@ -86,7 +86,7 @@ class DisplayWidgetInput: public DisplayWidget {
     { return this->fCursorVisible; }
 
     void
-    updateCursorPos( class CHtmlFormatter* formatter );
+    updateCursorPos( class CHtmlFormatter* formatter, bool keepSelection );
 
     // Reset cursor blink timer.  This will read the blinking rate from the
     // desktop environment and ajust the blink timer as needed.

@@ -116,7 +116,7 @@ void CHtmlSysWinInputQt::fUpdateInputFormatter()
         this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
         this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
     }
-    this->fCastDispWidget->updateCursorPos(this->formatter_);
+    this->fCastDispWidget->updateCursorPos(this->formatter_, false);
 }
 
 
@@ -124,7 +124,7 @@ void
 CHtmlSysWinInputQt::setCursorHeight( unsigned height )
 {
     this->fCastDispWidget->setCursorHeight(height);
-    this->fCastDispWidget->updateCursorPos(this->formatter_);
+    this->fCastDispWidget->updateCursorPos(this->formatter_, true);
 }
 
 
@@ -180,7 +180,7 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
     if (this->fTag->ready_to_format()) {
         this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
     }
-    this->fCastDispWidget->updateCursorPos(this->formatter_);
+    this->fCastDispWidget->updateCursorPos(this->formatter_, false);
 
     // If 'enter' is true, indicate that we've finished reading the command, so
     // that getInput() will return the new command as its result; otherwise,
@@ -198,7 +198,7 @@ CHtmlSysWinInputQt::resizeEvent( QResizeEvent* event )
 {
     CHtmlSysWinQt::resizeEvent(event);
     if (this->fCastDispWidget->isCursorVisible()) {
-        this->fCastDispWidget->updateCursorPos(this->formatter_);
+        this->fCastDispWidget->updateCursorPos(this->formatter_, true);
     }
 }
 
@@ -447,7 +447,7 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
         // The difference is that in that case, we need to restore the cursor.
         if (this->fRestoreFromCancel) {
             this->fCastDispWidget->setCursorVisible(true);
-            this->fCastDispWidget->updateCursorPos(formatter);
+            this->fCastDispWidget->updateCursorPos(formatter, false);
             this->fRestoreFromCancel = false;
         }
     } else {
@@ -467,7 +467,7 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
         }
         this->fTadsBuffer->show_caret();
         this->fCastDispWidget->setCursorVisible(true);
-        this->fCastDispWidget->updateCursorPos(formatter);
+        this->fCastDispWidget->updateCursorPos(formatter, false);
         this->fTadsBuffer->set_sel_range(0, 0, 0);
     }
 
