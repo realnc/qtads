@@ -141,9 +141,6 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     void
     fRunDropEventFile();
 
-    void
-    fUpdatePasteAction();
-
   protected:
     void
     closeEvent( QCloseEvent* e ) override;
@@ -165,6 +162,11 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     // mode.
     void
     pasteFromClipboard();
+
+    // Enable or disable the paste action according to whether there's text
+    // in the clipboard and a game window currently exists.
+    void
+    updatePasteAction();
 
   public:
     CHtmlSysWinGroupQt();

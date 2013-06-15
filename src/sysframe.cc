@@ -271,6 +271,7 @@ CHtmlSysFrameQt::fRunGame()
             }
             this->fMainWin->updateRecentGames();
             this->fSettings->saveToDisk();
+            qWinGroup->updatePasteAction();
 
             // Run the appropriate VM.
             this->fGameRunning = true;

@@ -155,10 +155,10 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     this->fPasteAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-paste")));
     this->fPasteAction->setShortcuts(QKeySequence::Paste);
 #endif
-    this->fPasteAction->setDisabled(QApplication::clipboard()->text().isEmpty());
+    this->fPasteAction->setDisabled(true);
     menu->addAction(this->fPasteAction);
     connect(this->fPasteAction, SIGNAL(triggered()), SLOT(pasteFromClipboard()));
-    connect(QApplication::clipboard(), SIGNAL(dataChanged()), SLOT(fUpdatePasteAction()));
+    connect(QApplication::clipboard(), SIGNAL(dataChanged()), SLOT(updatePasteAction()));
     menu->addSeparator();
     act = new QAction(tr("&Preferences..."), this);
 #if QT_VERSION >= 0x040600
@@ -641,9 +641,10 @@ CHtmlSysWinGroupQt::fRunDropEventFile()
 
 
 void
-CHtmlSysWinGroupQt::fUpdatePasteAction()
+CHtmlSysWinGroupQt::updatePasteAction()
 {
-    this->fPasteAction->setDisabled(QApplication::clipboard()->text().isEmpty());
+    this->fPasteAction->setDisabled(QApplication::clipboard()->text().isEmpty()
+                                    or not qFrame->gameWindow());
 }
 
 
