@@ -385,7 +385,8 @@ CHtmlSysWinGroupQt::fShowGameInfoDialog()
     }
     this->fGameInfoDialog = new GameInfoDialog(qStrToFname(qFrame->gameFile()), this);
     this->fGameInfoDialog->setWindowTitle(tr("Game Information"));
-    connect(this->fGameInfoDialog, SIGNAL(finished(int)), this, SLOT(fHideGameInfoDialog()));
+    connect(fGameInfoDialog, SIGNAL(finished(int)), SLOT(fHideGameInfoDialog()));
+    connect(fGameInfoDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
     this->fGameInfoDialog->show();
 }
 
@@ -421,6 +422,7 @@ CHtmlSysWinGroupQt::fShowConfDialog()
     this->fConfDialog->layout()->activate();
     this->fConfDialog->setMinimumHeight(this->fConfDialog->minimumHeight() + 4);
 #endif
+    connect(fConfDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
     this->fConfDialog->show();
 }
 
@@ -456,6 +458,7 @@ CHtmlSysWinGroupQt::fShowAboutGame()
         connect(this->fAboutBoxDialog, SIGNAL(finished(int)), SLOT(fHideAboutGame()));
     }
     this->fAboutBoxDialog->resize(this->fAboutBox->size());
+    connect(fAboutBoxDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
     this->fAboutBoxDialog->show();
 }
 
@@ -489,6 +492,7 @@ CHtmlSysWinGroupQt::fShowAboutQtads()
     this->fAboutQtadsDialog->layout()->activate();
     this->fAboutQtadsDialog->setMinimumHeight(this->fAboutQtadsDialog->minimumHeight() + 4);
 #endif
+    connect(fAboutQtadsDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
     this->fAboutQtadsDialog->show();
 }
 
@@ -510,6 +514,7 @@ CHtmlSysWinGroupQt::fOpenNewGame()
                                                         qFrame->settings()->lastFileOpenDir,
                                                         tr("TADS Games")
                                                         + QString::fromLatin1(" (*.gam *.Gam *.GAM *.t3 *.T3)"));
+    this->activateWindow();
     if (not fname.isEmpty()) {
         qFrame->settings()->lastFileOpenDir = QFileInfo(fname).absolutePath();
         qFrame->setNextGame(fname);

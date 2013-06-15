@@ -141,6 +141,10 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     void
     fRunDropEventFile();
 
+    void
+    fActivateWindow()
+    { this->activateWindow(); }
+
   protected:
     void
     closeEvent( QCloseEvent* e ) override;
