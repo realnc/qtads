@@ -704,7 +704,7 @@ CHtmlSysWinInputQt::removeFromPagePauseQueue( CHtmlSysWinQt* banner )
 void
 CHtmlSysWinInputQt::insertText( QString str )
 {
-    if (str.isEmpty() or not qFrame->gameRunning()) {
+    if (fInputMode != NormalInput or str.isEmpty() or not qFrame->gameRunning()) {
         return;
     }
     // Replace tabs and newlines with spaces.
