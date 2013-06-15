@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <QWidget>
+#include <QTime>
 
 #include "config.h"
 
@@ -47,6 +48,9 @@ class DisplayWidget: public QWidget {
     // Drag start position.
     QPoint fDragStartPos;
 
+    // Time of last double-click event.
+    QTime fLastDoubleClick;
+
     // Stop tracking links.
     void
     fInvalidateLinkTracking();
@@ -54,6 +58,9 @@ class DisplayWidget: public QWidget {
     // Returns the text currently selected in this window.
     QString
     fMySelectedText();
+
+    void
+    fHandleDoubleOrTripleClick( QMouseEvent* e, bool tripleClick );
 
   protected:
     // The window we're embeded in.

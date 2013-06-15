@@ -103,6 +103,40 @@ DisplayWidget::fMySelectedText()
 
 
 void
+DisplayWidget::fHandleDoubleOrTripleClick( QMouseEvent* e, bool tripleClick )
+{
+    // Get the offsets of the current word or line, depending on whether this
+    // is a double or triple click.
+    unsigned long start, end, offs;
+    offs = this->formatter->find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
+    if (tripleClick) {
+        this->formatter->get_line_limits(&start, &end, offs);
+    } else {
+        this->formatter->get_word_limits(&start, &end, offs);
+    }
+
+    // If this is a Ctrl+double-click, and pasting is enabled in the settings,
+    // paste the word into the current line input. Otherwise, just select the
+    // word.
+    if (qFrame->settings()->pasteOnDblClk and not tripleClick
+        and (QApplication::keyboardModifiers() & Qt::ControlModifier))
+    {
+        CStringBuf strBuf;
+        this->formatter->extract_text(&strBuf, start, end);
+        QString txt(QString::fromUtf8(strBuf.get()).trimmed());
+        if (not txt.isEmpty()) {
+            qFrame->gameWindow()->insertText(txt + QChar::fromLatin1(' '));
+        }
+    } else if (~QApplication::keyboardModifiers() & Qt::ControlModifier) {
+        this->formatter->set_sel_range(start, end);
+        qWinGroup->enableCopyAction(true);
+        this->fInSelectMode = true;
+        this->fHasSelection = true;
+    }
+}
+
+
+void
 DisplayWidget::paintEvent( QPaintEvent* e )
 {
     //qDebug() << Q_FUNC_INFO << "called";
@@ -117,6 +151,9 @@ DisplayWidget::paintEvent( QPaintEvent* e )
 void
 DisplayWidget::mouseMoveEvent( QMouseEvent* e )
 {   
+    // Avoid registering a triple click directly after the mouse was moved.
+    fLastDoubleClick = QTime();
+
     if (e->buttons() & Qt::LeftButton) {
         // If we're tracking a selection, update the selection range.
         if (this->fInSelectMode) {
@@ -167,6 +204,16 @@ DisplayWidget::mousePressEvent( QMouseEvent* e )
         // We're not hover-tracking a link. Start selection mode if we're not
         // already in that mode.
         if (this->fInSelectMode) {
+            return;
+        }
+
+        // If there was a double-click previously and not too much time has
+        // passed, then this is a triple-click.
+        if (fLastDoubleClick.isValid()
+            and fLastDoubleClick.msecsTo(QTime::currentTime())
+                <= QApplication::doubleClickInterval())
+        {
+            fHandleDoubleOrTripleClick(e, true);
             return;
         }
 
@@ -260,30 +307,9 @@ DisplayWidget::mouseDoubleClickEvent( QMouseEvent* e )
         e->ignore();
         return;
     }
-
-    // Get the offsets of the current word.
-    unsigned long start, end, offs;
-    offs = this->formatter->find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
-    this->formatter->get_word_limits(&start, &end, offs);
-
-    // If this is a Ctrl+double-click, and pasting is enabled in the settings,
-    // paste the word into the current line input. Otherwise, just select the
-    // word.
-    if (qFrame->settings()->pasteOnDblClk
-        and (QApplication::keyboardModifiers() & Qt::ControlModifier))
-    {
-        CStringBuf strBuf;
-        this->formatter->extract_text(&strBuf, start, end);
-        QString txt(QString::fromUtf8(strBuf.get()).trimmed());
-        if (not txt.isEmpty()) {
-            qFrame->gameWindow()->insertText(txt + QChar::fromLatin1(' '));
-        }
-    } else {
-        this->formatter->set_sel_range(start, end);
-        qWinGroup->enableCopyAction(true);
-        this->fInSelectMode = true;
-        this->fHasSelection = true;
-    }
+    // Note the time this occurred, since we need to detect triple-clicks.
+    fLastDoubleClick = QTime::currentTime();
+    fHandleDoubleOrTripleClick(e, false);
 }
 
 
