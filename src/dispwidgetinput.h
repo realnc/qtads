@@ -67,6 +67,9 @@ class DisplayWidgetInput: public DisplayWidget {
     void
     mousePressEvent( QMouseEvent* e ) override;
 
+    void
+    mouseMoveEvent( QMouseEvent* e ) override;
+
   public:
     DisplayWidgetInput( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter,
                         CHtmlInputBuf* tadsBuffer );
@@ -86,7 +89,8 @@ class DisplayWidgetInput: public DisplayWidget {
     { return this->fCursorVisible; }
 
     void
-    updateCursorPos( class CHtmlFormatter* formatter, bool keepSelection );
+    updateCursorPos(class CHtmlFormatter* formatter, bool keepSelection,
+                    bool updateFormatterSelection );
 
     // Reset cursor blink timer.  This will read the blinking rate from the
     // desktop environment and ajust the blink timer as needed.

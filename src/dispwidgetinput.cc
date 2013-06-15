@@ -80,8 +80,51 @@ DisplayWidgetInput::mousePressEvent( QMouseEvent* e )
     unsigned long offs = formatter->find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
     if (offs >= this->fInpTag->get_text_ofs()) {
         fTadsBuffer->set_caret(offs - this->fInpTag->get_text_ofs());
-        updateCursorPos(formatter, false);
+        this->updateCursorPos(formatter, false, true);
     }
+}
+
+
+void
+DisplayWidgetInput::mouseMoveEvent( QMouseEvent* e )
+{
+    DisplayWidget::mouseMoveEvent(e);
+
+    if ((~e->buttons() & Qt::LeftButton) or not fInpTag or not fTadsBuffer) {
+        return;
+    }
+
+    // If we have a selection and it extends into the input tag, sync the
+    // selection range with the tag.
+    unsigned long selStart, selEnd;
+    this->formatter->get_sel_range(&selStart, &selEnd);
+    if (selEnd < fInpTag->get_text_ofs()) {
+        // The selection doesn't extend into our input tag.
+        return;
+    }
+
+    // Figure out where to put the caret.
+    unsigned long offs = formatter->find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
+    size_t caretPos = 0;
+    if (offs > fInpTag->get_text_ofs()) {
+        caretPos = offs - fInpTag->get_text_ofs();
+    }
+
+    // If there's no selection, just update the caret position. Otherwise,
+    // also sync the input tag's selection with the formatter's.
+    if (selStart == selEnd) {
+        fTadsBuffer->set_caret(caretPos);
+    } else {
+        unsigned long inpSelStart;
+        if (selStart > fInpTag->get_text_ofs()) {
+            inpSelStart = selStart - fInpTag->get_text_ofs();
+        } else {
+            inpSelStart = 0;
+        }
+        unsigned long inpSelEnd = selEnd - fInpTag->get_text_ofs();
+        fTadsBuffer->set_sel_range(inpSelStart, inpSelEnd, caretPos);
+    }
+    this->updateCursorPos(formatter, true, false);
 }
 
 
@@ -119,7 +162,8 @@ DisplayWidgetInput::fHandleFocusChange( QWidget* old, QWidget* now )
 
 
 void
-DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter , bool keepSelection )
+DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter , bool keepSelection,
+                                     bool updateFormatterSelection )
 {
     // Ignore the call if there's currently no active tag.
     if (this->fInpTag == 0) {
@@ -149,13 +193,15 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter , bool keepSelect
     // Update the selection range in the formatter. If there's actually any
     // text selected, then mark us as the active selection widget and enable
     // the "Copy" action.
-    size_t start, end, caret;
-    unsigned long inp_txt_ofs = this->fInpTag->get_text_ofs();
-    this->fTadsBuffer->get_sel_range(&start, &end, &caret);
-    if (start != end) {
-        formatter->set_sel_range(start + inp_txt_ofs, end + inp_txt_ofs);
-        DisplayWidget::curSelWidget = this;
-        qWinGroup->enableCopyAction(true);
+    if (updateFormatterSelection) {
+        size_t start, end, caret;
+        unsigned long inp_txt_ofs = this->fInpTag->get_text_ofs();
+        this->fTadsBuffer->get_sel_range(&start, &end, &caret);
+        if (start != end) {
+            formatter->set_sel_range(start + inp_txt_ofs, end + inp_txt_ofs);
+            DisplayWidget::curSelWidget = this;
+            qWinGroup->enableCopyAction(true);
+        }
     }
 
     // Blink-in.
