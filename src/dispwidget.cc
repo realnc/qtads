@@ -261,14 +261,29 @@ DisplayWidget::mouseDoubleClickEvent( QMouseEvent* e )
         return;
     }
 
-    // Select the current word.
+    // Get the offsets of the current word.
     unsigned long start, end, offs;
     offs = this->formatter->find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
     this->formatter->get_word_limits(&start, &end, offs);
-    this->formatter->set_sel_range(start, end);
-    qWinGroup->enableCopyAction(true);
-    this->fInSelectMode = true;
-    this->fHasSelection = true;
+
+    // If this is a Ctrl+double-click, and pasting is enabled in the settings,
+    // paste the word into the current line input. Otherwise, just select the
+    // word.
+    if (qFrame->settings()->pasteOnDblClk
+        and (QApplication::keyboardModifiers() & Qt::ControlModifier))
+    {
+        CStringBuf strBuf;
+        this->formatter->extract_text(&strBuf, start, end);
+        QString txt(QString::fromUtf8(strBuf.get()).trimmed());
+        if (not txt.isEmpty()) {
+            qFrame->gameWindow()->insertText(txt + QChar::fromLatin1(' '));
+        }
+    } else {
+        this->formatter->set_sel_range(start, end);
+        qWinGroup->enableCopyAction(true);
+        this->fInSelectMode = true;
+        this->fHasSelection = true;
+    }
 }
 
 

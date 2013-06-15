@@ -95,6 +95,7 @@ Settings::loadFromDisk()
     this->ioSafetyLevelRead = sett.value(QString::fromLatin1("ioSafetyLevelRead"), 2).toInt();
     this->ioSafetyLevelWrite = sett.value(QString::fromLatin1("ioSafetyLevelWrite"), 2).toInt();
     this->tads2Encoding = sett.value(QString::fromLatin1("tads2encoding"), QByteArray("windows-1252")).toByteArray();
+    this->pasteOnDblClk = sett.value(QString::fromLatin1("pasteondoubleclick"), true).toBool();
     this->softScrolling = sett.value(QString::fromLatin1("softscrolling"), true).toBool();
     this->askForGameFile = sett.value(QString::fromLatin1("askforfileatstart"), false).toBool();
     this->confirmRestartGame = sett.value(QString::fromLatin1("confirmrestartgame"), true).toBool();
@@ -164,6 +165,7 @@ Settings::saveToDisk()
     sett.setValue(QString::fromLatin1("ioSafetyLevelRead"), this->ioSafetyLevelRead);
     sett.setValue(QString::fromLatin1("ioSafetyLevelWrite"), this->ioSafetyLevelWrite);
     sett.setValue(QString::fromLatin1("tads2encoding"), this->tads2Encoding);
+    sett.setValue(QString::fromLatin1("pasteondoubleclick"), this->pasteOnDblClk);
     sett.setValue(QString::fromLatin1("softscrolling"), this->softScrolling);
     sett.setValue(QString::fromLatin1("askforfileatstart"), this->askForGameFile);
     sett.setValue(QString::fromLatin1("confirmrestartgame"), this->confirmRestartGame);

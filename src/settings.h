@@ -60,6 +60,7 @@ class Settings {
     int ioSafetyLevelWrite;
 
     QByteArray tads2Encoding;
+    bool pasteOnDblClk;
     bool softScrolling;
     bool askForGameFile;
     bool confirmRestartGame;

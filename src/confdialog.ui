@@ -793,6 +793,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="pasteOnDblClkCheckBox">
+         <property name="text">
+          <string>Paste on double-click</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="softScrollCheckBox">
          <property name="text">
           <string>Soft Scrolling</string>

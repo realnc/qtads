@@ -141,6 +141,10 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
     }
     ui->encodingComboBox->setCurrentIndex(ui->encodingComboBox->findText(QString::fromLatin1(sett->tads2Encoding)));
 
+    QString txt(QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText));
+    ui->pasteOnDblClkCheckBox->setText(tr("Paste word on double-click") + QString::fromLatin1(" + ")
+                                       + txt.left(txt.length() - 1));
+    ui->pasteOnDblClkCheckBox->setChecked(sett->pasteOnDblClk);
     ui->softScrollCheckBox->setChecked(sett->softScrolling);
     ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
     ui->confirmRestartCheckBox->setChecked(sett->confirmRestartGame);
@@ -253,6 +257,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->updateNeverRadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
 
     connect(ui->encodingComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(fApplySettings()));
+    connect(ui->pasteOnDblClkCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->askForGameFileCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->confirmRestartCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
@@ -322,6 +327,7 @@ ConfDialog::fApplySettings()
         sett->ioSafetyLevelWrite = 4;
     }
     sett->tads2Encoding = ui->encodingComboBox->currentText().toLatin1();
+    sett->pasteOnDblClk = ui->pasteOnDblClkCheckBox->isChecked();
     sett->softScrolling = ui->softScrollCheckBox->isChecked();
     sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
     sett->confirmRestartGame = ui->confirmRestartCheckBox->isChecked();
