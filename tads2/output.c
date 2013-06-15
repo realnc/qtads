@@ -2711,7 +2711,8 @@ static int outformatlen_stream(out_stream_info *stream,
             }
 
             /* copy the last character after the tag to the stream */
-            outchar_stream(stream, c);
+            if (c != 0)
+                outchar_stream(stream, c);
         }
         else
         {
