@@ -92,13 +92,14 @@ DisplayWidget::fMySelectedText()
         return QString();
     }
 
-    // Figure out how much space we need.
+    // Figure out how much space we need. This is a worst-case size.
     unsigned long len = this->formatter->get_chars_in_ofs_range(startOfs, endOfs);
 
     // Get the text in the internal format.
     CStringBuf buf(len);
     this->formatter->extract_text(&buf, startOfs, endOfs);
-    return QString::fromUtf8(buf.get(), len);
+    // Return only the useful part of the buffer (which is null-terminated).
+    return QString::fromUtf8(buf.get());
 }
 
 
