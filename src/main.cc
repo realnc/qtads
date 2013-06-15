@@ -22,17 +22,6 @@
 #include "sysframe.h"
 #include "qtadssound.h"
 
-// On some platforms, SDL redefines main in order to provide a
-// platform-specific main() implementation.  However, Qt handles this too,
-// so things can get weird.  We need to make sure main is not redefined so
-// that Qt can find our own implementation and SDL will not try to do
-// platform-specific initialization work (like launching the Cocoa event-loop
-// or setting up the application menu on OS X, or redirecting stdout and stderr
-// to text files on Windows), which would break things.
-#ifdef main
-#  undef main
-#endif
-
 // Static OS X builds need the Qt codec plugins.
 #ifndef NO_STATIC_TEXTCODEC_PLUGINS
 #  if defined(Q_OS_MAC)
@@ -42,6 +31,17 @@
      Q_IMPORT_PLUGIN(qtwcodecs)
      Q_IMPORT_PLUGIN(qkrcodecs)
 #  endif
+#endif
+
+// On some platforms, SDL redefines main in order to provide a
+// platform-specific main() implementation.  However, Qt handles this too,
+// so things can get weird.  We need to make sure main is not redefined so
+// that Qt can find our own implementation and SDL will not try to do
+// platform-specific initialization work (like launching the Cocoa event-loop
+// or setting up the application menu on OS X, or redirecting stdout and stderr
+// to text files on Windows), which would break things.
+#ifdef main
+#  undef main
 #endif
 
 
@@ -79,7 +79,7 @@ int main( int argc, char** argv )
         return 1;
     }
 
-    QMetaObject::invokeMethod(app, "main", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
+    QMetaObject::invokeMethod(app, "entryPoint", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
     int ret = app->exec();
 
     delete app;

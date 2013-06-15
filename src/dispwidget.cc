@@ -19,6 +19,7 @@
 #include <QPaintEvent>
 #include <QStatusBar>
 #include <QDrag>
+#include <QMimeData>
 
 #include "htmlattr.h"
 #include "htmlfmt.h"

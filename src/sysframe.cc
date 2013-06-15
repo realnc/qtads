@@ -356,7 +356,7 @@ CHtmlSysFrameQt::event( QEvent* e )
 
 
 void
-CHtmlSysFrameQt::main( QString gameFileName )
+CHtmlSysFrameQt::entryPoint( QString gameFileName )
 {
     // Restore the application's size.
     this->fMainWin->resize(this->fSettings->appSize);
