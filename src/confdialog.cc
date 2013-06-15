@@ -142,8 +142,10 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
     ui->encodingComboBox->setCurrentIndex(ui->encodingComboBox->findText(QString::fromLatin1(sett->tads2Encoding)));
 
     QString txt(QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText));
-    ui->pasteOnDblClkCheckBox->setText(tr("Paste word on double-click") + QString::fromLatin1(" + ")
-                                       + txt.left(txt.length() - 1));
+    if (txt.endsWith(QChar::fromLatin1('+'))) {
+        txt.truncate(txt.length() - 1);
+    }
+    ui->pasteOnDblClkCheckBox->setText(tr("%1 + double-click pastes current word").arg(txt));
     ui->pasteOnDblClkCheckBox->setChecked(sett->pasteOnDblClk);
     ui->softScrollCheckBox->setChecked(sett->softScrolling);
     ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
