@@ -59,6 +59,9 @@ class DisplayWidget: public QWidget {
     void
     fHandleDoubleOrTripleClick( QMouseEvent* e, bool tripleClick );
 
+    void
+    fSyncClipboard();
+
   protected:
     // Are we in text selection mode?
     bool inSelectMode;

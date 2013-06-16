@@ -20,6 +20,7 @@
 #include <QStatusBar>
 #include <QDrag>
 #include <QMimeData>
+#include <QClipboard>
 
 #include "htmlattr.h"
 #include "htmlfmt.h"
@@ -130,10 +131,22 @@ DisplayWidget::fHandleDoubleOrTripleClick( QMouseEvent* e, bool tripleClick )
         }
     } else if (~QApplication::keyboardModifiers() & Qt::ControlModifier) {
         this->formatter->set_sel_range(start, end);
+        fSyncClipboard();
         qWinGroup->enableCopyAction(true);
         this->inSelectMode = true;
         this->fHasSelection = true;
     }
+}
+
+
+void
+DisplayWidget::fSyncClipboard()
+{
+    const QString txt(fMySelectedText());
+    if (txt.isEmpty() or not QApplication::clipboard()->supportsSelection()) {
+        return;
+    }
+    QApplication::clipboard()->setText(txt, QClipboard::Selection);
 }
 
 
@@ -162,6 +175,7 @@ DisplayWidget::mouseMoveEvent( QMouseEvent* e )
                                                       this->fSelectOrigin.y()),
                                            CHtmlPoint(e->pos().x(), e->pos().y()),
                                            0, 0);
+            fSyncClipboard();
             return;
         }
         // We're not tracking a selection, but the mouse is inside of one.
@@ -255,6 +269,15 @@ DisplayWidget::mousePressEvent( QMouseEvent* e )
 void
 DisplayWidget::mouseReleaseEvent( QMouseEvent* e )
 {
+#if QT_VERSION < 0x040700
+    #define MiddleButton MidButton
+#endif
+
+    if (e->button() == Qt::MiddleButton and QApplication::clipboard()->supportsSelection()) {
+        qFrame->gameWindow()->insertText(QApplication::clipboard()->text(QClipboard::Selection));
+        return;
+    }
+
     if (e->button() != Qt::LeftButton) {
         e->ignore();
         return;
