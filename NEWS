@@ -14,6 +14,9 @@
     key ("Command" key on the Mac) while double clicking.  This behavior can be
     disabled in the configuration dialog in the "Misc" section.
 
+  - On Mac OS X, the main window should now properly get focus again when
+    closing a dialog.
+
 
 2.1.6 - 2013/01/01
 ==================
