@@ -18,6 +18,7 @@
 #include <QDebug>
 #include <QLayout>
 #include <QLabel>
+#include <QIcon>
 #include <QStatusBar>
 #include <QDir>
 #include <QTextCodec>
