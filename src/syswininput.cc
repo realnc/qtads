@@ -281,6 +281,9 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
     } else if (e->matches(QKeySequence::MoveToNextLine)) {
         this->fTadsBuffer->select_next_hist();
         this->fCastDispWidget->clearSelection();
+    } else if (e->matches(QKeySequence::Find)) {
+        this->fTadsBuffer->select_prev_hist_prefix();
+        this->fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::SelectPreviousChar)) {
         if (not this->fTadsBuffer->has_sel_range()) {
             this->fCastDispWidget->clearSelection();
