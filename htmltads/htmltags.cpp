@@ -6531,7 +6531,7 @@ void CHtmlTagTABLE::set_row_positions(class CHtmlFormatter *formatter)
             if (tr->is_height_star())
                 height += extra_height / star_cnt;
         }
-        else
+        else if (total_interior_height != 0)
         {
             /* 
              *   Add in this row's portion of the extra height - the
