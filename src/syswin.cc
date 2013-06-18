@@ -1190,8 +1190,8 @@ CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
         if (this->fBgImage != 0) {
             this->fBgImage->remove_ref();
             this->fBgImage = 0;
+            this->set_html_bg_color(0, true);
         }
-        this->set_html_bg_color(0, true);
         return;
     }
 
