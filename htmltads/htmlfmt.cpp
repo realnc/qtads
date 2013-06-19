@@ -841,7 +841,7 @@ void CHtmlFormatter::extract_text(CStringBuf *buf,
     CHtmlDisp *disp;
 
     /* traverse our display items and pull out their text values */
-    for (disp = find_by_txtofs(start_ofs, FALSE, FALSE) ;
+    for (disp = find_by_txtofs(start_ofs, FALSE, TRUE) ;
          disp != 0 ; disp = disp->get_next_disp())
     {
         /* if we're past the ending offset, we're done */
