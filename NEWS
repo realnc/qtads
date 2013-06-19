@@ -17,6 +17,12 @@
   - On Mac OS X, the main window should now properly get focus again when
     closing a dialog.
 
+  - Text-grid banner windows should now be able to correctly show their
+    background color instead of always using black.
+
+  - Printing a table without any cells in it will no longer result in the
+    screen getting "stuck" and failing to update.
+
 
 2.1.6 - 2013/01/01
 ==================
