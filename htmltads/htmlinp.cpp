@@ -612,6 +612,8 @@ int CHtmlInputBuf::select_prev_hist()
 int CHtmlInputBuf::select_prev_hist_prefix(const textchar_t *pre, size_t len)
 {
     size_t cur;
+    /* abort search after 2 rounds not finding a result */
+    bool second_round = false;
 
     /* if there's nothing in the history buffer, ignore this */
     if (histcnt_ == 0)
@@ -650,7 +652,16 @@ int CHtmlInputBuf::select_prev_hist_prefix(const textchar_t *pre, size_t len)
         }
 
         /* move to the previous line, wrapping at the start of the list */
-        cur = (cur == 0 ? histcnt_ : cur) - 1;
+        if(cur == 0){
+            if(second_round){
+                break;
+            }else{
+                cur = histcnt_ - 1;
+                second_round = true;
+            }
+        }else{
+            cur--;
+        }
     }
 
     /* we didn't find a match; ignore it */
