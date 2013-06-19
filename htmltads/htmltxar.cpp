@@ -283,12 +283,9 @@ unsigned long CHtmlTextArray::reserve_space(size_t len)
  */
 unsigned long CHtmlTextArray::inc_ofs(unsigned long addr) const
 {
-    size_t pg;
-    size_t ofs;
-
     /* get the page and page offset of this address */
-    pg = get_page(addr);
-    ofs = get_page_ofs(addr);
+    size_t pg = get_page(addr);
+    size_t ofs = get_page_ofs(addr);
 
     /*
      *   if the address is at the end of its page, we need to move to the
@@ -296,10 +293,7 @@ unsigned long CHtmlTextArray::inc_ofs(unsigned long addr) const
      */
     if (ofs >= pages_[pg].alloced_)
     {
-        /*
-         *   if we're at the end of the whole array, return the same
-         *   address 
-         */
+        /* if we're at the end of the array, we can't increment */
         if (pg + 1 >= pages_alloced_)
             return addr;
 
@@ -315,12 +309,9 @@ unsigned long CHtmlTextArray::inc_ofs(unsigned long addr) const
  */
 unsigned long CHtmlTextArray::dec_ofs(unsigned long addr) const
 {
-    size_t pg;
-    size_t ofs;
-
     /* get the page and page offset of this address */
-    pg = get_page(addr);
-    ofs = get_page_ofs(addr);
+    size_t pg = get_page(addr);
+    size_t ofs = get_page_ofs(addr);
 
     /*
      *   if we're at the start of this page, we need to move to the
@@ -337,6 +328,87 @@ unsigned long CHtmlTextArray::dec_ofs(unsigned long addr) const
     }
     else
         return addr - 1;
+}
+
+/*
+ *   Increment an offset by a whole character 
+ */
+unsigned long CHtmlTextArray::inc_ofs_char(
+    oshtml_charset_id_t cs, unsigned long addr) const
+{
+    /* get the page and page offset of this address */
+    size_t pg = get_page(addr);
+    size_t ofs = get_page_ofs(addr);
+
+    /* 
+     *   If we're at the end of the page, move to the start of the next page.
+     *   The start of a page is always the start of a character, since
+     *   characters can't be split across chunks (and chunks can't be split
+     *   across pages), hence we're automatically at the start of a character
+     *   if we move to the start of the next page. 
+     */
+    if (ofs >= pages_[pg].alloced_)
+    {
+        /* if we're at the end of the array, we can't increment */
+        if (pg + 1 >= pages_alloced_)
+            return addr;
+
+        /* return the first address in the next page */
+        return make_addr(pg + 1, 0);
+    }
+
+    /* get a pointer to the given character position */
+    size_t rem = pages_[pg].used_ - ofs;
+    const textchar_t *p = pages_[pg].text_ + ofs;
+
+    /* increment by the offset to the next whole character */
+    return addr + (os_next_char(cs, p, rem) - p);
+}
+
+/*
+ *   Decrement an offset by a whole character
+ */
+unsigned long CHtmlTextArray::dec_ofs_char(
+    oshtml_charset_id_t cs, unsigned long addr) const
+{
+    /* get the page and page offset of this address */
+    size_t pg = get_page(addr);
+    size_t ofs = get_page_ofs(addr);
+
+    /*
+     *   if we're at the start of this page, we need to move to the previous
+     *   page, otherwise just move down a character on this page
+     */
+    if (ofs == 0)
+    {
+        /* if we're at the very beginning, return the same value */
+        if (addr == 0)
+            return addr;
+
+        /* move just past the end of the previous page */
+        pg -= 1;
+        ofs = pages_[pg].used_;
+        addr = make_addr(pg, ofs);
+    }
+
+    /* get a pointer to the starting character position */
+    size_t rem = pages_[pg].used_ - ofs;
+    const textchar_t *p = pages_[pg].text_ + ofs;
+
+    /* decrement by the offset to the start of the previous whole character */
+    return addr - (p - os_prev_char(cs, p, pages_[pg].text_));
+}
+
+/* is the character at the given offset a word character? */
+int CHtmlTextArray::is_word_char(
+    oshtml_charset_id_t cs, unsigned long addr) const
+{
+    /* get the page and page offset of this address */
+    size_t pg = get_page(addr);
+    size_t ofs = get_page_ofs(addr);
+    const textchar_t *p = pages_[pg].text_ + ofs;
+    size_t rem = pages_[pg].used_ - ofs;
+    return os_is_word_char(cs, p, rem);
 }
 
 /*
@@ -435,15 +507,6 @@ const textchar_t *CHtmlTextArray::get_text_chunk(unsigned long *addr,
 }
 
 /*
- *   is the given character a word character, for the purposes of a
- *   whole-word search?  
- */
-static int is_word_char(textchar_t c)
-{
-    return is_alpha(c) || is_digit(c);
-}
-
-/*
  *   Search for text 
  */
 int CHtmlTextArray::search(const textchar_t *txt, size_t txtlen,
@@ -460,6 +523,30 @@ int CHtmlTextArray::search(const textchar_t *txt, size_t txtlen,
     size_t cur_ofs;
     size_t start_pg;
     size_t start_ofs;
+
+    /* 
+     *   Get the system default character set.  For character classification
+     *   purposes, we'll assume that everything is in this character set.
+     *   This isn't always true, since entity markups (e.g., &auml;) can be
+     *   in non-default character sets.  But the information on the character
+     *   set is in the next layer up (the CHtmlDisp list), which we don't
+     *   have access to, so this potentially faulty assumption is the best we
+     *   can do.  The potential harm is that we interpret an entity markup
+     *   character's byte encoding in terms of the system default character
+     *   set rather than its actual character set, which in turn could cause
+     *   us to misclassify the character as a word or non-word character when
+     *   in fact it's the opposite.  If we make such an error for a character
+     *   at a word boundary, we could miss a word boundary (or, contrariwise,
+     *   think there's a word boundary someplace where there isn't one),
+     *   which could cause a "whole word" search to miss a match or find a
+     *   false match.  Note that this won't affect characters that are part
+     *   of the search string itself, since these can really only be
+     *   expressed in terms of the system default character set, as there's
+     *   no interface mechanism for mixing character sets in this kind of
+     *   input.  The potential for error is when such an entity is adjacent
+     *   to a match to a search string.
+     */
+    oshtml_charset_id_t cs = os_get_default_charset();
 
     /* get the page and offset of the starting address */
     start_pg = cur_pg = get_page(startofs);
@@ -578,9 +665,9 @@ int CHtmlTextArray::search(const textchar_t *txt, size_t txtlen,
                  *   end on word boundaries 
                  */
                 if (whole_word
-                    && ((a0 != 0 && is_word_char(get_char(a0 - 1)))
+                    && ((a0 != 0 && is_word_char(cs, dec_ofs_char(cs, a0)))
                         || (a1 < get_max_addr()
-                            && is_word_char(get_char(a1)))))
+                            && is_word_char(cs, a1))))
                 {
                     /* 
                      *   we have a word character on one side or the other,

@@ -157,17 +157,37 @@ public:
     /* get the character at a given offset */
     textchar_t get_char(unsigned long addr) const { return *get_text(addr); }
 
-    /* increment an offset so that it points to another valid offset */
-    unsigned long inc_ofs(unsigned long ofs) const;
+    /* is the character at the given offset a word character? */
+    int is_word_char(oshtml_charset_id_t cs, unsigned long addr) const;
 
-    /* decrement an offset so that it points to another valid offset */
+    /* 
+     *   Increment/decrement an offset by one byte, such that it points to
+     *   the next/previous valid byte offset.  Note that these ignore any
+     *   underlying multi-byte structure in the character set - they just
+     *   move the offset a byte at a time, which might leave the offset in
+     *   the middle of a multi-byte character.
+     */
+    unsigned long inc_ofs(unsigned long ofs) const;
     unsigned long dec_ofs(unsigned long ofs) const;
 
     /*
-     *   Determine how many characters are between two text offsets.
-     *   Since text offsets are not assigned continuously, it is possible
-     *   that the difference of the two offsets overstates the number of
-     *   characters between the two offset. 
+     *   Increment/decrement an offset by one character, such that it points
+     *   to the next/previous valid offset that's also the lead byte of a
+     *   character.  If the local system character set uses a multi-byte
+     *   encoding (e.g., UTF-8), this ensures that the new offset points to
+     *   the lead byte of a character, so it moves the offset by more than
+     *   one byte if necessary to skip one whole character.
+     */
+    unsigned long inc_ofs_char(
+        oshtml_charset_id_t cs, unsigned long ofs) const;
+    unsigned long dec_ofs_char(
+        oshtml_charset_id_t cs, unsigned long ofs) const;
+
+    /*
+     *   Determine how many characters are between two text offsets.  Since
+     *   text offsets are not assigned continuously, it is possible that the
+     *   difference of the two offsets overstates the number of characters
+     *   between the two offset. 
      */
     unsigned long get_char_count(unsigned long startofs,
                                  unsigned long endofs) const;

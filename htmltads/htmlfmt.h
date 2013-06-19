@@ -1068,6 +1068,9 @@ public:
     class CHtmlDisp *find_by_txtofs(unsigned long ofs, int use_prv,
                                     int use_nxt) const;
 
+    /* get the character set at a given text position */
+    oshtml_charset_id_t get_charset(unsigned long ofs) const;
+
     /*
      *   Find an object given a debugger source file seek position.  This
      *   is used only for debugger source windows. 
@@ -1376,16 +1379,37 @@ public:
     virtual textchar_t get_char_at_ofs(unsigned long ofs) const;
 
     /* 
-     *   Increment/decrement a text offset.  Since text offsets are not
-     *   necessarily continuous (i.e., gaps can exist, so two adjacent
-     *   characters might have text offsets that differ by more than 1),
-     *   these routines should always be used to traverse the display list's
-     *   text.  
+     *   Increment/decrement a text offset by one byte.  Since text offsets
+     *   are not necessarily continuous (i.e., gaps can exist, so two
+     *   adjacent characters might have text offsets that differ by more than
+     *   1), these routines should always be used to traverse the display
+     *   list's text.
+     *   
+     *   This function operates on bytes, so it can leave the offset pointing
+     *   into the middle of a multi-byte character (e.g., it could leave the
+     *   offset pointing at the second byte of a three-byte UTF-8 character).
      */
     virtual unsigned long inc_text_ofs(unsigned long ofs) const;
     virtual unsigned long dec_text_ofs(unsigned long ofs) const;
 
-    /* get the maximum text offset */
+    /*
+     *   Increment/decrement a text offset by a whole character.  These work
+     *   like inc/dec_text_ofs() but operates on characters rather than
+     *   bytes.  If the next/previous character is a multi-byte character
+     *   (e.g., a three-byte UTF-8 sequence), this skips all of the bytes of
+     *   the character.  This ensures that the new offset points to the lead
+     *   byte of a whole character, never at the middle byte of a multi-byte
+     *   character.  The underlying text is assumed to be in the system local
+     *   character set, as parsed by os_next_char() and os_prev_char().
+     */
+    virtual unsigned long inc_text_ofs_char(
+        oshtml_charset_id_t cs, unsigned long ofs) const;
+    virtual unsigned long dec_text_ofs_char(
+        oshtml_charset_id_t cs, unsigned long ofs) const;
+
+    /* 
+     *   get the maximum text offset 
+     */
     virtual unsigned long get_text_ofs_max() const;
 
     /* 

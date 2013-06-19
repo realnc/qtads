@@ -1125,6 +1125,18 @@ CHtmlSysFont *CHtmlDispText::get_draw_text_font(CHtmlSysWin *win,
     return font;
 }
 
+/* get our character set */
+int CHtmlDispText::get_charset(oshtml_charset_id_t &c) const
+{
+    if (font_ != 0)
+    {
+        c = font_->get_charset();
+        return TRUE;
+    }
+    else
+        return FALSE;
+}
+
 /*
  *   Draw a portion of the text, with optional selection highlighting,
  *   from a given point in the string, for a given maximum length.  We'll

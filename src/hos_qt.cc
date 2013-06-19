@@ -18,6 +18,8 @@
 
 #include <QDebug>
 
+#include "vmuni.h"
+
 
 #ifdef TADSHTML_DEBUG
 void
@@ -26,6 +28,15 @@ os_dbg_sys_msg( const textchar_t* msg )
     qDebug() << msg;
 }
 #endif
+
+
+oshtml_charset_id_t
+os_get_default_charset()
+{
+    // We always assume UTF-8, so the value we return here doesn't actually
+    // represent anything.
+    return 0;
+}
 
 
 /* Get the next character in a string.
@@ -67,6 +78,20 @@ os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t*
         --p;
     }
     return const_cast<textchar_t*>(p);
+}
+
+
+/* Determine if the character at the given string position is a word
+ * character - i.e., a character that's part of a written word.
+ */
+int
+os_is_word_char( oshtml_charset_id_t id, const textchar_t* p, size_t len )
+{
+    const QString& c = QString::fromUtf8(p, os_next_char(id, p, len) - p);
+    if (c.isEmpty()) {
+        return false;
+    }
+    return t3_is_alpha(c.at(0).unicode());
 }
 
 

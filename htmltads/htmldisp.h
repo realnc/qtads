@@ -598,6 +598,13 @@ public:
         { return 0; }
 
     /*
+     *   Get the character set for this item's text, if applicable.  Returns
+     *   true if we successfully fill in 'c' with a character set, false if
+     *   not.
+     */
+    virtual int get_charset(oshtml_charset_id_t &c) const { return FALSE; }
+
+    /*
      *   Determine if this item can qualify as an inexact hit when seeking
      *   the item nearest a mouse location.  Since inexact hits are used
      *   to determine text selection ranges, we only allow inexact matches
@@ -1488,6 +1495,9 @@ protected:
                            unsigned long sel_start, unsigned long sel_end,
                            class CHtmlDispLink *link, int clicked,
                            const CHtmlRect *pos);
+
+    /* get our character set */
+    int get_charset(oshtml_charset_id_t &c) const;
 
     /* get the font to use for drawing our text */
     class CHtmlSysFont *get_draw_text_font(class CHtmlSysWin *win,

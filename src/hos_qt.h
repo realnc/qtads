@@ -63,6 +63,10 @@ os_dbg_sys_msg( const textchar_t* msg );
 typedef unsigned int oshtml_charset_id_t;
 
 
+/* get the system default character set */
+oshtml_charset_id_t
+os_get_default_charset();
+
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -108,6 +112,24 @@ os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/ );
  */
 textchar_t*
 os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart );
+
+
+/*
+ *   Determine if the character at the given string position is a word
+ *   character - i.e., a character that's part of a written word.  The exact
+ *   set of included characters is up to the platform, since this is for UI
+ *   purposes, for things like selecting a word at a time in displayed text.
+ *   Word characters usually include alphabetic characters, digits, and
+ *   hyphens.
+ *
+ *   'p' is a pointer to the character of interest (if it's a multi-byte
+ *   character, 'p' points to the first byte of the character), and 'len' is
+ *   the number of bytes after 'p' in the overall string (which might contain
+ *   additional characters following the character of interest, so 'len'
+ *   isn't necessary the number of bytes in the single character at 'p').
+ */
+int
+os_is_word_char( oshtml_charset_id_t id, const textchar_t *p, size_t len );
 
 
 /* ------------------------------------------------------------------------ */

@@ -772,16 +772,36 @@ const textchar_t *CHtmlFormatter::get_text_ptr(unsigned long ofs) const
     return parser_->get_text_array()->get_text(ofs);
 }
 
-/* increment a text offset */
+/* increment a text offset by one byte */
 unsigned long CHtmlFormatter::inc_text_ofs(unsigned long ofs) const
 {
     return parser_->get_text_array()->inc_ofs(ofs);
 }
 
-/* decrement a text offset */
+/* decrement a text offset by one byte */
 unsigned long CHtmlFormatter::dec_text_ofs(unsigned long ofs) const
 {
     return parser_->get_text_array()->dec_ofs(ofs);
+}
+
+/* 
+ *   increment a text offset by one character (takes into account multi-byte
+ *   characters) 
+ */
+unsigned long CHtmlFormatter::inc_text_ofs_char(
+    oshtml_charset_id_t cs, unsigned long ofs) const
+{
+    return parser_->get_text_array()->inc_ofs_char(cs, ofs);
+}
+
+/* 
+ *   decrement a text offset by one character (takes into account multi-byte
+ *   characters) 
+ */
+unsigned long CHtmlFormatter::dec_text_ofs_char(
+    oshtml_charset_id_t cs, unsigned long ofs) const
+{
+    return parser_->get_text_array()->dec_ofs_char(cs, ofs);
 }
 
 /*
@@ -3315,6 +3335,29 @@ CHtmlDisp *CHtmlFormatter::get_disp_by_linenum(long linenum) const
 
 
 /*
+ *   Get the character set for the text at the given text offset.
+ */
+oshtml_charset_id_t CHtmlFormatter::get_charset(unsigned long ofs) const
+{
+    /* look up the display item at the given offset */
+    CHtmlDisp *disp = find_by_txtofs(ofs, TRUE, TRUE);
+
+    /* get the character set from the display item, if we foudn one */
+    oshtml_charset_id_t cs;
+    if (disp != 0 && disp->get_charset(cs))
+        return cs;
+
+    /* that didn't work - use the default character set for the window */
+    CHtmlSysWin *win;
+    CHtmlSysWinGroup *wingroup;
+    if ((win = get_win()) != 0 && (wingroup = win->get_win_group()) != 0)
+        return wingroup->get_default_win_charset();
+
+    /* still no luck - use the system default character set */
+    return os_get_default_charset();
+}
+
+/*
  *   Find an item by text offset 
  */
 CHtmlDisp *CHtmlFormatter::find_by_txtofs(unsigned long ofs, int use_prv,
@@ -3482,42 +3525,64 @@ void CHtmlFormatter::set_sel_range(CHtmlPoint start, CHtmlPoint end,
 unsigned long CHtmlFormatter::find_word_boundary(
     unsigned long start, int dir) const
 {
-    int start_class;
-    int cur_class;
-    unsigned long cur;
-    unsigned long nxt;
-
-    /* note whether we started off in a word or not */
-    start_class = get_char_class(get_char_at_ofs(start));
+    /* get our text array */
+    CHtmlTextArray *arr = parser_->get_text_array();
+        
+    /* note the character type at the starting position */
+    oshtml_charset_id_t cs = get_charset(start);
+    int start_is_word = arr->is_word_char(cs, start);
 
     /* keep going until we cross a word boundary or run out of text */
-    for (cur = start ;; )
+    unsigned long cur = start;
+    unsigned long nxt;
+    for ( ;; )
     {
+        /* 
+         *   Get the tag containing the current character if moving forward
+         *   or the previous byte if moving backwards.  Once we have the tag,
+         *   use it to get the character set for the text containing the
+         *   character we're traversing - this is necessary to ensure proper
+         *   traversal of multi-byte characters.
+         */
+
         /* move the pointer in the appropriate direction */
         if (dir > 0)
         {
             /* going forward - increment the pointer */
-            nxt = inc_text_ofs(cur);
+            nxt = inc_text_ofs_char(cs, cur);
             if (nxt > get_text_ofs_max())
                 break;
+
+            /* get the character set context for the new character */
+            cs = get_charset(nxt);
         }
         else
         {
-            /* going backwards - decrement the pointer */
+            /* going backwards - if already at the beginning, stop */
             if (cur == 0)
                 break;
-            nxt = dec_text_ofs(cur);
+
+            /* 
+             *   get the character set context for the previous character
+             *   (which necessarily contains the previous byte, so we can
+             *   just ask for the context for the previous byte - this avoids
+             *   a catch-22 where we have to know the previous character set
+             *   to find the bounds of the previous character, for which we
+             *   need to know the previous character set...)
+             */
+            cs = get_charset(dec_text_ofs(cur));
+            nxt = dec_text_ofs_char(cs, cur);
         }
 
         /* if we've reached the beginning or end of the text, stop here */
         if (nxt == cur)
             break;
 
-        /* check if the next character is in a word */
-        cur_class = get_char_class(get_char_at_ofs(nxt));
+        /* get the character type at the new position */
+        int cur_is_word = arr->is_word_char(cs, nxt);
         
         /* if we crossed a boundary, stop */
-        if (cur_class != start_class)
+        if (cur_is_word != start_is_word)
             break;
 
         /* move to the next character */
