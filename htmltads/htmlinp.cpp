@@ -611,19 +611,17 @@ int CHtmlInputBuf::select_prev_hist()
  */
 int CHtmlInputBuf::select_prev_hist_prefix(const textchar_t *pre, size_t len)
 {
-    size_t cur;
-    /* abort search after 2 rounds not finding a result */
-    bool second_round = false;
+    size_t cur, start;
 
     /* if there's nothing in the history buffer, ignore this */
     if (histcnt_ == 0)
         return FALSE;
         
     /* start with the previous line, wrapping at the start of the list */
-    cur = (histpos_ == 0 ? histcnt_ : histpos_) - 1;
+    cur = start = (histpos_ == 0 ? histcnt_ : histpos_) - 1;
 
     /* search for a matching line; if we get back to where we started, fail */
-    while (cur != histpos_)
+    do
     {
         /* if this one matches, stop here */
         if (strlen(history_[cur]) > len
@@ -652,17 +650,8 @@ int CHtmlInputBuf::select_prev_hist_prefix(const textchar_t *pre, size_t len)
         }
 
         /* move to the previous line, wrapping at the start of the list */
-        if(cur == 0){
-            if(second_round){
-                break;
-            }else{
-                cur = histcnt_ - 1;
-                second_round = true;
-            }
-        }else{
-            cur--;
-        }
-    }
+        cur = (cur == 0 ? histcnt_ : cur) - 1;
+    } while (cur != start);
 
     /* we didn't find a match; ignore it */
     return FALSE;
