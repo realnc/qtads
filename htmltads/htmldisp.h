@@ -1904,14 +1904,14 @@ public:
     void set_text_ofs(unsigned long ofs) { ofs_ = ofs; }
 
     /* get the number of characters in my text */
-    int get_text_columns() const { return max_col_; }
+    int get_text_columns() const { return chars_; }
 
     /* 
      *   check to see if we contain a text offset - add one to our range for
      *   a newline at the end of the line 
      */
     virtual int contains_text_ofs(unsigned long ofs) const
-        { return ofs >= ofs_ && ofs < ofs_ + max_col_ + 1; }
+        { return ofs >= ofs_ && ofs < ofs_ + bytes_ + 1; }
 
     /* determine if I'm past a given offset */
     int is_past_text_ofs(unsigned long ofs) const
@@ -1919,7 +1919,7 @@ public:
 
     /* determine if I overlap a given text range */
     virtual int overlaps_text_range(unsigned long l, unsigned long r) const
-        { return ofs_ <= r && ofs_ + max_col_ + 1 > l; }
+        { return ofs_ <= r && ofs_ + bytes_ + 1 > l; }
 
     /* get my width */
     int measure_width(class CHtmlSysWin *)
@@ -1949,15 +1949,59 @@ public:
     textchar_t get_char_at_ofs(unsigned long ofs) const
     {
         /* if it's outside of our offset range, it's not ours */
-        if (ofs < ofs_ || ofs > ofs_ + max_col_)
+        if (ofs < ofs_ || ofs > ofs_ + bytes_)
             return '\0';
 
         /* if it's just past our last character, it's a newline */
-        if (ofs == ofs_ + max_col_)
+        if (ofs == ofs_ + bytes_)
             return '\n';
 
         /* return the character from our buffer, if we have a buffer */
         return buf_.get() != 0 ? buf_.get()[ofs - ofs_] : '\0';
+    }
+
+    /* is the character at the given offset a word character? */
+    int is_word_char_at_ofs(oshtml_charset_id_t cs, unsigned long ofs)
+    {
+        /* if it's outside of our offset range, it's not ours */
+        if (ofs < ofs_ || ofs > ofs_ + bytes_)
+            return FALSE;
+
+        /* ask the OS helper to interpret the character */
+        size_t local_ofs = (size_t)(ofs - ofs_);
+        const textchar_t *p = buf_.get() + local_ofs;
+        size_t rem = bytes_ - local_ofs;
+        return os_is_word_char(cs, p, rem);
+    }
+
+    /* increment an offset by one character */
+    unsigned long inc_text_ofs_char(
+        oshtml_charset_id_t cs, unsigned long ofs) const
+    {
+        /* if it's outside of our offset range, it's not ours */
+        if (ofs < ofs_ || ofs > ofs_ + bytes_)
+            return FALSE;
+
+        /* ask the OS helper to interpret the character */
+        size_t local_ofs = (size_t)(ofs - ofs_);
+        const textchar_t *p = buf_.get() + local_ofs;
+        size_t rem = bytes_ - local_ofs;
+        return ofs + (os_next_char(cs, p, rem) - p);
+    }
+    
+    /* decrement an offset by one character */
+    unsigned long dec_text_ofs_char(
+        oshtml_charset_id_t cs, unsigned long ofs) const
+    {
+        /* if it's outside of our offset range, it's not ours */
+        if (ofs < ofs_ || ofs > ofs_ + bytes_)
+            return FALSE;
+
+        /* ask the OS helper to interpret the character */
+        size_t local_ofs = (size_t)(ofs - ofs_);
+        const textchar_t *p = buf_.get() + local_ofs;
+        size_t rem = bytes_ - local_ofs;
+        return ofs + (os_prev_char(cs, p, buf_.get()) - p);
     }
 
     /* use an I-beam cursor over our text */
@@ -1997,18 +2041,12 @@ public:
                                       unsigned long startofs,
                                       unsigned long endofs) const
     {
-        size_t ofs;
-        size_t len;
-        int add_nl;
-        
         /* start with our entire range */
-        ofs = 0;
-        len = max_col_;
+        size_t ofs = 0;
+        size_t len = bytes_;
 
         /* ignore if it's entirely outside our range, or we have no data */
-        if (startofs >= ofs_ + max_col_ + 1
-            || endofs < ofs_
-            || buf_.get() == 0)
+        if (startofs >= ofs_ + bytes_ + 1 || endofs < ofs_ || buf_.get() == 0)
             return;
 
         /* limit on the left if the starting offset is after our start */
@@ -2020,11 +2058,11 @@ public:
         }
 
         /* limit on the right if the ending offset is before our end */
-        if (endofs < ofs_ + max_col_)
-            len -= ofs_ + max_col_ - endofs;
+        if (endofs < ofs_ + bytes_)
+            len -= ofs_ + bytes_ - endofs;
 
-        /* add a newline if they want the char just past our last column */
-        add_nl = (endofs >= ofs_ + max_col_);
+        /* add a newline if they want the charater just past our end */
+        int add_nl = (endofs >= ofs_ + bytes_);
 
         /* append the data */
         buf->append(buf_.get() + ofs, len);
@@ -2052,8 +2090,13 @@ private:
     /* ascender height of my font */
     unsigned short ascent_ht_;
 
-    /* the highest column number we've filled in */
-    int max_col_;
+    /* 
+     *   The number of characters we store, and the number of bytes.  These
+     *   might differ if we're using a multi-byte character set (such as
+     *   UTF-8).  Note that text offsets are *byte* oriented.
+     */
+    int chars_;
+    int bytes_;
 
     /* my starting text offset */
     unsigned long ofs_;

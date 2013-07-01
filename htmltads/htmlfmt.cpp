@@ -812,6 +812,15 @@ unsigned long CHtmlFormatter::get_text_ofs_max() const
     return get_text_array()->get_max_addr();
 }
 
+/*
+ *   is the character at the given offset a word character? 
+ */
+int CHtmlFormatter::is_word_char_at_ofs(
+    oshtml_charset_id_t cs, unsigned long ofs) const
+{
+    return get_text_array()->is_word_char(cs, ofs);
+}
+
 
 /*
  *   Search for the given text 
@@ -3525,12 +3534,9 @@ void CHtmlFormatter::set_sel_range(CHtmlPoint start, CHtmlPoint end,
 unsigned long CHtmlFormatter::find_word_boundary(
     unsigned long start, int dir) const
 {
-    /* get our text array */
-    CHtmlTextArray *arr = parser_->get_text_array();
-        
     /* note the character type at the starting position */
     oshtml_charset_id_t cs = get_charset(start);
-    int start_is_word = arr->is_word_char(cs, start);
+    int start_is_word = is_word_char_at_ofs(cs, start);
 
     /* keep going until we cross a word boundary or run out of text */
     unsigned long cur = start;
@@ -3579,7 +3585,7 @@ unsigned long CHtmlFormatter::find_word_boundary(
             break;
 
         /* get the character type at the new position */
-        int cur_is_word = arr->is_word_char(cs, nxt);
+        int cur_is_word = is_word_char_at_ofs(cs, nxt);
         
         /* if we crossed a boundary, stop */
         if (cur_is_word != start_is_word)
@@ -6979,7 +6985,7 @@ void CHtmlFormatterBannerExtGrid::write_text_at(
     /* 
      *   if we expanded any of the lines we wrote, we must fix up the text
      *   offsets for all subsequent lines to account for the new text offsets
-     *   in the preceding lines 
+     *   in the expanded lines 
      */
     if (fix_disp != 0)
     {
@@ -7055,13 +7061,12 @@ void CHtmlFormatterBannerExtGrid::clear_contents()
 /*
  *   get the character at the given text offset 
  */
-textchar_t CHtmlFormatterBannerExtGrid::
-   get_char_at_ofs(unsigned long ofs) const
+textchar_t CHtmlFormatterBannerExtGrid::get_char_at_ofs(
+    unsigned long ofs) const
 {
-    CHtmlDispTextGrid *disp;
-
     /* find the display item containing the offset */
-    disp = (CHtmlDispTextGrid *)find_by_txtofs(ofs, TRUE, FALSE);
+    CHtmlDispTextGrid *disp =
+        (CHtmlDispTextGrid *)find_by_txtofs(ofs, TRUE, FALSE);
 
     /* if we didn't find a display item for the offset, there's no text */
     if (disp == 0)
@@ -7069,6 +7074,49 @@ textchar_t CHtmlFormatterBannerExtGrid::
 
     /* get the character at the given offset from the display item */
     return disp->get_char_at_ofs(ofs);
+}
+
+/* increment a text offset by one character */
+unsigned long CHtmlFormatterBannerExtGrid::inc_text_ofs_char(
+    oshtml_charset_id_t cs, unsigned long ofs) const
+{
+    /* find the display item containing the offset */
+    CHtmlDispTextGrid *disp =
+        (CHtmlDispTextGrid *)find_by_txtofs(ofs, TRUE, FALSE);
+
+    /* let it do the work */
+    return disp != 0 ? disp->inc_text_ofs_char(cs, ofs) : ofs + 1;
+}
+
+/* decrement a text offset by one character */
+unsigned long CHtmlFormatterBannerExtGrid::dec_text_ofs_char(
+    oshtml_charset_id_t cs, unsigned long ofs) const
+{
+    /* find the display item containing the offset */
+    CHtmlDispTextGrid *disp =
+        (CHtmlDispTextGrid *)find_by_txtofs(ofs, TRUE, FALSE);
+
+    /* let it do the work */
+    return disp != 0 ? disp->dec_text_ofs_char(cs, ofs) : ofs - 1;
+}
+
+/* is the character at the given offset a word character? */
+int CHtmlFormatterBannerExtGrid::is_word_char_at_ofs(
+    oshtml_charset_id_t cs, unsigned long ofs) const
+{
+    /* find the display item containing the offset */
+    CHtmlDispTextGrid *disp =
+        (CHtmlDispTextGrid *)find_by_txtofs(ofs, TRUE, FALSE);
+
+    /* 
+     *   if there's no display item, there's no text there, so it can't be a
+     *   word character 
+     */
+    if (disp == 0)
+        return FALSE;
+
+    /* ask the display item to make the determination */
+    return disp->is_word_char_at_ofs(cs, ofs);
 }
 
 /*

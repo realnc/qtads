@@ -626,6 +626,29 @@ CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const 
         return;
     }
 
+    if ((0x80 & *str) != 0x00 and (0xE0 & *str) != 0xC0
+        and (0xF0 & *str) != 0xE0 and (0xF8 & *str) != 0xF0)
+    {
+        //qDebug() << "ERROR";
+        ++str;
+        --len;
+    }
+    if (len == 0) {
+        return;
+    }
+
+
+    if (this->fBannerStyleGrid) {
+        //qDebug() << QString::fromUtf8(str, len);
+        const QString qStr(QString::fromUtf8(str, len));
+        //qDebug() << qStr;
+        if (qStr.startsWith(QString::fromUtf8("α"))) {
+            //qDebug() << len;
+            //abort();
+            //printf("%.*s\n", (int)len, str);
+        }
+    }
+
     QPainter painter(this->dispWidget);
     this->fSetupPainterForFont(painter, hilite, font);
     painter.drawText(x, y + painter.fontMetrics().ascent(), QString::fromUtf8(str, len));

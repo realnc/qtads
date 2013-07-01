@@ -1378,6 +1378,12 @@ public:
     /* get the character at the given text offset */
     virtual textchar_t get_char_at_ofs(unsigned long ofs) const;
 
+    /* is the character at the given offset a word character? */
+    virtual int is_word_char_at_ofs(
+        oshtml_charset_id_t cs, unsigned long ofs) const;
+    virtual int is_word_char_at_ofs(unsigned long ofs)
+        { return is_word_char_at_ofs(get_charset(ofs), ofs); }
+
     /* 
      *   Increment/decrement a text offset by one byte.  Since text offsets
      *   are not necessarily continuous (i.e., gaps can exist, so two
@@ -2649,6 +2655,10 @@ public:
     /* get the character at the given text offset */
     virtual textchar_t get_char_at_ofs(unsigned long ofs) const;
 
+    /* is the character at the given offset a word character? */
+    virtual int is_word_char_at_ofs(
+        oshtml_charset_id_t cs, unsigned long ofs) const;
+
     /* 
      *   Get the number of characters in an offset range.  We store our
      *   character offsets continuously (without gaps), so the number of
@@ -2664,6 +2674,11 @@ public:
         { return ofs + 1; }
     virtual unsigned long dec_text_ofs(unsigned long ofs) const
         { return ofs - 1; }
+
+    virtual unsigned long inc_text_ofs_char(
+        oshtml_charset_id_t cs, unsigned long ofs) const;
+    virtual unsigned long dec_text_ofs_char(
+        oshtml_charset_id_t cs, unsigned long ofs) const;
 
     /* get the maximum text offset */
     virtual unsigned long get_text_ofs_max() const { return max_ofs_; }

@@ -42,8 +42,11 @@ os_get_default_charset()
 /* Get the next character in a string.
  */
 textchar_t*
-os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/ )
+os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t len )
 {
+    if (p == 0) {
+        return 0;
+    }
     // We always use UTF-8, so we only need to figure out how many bytes to
     // skip by looking at the first byte. We don't need to actually iterate
     // over them.
@@ -68,9 +71,11 @@ os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/ )
 textchar_t*
 os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart )
 {
+    if (p == 0) {
+        return 0;
+    }
     // Move back one byte.
     --p;
-
     // Skip continuation bytes. Make sure we don't go past the beginning.
     // We need to iterate over every byte since it's not possible to determine
     // the length of the character without actually looking at the first byte.
@@ -87,6 +92,9 @@ os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t*
 int
 os_is_word_char( oshtml_charset_id_t id, const textchar_t* p, size_t len )
 {
+    if (p == 0) {
+        return false;
+    }
     const QString& c = QString::fromUtf8(p, os_next_char(id, p, len) - p);
     if (c.isEmpty()) {
         return false;

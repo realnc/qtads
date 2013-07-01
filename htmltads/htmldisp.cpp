@@ -2434,21 +2434,20 @@ struct textgrid_cellcolor_t
 CHtmlDispTextGrid::CHtmlDispTextGrid(CHtmlSysWin *win, CHtmlSysFont *font,
                                      unsigned long ofs)
 {
-    CHtmlPoint siz;
-
     /* remember my initial offset */
     ofs_ = ofs;
 
     /* there's nothing in our buffer yet */
-    max_col_ = 0;
+    bytes_ = 0;
+    chars_ = 0;
 
     /* set the font */
     set_font(win, font);
 
     /* allocate an initial set of cell colors */
     colors_max_ = 50;
-    colors_ = (textgrid_cellcolor_t *)th_malloc(colors_max_
-                                                * sizeof(colors_[0]));
+    colors_ = (textgrid_cellcolor_t *)th_malloc(
+        colors_max_ * sizeof(colors_[0]));
 }
 
 /*
@@ -2466,30 +2465,62 @@ CHtmlDispTextGrid::~CHtmlDispTextGrid()
 int CHtmlDispTextGrid::write_text(CHtmlSysWin *win, CHtmlSysFont *font,
                                   int col, const textchar_t *txt, size_t len)
 {
-    char *p;
-    textgrid_cellcolor_t *cp;
-    int i;
-    int expanded;
+    /* get my font descriptor */
     CHtmlFontDesc desc;
+    font->get_font_desc(&desc);
+
+    /* get my character set */
+    oshtml_charset_id_t cs = desc.charset;
+
+    /* count the number of characters in the new text */
+    size_t charlen = 0;
+    for (const textchar_t *tp = txt ; tp < txt + len ;
+         tp = os_next_char(cs, tp, len - (tp - txt)), ++charlen) ;
 
     /* assume we won't have to expand the row */
-    expanded = FALSE;
+    int expanded = FALSE;
+
+    /* seek the starting point, accounting for multi-byte characters */
+    int i;
+    char *p;
+    for (i = 0, p = buf_.get() ; i < col && i < chars_ ;
+         ++i, p = os_next_char(cs, p, bytes_ - (p - buf_.get()))) ;
+    int starti = p - buf_.get();
+
+    /* seek the ending point in the existing text */
+    for ( ; i < col + (int)charlen && i < chars_ ;
+          ++i, p = os_next_char(cs, p, bytes_ - (p - buf_.get()))) ;
+    int endi = p - buf_.get();
+
+    /* 
+     *   figure the number of bytes after the replacement - this is the
+     *   current length minus the removed length plus the added length 
+     */
+    size_t new_bytes = bytes_ - (endi - starti) + len;
+
+    /* 
+     *   add room for padding, if necessary: we pad with spaces if the
+     *   insertion column is more than one past the existing end column 
+     */
+    if (col > chars_)
+        new_bytes += col - chars_;
 
     /* ensure that we have enough space in our string buffer */
-    buf_.ensure_size(col + len);
+    buf_.ensure_size(new_bytes);
 
     /* make sure we have enough space for the cell colors */
-    if (col + len > colors_max_)
+    if (col + charlen > colors_max_)
     {
         /* expand a bit over the immediate need, and reallocate */
-        colors_max_ = col + len + 50;
+        colors_max_ = col + charlen + 50;
         colors_ = (textgrid_cellcolor_t *)th_realloc(
             colors_, colors_max_ * sizeof(colors_[0]));
     }
 
-    /* if we're going past the maximum column so far, pad with spaces */
-    for (p = buf_.get() + max_col_, cp = colors_ + max_col_, i = max_col_ ;
-         i < col ; ++i, ++p, ++cp)
+    /* add padding spaces if inserting past the last current column */
+    textgrid_cellcolor_t *cp;
+    for (p = buf_.get() + starti, cp = colors_ + chars_, i = chars_ ;
+         i < col ; ++i, ++p, ++starti, ++endi, ++cp, ++bytes_, ++chars_)
     {
         /* add a space */
         *p = ' ';
@@ -2499,14 +2530,27 @@ int CHtmlDispTextGrid::write_text(CHtmlSysWin *win, CHtmlSysFont *font,
         cp->bg = 0x01000000;
     }
 
-    /* copy the text */
-    memcpy(buf_.get() + col, txt, len);
+    /* 
+     *   Move existing trailing text to its new position.  The new text
+     *   replaces the old text with the same number of *characters*, but it
+     *   might nonetheless have a different *byte* length, since we could be
+     *   using a multi-byte character set.  The trailing text might need to
+     *   move as a result to compensate for the change in byte length of the
+     *   replaced text.
+     */
+    int trailing_len = bytes_ - endi;
+    int trailingi = starti + len;
+    if (trailing_len > 0 && trailingi != endi)
+        memmove(buf_.get() + trailingi, buf_.get() + endi, trailing_len);
 
-    /* get the color of the text from the font */
-    font->get_font_desc(&desc);
+    /* copy the replacement text into the buffer */
+    memcpy(buf_.get() + starti, txt, len);
+
+    /* figure the new byte length */
+    bytes_ = trailingi + trailing_len;
 
     /* set the colors */
-    for (i = col, cp = colors_ + col ; i < col + (int)len ; ++i, ++cp)
+    for (i = col, cp = colors_ + col ; i < col + (int)charlen ; ++i, ++cp)
     {
         /* set the foreground color */
         cp->fg = desc.color;
@@ -2516,15 +2560,13 @@ int CHtmlDispTextGrid::write_text(CHtmlSysWin *win, CHtmlSysFont *font,
     }
 
     /* adjust the maximum column and size if we've expanded the width */
-    if (col + (int)len >= max_col_)
+    if (col + (int)charlen >= chars_)
     {
-        CHtmlPoint siz;
-        
         /* note the new maximum column */
-        max_col_ = col + len;
+        chars_ = col + charlen;
 
         /* calculate the new size */
-        siz = win->measure_text(font_, buf_.get(), max_col_, 0);
+        CHtmlPoint siz = win->measure_text(font_, buf_.get(), bytes_, 0);
 
         /* adjust our position for the new size */
         pos_.right = pos_.left + siz.x;
@@ -2534,7 +2576,7 @@ int CHtmlDispTextGrid::write_text(CHtmlSysWin *win, CHtmlSysFont *font,
     }
 
     /* invalidate our affected on-screen area */
-    inval_range(win, ofs_ + col, ofs_ + col + len);
+    inval_range(win, ofs_ + starti, ofs_ + starti + len);
 
     /* return an indication of whether or not we expanded our width */
     return expanded;
@@ -2545,16 +2587,13 @@ int CHtmlDispTextGrid::write_text(CHtmlSysWin *win, CHtmlSysFont *font,
  */
 void CHtmlDispTextGrid::set_font(CHtmlSysWin *win, CHtmlSysFont *font)
 {
-    CHtmlPoint siz;
-    int ascent;
-    const textchar_t *txt;
-
     /* remember my new font */
     font_ = font;
 
     /* calculate my new size */
-    txt = (max_col_ != 0 && buf_.get() != 0 ? buf_.get() : "X");
-    siz = win->measure_text(font, txt, strlen(txt), &ascent);
+    const textchar_t *txt = (bytes_ != 0 && buf_.get() != 0 ? buf_.get() : "X");
+    int ascent;
+    CHtmlPoint siz = win->measure_text(font, txt, strlen(txt), &ascent);
 
     /* change my position to account for the new size */
     pos_.set(pos_.left, pos_.top, pos_.left + siz.x, pos_.top + siz.y);
@@ -2577,81 +2616,80 @@ void CHtmlDispTextGrid::draw(CHtmlSysWin *win,
     draw_part(win, TRUE, sel_start, sel_end);
 
     /* draw the part after the end of the selection */
-    draw_part(win, FALSE, sel_end, ofs_ + max_col_);
+    draw_part(win, FALSE, sel_end, ofs_ + bytes_);
 }
 
 /* draw a text section, limiting to our range */
 void CHtmlDispTextGrid::draw_part(CHtmlSysWin *win, int hilite,
                                   unsigned long l, unsigned long r)
 {
+    /* get my font descriptor */
+    CHtmlFontDesc desc;
+    font_->get_font_desc(&desc);
+
+    /* get my character set ID */
+    oshtml_charset_id_t cs = desc.charset;
+
     /* limit the start and end positions to our range */
     if (l < ofs_)
         l = ofs_;
-    if (r > ofs_ + max_col_)
-        r = ofs_ + max_col_;
+    if (r > ofs_ + bytes_)
+        r = ofs_ + bytes_;
 
     /* if that leaves anything to draw, draw it */
     if (l < r)
     {
-        size_t col;
-        size_t len;
-        int x;
-        
-        /* get the starting column and length to draw */
-        col = l - ofs_;
-        len = r - l;
+        /* adjust 'l' and 'r' to be relative to our starting offset */
+        l -= ofs_;
+        r -= ofs_;
 
-        /* figure out where the drawing starts */
-        x = pos_.left;
-        x += win->measure_text(font_, buf_.get(), col, 0).x;
+        /* find the starting character column ('l' is a *byte* index) */
+        size_t col;
+        const textchar_t *p0 = buf_.get();
+        const textchar_t *pl = p0 + l, *pr = p0 + r;
+        const textchar_t *p;
+        for (col = 0, p = p0 ; p < pl ;
+             ++col, p = os_next_char(cs, p, bytes_ - (p - p0))) ;
+
+        /* find the left pixel position of the update area */
+        int x = pos_.left;
+        x += win->measure_text(font_, p0, p - p0, 0).x;
 
         /* draw in pieces of like color */
         for (;;)
         {
-            size_t ofs;
-            CHtmlSysFont *font;
-            CHtmlFontDesc desc;
-            textgrid_cellcolor_t *cp;
-
             /* get the color of the first character to draw */
-            cp = &colors_[col];
-            
+            textgrid_cellcolor_t *cp = &colors_[col];
+
             /* find the next cell with a different color */
-            for (ofs = 1 ; ofs < len ; ++ofs)
+            for ( ; p < pr ; ++col, p = os_next_char(cs, p, bytes_ - (p - p0)))
             {
                 /* if the color differs, stop scanning */
-                if (colors_[col + ofs].fg != cp->fg
-                    || colors_[col + ofs].bg != cp->bg)
+                if (colors_[col].fg != cp->fg || colors_[col].bg != cp->bg)
                     break;
             }
 
-            /* 
-             *   set up a descriptor for our font in the chunk's color - use
-             *   the base font, but substitute the colors defined in the
-             *   chunk 
-             */
-            font_->get_font_desc(&desc);
+            /* update the base font descriptor with the current color */
             desc.default_color = FALSE;
             desc.color = cp->fg;
             desc.default_bgcolor = (cp->bg == 0x01000000);
             desc.bgcolor = cp->bg;
 
-            /* get the font for the chunk */
-            font = win->get_font(&desc);
+            /* create a font object for the updated color */
+            CHtmlSysFont *font = win->get_font(&desc);
 
             /* draw the text */
-            win->draw_text(hilite, x, pos_.top, font, buf_.get() + col, ofs);
+            win->draw_text(hilite, x, pos_.top, font, pl, p - pl);
 
             /* if that was everything, stop looping */
-            if (ofs == len)
+            if (p >= pr)
                 break;
 
             /* move horizontally past the chunk's text size */
-            x += win->measure_text(font_, buf_.get() + col, ofs, 0).x;
+            x += win->measure_text(font_, pl, p - pl, 0).x;
 
             /* skip this chunk */
-            col += ofs;
-            len -= ofs;
+            pl = p;
         }
     }
 }
@@ -2663,26 +2701,22 @@ void CHtmlDispTextGrid::inval_range(CHtmlSysWin *win,
                                     unsigned long start_ofs,
                                     unsigned long end_ofs)
 {
-    CHtmlRect inval;
-    size_t col;
-    size_t len;
-
     /* make sure the range overlaps us */
-    if (start_ofs >= ofs_ + max_col_ || end_ofs < ofs_)
+    if (start_ofs >= ofs_ + bytes_ || end_ofs < ofs_)
         return;
 
     /* limit the range to our actual range */
     if (start_ofs < ofs_)
         start_ofs = ofs_;
-    if (end_ofs > ofs_ + max_col_)
-        end_ofs = ofs_ + max_col_;
+    if (end_ofs > ofs_ + bytes_)
+        end_ofs = ofs_ + bytes_;
 
     /* calculate the starting column and number of columns in the range */
-    col = (size_t)(start_ofs - ofs_);
-    len = (size_t)(end_ofs - start_ofs);
+    size_t col = (size_t)(start_ofs - ofs_);
+    size_t len = (size_t)(end_ofs - start_ofs);
 
     /* start with our full rectangle */
-    inval = pos_;
+    CHtmlRect inval = pos_;
 
     /* reduce the area to the desired range */
     inval.left += win->measure_text(font_, buf_.get(), col, 0).x;
@@ -2699,8 +2733,6 @@ void CHtmlDispTextGrid::inval_range(CHtmlSysWin *win,
 CHtmlPoint CHtmlDispTextGrid::get_text_pos(CHtmlSysWin *win,
                                            unsigned long txtofs)
 {
-    CHtmlPoint pt;
-
     /* 
      *   if the offset is before us, or we have no text, return our upper
      *   left corner 
@@ -2709,10 +2741,11 @@ CHtmlPoint CHtmlDispTextGrid::get_text_pos(CHtmlSysWin *win,
         return CHtmlPoint(pos_.left, pos_.top);
 
     /* if the offset is after us, return our upper right corner */
-    if (txtofs >= ofs_ + max_col_)
+    if (txtofs >= ofs_ + bytes_)
         return CHtmlPoint(pos_.right, pos_.top);
 
     /* start with our upper left corner */
+    CHtmlPoint pt;
     pt.x = pos_.left;
     pt.y = pos_.top;
 
@@ -2739,15 +2772,15 @@ unsigned long CHtmlDispTextGrid::find_textofs_by_pos(
         if (pt.y <= pos_.top || pt.x <= pos_.left)
             return ofs_;
         else
-            return ofs_ + max_col_;
+            return ofs_ + bytes_;
     }
 
     /* figure out how much of our text is before the given position */
-    fit_cnt = win->get_max_chars_in_width(font_, txt, max_col_,
-                                          pt.x - pos_.left);
+    fit_cnt = win->get_max_chars_in_width(
+        font_, txt, bytes_, pt.x - pos_.left);
 
     /* if we're over halfway into the next character, skip ahead one */
-    if (fit_cnt + 1 <= (size_t)max_col_
+    if (fit_cnt + 1 <= (size_t)bytes_
         && pt.x > (pos_.left
                    + win->measure_text(font_, txt, fit_cnt, 0).x
                    + win->measure_text(font_, txt + fit_cnt, 1, 0).x / 2))
