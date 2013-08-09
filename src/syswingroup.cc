@@ -307,12 +307,12 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
     str = QString::fromUtf8(reply->readLine(10));
     int newVersion = 0;
     if (str.length() > 3) {
-      // Chop the newline at the end, if there is one.
-      if (str.endsWith(QChar::fromLatin1('\n'))) {
-      	  str.chop(1);
-      }
-      strList = str.split(QChar::fromLatin1('.'));
-      newVersion = QT_VERSION_CHECK(strList.at(0).toInt(), strList.at(1).toInt(), strList.at(2).toInt());
+        // Chop the newline at the end, if there is one.
+        if (str.endsWith(QChar::fromLatin1('\n'))) {
+            str.chop(1);
+        }
+        strList = str.split(QChar::fromLatin1('.'));
+        newVersion = QT_VERSION_CHECK(strList.at(0).toInt(), strList.at(1).toInt(), strList.at(2).toInt());
     }
     QMessageBox* msgBox = new QMessageBox(this);
     msgBox->setTextFormat(Qt::RichText);
