@@ -279,7 +279,15 @@ CHtmlSysWinGroupQt::fCheckForUpdates()
     this->fNetManager = new QNetworkAccessManager(this);
     connect(this->fNetManager, SIGNAL(finished(QNetworkReply*)), SLOT(fReplyFinished(QNetworkReply*)));
 
-    this->fReply = this->fNetManager->get(QNetworkRequest(QUrl(QString::fromLatin1("http://qtads.sourceforge.net/currentversion"))));
+    QByteArray userAgent = "QTads/";
+    userAgent += QByteArray(QTADS_VERSION).replace(' ', '_');
+    userAgent += " Qt/";
+    userAgent += qVersion();
+
+    QNetworkRequest req(QUrl(QString::fromLatin1("http://qtads.sourceforge.net/currentversion")));
+    req.setRawHeader("User-Agent", userAgent);
+
+    this->fReply = this->fNetManager->get(req);
     connect(this->fReply, SIGNAL(error(QNetworkReply::NetworkError)),
             SLOT(fErrorOccurred(QNetworkReply::NetworkError)));
 }
