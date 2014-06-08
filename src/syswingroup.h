@@ -71,6 +71,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     class QAction* fPasteAction;
     class QNetworkAccessManager* fNetManager;
     class QNetworkReply* fReply;
+    unsigned int fHttpRedirectCount;
     QString fGameFileFromDropEvent;
 
     // Are we trying to quit the application?
@@ -92,9 +93,6 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
     void
     fReplyFinished( QNetworkReply* reply );
-
-    void
-    fErrorOccurred( QNetworkReply::NetworkError code );
 
     void
     fShowGameInfoDialog();

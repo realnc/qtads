@@ -70,6 +70,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
       fAboutBox(0),
       fAboutQtadsDialog(0),
       fNetManager(0),
+      fHttpRedirectCount(0),
       fWantsToQuit(false),
       fSilentIfNoUpdates(false)
 {
@@ -268,6 +269,22 @@ CHtmlSysWinGroupQt::fAskRestartGameDialog()
 }
 
 
+static QNetworkReply*
+sendNetRequest( QNetworkAccessManager* nam, const QUrl& url )
+{
+    QByteArray userAgent = "QTads/";
+    userAgent += QByteArray(QTADS_VERSION).replace(' ', '_');
+    userAgent += " Qt/";
+    userAgent += qVersion();
+
+    QNetworkRequest req(url);
+    req.setRawHeader("User-Agent", userAgent);
+    req.setRawHeader("Connection", "close");
+
+    return nam->get(req);
+}
+
+
 void
 CHtmlSysWinGroupQt::fCheckForUpdates()
 {
@@ -279,18 +296,23 @@ CHtmlSysWinGroupQt::fCheckForUpdates()
     this->fNetManager = new QNetworkAccessManager(this);
     connect(this->fNetManager, SIGNAL(finished(QNetworkReply*)), SLOT(fReplyFinished(QNetworkReply*)));
 
-    QByteArray userAgent = "QTads/";
-    userAgent += QByteArray(QTADS_VERSION).replace(' ', '_');
-    userAgent += " Qt/";
-    userAgent += qVersion();
+    this->fHttpRedirectCount = 0;
+    this->fReply = sendNetRequest(this->fNetManager,
+                                  QUrl(QString::fromLatin1("http://qtads.sourceforge.net/currentversion")));
+}
 
-    QNetworkRequest req(QUrl(QString::fromLatin1("http://qtads.sourceforge.net/currentversion")));
-    req.setRawHeader("User-Agent", userAgent);
-    req.setRawHeader("Connection", "close");
 
-    this->fReply = this->fNetManager->get(req);
-    connect(this->fReply, SIGNAL(error(QNetworkReply::NetworkError)),
-            SLOT(fErrorOccurred(QNetworkReply::NetworkError)));
+static void
+showUpdateErrorMsg( const QString& detailedText )
+{
+    QMessageBox* msg = new QMessageBox(
+                QMessageBox::Critical, QObject::tr("Check for Updates - Error"),
+                QObject::tr("It was not possible to retrieve update information. Please try again later,"
+                            " as the problem might be temporary. If the problem persists, feel free to"
+                            " contact the author.")
+    );
+    msg->setDetailedText(detailedText);
+    msg->show();
 }
 
 
@@ -298,8 +320,45 @@ void
 CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
 {
     if (reply->error() != QNetworkReply::NoError) {
-        // There was an error.  Don't do anything; the error slot will
-        // take care of it.
+        showUpdateErrorMsg(this->fReply->errorString());
+        this->fNetManager->deleteLater();
+        this->fReply->deleteLater();
+        this->fNetManager = 0;
+        return;
+    }
+
+    // If we get an HTTP redirect, retry the request with the new URL.
+    if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 302) {
+        ++this->fHttpRedirectCount;
+        // If we got more than 5 redirects by now, something's wrong. Abort.
+        if (this->fHttpRedirectCount > 5) {
+            showUpdateErrorMsg(tr("Too many HTTP redirects"));
+            this->fNetManager->deleteLater();
+            this->fReply->deleteLater();
+            this->fNetManager = 0;
+            return;
+        }
+        QUrl newUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        if (newUrl.isRelative()) {
+            newUrl = reply->url().resolved(newUrl);
+        }
+        reply->deleteLater();
+        this->fReply = sendNetRequest(this->fNetManager, newUrl);
+        return;
+    }
+
+    // If we get here, then anything else than an HTTP 200 status is an error.
+    if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
+        QString errMsg = tr("Expected HTTP status code 200, got:\n");
+        errMsg += reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString();
+        QString httpReason = reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
+        if (not httpReason.isEmpty()) {
+            errMsg += QString::fromLatin1(" (") + httpReason + QString::fromLatin1(")");
+        }
+        showUpdateErrorMsg(errMsg);
+        this->fNetManager->deleteLater();
+        this->fReply->deleteLater();
+        this->fNetManager = 0;
         return;
     }
 
@@ -368,20 +427,6 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
     this->fReply->deleteLater();
     this->fNetManager = 0;
     qFrame->settings()->lastUpdateDate = QDate::currentDate();
-}
-
-void
-CHtmlSysWinGroupQt::fErrorOccurred( QNetworkReply::NetworkError )
-{
-    QMessageBox* msg = new QMessageBox(QMessageBox::Critical, tr("Check for Updates - Error"),
-                                       tr("It was not possible to retrieve update information. Please try again later,"
-                                          " as the problem is probably temporary. If the problem persists, feel free"
-                                          " to contact the author."));
-    msg->setDetailedText(this->fReply->errorString());
-    msg->show();
-    this->fNetManager->deleteLater();
-    this->fReply->deleteLater();
-    this->fNetManager = 0;
 }
 
 
