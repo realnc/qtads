@@ -1,4 +1,4 @@
-2.1.7 - 2013-06-15
+2.1.7 - 2014-06-09
 ==================
 
   - The TADS virtual machines have been updated to 2.5.17/3.1.3
@@ -22,6 +22,15 @@
 
   - Printing a table without any cells in it will no longer result in the
     screen getting "stuck" and failing to update.
+
+  - Fixed a problem with the online update check, which would result in a
+    a connection error, or sometimes an application crash. Thanks to Denis
+    Pokataev for finding and fixing the crash case.
+
+  - Added Ctrl+F command history search. It finds previous commands that begin
+    with the same text as the text that is currently to the left of the input
+    caret. If multiple matches are found, repeatedly pressing Ctrl+F will cycle
+    through all matches. Thanks to tetzank for the patch.
 
 
 2.1.6 - 2013/01/01
