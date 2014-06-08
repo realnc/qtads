@@ -228,6 +228,7 @@ CHtmlSysWinGroupQt::fAskQuitGameDialog()
                                           tr("If you didn't save the current game, all progress will"
                                              " be lost. Do you wish to quit the game?"),
                                           QMessageBox::Yes | QMessageBox::Cancel, this);
+    msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setDefaultButton(QMessageBox::Cancel);
 #ifdef Q_OS_MAC
     msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
@@ -255,6 +256,7 @@ CHtmlSysWinGroupQt::fAskRestartGameDialog()
                                           tr("If you didn't save the current game, all progress will be lost."
                                              " Do you wish to restart the game?"),
                                           QMessageBox::Yes | QMessageBox::Cancel, this);
+    msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setDefaultButton(QMessageBox::Cancel);
 #ifdef Q_OS_MAC
     msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
@@ -311,6 +313,7 @@ showUpdateErrorMsg( const QString& detailedText )
                             " as the problem might be temporary. If the problem persists, feel free to"
                             " contact the author.")
     );
+    msg->setAttribute(Qt::WA_DeleteOnClose);
     msg->setDetailedText(detailedText);
     msg->show();
 }
@@ -383,6 +386,7 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
         newVersion = QT_VERSION_CHECK(strList.at(0).toInt(), strList.at(1).toInt(), strList.at(2).toInt());
     }
     QMessageBox* msgBox = new QMessageBox(this);
+    msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setTextFormat(Qt::RichText);
     msgBox->setWindowTitle(tr("Check for Updates"));
     if (newVersion > curVersion) {
@@ -635,6 +639,7 @@ CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
                                           tr("Quit QTads"),
                                           tr("A game is currently running. Abandon the game and quit the interpreter?"),
                                           QMessageBox::Yes | QMessageBox::Cancel, this);
+    msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setDefaultButton(QMessageBox::Cancel);
 #ifdef Q_OS_MAC
     msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
