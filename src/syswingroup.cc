@@ -286,6 +286,7 @@ CHtmlSysWinGroupQt::fCheckForUpdates()
 
     QNetworkRequest req(QUrl(QString::fromLatin1("http://qtads.sourceforge.net/currentversion")));
     req.setRawHeader("User-Agent", userAgent);
+    req.setRawHeader("Connection", "close");
 
     this->fReply = this->fNetManager->get(req);
     connect(this->fReply, SIGNAL(error(QNetworkReply::NetworkError)),
