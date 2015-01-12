@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=QTads
+GenericName=TADS interpreter
+Comment=GUI multimedia interpreter for TADS games
+Exec=qtads %F
+Icon=qtads
+Terminal=false
+Type=Application
+MimeType=application/x-tads;application/x-t3vm-image;
+Categories=Game;
