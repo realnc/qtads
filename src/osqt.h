@@ -190,7 +190,7 @@ typedef struct QFile osfildef;
 
 /* File modes.  On Windows, we do the Microsoft thing.  Everywhere else, we
  * assume POSIX stat(2). */
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     #define OSFMODE_FILE     _S_IFREG
     #define OSFMODE_DIR      _S_IFDIR
     #define OSFMODE_BLK      0
@@ -221,7 +221,7 @@ typedef struct QDirIterator* osdirhdl_t;
 #endif
 
 /* 64-bit time_t.  Only Windows supports this. */
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     #define os_time_t __time64_t
 #endif
 
@@ -248,7 +248,7 @@ extern "C" {
 #endif
 
 /* 64-bit replacements for <time.h> routines.  Only Windows supports this. */
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     #define os_gmtime    _gmtime64
     #define os_localtime _localtime64
     #define os_time      _time64

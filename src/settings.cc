@@ -62,7 +62,7 @@ Settings::loadFromDisk()
     const QString& DEFAULT_MONO = QString::fromLatin1("Andale Mono,15");
     const QString& DEFAULT_SCRIPT = QString::fromLatin1("Apple Chancery,17");
 #else
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     const QString& DEFAULT_SERIF = QString::fromLatin1("Times New Roman,12");
     const QString& DEFAULT_SANS = QString::fromLatin1("Verdana,12");
     const QString& DEFAULT_MONO = QString::fromLatin1("Courier New,12");

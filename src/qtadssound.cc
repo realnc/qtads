@@ -443,7 +443,7 @@ QTadsSound::createSound( const CHtmlUrl* /*url*/, const textchar_t* filename, un
         // MP3s on Windows; the decoding will take extremely long with small
         // buffer sizes.
         Sound_Sample* sample = Sound_NewSample(rw, type == WAV ? "WAV" : "MP3", &wantedFormat,
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
                                                6291456
 #else
                                                131072

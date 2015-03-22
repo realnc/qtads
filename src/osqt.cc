@@ -400,7 +400,7 @@ osfacc( const char* fname )
 
 
 // On Windows, we need to enable NTFS permission lookups.
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 #endif
 
@@ -412,7 +412,7 @@ os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
 
     const QString& fnameStr = fnameToQStr(fname);
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     struct __stat64 info;
 
     // Get a UTF-16 version of the filename and NULL-terminate it.
@@ -460,7 +460,7 @@ os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
     }
     QFileInfo inf(fnameStr);
     bool isLink = inf.isSymLink();
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     // Don't treat shortcut files as symlinks.
     if (isLink and (QString::compare(inf.suffix(), QLatin1String("lnk"), Qt::CaseInsensitive) == 0)) {
         isLink = false;
@@ -478,7 +478,7 @@ os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
         s->attrs |= OSFATTR_HIDDEN;
     }
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     // Enable NTFS permissions.
     ++qt_ntfs_permission_lookup;
 #endif
@@ -488,7 +488,7 @@ os_file_stat( const char* fname, int follow_links, os_file_stat_t* s )
     if (inf.isWritable()) {
         s->attrs |= OSFATTR_WRITE;
     }
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     // Disable NTFS permissions.
     --qt_ntfs_permission_lookup;
 #endif
