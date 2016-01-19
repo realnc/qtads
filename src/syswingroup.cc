@@ -47,10 +47,10 @@ QTadsFrame::resizeEvent( QResizeEvent* )
 void
 QTadsFrame::dragEnterEvent( QDragEnterEvent* e )
 {
-    // Only accept text. URLs are handled by the main window instead, for
-    // opening game files through drag&drop.
+    CHtmlSysWinInputQt* gameWindow = qFrame->gameWindow();
+    // Only accept text. URLs are handled by the main window instead.
     if (e->mimeData()->hasText() and not e->mimeData()->hasUrls()
-        and qFrame->gameWindow()->acceptsText())
+        and (gameWindow and gameWindow->acceptsText()))
     {
         e->acceptProposedAction();
     }
