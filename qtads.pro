@@ -36,10 +36,8 @@ macx {
     CONFIG += link_pkgconfig
     PKGCONFIG += SDL2_mixer
     LIBS += -lSDL_sound
-    QMAKE_CFLAGS += -fvisibility=hidden
+    QMAKE_CFLAGS += -std=gnu11 -fvisibility=hidden
     QMAKE_CXXFLAGS += -fvisibility=hidden
-    QMAKE_CFLAGS_RELEASE += -fomit-frame-pointer
-    QMAKE_CXXFLAGS_RELEASE += -fomit-frame-pointer
     QMAKE_LFLAGS += -dead_strip
 } else:!android {
     CONFIG += link_pkgconfig
