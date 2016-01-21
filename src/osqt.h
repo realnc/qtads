@@ -37,6 +37,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,15 +65,6 @@ extern "C" {
 #define OSNOUI_OMIT_OS_CVT_URL_DIR
 #define OSNOUI_OMIT_TEMPFILE
 #define fname_memcmp memcmp
-
-/* ANSI C99 exact-size integer types.  We simply map them to the Qt types.
- * If these types have already been defined, it's harmless to typedef them
- * again here, and in that case the compiler will only bark if our
- * definition is different from the existing one. */
-typedef qint16 int16_t;
-typedef quint16 uint16_t;
-typedef qint32 int32_t;
-typedef quint32 uint32_t;
 
 /* TODO: Implement threads.
  */
