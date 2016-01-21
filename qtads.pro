@@ -1,8 +1,11 @@
 QT += core gui network
+QT_CONFIG -= no-pkg-config
 contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
 CONFIG += silent warn_off
 VERSION = 2.1.6.99
+
+static:DEFINES += STATIC_QT
 
 android {
     CONFIG += mobility
@@ -22,21 +25,16 @@ win32 {
     RC_FILE += qtads.rc
 }
 
-# Static OS X builds need to explicitly include the text codec plugins.
-macx {
+# Static OS X builds against Qt4 need to explicitly include the text codec plugins.
+macx:static:contains(QT_MAJOR_VERSION, 4) {
     QTPLUGIN += qcncodecs qjpcodecs qtwcodecs qkrcodecs
 }
 
 macx {
     QMAKE_INFO_PLIST = Info.plist
-    exists(/Developer/SDKs/MacOSX10.5.sdk) {
-        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
-        QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
-    } else {
-        warning("OS X 10.5 SDK not found. Will use Qt defaults.")
-    }
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
     CONFIG += link_pkgconfig
-    PKGCONFIG += SDL_mixer
+    PKGCONFIG += SDL2_mixer
     LIBS += -lSDL_sound
     QMAKE_CFLAGS += -fvisibility=hidden
     QMAKE_CXXFLAGS += -fvisibility=hidden

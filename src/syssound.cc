@@ -43,7 +43,11 @@ CHtmlSysSoundMidiQt::CHtmlSysSoundMidiQt( SDL_RWops* music )
       fRepeats(0),
       fRepeatsWanted(1)
 {
+#if SDL_VERSION_ATLEAST(1,3,0)
+    this->fMusic = Mix_LoadMUS_RW(this->fRWops, false);
+#else
     this->fMusic = Mix_LoadMUS_RW(this->fRWops);
+#endif
 }
 
 
