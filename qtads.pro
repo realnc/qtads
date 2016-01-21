@@ -70,7 +70,7 @@ win32 {
 
     # We don't really need libmad and libmodplug, but my w32 SDL_mixer
     # in my mingw-cross-env build environment does.
-    LIBS += -lmad -lmodplug -lvorbisfile -lvorbis -logg -liberty
+    LIBS += -lmad -lmodplug -lvorbisfile -lvorbis -logg
 
     # So that we can use _stat64().  This means the minimum version
     # of Windows needed to run the application is Windows XP SP2.
