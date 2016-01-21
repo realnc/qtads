@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=QTads
 GenericName=TADS interpreter
-Comment=GUI multimedia interpreter for TADS games
-Exec=qtads %F
+Comment=Multimedia interpreter for TADS games
+Exec=qtads %f
 Icon=qtads
 Terminal=false
 Type=Application
