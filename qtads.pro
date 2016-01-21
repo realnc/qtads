@@ -3,7 +3,7 @@ QT_CONFIG -= no-pkg-config
 contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
 CONFIG += silent warn_off
-VERSION = 2.1.6.99
+VERSION = 2.1.7
 
 static:DEFINES += STATIC_QT
 
