@@ -2,11 +2,11 @@
 #define GLOBALS_H
 
 /* QTads version string. */
-#define QTADS_VERSION "2.1.7"
+#define QTADS_VERSION "2.1.7 git"
 
 /* MS Windows executable resource versions. */
-#define W32_RC_FILEVERSION 2,1,7,00
-#define W32_RC_PRODUCTVERSION 2,1,7,00
+#define W32_RC_FILEVERSION 2,1,7,99
+#define W32_RC_PRODUCTVERSION 2,1,7,99
 
 #ifdef __cplusplus
 /* Works like qApp, but contains the global CHtmlSysFrameQt object instead.  If
