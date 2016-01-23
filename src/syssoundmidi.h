@@ -18,10 +18,12 @@
 #ifndef SYSSOUNDMIDI_H
 #define SYSSOUNDMIDI_H
 
-#include <QDebug>
-
+#include "qtadssound.h"
 #include "htmlsys.h"
 #include "config.h"
+#ifndef Q_OS_ANDROID
+#include "Aulib/AudioStream.h"
+#endif
 
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -30,37 +32,14 @@
  * See htmltads/htmlsys.h and htmltads/notes/porting.htm for information
  * about this class.
  */
-class CHtmlSysSoundMidiQt: public CHtmlSysSoundMidi {
-#ifndef NO_AUDIO
-  private:
-    struct SDL_RWops* fRWops;
-    Mix_Music* fMusic;
-    bool fPlaying;
-
-    // TADS callback to invoke on stop.
-    void (*fDone_func)(void*, int repeat_count);
-
-    // CTX to pass to the TADS callback.
-    void* fDone_func_ctx;
-
-    // How many times we repeated the sound.
-    int fRepeats;
-
-    // How many times should we repeat the sound.
-    // 0 means repeat forever.
-    int fRepeatsWanted;
-
-    // Currently playing MIDI object.  The callback needs this.
-    static CHtmlSysSoundMidiQt* fActiveMidi;
-#endif
+class CHtmlSysSoundMidiQt: public QTadsSound, public CHtmlSysSoundMidi {
+    Q_OBJECT
 
   public:
 #ifndef NO_AUDIO
-    CHtmlSysSoundMidiQt( struct SDL_RWops* music );
-    ~CHtmlSysSoundMidiQt() override;
-
-    // SDL_Mixer callback.
-    static void callback();
+    CHtmlSysSoundMidiQt( QObject* parent, Aulib::AudioStream* stream, SoundType type )
+        : QTadsSound(parent, stream, type)
+    { }
 #endif
 
     //
@@ -71,32 +50,19 @@ class CHtmlSysSoundMidiQt: public CHtmlSysSoundMidi {
                 const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade ) override;
 
     void
-    add_crossfade( CHtmlSysWin*, long ) override
-    { qDebug() << Q_FUNC_INFO; }
+    add_crossfade( CHtmlSysWin* win, long ms ) override;
 
     void
     cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg ) override;
 
     int
     maybe_suspend( CHtmlSysSound* ) override
-    // MIDI is exclusive - we can only play one MIDI sound at a time.  However,
-    // the current HTML TADS model only allows MIDI to play in one layer (the
-    // background layer) anyway, so we should never find ourselves wanting to
-    // play a MIDI sound while another MIDI sound is already active.  So, we'll
-    // just ignore this request entirely; the result will be that the new
-    // foreground sound will be unable to play.
-    //
-    // If at some point in the future the HTML TADS model changes to allow
-    // multiple layers of MIDI sounds, this part of this routine will have to
-    // have a real implementation.
+    // We always return false since we have no limitation regarding the amount
+    // of sounds we can play simultaneously.
     { return false; }
 
     void
-    resume() override
-    // We never suspend MIDI, so there's nothing to do.  (See the notes in
-    // maybe_suspend() - if the model changes to require that MIDI suspension
-    // be implemented, we would have to provide a real implementation here.)
-    { }
+    resume() override;
 };
 
 

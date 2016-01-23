@@ -2,17 +2,19 @@ QT += core gui network
 QT_CONFIG -= no-pkg-config
 contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
-CONFIG += silent warn_off c++11
+CONFIG += silent warn_off c++14
 VERSION = 2.1.7.99
 
 # qmake on Qt 5.3 and lower doesn't recognize c++14.
 contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 4) {
+    # First, tell qmake to use C++11 ...
     CONFIG += c++11
+    # ... then, replace 11 with 14.
     QMAKE_CXXFLAGS_CXX11 = $$replace(QMAKE_CXXFLAGS_CXX11, "std=c\+\+11", "std=c++1y")
     QMAKE_CXXFLAGS_CXX11 = $$replace(QMAKE_CXXFLAGS_CXX11, "std=c\+\+0x", "std=c++1y")
 }
 
-# Qt 4 doesn't even know about C++11.
+# Qt 4 doesn't even know about C++11, let alone C++14.
 contains(QT_MAJOR_VERSION, 4) {
     QMAKE_CXXFLAGS += -std=c++1y
 }
@@ -24,7 +26,6 @@ android {
     MOBILITY =
 }
 
-disable-audio:DEFINES += NO_AUDIO
 
 # Mac OS application and file icons.
 macx {
@@ -48,21 +49,11 @@ macx {
     QMAKE_INFO_PLIST = Info.plist
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
     CONFIG += link_pkgconfig
-    !disable-audio {
-        PKGCONFIG += SDL2_mixer
-        LIBS += -lSDL_sound
-    }
     QMAKE_CFLAGS += -std=gnu11 -fvisibility=hidden
     QMAKE_CXXFLAGS += -fvisibility=hidden
     QMAKE_LFLAGS += -dead_strip
-} else:!disable-audio {
-    CONFIG += link_pkgconfig
-    PKGCONFIG += sdl
-    # Normally we would use pkg-config for SDL_mixer too, but it has to appear
-    # in the linker flags before SDL_sound, which lacks pkg-config support, or
-    # else we crash.
-    LIBS += -lSDL_mixer -lSDL_sound
 }
+
 win32 {
     *-g++* {
         QMAKE_CFLAGS += -march=i686 -mtune=generic
@@ -78,12 +69,6 @@ win32 {
         # Don't dead-strip the resource section (it contains the icon,
         # version strings, etc.)  We use a linker script to do that.
         QMAKE_LFLAGS += $$PWD/w32_linkscript
-    }
-
-    !disable-audio {
-        # We don't really need libmad and libmodplug, but my w32 SDL_mixer
-        # in my mingw-cross-env build environment does.
-        LIBS += -lmad -lmodplug -lvorbisfile -lvorbis -logg
     }
 
     # So that we can use _stat64().  This means the minimum version
@@ -118,6 +103,49 @@ QMAKE_CFLAGS_WARN_OFF =
 T2DIR = tads2
 T3DIR = tads3
 HTDIR = htmltads
+
+disable-audio {
+    DEFINES += NO_AUDIO
+} else {
+    CONFIG(debug, release|debug) {
+        DEFINES += AULIB_DEBUG
+    }
+
+    DEFINES += \
+        AULIB_STATIC_DEFINE \
+        SPX_RESAMPLE_EXPORT= \
+        RANDOM_PREFIX=SDL_audiolib \
+        OUTSIDE_SPEEX
+
+    CONFIG += link_pkgconfig
+    PKGCONFIG += sdl2 sndfile libmpg123 fluidsynth vorbisfile
+
+    INCLUDEPATH += \
+        SDL_audiolib \
+        SDL_audiolib/include \
+        SDL_audiolib/resampler \
+        SDL_audiolib/src
+
+    HEADERS += \
+        "$$PWD"/SDL_audiolib/include/Aulib/*.h \
+        "$$PWD"/SDL_audiolib/src/*.h \
+        "$$PWD"/SDL_audiolib/*.h
+
+    SOURCES += \
+        SDL_audiolib/resampler/resample.c \
+        SDL_audiolib/src/AudioDecoder.cpp \
+        SDL_audiolib/src/AudioDecoderFluidsynth.cpp \
+        SDL_audiolib/src/AudioDecoderMpg123.cpp \
+        SDL_audiolib/src/AudioDecoderSndfile.cpp \
+        SDL_audiolib/src/AudioDecoderVorbis.cpp \
+        SDL_audiolib/src/AudioResampler.cpp \
+        SDL_audiolib/src/AudioResamplerSpeex.cpp \
+        SDL_audiolib/src/AudioStream.cpp \
+        SDL_audiolib/src/Stream.cpp \
+        SDL_audiolib/src/audiostream_p.cpp \
+        SDL_audiolib/src/aulib.cpp \
+        SDL_audiolib/src/sampleconv.cpp
+}
 
 DEFINES += \
     QT_NO_CAST_FROM_ASCII \
@@ -158,7 +186,12 @@ macx|win32 {
 #   VM_UNDO_MAX_RECORDS=65536 \
 #   VM_UNDO_MAX_SAVEPTS=255
 
-INCLUDEPATH += src $$T2DIR $$T3DIR $$HTDIR
+INCLUDEPATH += \
+    src \
+    $$T2DIR \
+    $$T3DIR \
+    $$HTDIR
+
 win32:INCLUDEPATH += $$T2DIR/msdos
 DEPENDPATH += src $$T2DIR $$T3DIR $$HTDIR
 OBJECTS_DIR = obj
@@ -213,7 +246,8 @@ HEADERS += \
     src/gameinfodialog.h \
     src/kcolorbutton.h \
     src/aboutqtadsdialog.h \
-    src/config.h
+    src/config.h \
+    src/rwopsbundle.h
 
 # QTads sources.
 SOURCES += \
@@ -238,7 +272,8 @@ SOURCES += \
     src/settings.cc \
     src/gameinfodialog.cc \
     src/kcolorbutton.cc \
-    src/aboutqtadsdialog.cc
+    src/aboutqtadsdialog.cc \
+    src/rwopsbundle.c
 
 unix:SOURCES += \
     $$T2DIR/ostzposix.c

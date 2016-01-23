@@ -18,10 +18,23 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QTimer>
+#include <QResource>
 
 #ifndef NO_AUDIO
-#include <SDL_mixer.h>
-#include <SDL_sound.h>
+#include <functional>
+#include <cstring>
+#include <cerrno>
+#include <cstdio>
+#include <SDL.h>
+#include <SDL_error.h>
+#include <SDL_rwops.h>
+#include "aulib.h"
+#include "Aulib/AudioResamplerSpeex.h"
+#include "Aulib/AudioDecoderVorbis.h"
+#include "Aulib/AudioDecoderMpg123.h"
+#include "Aulib/AudioDecoderFluidsynth.h"
+#include "Aulib/AudioDecoderSndfile.h"
+#include "rwopsbundle.h"
 #endif
 
 #include "qtadssound.h"
@@ -33,71 +46,22 @@
 #include "syssoundmpeg.h"
 #include "syssoundmidi.h"
 
+namespace chrono = std::chrono;
+using namespace std::chrono_literals;
 
 bool
 initSound()
 {
 #ifndef NO_AUDIO
     if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-        qWarning("Unable to initialize sound system: %s", SDL_GetError());
+        qWarning("Unable to initialize SDL audio engine: %s", SDL_GetError());
         return false;
     }
 
-    // Initialize SDL_sound.
-    Sound_Init();
-
-    // This will preload the needed codecs now instead of constantly loading
-    // and unloading them each time a sound is played/stopped.  This is only
-    // available in SDL_Mixer 1.2.10 and newer.
-#if (MIX_MAJOR_VERSION > 1) \
-    || ((MIX_MAJOR_VERSION == 1) && (MIX_MINOR_VERSION > 2)) \
-    || ((MIX_MAJOR_VERSION == 1) && (MIX_MINOR_VERSION == 2) && (MIX_PATCHLEVEL > 9))
-    int sdlFormats = MIX_INIT_OGG;
-    if (Mix_Init((sdlFormats & sdlFormats) != sdlFormats)) {
-        qWarning("Unable to load Ogg Vorbis support: %s", Mix_GetError());
+    if (Aulib::init(44100, AUDIO_S16SYS, 2, 2048) != 0) {
+        qWarning("Unable to initialize SDL_audiolib: %s", SDL_GetError());
         return false;
     }
-#endif
-
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
-        qWarning("Unable to initialize audio mixer: %s", Mix_GetError());
-        return false;
-    }
-    Mix_AllocateChannels(16);
-    Mix_ChannelFinished(QTadsSound::callback);
-    Mix_HookMusicFinished(CHtmlSysSoundMidiQt::callback);
-
-    /*
-    int numtimesopened, frequency, channels;
-    Uint16 format;
-    numtimesopened=Mix_QuerySpec(&frequency, &format, &channels);
-    if(numtimesopened) {
-        printf("Mix_QuerySpec: %s\n",Mix_GetError());
-    }
-    else {
-        char *format_str="Unknown";
-        switch(format) {
-            case AUDIO_U8: format_str="U8"; break;
-            case AUDIO_S8: format_str="S8"; break;
-            case AUDIO_U16LSB: format_str="U16LSB"; break;
-            case AUDIO_S16LSB: format_str="S16LSB"; break;
-            case AUDIO_U16MSB: format_str="U16MSB"; break;
-            case AUDIO_S16MSB: format_str="S16MSB"; break;
-        }
-        qDebug("opened=%d times  frequency=%dHz  format=%s  channels=%d",
-                numtimesopened, frequency, format_str, channels);
-    }
-    */
-    /*
-    int max = Mix_GetNumChunkDecoders();
-    for(int i = 0; i < max; ++i) {
-        qDebug() << "Sample chunk decoder" << i << "is for" << Mix_GetChunkDecoder(i);
-    }
-    max = Mix_GetNumMusicDecoders();
-    for(int i = 0; i < max; ++i) {
-        qDebug() << "Sample chunk decoder" << i << "is for" << Mix_GetMusicDecoder(i);
-    }
-    */
     return true;
 #else
     return false;
@@ -109,52 +73,34 @@ void
 quitSound()
 {
 #ifndef NO_AUDIO
-    Mix_ChannelFinished(0);
-    Mix_HookMusicFinished(0);
-    // Close the audio device as many times as it was opened.
-    // We disable this for now since it results in a crash in some systems.
-    // It looks like a clash between SDL_mixer and SDL_sound.
-    /*
-    int opened = Mix_QuerySpec(0, 0, 0);
-    for (int i = 0; i < opened; ++i) {
-        Mix_CloseAudio();
-    }
-    */
-    Sound_Quit();
+    Aulib::quit();
     SDL_Quit();
 #endif
 }
 
 
 #ifndef NO_AUDIO
-QList<QTadsSound*> QTadsSound::fObjList;
-
-
-QTadsSound::QTadsSound( QObject* parent, Mix_Chunk* chunk, SoundType type )
+QTadsSound::QTadsSound(QObject* parent, Aulib::AudioStream* stream, SoundType type )
     : QObject(parent),
-      fChunk(chunk),
-      fChannel(-1),
+      fAudStream(stream),
       fType(type),
       fPlaying(false),
-      fFadeOut(0),
       fCrossFade(false),
       fFadeOutTimer(new QTimer(0)),
       fDone_func(0),
       fDone_func_ctx(0),
       fRepeats(0),
-      fRepeatsWanted(1)
+      fRepeatsWanted(1),
+      fLength(chrono::duration_cast<chrono::milliseconds>(stream->duration()))
 {
-    // FIXME: Calculate sound length in a safer way.
-    this->fLength = (this->fChunk->alen * 8) / (2 * 16 * 44.1);
     // Pretend that the sound is 30ms shorter than it really is in order to
-    // compensate for wacky OS timers (Windows and low-Hz systems).
-    if (this->fLength > 30) {
-        this->fLength -= 30;
+    // compensate for wacky OS timers (Windows and low-ticks systems).
+    if (fLength > 30ms) {
+        fLength -= 30ms;
     } else {
-        this->fLength = 0;
+        fLength = 0ms;
     }
     //qDebug() << "Sound length:" << this->fLength;
-    connect(this, SIGNAL(readyToLoop()), SLOT(fDoLoop()));
     connect(this, SIGNAL(readyToFadeOut()), SLOT(fPrepareFadeOut()));
     connect(this->fFadeOutTimer, SIGNAL(timeout()), this, SLOT(fDoFadeOut()));
     connect(this, SIGNAL(destroyed()), SLOT(fDeleteTimer()));
@@ -168,54 +114,54 @@ QTadsSound::~QTadsSound()
 {
     //qDebug() << Q_FUNC_INFO;
     this->fRepeatsWanted = -1;
-    // If our chunk is still playing, halt it.
-    if (Mix_GetChunk(this->fChannel) == this->fChunk and Mix_Playing(this->fChannel) == 1) {
-        Mix_HaltChannel(this->fChannel);
+    delete this->fAudStream;
+}
+
+
+void
+QTadsSound::fFinishCallback( Aulib::Stream& strm )
+{
+    //qDebug() << Q_FUNC_INFO;
+
+    // Invoke the TADS callback, if there is one.
+    this->fPlaying = false;
+    if (this->fDone_func) {
+        this->fDone_func(this->fDone_func_ctx, this->fRepeats);
     }
-    // Wait till it finished before deleting it.
-    if (Mix_GetChunk(this->fChannel) == this->fChunk) {
-        while (Mix_Playing(this->fChannel) != 0) {
-            SDL_Delay(10);
-        }
+}
+
+
+void
+QTadsSound::fLoopCallback( Aulib::Stream& strm )
+{
+    //qDebug() << Q_FUNC_INFO;
+
+    ++this->fRepeats;
+    this->fTimePos.start();
+
+    // If this is the last iteration and we have a fade-out, set the fade-out
+    // timer.
+    if (fFadeOut.count() > 0 and (fRepeatsWanted == -1 or fRepeats == fRepeatsWanted)) {
+        // Clamp the interval to 0 (= now), in case the fade out time is larger than the sound length.
+        fFadeOutTimer->start(std::max(0ms, fLength - fFadeOut));
     }
-    // Free the raw audio data buffer if SDL_mixer didn't allocate it itself.
-    if (not this->fChunk->allocated) {
-        free(this->fChunk->abuf);
-    }
-    Mix_FreeChunk(this->fChunk);
 }
 
 
 void
 QTadsSound::fDoFadeOut()
 {
-    Q_ASSERT(Mix_GetChunk(this->fChannel) == this->fChunk and Mix_Playing(this->fChannel) == 1);
+    Q_ASSERT(this->fAudStream->isPlaying());
 
     // If we need to do a crossfade, call the TADS callback now.
     if (this->fCrossFade and this->fDone_func) {
         this->fDone_func(this->fDone_func_ctx, this->fRepeats);
-        // Make sure our SDL callback won't call the TADS callback a second
+        // Make sure our AudioStream callback won't call the TADS callback a second
         // time.
         this->fDone_func = 0;
         this->fDone_func_ctx = 0;
     }
-    Mix_FadeOutChannel(this->fChannel, this->fFadeOut);
-}
-
-
-void
-QTadsSound::fDoLoop()
-{
-    // When playing again, we can't assume that we can use the same channel.
-    this->fChannel = Mix_PlayChannel(-1, this->fChunk, 0);
-    this->fTimePos.start();
-    ++this->fRepeats;
-
-    // If this is the last iteration and we have a fade-out, set the fade-out
-    // timer.
-    if (this->fFadeOut > 0 and (this->fRepeatsWanted == -1 or this->fRepeats == this->fRepeatsWanted)) {
-        this->fFadeOutTimer->start(this->fLength - this->fFadeOut);
-    }
+    fAudStream->stop(chrono::milliseconds(fFadeOut));
 }
 
 
@@ -233,48 +179,12 @@ QTadsSound::fDeleteTimer()
 }
 
 
-void
-QTadsSound::callback( int channel )
-{
-    QTadsSound* mObj = 0;
-    int index = 0;
-    // Find the object that uses the specified channel.
-    for (int i = 0; i < fObjList.size() and mObj == 0; ++i) {
-        if (fObjList.at(i)->fChannel == channel) {
-            mObj = fObjList.at(i);
-            index = i;
-        }
-    }
-
-    if (mObj == 0) {
-        return;
-    }
-
-    // If it's an infinite loop sound, or it has not reached the wanted repeat
-    // count yet, play again.
-    if ((mObj->fRepeatsWanted == 0) or (mObj->fRepeats < mObj->fRepeatsWanted)) {
-        mObj->emitReadyToLoop();
-        return;
-    }
-
-    // Remove the object from the list.  Since it can be included several
-    // times, only remove the instance we associated to the channel we're
-    // handling.
-    fObjList.removeAt(index);
-
-    // Sound has repeated enough times, or it has been halted.  In either case,
-    // we need to invoke the TADS callback, if there is one.
-    mObj->fPlaying = false;
-    if (mObj->fDone_func) {
-        mObj->fDone_func(mObj->fDone_func_ctx, mObj->fRepeats);
-    }
-}
-
-
 int
-QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
-                          int fadeIn, int fadeOut, bool crossFade )
+QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+                          int vol, int fadeIn, int fadeOut, bool crossFade )
 {
+    //qDebug() << Q_FUNC_INFO;
+
     // Check if user disabled digital sound.
     if (not qFrame->settings()->enableSoundEffects) {
         return 1;
@@ -289,33 +199,32 @@ QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done
         vol = 100;
     }
 
-    // Convert the TADS volume level semantics [0..100] to SDL volume
-    // semantics [0..MIX_MAX_VOLUME].
-    vol = (vol * MIX_MAX_VOLUME) / 100;
-
     // Set the volume level.
-    Mix_VolumeChunk(this->fChunk, vol);
+    this->fAudStream->setVolume(static_cast<float>(vol) / 100.f);
 
-    this->fRepeatsWanted = repeat;
-    if (fadeIn > 0) {
-        this->fChannel = Mix_FadeInChannel(-1, this->fChunk, 0, fadeIn);
-    } else {
-        this->fChannel = Mix_PlayChannel(-1, this->fChunk, 0);
+    if (repeat < 0) {
+        repeat = 0;
     }
-    if (this->fChannel == -1) {
-        qWarning() << "ERROR:" << Mix_GetError();
-        Mix_SetError("");
+    this->fRepeatsWanted = repeat;
+    bool playOk;
+    if (fadeIn > 0) {
+        playOk = this->fAudStream->play(repeat, chrono::milliseconds(fadeIn));
+    } else {
+        playOk = this->fAudStream->play(repeat);
+    }
+    if (not playOk) {
+        qWarning() << "ERROR:" << SDL_GetError();
+        SDL_ClearError();
         return 1;
     } else {
         this->fTimePos.start();
         this->fPlaying = true;
         this->fCrossFade = crossFade;
         this->fRepeats = 1;
-        QTadsSound::fObjList.append(this);
         this->fDone_func = done_func;
         this->fDone_func_ctx = done_func_ctx;
         if (fadeOut > 0) {
-            this->fFadeOut = fadeOut;
+            this->fFadeOut = chrono::milliseconds(fadeOut);
             if (repeat == 1) {
                 // The sound should only be played once.  We need to set the
                 // fade-out timer here since otherwise the sound won't get a
@@ -347,14 +256,15 @@ QTadsSound::cancelPlaying( bool sync, int fadeOut, bool fadeOutInBg )
             this->fDone_func = 0;
             this->fDone_func_ctx = 0;
         }
-        Mix_FadeOutChannel(this->fChannel, fadeOut);
+        this->fAudStream->stop(chrono::milliseconds(fadeOut));
     } else {
-        Mix_HaltChannel(this->fChannel);
+        this->fAudStream->stop();
+        this->fFinishCallback(*this->fAudStream);
     }
 
-    if (sync and Mix_GetChunk(this->fChannel) == this->fChunk) {
+    if (sync) {
         // The operation needs to be synchronous; wait for the sound to finish.
-        while (Mix_Playing(this->fChannel) != 0) {
+        while (this->fAudStream->isPlaying()) {
             SDL_Delay(10);
         }
     }
@@ -365,14 +275,14 @@ void
 QTadsSound::addCrossFade( int ms )
 {
     this->fCrossFade = true;
-    this->fFadeOut = ms;
+    fFadeOut = chrono::milliseconds(ms);
 
     if (this->fPlaying) {
         this->fRepeatsWanted = -1;
-        int timeFromNow = this->fLength - this->fFadeOut - this->fTimePos.elapsed();
-        if (timeFromNow < 1) {
-            timeFromNow = 1;
-            this->fFadeOut = this->fLength - this->fTimePos.elapsed();
+        auto timeFromNow = fLength - fFadeOut - chrono::milliseconds(fTimePos.elapsed());
+        if (timeFromNow < 1ms) {
+            timeFromNow = 1ms;
+            fFadeOut = fLength - chrono::milliseconds(fTimePos.elapsed());
         }
         this->fFadeOutTimer->start(timeFromNow);
     }
@@ -396,163 +306,90 @@ QTadsSound::createSound( const CHtmlUrl* /*url*/, const textchar_t* filename, un
     }
 
     // Open the file and seek to the specified position.
-    QFile file(inf.filePath());
-    if (not file.open(QIODevice::ReadOnly)) {
-        qWarning() << "ERROR: Can't open file" << inf.filePath();
+    FILE* file = std::fopen(inf.filePath().toLocal8Bit().constData(), "rb");
+    if (file == 0) {
+        int errtmp = errno;
+        qWarning() << "ERROR: Can't open file" << inf.filePath() << " (" << std::strerror(errtmp) << ")";
         return 0;
     }
-    if (not file.seek(seekpos)) {
-        qWarning() << "ERROR: Can't seek in file" << inf.filePath();
-        file.close();
+    if (std::fseek(file, seekpos, SEEK_SET) < 0) {
+        int errtmp = errno;
+        qWarning() << "ERROR: Can't seek in file" << inf.filePath() << " (" << std::strerror(errtmp) << ")";
+        std::fclose(file);
         return 0;
-    }
-    QByteArray data(file.read(filesize));
-    file.close();
-    if (data.isEmpty() or static_cast<unsigned long>(data.size()) < filesize) {
-        qWarning() << "ERROR: Could not read" << filesize << "bytes from file" << inf.filePath();
-        return 0;
+
     }
 
     // Create the RWops through which the data will be read later.
-    SDL_RWops* rw = SDL_RWFromConstMem(data.constData(), data.size());
+    SDL_RWops* rw = RWFromMediaBundle(file, filesize);
     if (rw == 0) {
         qWarning() << "ERROR:" << SDL_GetError();
         SDL_ClearError();
+        std::fclose(file);
         return 0;
     }
 
-    // The chunk that will hold the final, decoded sound.
-    Mix_Chunk* chunk;
-
-    // If it's an MP3 or WAV, we'll decode it with SDL_sound.  For Ogg Vorbis
-    // we use SDL_mixer.  The reason is that SDL_mixer plays WAV at wrong
-    // speeds if they're not 11, 22 or 44kHz (like 48kHz or 32kHz) and crashes
-    // sometimes with MP3s.  SDL_sound can't cope well with Ogg Vorbis that
-    // have more then two channels.
-    if (type == MPEG or type == WAV) {
-        if (rw == 0) {
-            qWarning() << "ERROR:" << SDL_GetError();
-            SDL_ClearError();
-            return 0;
-        }
-        Sound_AudioInfo wantedFormat;
-        wantedFormat.channels = 2;
-        wantedFormat.rate = 44100;
-        wantedFormat.format = MIX_DEFAULT_FORMAT;
-        // Note that we use a large buffer size to speed-up decoding of large
-        // MP3s on Windows; the decoding will take extremely long with small
-        // buffer sizes.
-        Sound_Sample* sample = Sound_NewSample(rw, type == WAV ? "WAV" : "MP3", &wantedFormat,
-#ifdef Q_OS_WIN
-                                               6291456
-#else
-                                               131072
-#endif
-                                               );
-        if (sample == 0) {
-            qWarning() << "ERROR:" << Sound_GetError();
-            Sound_ClearError();
-            return 0;
-        }
-        Sound_DecodeAll(sample);
-        if (sample->flags & SOUND_SAMPLEFLAG_ERROR) {
-            // We don't abort since some of these errors can be non-fatal.
-            // Unfortunately, there's no way to tell :-/
-            qWarning() << "WARNING:" << Sound_GetError();
-            Sound_ClearError();
-        }
-        Uint8* buf = static_cast<Uint8*>(malloc(sample->buffer_size));
-        memcpy(buf, sample->buffer, sample->buffer_size);
-        Sound_FreeSample(sample);
-        chunk = Mix_QuickLoad_RAW(buf, sample->buffer_size);
-        if (chunk == 0) {
-            qWarning() << "ERROR:" << Mix_GetError();
-            Mix_SetError("");
-            free(buf);
-            return 0;
-        }
-    } else {
-        Q_ASSERT(type == OGG);
-        chunk = Mix_LoadWAV_RW(rw, true);
-        if (chunk == 0) {
-            qWarning() << "ERROR:" << Mix_GetError();
-            Mix_SetError("");
-            return 0;
-        }
-    }
-
-    // Alternative way of decoding MPEG, utilizing SMPEG directly.  It sucks,
-    // since SMPEG, for the piece of crap it is, tends to play MP3s at double
-    // speed (chipmunks ahoy...)
-#if 0
-    if (type == MPEG) {
-        // The sound is an mp3.  We'll decode it into an SDL_Mixer chunk using
-        // SMPEG.
-        SMPEG* smpeg = SMPEG_new_data(data.data(), data.size(), 0, 0);
-
-        // Set the format we want the decoded raw data to have.
-        SDL_AudioSpec spec;
-        SMPEG_wantedSpec(smpeg, &spec);
-        spec.channels = 2;
-        spec.format = MIX_DEFAULT_FORMAT;
-        spec.freq = 44100;
-        SMPEG_actualSpec(smpeg, &spec);
-
-        // We decode the mpeg stream in steps of 8192kB each and increase the
-        // size of the output buffer after each step.
-        size_t bufSize = 8192;
-        Uint8* buf = static_cast<Uint8*>(malloc(bufSize));
-        // Needs to be set to digital silence because SMPEG is mixing source
-        // and destination.
-        memset(buf, 0, bufSize);
-        // Prepare for decoding and decode the first bunch of data.
-        SMPEG_play(smpeg);
-        int bytesWritten = SMPEG_playAudio(smpeg, buf, 8192);
-        // Decode the rest.  Increase buffer as needed.
-        while (bytesWritten > 0 and bytesWritten <= 8192) {
-            bufSize += 8192;
-            buf = static_cast<Uint8*>(realloc(buf, bufSize));
-            memset(buf + (bufSize - 8192), 0, 8192);
-            bytesWritten = SMPEG_playAudio(smpeg, buf + (bufSize - 8192), 8192);
-        }
-        // Done with decoding.
-        SMPEG_stop(smpeg);
-        if (SMPEG_error(smpeg) != 0) {
-            qWarning() << "ERROR: cannot decode sound data:" << SMPEG_error(smpeg);
-            free(buf);
-            SMPEG_delete(smpeg);
-            return 0;
-        }
-        SMPEG_delete(smpeg);
-        // Adjust final buffer size to fit the decoded data exactly.
-        buf = static_cast<Uint8*>(realloc(buf, (bufSize - 8192) + bytesWritten));
-        chunk = Mix_QuickLoad_RAW(buf, (bufSize - 8192) + bytesWritten);
-    }
-#endif
-
-    // We have all the data we need; create the sound object.  It is
-    // *important* not to pass the CHtmlSysWin object as the parent in the
-    // constructor; doing so would result in Qt deleting the sound object when
-    // the parent object gets destroyed.  Therefore, we simply pass 0 to make
-    // the sound object parentless.
-    CHtmlSysSound* sound = NULL;
+    std::unique_ptr<Aulib::AudioDecoder> decoder = nullptr;
     switch (type) {
-      case WAV:
-        //qDebug() << "Sound type: WAV";
-        sound = new CHtmlSysSoundWavQt(0, chunk, WAV);
-        break;
-
-      case OGG:
-        //qDebug() << "Sound type: OGG";
-        sound = new CHtmlSysSoundOggQt(0, chunk, OGG);
-        break;
-
-      case MPEG:
-        //qDebug() << "Sound type: MPEG";
-        sound = new CHtmlSysSoundMpegQt(0, chunk, MPEG);
-        break;
+        case MPEG:
+            decoder = std::make_unique<Aulib::AudioDecoderMpg123>();
+            break;
+        case OGG:
+            decoder = std::make_unique<Aulib::AudioDecoderVorbis>();
+            break;
+        case WAV:
+            decoder = std::make_unique<Aulib::AudioDecoderSndfile>();
+            break;
+        case MIDI: {
+            decoder = std::make_unique<Aulib::AudioDecoderFluidSynth>();
+            QResource sf2Res(QStringLiteral(":/soundfont.sf2"));
+            auto* sf2_rwops = SDL_RWFromConstMem(sf2Res.data(), sf2Res.size());
+            auto fsynth = static_cast<Aulib::AudioDecoderFluidSynth*>(decoder.get());
+            fsynth->loadSoundfont(sf2_rwops);
+            fsynth->setGain(0.6f);
+            break;
+        }
     }
-    return sound;
+
+    Aulib::AudioStream* stream = new Aulib::AudioStream(rw, std::move(decoder),
+                                                        std::make_unique<Aulib::AudioResamplerSpeex>(),
+                                                        true);
+    if (not stream->open()) {
+        qWarning() << "ERROR:" << SDL_GetError();
+        SDL_ClearError();
+        delete stream;
+        return 0;
+    }
+
+    // Create the sound object.  It is *important* not to pass the CHtmlSysWin object as the parent in the
+    // constructor; doing so would result in Qt deleting the sound object when the parent object gets
+    // destroyed.  Therefore, we simply pass 0 to make the sound object parentless.
+    QTadsSound* sound = NULL;
+    switch (type) {
+        case WAV:
+            //qDebug() << "Sound type: WAV";
+            sound = new CHtmlSysSoundWavQt(0, stream, WAV);
+            break;
+
+        case OGG:
+            //qDebug() << "Sound type: OGG";
+            sound = new CHtmlSysSoundOggQt(0, stream, OGG);
+            break;
+
+        case MPEG:
+            //qDebug() << "Sound type: MPEG";
+            sound = new CHtmlSysSoundMpegQt(0, stream, MPEG);
+            break;
+
+        case MIDI:
+            //qDebug() << "Sound type: MIDI";
+            sound = new CHtmlSysSoundMidiQt(0, stream, MIDI);
+            break;
+    }
+    using namespace std::placeholders;
+    stream->setFinishCallback(std::bind(&QTadsSound::fFinishCallback, sound, _1));
+    stream->setLoopCallback(std::bind(&QTadsSound::fLoopCallback, sound, _1));
+    return dynamic_cast<CHtmlSysSound*>(sound);
 }
 #else
 {

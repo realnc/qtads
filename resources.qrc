@@ -3,5 +3,6 @@
         <file>qtads-logo.png</file>
         <file>qtads_48x48.png</file>
         <file>qtads_72x72.png</file>
+        <file>soundfont.sf2</file>
     </qresource>
 </RCC>

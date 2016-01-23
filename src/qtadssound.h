@@ -23,6 +23,9 @@
 
 #include "tadshtml.h"
 #include "config.h"
+#ifndef NO_AUDIO
+#include "Aulib/AudioStream.h"
+#endif
 
 
 bool initSound();
@@ -37,15 +40,14 @@ class QTadsSound: public QObject {
     Q_OBJECT
 
   public:
-    enum SoundType { WAV, OGG, MPEG };
+    enum SoundType { WAV, OGG, MPEG, MIDI };
 
-  private:
 #ifndef NO_AUDIO
-    struct Mix_Chunk* fChunk;
-    int fChannel;
+  private:
+    Aulib::AudioStream* fAudStream;
     SoundType fType;
     bool fPlaying;
-    int fFadeOut;
+    std::chrono::milliseconds fFadeOut{};
     bool fCrossFade;
     class QTimer* fFadeOutTimer;
     QTime fTimePos;
@@ -64,24 +66,15 @@ class QTadsSound: public QObject {
     int fRepeatsWanted;
 
     // Total length of the sound in milliseconds.
-    unsigned fLength;
+    std::chrono::milliseconds fLength{};
 
-    // All QTadsMediaObjects that currently exist.  We need this in order to
-    // implement the SDL_Mixer callback (which in turn needs to call the TADS
-    // callback) that is invoked after a channel has stopped playing.  That
-    // callback has to be a static member (C++ methods can't be C callbacks),
-    // and since there's no 'this' pointer in static member functions, it needs
-    // to invoke the TADS callback based on the channel number.
-    static QList<QTadsSound*> fObjList;
-
-    // We can't call SDL_mixer functions from inside an SDL_mixer callback, so
-    // we use the following method: when the sound stops and the callback gets
-    // called, we don't play it again (if it's looped) from inside the callback
-    // but emit a signal which connects to a slot which plays the sound one
-    // more time.
+    // Aulib finish callback.
     void
-    emitReadyToLoop()
-    { emit readyToLoop(); }
+    fFinishCallback( Aulib::Stream& strm );
+
+    // Aulib loop callback.
+    void
+    fLoopCallback( Aulib::Stream& strm );
 
     void
     emitReadyToFadeOut()
@@ -92,27 +85,20 @@ class QTadsSound: public QObject {
     fDoFadeOut();
 
     void
-    fDoLoop();
-
-    void
     fPrepareFadeOut();
 
     void
     fDeleteTimer();
 
   signals:
-    void readyToLoop();
     void readyToFadeOut();
 
   public:
-    QTadsSound( QObject* parent, struct Mix_Chunk* chunk, SoundType type );
+    QTadsSound( QObject* parent, Aulib::AudioStream* stream, SoundType type );
     ~QTadsSound() override;
 #endif
 
   public:
-    // The SDL_Mixer callback for when a sound finished playing.
-    static void callback( int channel );
-
     int
     startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
                   int fadeIn, int fadeOut, bool crossFade );

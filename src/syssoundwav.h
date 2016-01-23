@@ -20,6 +20,10 @@
 
 #include "qtadssound.h"
 #include "htmlsys.h"
+#include "config.h"
+#ifndef Q_OS_ANDROID
+#include "Aulib/AudioStream.h"
+#endif
 
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -33,8 +37,8 @@ class CHtmlSysSoundWavQt: public QTadsSound, public CHtmlSysSoundWav {
 
   public:
 #ifndef NO_AUDIO
-    CHtmlSysSoundWavQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
-    : QTadsSound(parent, chunk, type)
+    CHtmlSysSoundWavQt( QObject* parent, Aulib::AudioStream* stream, SoundType type )
+        : QTadsSound(parent, stream, type)
     { }
 #endif
 
