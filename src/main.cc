@@ -39,7 +39,7 @@
 // platform-specific initialization work (like launching the Cocoa event-loop
 // or setting up the application menu on OS X, or redirecting stdout and stderr
 // to text files on Windows), which would break things.
-#ifdef main
+#if !defined(NO_AUDIO) && defined(main)
 #  undef main
 #endif
 
