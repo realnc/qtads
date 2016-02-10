@@ -31,7 +31,7 @@
  * about this class.
  */
 class CHtmlSysSoundMidiQt: public CHtmlSysSoundMidi {
-#ifndef Q_OS_ANDROID
+#ifndef NO_AUDIO
   private:
     struct SDL_RWops* fRWops;
     Mix_Music* fMusic;
@@ -55,7 +55,7 @@ class CHtmlSysSoundMidiQt: public CHtmlSysSoundMidi {
 #endif
 
   public:
-#ifndef Q_OS_ANDROID
+#ifndef NO_AUDIO
     CHtmlSysSoundMidiQt( struct SDL_RWops* music );
     ~CHtmlSysSoundMidiQt() override;
 

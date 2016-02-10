@@ -12,6 +12,8 @@ android {
     MOBILITY =
 }
 
+disable-audio:DEFINES += NO_AUDIO
+
 # Mac OS application and file icons.
 macx {
     ICON = QTads.icns
@@ -34,12 +36,14 @@ macx {
     QMAKE_INFO_PLIST = Info.plist
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
     CONFIG += link_pkgconfig
-    PKGCONFIG += SDL2_mixer
-    LIBS += -lSDL_sound
+    !disable-audio {
+        PKGCONFIG += SDL2_mixer
+        LIBS += -lSDL_sound
+    }
     QMAKE_CFLAGS += -std=gnu11 -fvisibility=hidden
     QMAKE_CXXFLAGS += -fvisibility=hidden
     QMAKE_LFLAGS += -dead_strip
-} else:!android {
+} else:!disable-audio {
     CONFIG += link_pkgconfig
     PKGCONFIG += sdl
     # Normally we would use pkg-config for SDL_mixer too, but it has to appear
@@ -64,9 +68,11 @@ win32 {
         QMAKE_LFLAGS += $$PWD/w32_linkscript
     }
 
-    # We don't really need libmad and libmodplug, but my w32 SDL_mixer
-    # in my mingw-cross-env build environment does.
-    LIBS += -lmad -lmodplug -lvorbisfile -lvorbis -logg
+    !disable-audio {
+        # We don't really need libmad and libmodplug, but my w32 SDL_mixer
+        # in my mingw-cross-env build environment does.
+        LIBS += -lmad -lmodplug -lvorbisfile -lvorbis -logg
+    }
 
     # So that we can use _stat64().  This means the minimum version
     # of Windows needed to run the application is Windows XP SP2.

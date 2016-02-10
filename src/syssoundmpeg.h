@@ -33,7 +33,7 @@ class CHtmlSysSoundMpegQt: public QTadsSound, public CHtmlSysSoundMpeg {
     Q_OBJECT
 
   public:
-#ifndef Q_OS_ANDROID
+#ifndef NO_AUDIO
     CHtmlSysSoundMpegQt( QObject* parent, Mix_Chunk* chunk, SoundType type )
     : QTadsSound(parent, chunk, type)
     { }

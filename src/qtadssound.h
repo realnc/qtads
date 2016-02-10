@@ -40,7 +40,7 @@ class QTadsSound: public QObject {
     enum SoundType { WAV, OGG, MPEG };
 
   private:
-#ifndef Q_OS_ANDROID
+#ifndef NO_AUDIO
     struct Mix_Chunk* fChunk;
     int fChannel;
     SoundType fType;

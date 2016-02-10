@@ -32,12 +32,12 @@ Settings::loadFromDisk()
 
     sett.beginGroup(QString::fromLatin1("media"));
     this->enableGraphics = sett.value(QString::fromLatin1("graphics"), true).toBool();
-#ifndef Q_OS_ANDROID
+#ifndef NO_AUDIO
     this->enableSoundEffects = sett.value(QString::fromLatin1("sounds"), true).toBool();
     this->enableMusic = sett.value(QString::fromLatin1("music"), true).toBool();
 #else
-    this->enableSoundEffects = sett.value(QString::fromLatin1("sounds"), false).toBool();
-    this->enableMusic = sett.value(QString::fromLatin1("music"), false).toBool();
+    this->enableSoundEffects = false;
+    this->enableMusic = false;
 #endif
     this->enableLinks = sett.value(QString::fromLatin1("links"), true).toBool();
     this->useSmoothScaling = sett.value(QString::fromLatin1("smoothImageScaling"), true).toBool();
@@ -132,8 +132,10 @@ Settings::saveToDisk()
 
     sett.beginGroup(QString::fromLatin1("media"));
     sett.setValue(QString::fromLatin1("graphics"), this->enableGraphics);
+#ifndef NO_AUDIO
     sett.setValue(QString::fromLatin1("sounds"), this->enableSoundEffects);
     sett.setValue(QString::fromLatin1("music"), this->enableMusic);
+#endif
     sett.setValue(QString::fromLatin1("links"), this->enableLinks);
     sett.setValue(QString::fromLatin1("smoothImageScaling"), this->useSmoothScaling);
     sett.endGroup();

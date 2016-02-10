@@ -73,10 +73,12 @@ int main( int argc, char** argv )
                                                     + QString::fromLatin1("(*.gam *.Gam *.GAM *.t3 *.T3)"));
     }
 
+#ifndef NO_AUDIO
     if (not initSound()) {
         delete app;
         return 1;
     }
+#endif
 
     QMetaObject::invokeMethod(app, "entryPoint", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
     int ret = app->exec();

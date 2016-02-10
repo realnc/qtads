@@ -19,7 +19,7 @@
 #include <QFileInfo>
 #include <QTimer>
 
-#ifndef Q_OS_ANDROID
+#ifndef NO_AUDIO
 #include <SDL_mixer.h>
 #include <SDL_sound.h>
 #endif
@@ -37,7 +37,7 @@
 bool
 initSound()
 {
-#ifndef Q_OS_ANDROID
+#ifndef NO_AUDIO
     if (SDL_Init(SDL_INIT_AUDIO) != 0) {
         qWarning("Unable to initialize sound system: %s", SDL_GetError());
         return false;
@@ -108,7 +108,7 @@ initSound()
 void
 quitSound()
 {
-#ifndef Q_OS_ANDROID
+#ifndef NO_AUDIO
     Mix_ChannelFinished(0);
     Mix_HookMusicFinished(0);
     // Close the audio device as many times as it was opened.
@@ -126,7 +126,7 @@ quitSound()
 }
 
 
-#ifndef Q_OS_ANDROID
+#ifndef NO_AUDIO
 QList<QTadsSound*> QTadsSound::fObjList;
 
 
@@ -383,7 +383,7 @@ QTadsSound::addCrossFade( int ms )
 CHtmlSysSound*
 QTadsSound::createSound( const CHtmlUrl* /*url*/, const textchar_t* filename, unsigned long seekpos,
                          unsigned long filesize, CHtmlSysWin*, SoundType type )
-#ifndef Q_OS_ANDROID
+#ifndef NO_AUDIO
 {
     //qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
     //      << "url:" << url->get_url();

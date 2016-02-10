@@ -19,6 +19,7 @@
 #include <QColorDialog>
 #include <QSignalMapper>
 #include <QPushButton>
+#include <QCheckBox>
 #include <QTextCodec>
 
 #include "confdialog.h"
@@ -52,8 +53,15 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
 #endif
 
     ui->allowGraphicsCheckBox->setChecked(sett->enableGraphics);
+#ifdef NO_AUDIO
+    ui->allowSoundEffectsCheckBox->setDisabled(true);
+    ui->allowSoundEffectsCheckBox->hide();
+    ui->allowMusicCheckBox->setDisabled(true);
+    ui->allowMusicCheckBox->hide();
+#else
     ui->allowSoundEffectsCheckBox->setChecked(sett->enableSoundEffects);
     ui->allowMusicCheckBox->setChecked(sett->enableMusic);
+#endif
     ui->allowLinksCheckBox->setChecked(sett->enableLinks);
     ui->smoothScalingCheckBox->setChecked(sett->useSmoothScaling);
 
@@ -229,8 +237,10 @@ ConfDialog::fMakeInstantApply()
     connect(ui->underlineLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->highlightLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+#ifndef NO_AUDIO
     connect(ui->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+#endif
     connect(ui->allowLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->smoothScalingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 
@@ -279,8 +289,10 @@ ConfDialog::fApplySettings()
     Settings* sett = qFrame->settings();
 
     sett->enableGraphics = ui->allowGraphicsCheckBox->isChecked();
+#ifndef NO_AUDIO
     sett->enableSoundEffects = ui->allowSoundEffectsCheckBox->isChecked();
     sett->enableMusic = ui->allowMusicCheckBox->isChecked();
+#endif
     sett->enableLinks = ui->allowLinksCheckBox->isChecked();
     sett->useSmoothScaling = ui->smoothScalingCheckBox->isChecked();
 

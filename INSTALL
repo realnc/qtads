@@ -13,11 +13,20 @@ QTads uses qmake as its build system.  To build it:
 This will create a "qtads" binary which you can then copy and run from
 anywhere.  There are no files that need to be installed.
 
+You can disable audio support when building by running qmake like this instead:
+
+  qmake CONFIG+=disable-audio
+
+This will produce a version of QTads that does not support audio.
+
 For it to build correctly, you will need to have the needed libraries along
 with their development headers/tools installed.  At this time, this would be:
 
   Qt4 "Core" and "GUI" modules
   Qt4 development tools (qmake, uic, etc.)
+
+If audio support is enabled, you'll also need:
+
   SDL
   SDL_mixer
   SDL_sound
@@ -27,6 +36,9 @@ Most Linux distributions provide the development versions in packages that have
 to install the following packages in order to be able to build QTads:
 
   libqt4-dev
+
+And for audio support:
+
   libsdl-mixer1.2-dev
   libsdl-sound1.2-dev
 
