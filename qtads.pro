@@ -85,7 +85,7 @@ RESOURCES += resources.qrc
 QMAKE_CXXFLAGS_WARN_OFF =
 QMAKE_CFLAGS_WARN_OFF =
 
-*-g++* {
+*-g++*|*-clang* {
     # The code does a lot of type punning, which breaks ANSI/ISO strict
     # aliasing rules.
     QMAKE_CXXFLAGS += -fno-strict-aliasing
