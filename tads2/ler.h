@@ -188,7 +188,7 @@ char *errstr(errcxdef *ctx, const char *str, int len);
 
 /* signal an error with argument count already set */
 #ifdef ERR_NO_MACRO
-void errsign(errcxdef *ctx, int e, char *facility);
+NORETURN void errsign(errcxdef *ctx, int e, char *facility);
 #else /* ERR_NO_MACRO */
 # ifdef DEBUG
 void errjmp(jmp_buf buf, int e);
@@ -207,7 +207,7 @@ void errjmp(jmp_buf buf, int e);
 
 /* signal an error with no arguments */
 #ifdef ERR_NO_MACRO
-void errsigf(errcxdef *ctx, char *facility, int err);
+NORETURN void errsigf(errcxdef *ctx, char *facility, int err);
 #else /* ERR_NO_MACRO */
 #define errsigf(ctx, fac, e) (errargc(ctx,0),errsign(ctx,e,fac))
 #endif /* ERR_NO_MACRO */
@@ -223,7 +223,7 @@ void errsigf(errcxdef *ctx, char *facility, int err);
 
 /* resignal the current error - only usable within exception handlers */
 #ifdef ERR_NO_MACRO
-void errrse1(errcxdef *ctx, errdef *fr);
+NORETURN void errrse1(errcxdef *ctx, errdef *fr);
 # define errrse(ctx) errrse1(ctx, &fr_)
 #else /* ERR_NO_MACRO */
 

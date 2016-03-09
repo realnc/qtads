@@ -1964,7 +1964,7 @@ public:
     int is_word_char_at_ofs(oshtml_charset_id_t cs, unsigned long ofs)
     {
         /* if it's outside of our offset range, it's not ours */
-        if (ofs < ofs_ || ofs > ofs_ + bytes_)
+        if (ofs < ofs_ || ofs > ofs_ + bytes_ || buf_.get() == 0)
             return FALSE;
 
         /* ask the OS helper to interpret the character */
@@ -1980,7 +1980,11 @@ public:
     {
         /* if it's outside of our offset range, it's not ours */
         if (ofs < ofs_ || ofs > ofs_ + bytes_)
-            return FALSE;
+            return ofs;
+
+        /* if we don't have any text, just increment for our line ending */
+        if (buf_.get() == 0)
+            return ofs + 1;
 
         /* ask the OS helper to interpret the character */
         size_t local_ofs = (size_t)(ofs - ofs_);
@@ -1997,10 +2001,13 @@ public:
         if (ofs < ofs_ || ofs > ofs_ + bytes_)
             return FALSE;
 
+        /* if we have no text, decrement for the previous line ending */
+        if (buf_.get() == 0)
+            return ofs - 1;
+
         /* ask the OS helper to interpret the character */
         size_t local_ofs = (size_t)(ofs - ofs_);
         const textchar_t *p = buf_.get() + local_ofs;
-        size_t rem = bytes_ - local_ofs;
         return ofs + (os_prev_char(cs, p, buf_.get()) - p);
     }
 

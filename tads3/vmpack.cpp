@@ -962,6 +962,7 @@ static long intval(VMG_ const vm_val_t *val, long minval, long maxval,
     return l;
 }
 
+#if 0          /* not curently used - retained for documentation/future use */
 /* 
  *   integer decomposition - get the low-order byte and shift 
  */
@@ -986,6 +987,7 @@ static inline char lsb(long &l, int is_signed)
     /* return the low byte */
     return ret;
 }
+#endif /* unused */
 
 /* 
  *   reverse the byte order of a buffer 
@@ -2141,7 +2143,7 @@ void CVmPack::pack_one_item(VMG_ CVmPackGroup *group, CVmPackArgs *args,
                  *   conversions, which is three bytes for some utf8
                  *   characters.  
                  */
-                if (p - buf > sizeof(buf) - 3)
+				if (p - buf > (ptrdiff_t)sizeof(buf) - 3)
                 {
                     /* flush the buffer */
                     if (dst->write(buf, p - buf))

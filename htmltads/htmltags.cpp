@@ -7703,13 +7703,12 @@ void CHtmlTagTableCell::set_cell_y_pos(CHtmlFormatter *formatter,
                                        long row_y_offset, long row_height,
                                        HTML_Attrib_id_t row_valign)
 {
-    HTML_Attrib_id_t valign;
-    long ypos;
-
     /* use the row's valign if we don't have our own */
-    valign = (valign_ == HTML_Attrib_invalid ? row_valign : valign_);
+	HTML_Attrib_id_t valign =
+		(valign_ == HTML_Attrib_invalid ? row_valign : valign_);
 
-    /* figure the position based on the alignment */
+	/* figure the position based on the alignment */
+	long ypos;
     switch(valign)
     {
     case HTML_Attrib_top:
@@ -7729,7 +7728,8 @@ void CHtmlTagTableCell::set_cell_y_pos(CHtmlFormatter *formatter,
         break;
 
     default:
-        /* other attributes should never occur; ignore them if they do */
+		/* other attributes should never occur; default to top alignment */
+		ypos = row_y_offset;
         break;
     }
     

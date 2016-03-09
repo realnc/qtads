@@ -322,7 +322,7 @@ static int s_readdir_local(VMG_ const char *lclfname,
                     ele.set_obj(fnobj);
                     lst->cons_ensure_space(vmg_ idx, 16);
                     lst->cons_set_element(idx, &ele);
-                    lst->cons_set_len(++idx);
+                    ++idx;
                 }
             
                 /* if there's a callback, invoke it */
@@ -364,14 +364,22 @@ static int s_readdir_local(VMG_ const char *lclfname,
                             subfname, sizeof(subfname), lclfname, curname);
                 
                         /* do the recursive listing */
-                        ok |= s_readdir_local(vmg_ subfname, path + VMB_LEN,
+                        ok &= s_readdir_local(vmg_ subfname, path + VMB_LEN,
                                               retval, rc, cb, TRUE);
+
+                        /* stop on failure */
+                        if (!ok)
+                            break;
                     }
                 }
             
                 /* we're done with the FileName object for this iteration */
                 G_stk->discard(1);
             }
+
+            /* set the final list length */
+            if (lst != 0)
+                lst->cons_set_len(idx);
         }
         err_finally
         {
@@ -380,6 +388,15 @@ static int s_readdir_local(VMG_ const char *lclfname,
         }
         err_end;
     }
+    else
+    {
+        /* failed to open the directory - return failure */
+        ok = FALSE;
+    }
+
+    /* if we failed, zero out the list */
+    if (!ok && lst != 0)
+        lst->cons_set_len(0);
 
     /* discard the gc protection for the list, if applicable */
     if (retval != 0)

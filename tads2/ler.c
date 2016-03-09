@@ -146,7 +146,7 @@ void errjmp(jmp_buf buf, int e)
 #ifdef ERR_NO_MACRO
 
 /* base error signal function */
-void errsign(errcxdef *ctx, int e, char *facility)
+NORETURN void errsign(errcxdef *ctx, int e, char *facility)
 {
     strncpy(ctx->errcxptr->errfac, facility, ERRFACMAX);
     ctx->errcxptr->errfac[ERRFACMAX] = '\0';
@@ -155,7 +155,7 @@ void errsign(errcxdef *ctx, int e, char *facility)
 }
 
 /* signal an error with no arguments */
-void errsigf(errcxdef *ctx, char *facility, int e)
+NORETURN void errsigf(errcxdef *ctx, char *facility, int e)
 {
     errargc(ctx, 0);
     errsign(ctx, e, facility);
@@ -173,7 +173,7 @@ char *errstr(errcxdef *ctx, const char *str, int len)
 }
 
 /* resignal current error */
-void errrse1(errcxdef *ctx, errdef *fr)
+NORETURN void errrse1(errcxdef *ctx, errdef *fr)
 {
     errargc(ctx, fr->erraac);
     memcpy(ctx->errcxptr->erraav, fr->erraav,

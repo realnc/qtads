@@ -4663,10 +4663,10 @@ void CTcParser::finish_prop_expr(
 
 void propset_token_source::insert_token(const CTcToken *tok)
 {
-        /* create a new link entry and initialize it */
+	/* create a new link entry and initialize it */
     propset_tok *cur = new (G_prsmem) propset_tok(tok);
 
-        /* link it into our list */
+	/* link it into our list */
     if (last_tok != 0)
         last_tok->nxt = cur;
     else
@@ -4719,8 +4719,8 @@ void CTcParser::insert_propset_expansion(struct propset_def *propset_stack,
     if (formals_found)
     {
         /* insert an open paren at the start of the expansion list */
-        propset_token_source tok_src;
-        tok_src.insert_token(TOKT_LPAR, "(", 1);
+		propset_token_source *tok_src = new (G_prsmem) propset_token_source;
+        tok_src->insert_token(TOKT_LPAR, "(", 1);
         
         /* we don't yet need a leading comma */
         int need_comma = FALSE;
@@ -4743,7 +4743,7 @@ void CTcParser::insert_propset_expansion(struct propset_def *propset_stack,
                  */
                 if (need_comma)
                 {
-                    tok_src.insert_token(TOKT_COMMA, ",", 1);
+                    tok_src->insert_token(TOKT_COMMA, ",", 1);
                     need_comma = FALSE;
                 }
                 
@@ -4773,7 +4773,7 @@ void CTcParser::insert_propset_expansion(struct propset_def *propset_stack,
                     break;
                 
                 /* insert it into our expansion list */
-                tok_src.insert_token(&cur->tok);
+                tok_src->insert_token(&cur->tok);
             }
         }
         
@@ -4793,7 +4793,7 @@ void CTcParser::insert_propset_expansion(struct propset_def *propset_stack,
                  *   the list is non-empty - if we need a comma, add it now 
                  */
                 if (need_comma)
-                    tok_src.insert_token(TOKT_COMMA, ",", 1);
+                    tok_src->insert_token(TOKT_COMMA, ",", 1);
                 
                 /* we will need a comma at the end of this list */
                 need_comma = TRUE;
@@ -4807,7 +4807,7 @@ void CTcParser::insert_propset_expansion(struct propset_def *propset_stack,
                    && G_tok->cur() != TOKT_EOF)
             {
                 /* insert this token into our expansion list */
-                tok_src.insert_token(G_tok->getcur());
+                tok_src->insert_token(G_tok->getcur());
                 
                 /* skip it */
                 G_tok->next();
@@ -4853,17 +4853,17 @@ void CTcParser::insert_propset_expansion(struct propset_def *propset_stack,
                 /* if we need a comma, add it now */
                 if (need_comma)
                 {
-                    tok_src.insert_token(TOKT_COMMA, ",", 1);
+                    tok_src->insert_token(TOKT_COMMA, ",", 1);
                     need_comma = FALSE;
                 }
                 
                 /* insert this token */
-                tok_src.insert_token(&cur->tok);
+                tok_src->insert_token(&cur->tok);
             }
         }
         
         /* add the closing paren at the end of the expansion list */
-        tok_src.insert_token(TOKT_RPAR, ")", 1);
+        tok_src->insert_token(TOKT_RPAR, ")", 1);
         
         /*
          *   We've fully expanded the formal list.  Now all that remains is
@@ -4871,7 +4871,7 @@ void CTcParser::insert_propset_expansion(struct propset_def *propset_stack,
          *   so that we read from the expanded list instead of from the
          *   original token stream.  
          */
-        G_tok->set_external_source(&tok_src);
+        G_tok->set_external_source(tok_src);
     }
 }
 
@@ -4919,7 +4919,7 @@ int CTcParser::parse_obj_prop_list(
                  *   It's a property set definition.  These definitions
                  *   nest; make sure we have space left in our stack.  
                  */
-                if (propset_depth >= MAX_PROPSET_DEPTH)
+				if (propset_depth >= (int)MAX_PROPSET_DEPTH)
                 {
                     /* 
                      *   nested too deeply - flag the error if this is the
@@ -5514,7 +5514,7 @@ void CTcParser::parse_obj_prop(
          *   just start with the deepest legal level.  
          */
         int i = propset_depth;
-        if (i > MAX_PROPSET_DEPTH)
+		if (i > (int)MAX_PROPSET_DEPTH)
             i = MAX_PROPSET_DEPTH;
         
         /* start with the current token */

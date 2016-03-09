@@ -49,6 +49,7 @@ Modified
 #include "vmbiftad.h"
 #include "sha2.h"
 #include "vmnet.h"
+#include "vmtz.h"
 
 
 /* ------------------------------------------------------------------------ */
@@ -141,6 +142,10 @@ int vm_run_image(const vm_run_image_params *params)
         
         /* set the networking configuration in the globals */
         G_net_config = params->netconfig;
+
+        /* set the local time zone, if specified */
+        if (params->timezone)
+            G_tzcache->set_local_zone(params->timezone);
         
         /* tell the client system to initialize */
         params->clientifc->client_init(
@@ -612,6 +617,17 @@ int vm_run_image_main(CVmMainClientIfc *clientifc,
                 goto opt_error;
             break;
 
+        case 't':
+            /* -tz - set local timezone */
+            if (strcmp(argv[curarg], "-tz") == 0 && curarg+1 < argc)
+            {
+                /* set the local timezone */
+                params.timezone = argv[++curarg];
+            }
+            else
+                goto opt_error;
+            break;
+
 #ifdef TADSNET
         case 'w':
             /* -webhost, -websid, -webimage */
@@ -814,6 +830,8 @@ int vm_run_image_main(CVmMainClientIfc *clientifc,
                     "file access)\n"
                     "  -sd dir - set the sandbox directory for file "
                     "safety restrictions\n"
+                    "  -tz z   - set the local time zone to 'z' (e.g., "
+                    "America/New_York)\n"
                     "\n"
                     "If provided, the optional extra arguments are passed "
                     "to the program's\n"
@@ -1080,7 +1098,10 @@ int vm_get_game_arg(int argc, const char *const *argv,
             break;
 
         case 't':
-            /* tads 2 "-tfFile", "-tsSize", "-tp[+-]", "-t[+0]" */
+            /* 
+             *   tads 2 "-tfFile", "-tsSize", "-tp[+-]", "-t[+0]"; tads3 "-tz
+             *   timezone" 
+             */
             switch(argv[i][2])
             {
             case 'f':
@@ -1095,6 +1116,11 @@ int vm_get_game_arg(int argc, const char *const *argv,
                 
             case 'p':
                 /* no arguments */
+                break;
+
+            case 'z':
+                /* -tz - one argument required */
+                ++i;
                 break;
 
             default:

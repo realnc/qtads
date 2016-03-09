@@ -48,8 +48,8 @@ public:
 /* TADS input/output extension functions */
 vm_bif_desc CVmBifTIOExt::bif_table[] =
 {
-    { &CVmBifTIOExt::show_popup_menu, 3, 0, FALSE },
-    { &CVmBifTIOExt::enable_sys_menu_cmd, 2, 0, FALSE }
+	{ &CVmBifTIOExt::show_popup_menu, 3, 0, FALSE, { }, { } },
+	{ &CVmBifTIOExt::enable_sys_menu_cmd, 2, 0, FALSE, { }, { } }
 };
 
 #endif /* VMBIF_DEFINE_VECTOR */

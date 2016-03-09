@@ -717,7 +717,7 @@ struct tok_embed_ctx
             --level;
         if (level == 0)
             s = 0;
-        else if (level < countof(stk))
+		else if (level < (int)countof(stk))
             s = stk + level - 1;
     }
 
@@ -1265,7 +1265,7 @@ public:
      *   fatal: these indicate that something has gone wrong in the
      *   compiler, and are equivalent to an assert failure) 
      */
-    static void throw_internal_error(int errnum, ...);
+	NORETURN static void throw_internal_error(int errnum, ...);
 
     /* display a string/number value */
     void msg_str(const char *str, size_t len) const;

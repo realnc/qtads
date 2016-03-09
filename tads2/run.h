@@ -369,7 +369,7 @@ void runistat(struct voccxdef *vctx, struct runcxdef *rctx,
                   struct tiocxdef *tctx);
 
 /* signal a run-time error - allows debugger trapping */
-void runsign(runcxdef *ctx, int err);
+NORETURN void runsign(runcxdef *ctx, int err);
 
 /* sign a run-time error with zero arguments */
 #define runsig(ctx, err) (errargc((ctx)->runcxerr,0),runsign(ctx,err))

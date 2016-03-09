@@ -2035,19 +2035,34 @@ void CTPNAnonFunc::gen_code(int discard, int)
          *   because the caller is at the next recursion level out 
          */
         int our_varnum;
-        if (!G_cs->get_code_body()
+        if (G_cs->get_code_body()
             ->get_ctx_var_for_level(cur_ctx->level_ - 1, &our_varnum))
         {
-            /* this should never happen */
-            assert(FALSE);
-        }
-
-        /* 
-         *   push this context object - to do this, simply retrieve the
-         *   value of the local variable in our frame that contains this
-         *   context level 
-         */
-        CTcSymLocal::s_gen_code_getlcl(our_varnum, FALSE);
+			/* 
+			 *   push this context object - to do this, simply retrieve the
+			 *   value of the local variable in our frame that contains this
+			 *   context level 
+			 */
+			CTcSymLocal::s_gen_code_getlcl(our_varnum, FALSE);
+		}
+		else if (code_body_->is_anon_method())
+		{
+			/* 
+			 *   anonymous methods don't use context variables, since they
+			 *   use the live method context 
+			 */
+			G_cg->write_op(OPC_PUSHNIL);
+			G_cg->note_push();
+		}
+		else
+		{
+			/* 
+			 *   If this is an anonymous function (rather than an anonymous
+			 *   method), we require the context variable.  Anonymous methods
+			 *   don't use these.
+			 */
+			assert(FALSE);
+		}
     }
 
     /* 

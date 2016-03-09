@@ -162,43 +162,43 @@ protected:
 /* TADS input/output functions */
 vm_bif_desc CVmBifTIO::bif_table[] =
 {
-    { &CVmBifTIO::say, 1, 0, TRUE },                                   /* 0 */
-    { &CVmBifTIO::logging, 1, 1, FALSE },                              /* 1 */
-    { &CVmBifTIO::clearscreen, 0, 0, FALSE },                          /* 2 */
-    { &CVmBifTIO::more, 0, 0, FALSE },                                 /* 3 */
-    { &CVmBifTIO::input, 0, 0, FALSE },                                /* 4 */
-    { &CVmBifTIO::inputkey, 0, 0, FALSE },                             /* 5 */
-    { &CVmBifTIO::inputevent, 0, 1, FALSE },                           /* 6 */
-    { &CVmBifTIO::inputdialog, 5, 0, FALSE },                          /* 7 */
-    { &CVmBifTIO::askfile, 4, 0, FALSE },                              /* 8 */
-    { &CVmBifTIO::timedelay, 1, 0, FALSE },                            /* 9 */
-    { &CVmBifTIO::sysinfo, 1, 0, TRUE },                              /* 10 */
-    { &CVmBifTIO::status_mode, 1, 0, FALSE },                         /* 11 */
-    { &CVmBifTIO::status_right, 1, 0, FALSE },                        /* 12 */
-    { &CVmBifTIO::res_exists, 1, 0, FALSE },                          /* 13 */
-    { &CVmBifTIO::set_script_file, 1, 1, FALSE },                     /* 14 */
-    { &CVmBifTIO::get_charset, 1, 0, FALSE },                         /* 15 */
-    { &CVmBifTIO::flush_output, 0, 0, FALSE },                        /* 16 */
-    { &CVmBifTIO::input_timeout, 0, 1, FALSE },                       /* 17 */
-    { &CVmBifTIO::input_cancel, 1, 0, FALSE },                        /* 18 */
+	{ &CVmBifTIO::say, 1, 0, TRUE, { }, { } },                         /* 0 */
+	{ &CVmBifTIO::logging, 1, 1, FALSE, { }, { } },                    /* 1 */
+	{ &CVmBifTIO::clearscreen, 0, 0, FALSE, { }, { } },                /* 2 */
+	{ &CVmBifTIO::more, 0, 0, FALSE, { }, { } },                       /* 3 */
+	{ &CVmBifTIO::input, 0, 0, FALSE, { }, { } },                      /* 4 */
+	{ &CVmBifTIO::inputkey, 0, 0, FALSE, { }, { } },                   /* 5 */
+	{ &CVmBifTIO::inputevent, 0, 1, FALSE, { }, { } },                 /* 6 */
+	{ &CVmBifTIO::inputdialog, 5, 0, FALSE, { }, { } },                /* 7 */
+	{ &CVmBifTIO::askfile, 4, 0, FALSE, { }, { } },                    /* 8 */
+	{ &CVmBifTIO::timedelay, 1, 0, FALSE, { }, { } },                  /* 9 */
+	{ &CVmBifTIO::sysinfo, 1, 0, TRUE, { }, { } },                    /* 10 */
+	{ &CVmBifTIO::status_mode, 1, 0, FALSE, { }, { } },               /* 11 */
+	{ &CVmBifTIO::status_right, 1, 0, FALSE, { }, { } },              /* 12 */
+	{ &CVmBifTIO::res_exists, 1, 0, FALSE, { }, { } },                /* 13 */
+	{ &CVmBifTIO::set_script_file, 1, 1, FALSE, { }, { } },           /* 14 */
+	{ &CVmBifTIO::get_charset, 1, 0, FALSE, { }, { } },               /* 15 */
+	{ &CVmBifTIO::flush_output, 0, 0, FALSE, { }, { } },              /* 16 */
+	{ &CVmBifTIO::input_timeout, 0, 1, FALSE, { }, { } },             /* 17 */
+	{ &CVmBifTIO::input_cancel, 1, 0, FALSE, { }, { } },              /* 18 */
     
-    { &CVmBifTIO::banner_create, 8, 0, FALSE },                       /* 19 */
-    { &CVmBifTIO::banner_delete, 1, 0, FALSE },                       /* 20 */
-    { &CVmBifTIO::banner_clear, 1, 0, FALSE },                        /* 21 */
-    { &CVmBifTIO::banner_say, 1, 0, TRUE },                           /* 22 */
-    { &CVmBifTIO::banner_flush, 1, 0, FALSE },                        /* 23 */
-    { &CVmBifTIO::banner_size_to_contents, 1, 0, FALSE },             /* 24 */
-    { &CVmBifTIO::banner_goto, 3, 0, FALSE },                         /* 25 */
-    { &CVmBifTIO::banner_set_text_color, 3, 0, FALSE },               /* 26 */
-    { &CVmBifTIO::banner_set_screen_color, 2, 0, FALSE },             /* 27 */
-    { &CVmBifTIO::banner_get_info, 1, 0, FALSE },                     /* 28 */
-    { &CVmBifTIO::banner_set_size, 4, 0, FALSE },                     /* 29 */
+	{ &CVmBifTIO::banner_create, 8, 0, FALSE, { }, { } },             /* 19 */
+	{ &CVmBifTIO::banner_delete, 1, 0, FALSE, { }, { } },             /* 20 */
+	{ &CVmBifTIO::banner_clear, 1, 0, FALSE, { }, { } },              /* 21 */
+	{ &CVmBifTIO::banner_say, 1, 0, TRUE, { }, { } },                 /* 22 */
+	{ &CVmBifTIO::banner_flush, 1, 0, FALSE, { }, { } },              /* 23 */
+	{ &CVmBifTIO::banner_size_to_contents, 1, 0, FALSE, { }, { } },   /* 24 */
+	{ &CVmBifTIO::banner_goto, 3, 0, FALSE, { }, { } },               /* 25 */
+	{ &CVmBifTIO::banner_set_text_color, 3, 0, FALSE, { }, { } },     /* 26 */
+	{ &CVmBifTIO::banner_set_screen_color, 2, 0, FALSE, { }, { } },   /* 27 */
+	{ &CVmBifTIO::banner_get_info, 1, 0, FALSE, { }, { } },           /* 28 */
+	{ &CVmBifTIO::banner_set_size, 4, 0, FALSE, { }, { } },           /* 29 */
 
-    { &CVmBifTIO::log_console_create, 3, 0, FALSE },                  /* 30 */
-    { &CVmBifTIO::log_console_close, 1, 0, FALSE },                   /* 31 */
-    { &CVmBifTIO::log_console_say, 1, 0, TRUE },                      /* 32 */
+	{ &CVmBifTIO::log_console_create, 3, 0, FALSE, { }, { } },        /* 30 */
+	{ &CVmBifTIO::log_console_close, 1, 0, FALSE, { }, { } },         /* 31 */
+	{ &CVmBifTIO::log_console_say, 1, 0, TRUE, { }, { } },            /* 32 */
 
-    { &CVmBifTIO::log_input_event, 1, 0, FALSE }                      /* 33 */
+	{ &CVmBifTIO::log_input_event, 1, 0, FALSE, { }, { } }            /* 33 */
 };
 
 #endif /* VMBIF_DEFINE_VECTOR */

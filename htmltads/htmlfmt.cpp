@@ -3984,9 +3984,6 @@ void CHtmlFormatter::add_map_area(HTML_Attrib_id_t shape,
                                   const CHtmlTagAREA_coords_t *coords,
                                   int coord_cnt, int append, int noenter)
 {
-    CHtmlDispLink *link;
-    CHtmlFmtMapZone *zone;
-
     /* if there's no open map, we can't add a map area */
     if (cur_map_ == 0)
         return;
@@ -3997,32 +3994,29 @@ void CHtmlFormatter::add_map_area(HTML_Attrib_id_t shape,
      *   because we do not want to open a link range -- this is a
      *   single-use link that doesn't contain any other display items. 
      */
-    link = new (this)
-           CHtmlDispLink(FALSE, append, noenter, href, alt, altlen);
+	CHtmlDispLink *link = new (this) CHtmlDispLink(
+		FALSE, append, noenter, href, alt, altlen);
     add_disp_item(link);
 
     /* set up an appropriate zone object based on the shape setting */
     switch(shape)
     {
     case HTML_Attrib_rect:
-        zone = new CHtmlFmtMapZoneRect(coords, link);
+		cur_map_->add_zone(new CHtmlFmtMapZoneRect(coords, link));
         break;
 
     case HTML_Attrib_circle:
-        zone = new CHtmlFmtMapZoneCircle(coords, link);
+		cur_map_->add_zone(new CHtmlFmtMapZoneCircle(coords, link));
         break;
 
     case HTML_Attrib_poly:
-        zone = new CHtmlFmtMapZonePoly(coords, coord_cnt, link);
+		cur_map_->add_zone(new CHtmlFmtMapZonePoly(coords, coord_cnt, link));
         break;
 
     default:
         /* other cases should never occur; ignore them if they do */
-        break;
+		break;
     }
-
-    /* add the new zone to the current map */
-    cur_map_->add_zone(zone);
 }
 
 /*

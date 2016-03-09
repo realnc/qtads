@@ -512,7 +512,7 @@ void CHtmlParser::init(int literal_mode)
           &clsname::process_end_tag },
 
 #include "htmlreg.h"
-        { 0, 0 }
+        { 0, 0, 0 }
     };
     const struct tag_tbl_t *tagptr;
 

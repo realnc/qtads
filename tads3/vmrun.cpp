@@ -1095,15 +1095,32 @@ static inline void int_neg(VMG_ vm_val_t *aval)
  *   Calculations for conditionals 
  */
 #if 1
+/* 
+ *   Faster versions.  All of the type checks in these are inline.  These
+ *   yield equivalent results to the more abstracted versions, but since they
+ *   check for an explicit set of types, these won't automatically adapt if
+ *   new primitive types are added to the VM in the future.  These tests are
+ *   done so frequently in typical bytecode execution that they're critical
+ *   for performance, so the loss of abstractness from the micro-optimization
+ *   is worthwhile for speed.
+ */
 # define false_for_cond(v) \
     ((v)->typ == VM_NIL || ((v)->typ == VM_INT && (v)->val.intval == 0))
 # define true_for_cond(v) \
     ((v)->typ == VM_TRUE \
      || (v)->typ == VM_ENUM \
-     || ((v)->typ == VM_INT && !(v)->val.intval == 0))
+	 || ((v)->typ == VM_INT && (!(v)->val.intval) == 0))
 # define is_valid_for_jst(v) \
     ((v)->typ == VM_NIL || (v)->typ == VM_INT)
+
 #else
+/* 
+ *   Abstracted versions.  These yield the same results as the faster
+ *   versions above.  These versions use abstract type tests that should in
+ *   principle adapt automatically if new primitive numeric types are added
+ *   in future VM versions.  But the virtual method calls add runtime
+ *   overhead vs the faster inline versions.
+ */
 # define false_for_cond(v) \
     ((v)->typ == VM_NIL \
      || ((v)->is_numeric(vmg0_) && (v)->num_is_zero(vmg0_)))
@@ -1113,6 +1130,7 @@ static inline void int_neg(VMG_ vm_val_t *aval)
      || ((v)->is_numeric(vmg0_) && !(v)->num_is_zero(vmg0_)))
 # define is_valid_for_jst(v) \
     ((v)->typ == VM_NIL || (v)->is_numeric(vmg0_))
+
 #endif
 
 
@@ -1130,7 +1148,7 @@ void CVmRun::run(VMG_ const uchar *start_pc)
      *   it causes better optimization on some platforms, and is harmless
      *   when it doesn't help with optimization.  
      */
-    register const uchar *p = start_pc;
+    REGISTER const uchar *p = start_pc;
     vmrun_prop_eval propev;
     vm_val_t *valp;
     vm_val_t *valp2;

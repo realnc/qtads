@@ -661,7 +661,7 @@ int CVmBifTIO::map_ext_key(VMG_ char *namebuf, int extc)
 
     /* if it's in the key name array, use the array entry */
     if (extc >= 1
-        && extc <= (int)sizeof(ext_key_names)/sizeof(ext_key_names[0]))
+		&& (size_t)extc <= sizeof(ext_key_names)/sizeof(ext_key_names[0]))
     {
         /* use the array name */
         strcpy(namebuf, ext_key_names[extc - 1]);
@@ -820,8 +820,8 @@ void CVmBifTIO::inputdialog(VMG_ uint argc)
          */
         vm_val_t *lst = G_stk->get(0);
 
-        /* limit the number of elements to our private array size */
-        if (lst_cnt > (int)sizeof(label_val)/sizeof(label_val[0]))
+		/* limit the number of elements to our private array size */
+		if ((size_t)lst_cnt > sizeof(label_val)/sizeof(label_val[0]))
             lst_cnt = sizeof(label_val)/sizeof(label_val[0]);
 
         /* copy the list */

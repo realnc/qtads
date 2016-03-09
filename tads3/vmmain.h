@@ -158,6 +158,9 @@ struct vm_run_image_params
 
         /* assume no network configuration */
         netconfig = 0;
+
+        /* assume we'll get the local time zone from the operating system */
+        timezone = 0;
     }
     
     /* 
@@ -278,6 +281,13 @@ struct vm_run_image_params
      *   host mode, with the network parameters specified in this object.
      */
     class TadsNetConfig *netconfig;
+
+    /* 
+     *   Local time zone.  This lets the user specify a time zone on the
+     *   command line, overriding the default settings taken from the
+     *   operating system or environment.
+     */
+    const char *timezone;
 };
 
 /*

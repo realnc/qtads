@@ -68,8 +68,11 @@ void CVmBifTIOExt::show_popup_menu(VMG_ uint argc)
         G_stk->discard(2);
     }
     else
-    {
-        /* pop the x,y positions */
+	{
+		/* explicit position provided - override default */
+		default_pos = FALSE;
+
+		/* pop the x,y positions */
         x = pop_int_val(vmg0_);
         y = pop_int_val(vmg0_);
     }

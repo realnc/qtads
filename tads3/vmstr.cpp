@@ -2669,7 +2669,7 @@ int CVmObjString::getp_splice(VMG_ vm_val_t *retval,
 
     /* retrieve the starting index and deletion length */
     int start_idx = CVmBif::pop_int_val(vmg0_);
-    int del_len = CVmBif::pop_int_val(vmg0_);
+    int del_char_len = CVmBif::pop_int_val(vmg0_);
 
     /* get and skip our length */
     size_t len = vmb_get_len(str);
@@ -2684,9 +2684,9 @@ int CVmObjString::getp_splice(VMG_ vm_val_t *retval,
     start_idx = (start_idx < 0 ? 0 :
                  start_idx > (int)charlen ? charlen :
                  start_idx);
-    del_len = (del_len < 0 ? 0 :
-               del_len > (int)(charlen - start_idx) ? charlen - start_idx :
-               del_len);
+    del_char_len = (del_char_len < 0 ? 0 :
+                    del_char_len > (int)(charlen - start_idx) ? charlen - start_idx :
+                    del_char_len);
 
     /* get the starting byte index */
     size_t start_byte_idx = p.bytelen(start_idx);
@@ -2698,7 +2698,7 @@ int CVmObjString::getp_splice(VMG_ vm_val_t *retval,
      *   If there's an insertion string, get it as a string.  Treat nil as an
      *   empty insertion.  
      */
-    size_t ins_len = 0;
+    size_t ins_byte_len = 0;
     const char *ins = 0;
     vm_val_t new_ins_str;
     new_ins_str.set_nil();
@@ -2710,7 +2710,7 @@ int CVmObjString::getp_splice(VMG_ vm_val_t *retval,
          */
         ins = cvt_to_str(vmg_ &new_ins_str, ins_buf, sizeof(ins_buf),
                          G_stk->get(1), 10, 0);
-        ins_len = vmb_get_len(ins);
+        ins_byte_len = vmb_get_len(ins);
         ins += VMB_LEN;
     }
 
@@ -2718,10 +2718,13 @@ int CVmObjString::getp_splice(VMG_ vm_val_t *retval,
     G_stk->push(&new_ins_str);
 
     /* check to see if we're making any changes */
-    if (del_len != 0 || ins_len != 0)
+    if (del_char_len != 0 || ins_byte_len != 0)
     {
+        /* figure the byte length to be deleted */
+        size_t del_byte_len = utf8_ptr::s_bytelen(str + start_byte_idx, del_char_len);
+
         /* allocate a new string at the proper length */
-        retval->set_obj(create(vmg_ FALSE, len + ins_len - del_len));
+        retval->set_obj(create(vmg_ FALSE, len + ins_byte_len - del_byte_len));
         CVmObjString *new_str = (CVmObjString *)vm_objp(vmg_ retval->val.obj);
         char *newp = new_str->cons_get_buf();
 
@@ -2733,20 +2736,17 @@ int CVmObjString::getp_splice(VMG_ vm_val_t *retval,
         }
 
         /* if we have an insertion string, copy it */
-        if (ins_len != 0)
+        if (ins_byte_len != 0)
         {
-            memcpy(newp, ins, ins_len);
-            newp += ins_len;
+            memcpy(newp, ins, ins_byte_len);
+            newp += ins_byte_len;
         }
 
-        /* skip past the deleted material in the original string */
-        p.set((char *)str + start_byte_idx);
-        for (len -= start_byte_idx ; del_len != 0 && len != 0 ; --del_len)
-            p.inc(&len);
-                
-        /* if we have any more of the spliced string, copy it */
-        if (len != 0)
-            memcpy(newp, p.getptr(), len);
+        /* if there's anything after the deleted section, add it */
+        size_t tail_byte_idx = start_byte_idx + del_byte_len;
+        int tail_byte_len = len - tail_byte_idx;
+        if (tail_byte_len > 0)
+            memcpy(newp, str + tail_byte_idx, tail_byte_len);
     }
     else
     {

@@ -1552,8 +1552,8 @@ void CVmObjTable::clear_obj_table(VMG0_)
     for (size_t i = 0 ; i < pages_used_ ; ++i)
     {
         /* delete all of the objects on the page */
-        int j;
-        CVmObjPageEntry *entry;
+        unsigned int j;
+		CVmObjPageEntry *entry;
         for (j = 0, entry = pages_[i] ; j < VM_OBJ_PAGE_CNT ; ++j, ++entry)
         {
             /* if this entry is still in use, delete it */

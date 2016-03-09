@@ -81,6 +81,9 @@ static int mcmtoss(mcmcx1def *ctx, mcmon objnum);
  ((p) + osrndsz(sizeof(mcmon)) + mcmgobje(ctx, *(mcmon*)(p))->mcmosiz)
 
 #ifdef DEBUG
+
+# error "This file doesn't currently work with DEBUG defined. Please remove it from the compiler command line."
+
 # define MCMCLICTX(ctx) assert(*(((ulong *)ctx) - 1) == 0x02020202)
 # define MCMGLBCTX(ctx) assert(*(((ulong *)ctx) - 1) == 0x01010101)
 #else /* DEBUG */

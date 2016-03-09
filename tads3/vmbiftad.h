@@ -183,35 +183,35 @@ public:
 /* TADS general data manipulation functions */
 vm_bif_desc CVmBifTADS::bif_table[] =
 {
-    { &CVmBifTADS::datatype, 1, 0, FALSE },                            /* 0 */
-    { &CVmBifTADS::getarg, 1, 0, FALSE },                              /* 1 */
-    { &CVmBifTADS::firstobj, 0, 2, FALSE },                            /* 2 */
-    { &CVmBifTADS::nextobj, 1, 2, FALSE },                             /* 3 */
-    { &CVmBifTADS::randomize, 0, 0, FALSE },                           /* 4 */
-    { &CVmBifTADS::rand, 0, 0, TRUE },                                 /* 5 */
-    { &CVmBifTADS::toString, 1, 2, FALSE },                            /* 6 */
-    { &CVmBifTADS::toInteger, 1, 1, FALSE },                           /* 7 */
-    { &CVmBifTADS::gettime, 0, 1, FALSE },                             /* 8 */
-    { &CVmBifTADS::re_match, 2, 1, FALSE },                            /* 9 */
-    { &CVmBifTADS::re_search, 2, 1, FALSE },                          /* 10 */
-    { &CVmBifTADS::re_group, 1, 0, FALSE },                           /* 11 */
-    { &CVmBifTADS::re_replace, 3, 2, FALSE },                         /* 12 */
-    { &CVmBifTADS::savepoint, 0, 0, FALSE },                          /* 13 */
-    { &CVmBifTADS::undo, 0, 0, FALSE },                               /* 14 */
-    { &CVmBifTADS::save, 1, 0, FALSE },                               /* 15 */
-    { &CVmBifTADS::restore, 1, 0, FALSE },                            /* 16 */
-    { &CVmBifTADS::restart, 0, 0, FALSE },                            /* 17 */
-    { &CVmBifTADS::get_max, 1, 0, TRUE },                             /* 18 */
-    { &CVmBifTADS::get_min, 1, 0, TRUE },                             /* 19 */
-    { &CVmBifTADS::make_string, 1, 1, FALSE },                        /* 20 */
-    { &CVmBifTADS::get_func_params, 1, 0, FALSE },                    /* 21 */
-    { &CVmBifTADS::toNumber, 1, 1, FALSE },                           /* 23 */
-    { &CVmBifTADS::sprintf, 1, 0, TRUE },                             /* 24 */
-    { &CVmBifTADS::make_list, 1, 1, FALSE },                          /* 25 */
-    { &CVmBifTADS::get_abs, 1, 0, FALSE },                            /* 26 */
-    { &CVmBifTADS::get_sgn, 1, 0, FALSE },                            /* 27 */
-    { &CVmBifTADS::concat, 0, 0, TRUE },                              /* 28 */
-    { &CVmBifTADS::re_search_back, 2, 1, FALSE }                      /* 29 */
+	{ &CVmBifTADS::datatype, 1, 0, FALSE, { }, { } },                  /* 0 */
+	{ &CVmBifTADS::getarg, 1, 0, FALSE, { }, { } },                    /* 1 */
+	{ &CVmBifTADS::firstobj, 0, 2, FALSE, { }, { } },                  /* 2 */
+	{ &CVmBifTADS::nextobj, 1, 2, FALSE, { }, { } },                   /* 3 */
+	{ &CVmBifTADS::randomize, 0, 0, FALSE, { }, { } },                 /* 4 */
+	{ &CVmBifTADS::rand, 0, 0, TRUE, { }, { } },                       /* 5 */
+	{ &CVmBifTADS::toString, 1, 2, FALSE, { }, { } },                  /* 6 */
+	{ &CVmBifTADS::toInteger, 1, 1, FALSE, { }, { } },                 /* 7 */
+	{ &CVmBifTADS::gettime, 0, 1, FALSE, { }, { } },                   /* 8 */
+	{ &CVmBifTADS::re_match, 2, 1, FALSE, { }, { } },                  /* 9 */
+	{ &CVmBifTADS::re_search, 2, 1, FALSE, { }, { } },                /* 10 */
+	{ &CVmBifTADS::re_group, 1, 0, FALSE, { }, { } },                 /* 11 */
+	{ &CVmBifTADS::re_replace, 3, 2, FALSE, { }, { } },               /* 12 */
+	{ &CVmBifTADS::savepoint, 0, 0, FALSE, { }, { } },                /* 13 */
+	{ &CVmBifTADS::undo, 0, 0, FALSE, { }, { } },                     /* 14 */
+	{ &CVmBifTADS::save, 1, 0, FALSE, { }, { } },                     /* 15 */
+	{ &CVmBifTADS::restore, 1, 0, FALSE, { }, { } },                  /* 16 */
+	{ &CVmBifTADS::restart, 0, 0, FALSE, { }, { } },                  /* 17 */
+	{ &CVmBifTADS::get_max, 1, 0, TRUE, { }, { } },                   /* 18 */
+	{ &CVmBifTADS::get_min, 1, 0, TRUE, { }, { } },                   /* 19 */
+	{ &CVmBifTADS::make_string, 1, 1, FALSE, { }, { } },              /* 20 */
+	{ &CVmBifTADS::get_func_params, 1, 0, FALSE, { }, { } },          /* 21 */
+	{ &CVmBifTADS::toNumber, 1, 1, FALSE, { }, { } },                 /* 23 */
+	{ &CVmBifTADS::sprintf, 1, 0, TRUE, { }, { } },                   /* 24 */
+	{ &CVmBifTADS::make_list, 1, 1, FALSE, { }, { } },                /* 25 */
+	{ &CVmBifTADS::get_abs, 1, 0, FALSE, { }, { } },                  /* 26 */
+	{ &CVmBifTADS::get_sgn, 1, 0, FALSE, { }, { } },                  /* 27 */
+	{ &CVmBifTADS::concat, 0, 0, TRUE, { }, { } },                    /* 28 */
+	{ &CVmBifTADS::re_search_back, 2, 1, FALSE, { }, { } }            /* 29 */
 };
 
 #endif /* VMBIF_DEFINE_VECTOR */

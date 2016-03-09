@@ -1562,7 +1562,7 @@ static int32_t filemode_to_filetype(int osmode)
 
     /* run through the bit flags, and set the translated bits */
     int32_t tadsmode = 0;
-    for (int i = 0 ; i < countof(xlat) ; ++i)
+    for (size_t i = 0 ; i < countof(xlat) ; ++i)
     {
         /* if this OS mode bit is set, set the corresponding TADS bit */
         if ((osmode & xlat[i].osmode) != 0)
@@ -1594,7 +1594,7 @@ static int32_t map_file_attrs(unsigned long osattrs)
 
     /* run through the bit flags, and set the translated bits */
     int32_t tadsattrs = 0;
-    for (int i = 0 ; i < countof(xlat) ; ++i)
+    for (size_t i = 0 ; i < countof(xlat) ; ++i)
     {
         /* if this OS mode bit is set, set the corresponding TADS bit */
         if ((osattrs & xlat[i].osattr) != 0)
@@ -1744,7 +1744,7 @@ int CVmObjFileName::getp_getFileInfo(VMG_ vm_obj_id_t self,
     /* get the filename; use the GETINFO access mode */
     vm_rcdesc rc(vmg_ "FileName.getFileInfo",
                  metaclass_reg_->get_class_obj(vmg0_),
-                 VMOFN_GETFILETYPE, G_stk->get(0), argc);
+                 VMOFN_GETFILEINFO, G_stk->get(0), argc);
     CVmNetFile *netfile = CVmObjFile::get_filename_from_obj(
         vmg_ self, &rc, VMOBJFILE_ACCESS_GETINFO,
         OSFTUNK, "application/octet-stream");

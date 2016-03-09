@@ -611,14 +611,13 @@ int CHtmlInputBuf::select_prev_hist()
  */
 int CHtmlInputBuf::select_prev_hist_prefix(const textchar_t *pre, size_t len)
 {
-    size_t cur, start;
-
     /* if there's nothing in the history buffer, ignore this */
     if (histcnt_ == 0)
         return FALSE;
         
     /* start with the previous line, wrapping at the start of the list */
-    cur = start = (histpos_ == 0 ? histcnt_ : histpos_) - 1;
+    size_t start = (histpos_ == 0 ? histcnt_ : histpos_) - 1;
+    size_t cur = start;
 
     /* search for a matching line; if we get back to where we started, fail */
     do
@@ -627,8 +626,6 @@ int CHtmlInputBuf::select_prev_hist_prefix(const textchar_t *pre, size_t len)
         if (strlen(history_[cur]) > len
             && memcmp(history_[cur], pre, len) == 0)
         {
-            int ret;
-            
             /* remember the current caret position so we can restore it */
             size_t old_caret = caret_;
             
@@ -639,7 +636,7 @@ int CHtmlInputBuf::select_prev_hist_prefix(const textchar_t *pre, size_t len)
             save_undo();
 
             /* select this item */
-            ret = select_cur_hist();
+            int ret = select_cur_hist();
 
             /* if that succeeded, restore the caret position */
             if (ret)
@@ -651,7 +648,8 @@ int CHtmlInputBuf::select_prev_hist_prefix(const textchar_t *pre, size_t len)
 
         /* move to the previous line, wrapping at the start of the list */
         cur = (cur == 0 ? histcnt_ : cur) - 1;
-    } while (cur != start);
+    }
+    while (cur != start);
 
     /* we didn't find a match; ignore it */
     return FALSE;

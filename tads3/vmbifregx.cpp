@@ -72,7 +72,7 @@ vm_bif_entry_t G_bif_reg_table[] =
     // !!! ADD ANY HOST-SPECIFIC FUNCTION SETS HERE
 
     /* end of table marker */
-    { 0, 0, 0 }
+    { 0, 0, 0, 0, 0 }
 };
 
 /* we don't need the MAKE_ENTRY macro any longer */

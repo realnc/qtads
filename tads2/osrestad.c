@@ -83,7 +83,7 @@ int os_get_str_rsc(int id, char *buf, size_t buflen)
      *   index values start at 1, but our array starts at 0, so adjust
      *   accordingly 
      */
-    if (id < 0 || id >= (int)sizeof(S_res_strings)/sizeof(S_res_strings[0]))
+	if (id < 0 || (size_t)id >= sizeof(S_res_strings)/sizeof(S_res_strings[0]))
         return 1;
 
     /* make sure the buffer is large enough */

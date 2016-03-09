@@ -31,6 +31,8 @@ Modified
 
 #include "os.h"
 #include "t3std.h"
+#include "utf8.h"
+#include "vmuni.h"
 #include "vmerr.h"
 #include "vmhash.h"
 #include "tcerr.h"
@@ -79,7 +81,7 @@ private:
  */
 void tok_embed_ctx::start_expr(wchar_t qu, int triple, int report)
 {
-    if (level < countof(stk))
+	if (level < (int)countof(stk))
     {
         s = stk + level;
         s->enter(qu, triple);
@@ -2015,15 +2017,12 @@ tc_toktyp_t CTcTokenizer::next_on_line(utf8_ptr *p, CTcToken *tok,
 
     default:        
         /* check to see if it's a symbol */
-        if (is_syminit(cur) || !is_ascii(cur))
+        if (cur == '_' || t3_is_alpha(cur))
         {
         tokenize_symbol:
-            wchar_t non_ascii = 0;
             const char *stop = 0;
+            wchar_t non_ascii = 0;
 
-            /* note if we're starting with a non-ASCII character */
-            if (!is_ascii(cur))
-                non_ascii = cur;
 
             /* 
              *   scan the identifier (note that we've already skipped the
@@ -2042,13 +2041,12 @@ tc_toktyp_t CTcTokenizer::next_on_line(utf8_ptr *p, CTcToken *tok,
                  *   Otherwise, stop on any non-symbol character.
                  */
                 wchar_t ch = p->getch();
-                if (!is_ascii(ch))
-                {
-                    if (non_ascii == 0)
-                        non_ascii = ch;
-                }
-                else if (!is_sym(ch))
+                if (ch != '_' && !t3_is_alpha(ch) && !t3_is_digit(ch))
                     break;
+
+                /* note the first non-ascii character we encounter */
+                if (!is_ascii(ch))
+                    non_ascii = ch;
 
                 /* skip this character */
                 const char *prv = p->getptr();
@@ -2056,12 +2054,15 @@ tc_toktyp_t CTcTokenizer::next_on_line(utf8_ptr *p, CTcToken *tok,
 
                 /* if this character would push us over the limit, end here */
                 if (stop == 0
-                    && p->getptr() - start.getptr() >= TOK_SYM_MAX_LEN)
+					&& p->getptr() - start.getptr() >= (int)TOK_SYM_MAX_LEN)
                     stop = prv;
             }
 
-            /* if we found any non-ASCII characters, flag an error */
-            if (non_ascii != 0)
+            /* 
+             *   if we found any non-ASCII characters, and we're not still
+             *   doing macro expansion, flag an error 
+             */
+            if (non_ascii != 0 && !expanding)
                 log_error(TCERR_NON_ASCII_SYMBOL,
                           (int)(p->getptr() - start.getptr()), start.getptr(),
                           (int)non_ascii);
@@ -5088,7 +5089,7 @@ int CTcTokenizer::substitute_macro_actuals(
                 subexp->append(start, tok.get_text() - start);
 
             /* push a #foreach level, if possible */
-            if (expand_sp - expand_stack >= expand_max)
+			if (expand_sp - expand_stack >= (ptrdiff_t)expand_max)
             {
                 /* 
                  *   we can't create another level - log an error and ignore
@@ -5176,7 +5177,7 @@ int CTcTokenizer::substitute_macro_actuals(
             if (expand)
             {
                 /* make sure we have room for another level */
-                if (expand_sp - expand_stack >= expand_max)
+				if (expand_sp - expand_stack >= (ptrdiff_t)expand_max)
                 {
                     /* no room - log an error and ignore the new level */
                     log_error(TCERR_PP_FOREACH_TOO_DEEP);
@@ -6282,7 +6283,6 @@ void CTcTokenizer::splice_string()
      */
     wchar_t in_quote = in_quote_;
     int in_triple = in_triple_;
-    tok_embed_ctx old_ec = comment_in_embedding_;
 
     /* note if the previous line ended with an explicit \n sequence */
     int explicit_nl = (linebuf_.get_text_len() >= 2
@@ -8485,7 +8485,7 @@ void CTcTokenizer::log_warning_curtok(int errnum)
 /*
  *   Log and throw an internal error 
  */
-void CTcTokenizer::throw_internal_error(int errnum, ...)
+NORETURN void CTcTokenizer::throw_internal_error(int errnum, ...)
 {
     va_list marker;
 

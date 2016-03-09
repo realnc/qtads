@@ -645,8 +645,8 @@ protected:
     int getp_getISOWeekDate(
         VMG_ vm_obj_id_t self, vm_val_t *retval, uint *argc);
 
-    /* getTime method */
-    int getp_getTime(VMG_ vm_obj_id_t self, vm_val_t *retval, uint *argc);
+    /* getClockTime method */
+    int getp_getClockTime(VMG_ vm_obj_id_t self, vm_val_t *retval, uint *argc);
 
     /* addInterval method */
     int getp_addInterval(VMG_ vm_obj_id_t self, vm_val_t *retval, uint *argc);

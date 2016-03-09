@@ -154,10 +154,8 @@ public:
         *caret = caret_;
     }
 
-    bool has_sel_range()
-    {
-        return sel_start_ != sel_end_;
-    }
+    /* determine if the buffer has a non-empty selection range */
+    int has_sel_range() const { return sel_start_ != sel_end_; }
 
     /* show or hide the caret */
     void show_caret() { caret_vis_ = TRUE; }

@@ -133,6 +133,59 @@ extern "C" {
 
 /* ------------------------------------------------------------------------ */
 /*
+ *   NORETURN function declaration modifier keyword.
+ *   
+ *   The NORETURN modifier can be used in a function declaration to specify
+ *   that the function never returns via a 'return' statement or implicitly
+ *   by falling off the end of the function.  This applies to functions that
+ *   call library routines like longjmp() or exit(), or operating system APIs
+ *   that abort the thread or process.
+ *   
+ *   C11 and C++11 define 'noreturn' as a language keyword, which can be
+ *   added as a modifier to a function declaration:
+ *   
+ *   noreturn void foo();
+ *   
+ *   We use the same syntax in the portable code, exept that we use an
+ *   all-caps version of the name to avoid macro conflicts with existing
+ *   platform macros:
+ *   
+ *   NORETURN void foo();
+ *   
+ *   To accommodate compilers that don't implement the keyword natively or in
+ *   macros, we provide a macro for NORETURN that expands to nothing, IF no
+ *   such macro is already defined by a previous header AND we're not
+ *   compiling with a C11 or C++11 compiler.
+ *   
+ *   Many pre-C11 compilers provide their own private syntax for an
+ *   equivalent declaration.  Where those are available, OS-specific headers
+ *   can define their own 'noreturn' macros.  Since we only define the empty
+ *   macro if another definition hasn't already been provided, the OS
+ *   header's version will override the empty version.
+ *   
+ *   Note that it's always safe to leave 'noreturn' empty.  It doesn't affect
+ *   the way a function behaves at run-time.  Its purpose is to tell the C
+ *   compiler that a function doesn't return, to help the compiler with code
+ *   flow analysis and optimization in calling code, and to suppress warnings
+ *   related to the missing return path.
+ */
+#ifndef NORETURN
+#  ifdef __cplusplus
+#    if __cplusplus >= 201103L
+#      define NORETURN [[noreturn]]
+#    else
+#      define NORETURN
+#    endif
+#  elif __STDC_VERSION__ >= 201112L
+#    include <stdnoreturn.h>
+#    define NORETURN noreturn
+#  else
+#    define NORETURN
+#  endif
+#endif
+
+/* ------------------------------------------------------------------------ */
+/*
  *   Thread-local storage (TLS).
  *   
  *   When TADS is compiled with threading support, it requires some variables

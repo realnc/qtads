@@ -64,8 +64,9 @@ int CVmConsole::input_dialog(VMG_ int icon_id, const char *prompt,
     ui_prompt[ui_prompt_len] = '\0';
 
     /* convert the button labels to the local character set */
-    if (button_count > (int)sizeof(ui_buttons)/sizeof(ui_buttons[0]))
-        button_count = (int)sizeof(ui_buttons)/sizeof(ui_buttons[0]);
+	if (button_count > 0
+		&& (size_t)button_count > sizeof(ui_buttons)/sizeof(ui_buttons[0]))
+        button_count = sizeof(ui_buttons)/sizeof(ui_buttons[0]);
     for (i = 0, dst = ui_button_buf, dstrem = sizeof(ui_button_buf) ;
          i < button_count ; ++i)
     {

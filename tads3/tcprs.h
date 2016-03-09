@@ -2248,7 +2248,7 @@ public:
     class CTcSymObj *getval_prod() const { return val_.obj_; }
     tctarg_prop_id_t getval_part_of_speech() const { return val_.prop_; }
     const char *getval_literal_txt() const { return val_.str_.txt_; }
-    const size_t getval_literal_len() const { return val_.str_.len_; }
+    size_t getval_literal_len() const { return val_.str_.len_; }
     ulong getval_token_type() const { return val_.enum_id_; }
     size_t getval_part_list_len() const { return val_.prop_list_.len_; }
     tctarg_prop_id_t getval_part_list_ele(size_t idx) const

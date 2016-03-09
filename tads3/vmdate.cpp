@@ -394,10 +394,10 @@ int (CVmObjDate::*CVmObjDate::func_table_[])(
     &CVmObjDate::getp_getJulianDay,                                    /* 7 */
     &CVmObjDate::getp_getJulianDate,                                   /* 8 */
     &CVmObjDate::getp_getISOWeekDate,                                  /* 9 */
-    &CVmObjDate::getp_getTime,                                        /* 10 */
-    &CVmObjDate::getp_addInterval,                                    /* 11 */
-    &CVmObjDate::getp_findWeekday,                                    /* 12 */
-    &CVmObjDate::getp_setLocaleInfo                                   /* 13 */
+    &CVmObjDate::getp_getClockTime,                                    /* 10 */
+    &CVmObjDate::getp_addInterval,                                     /* 11 */
+    &CVmObjDate::getp_findWeekday,                                     /* 12 */
+    &CVmObjDate::getp_setLocaleInfo                                    /* 13 */
 };
 
 /* static property indices */
@@ -3101,7 +3101,7 @@ static void _wrtnum(char *&buf, size_t &buflen, size_t &outlen,
             { "IV", 4 },
             { "I", 1 }
         };
-        for (int i = 0 ; v != 0 && i < countof(r) ; )
+        for (size_t i = 0 ; v != 0 && i < countof(r) ; )
         {
             /* if this numeral fits, append it */
             if (r[i].val <= v)
@@ -3762,10 +3762,10 @@ int CVmObjDate::getp_getISOWeekDate(VMG_ vm_obj_id_t self,
 
 /* ------------------------------------------------------------------------ */
 /*
- *   getTime method
+ *   getClockTime method
  */
-int CVmObjDate::getp_getTime(VMG_ vm_obj_id_t self,
-                             vm_val_t *retval, uint *oargc)
+int CVmObjDate::getp_getClockTime(
+    VMG_ vm_obj_id_t self, vm_val_t *retval, uint *oargc)
 {
     /* check arguments */
     uint argc = (oargc != 0 ? *oargc : 0);
@@ -3779,9 +3779,9 @@ int CVmObjDate::getp_getTime(VMG_ vm_obj_id_t self,
 
     /* return [hour, minute, second, msec] */
     make_int_list(vmg_ retval, 4,
-                  daytime/(24*60*60*1000),
-                  daytime/(60*60*1000) % 60,
+                  daytime/(60*60*1000),
                   daytime/(60*1000) % 60,
+                  daytime/(1000) % 60,
                   daytime % 1000);
 
     /* discard arguments */

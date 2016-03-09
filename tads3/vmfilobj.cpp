@@ -1317,7 +1317,7 @@ int CVmObjFile::query_safety_for_open(VMG_ const char *lclfname, int access)
         /* 
          *   Writing, deleting, renaming, creating/removing a directory.  If
          *   the safety level is MINIMUM, we're allowed to write anywhere.
-         *   If it's READ_CUR or higher, writing isn't allowed anywhere.
+         *   If it's WRITE_CUR or higher, writing isn't allowed anywhere.
          */
         if (write_level <= VM_IO_SAFETY_MINIMUM)
             return TRUE;

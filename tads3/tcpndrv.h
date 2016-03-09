@@ -570,7 +570,7 @@ public:
 
     /* get the name and its length */
     const char *get_name() const { return name_.get_text(); }
-    const size_t get_name_len() const { return name_.get_text_len(); }
+	size_t get_name_len() const { return name_.get_text_len(); }
 
     /* is this a named parameter? */
     int is_named_param() { return name_.gettyp() != TOKT_INVALID; }
@@ -4192,8 +4192,8 @@ public:
 
     /* adjust for dynamic (run-time) compilation */
     class CTcPrsNode *adjust_for_dyn(const tcpn_dyncomp_info *info)
-    {
-        stm_ = (CTPNStm *)stm_->adjust_for_dyn(info);
+	{
+		stm_ = (CTPNStm *)stm_->adjust_for_dyn(info);
         return this;
     }
 

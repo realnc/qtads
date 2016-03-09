@@ -81,7 +81,7 @@ void err_terminate()
 /*
  *   Throw the error currently on the stack 
  */
-static void err_throw_current()
+NORETURN static void err_throw_current()
 {
     err_state_t new_state;
 
@@ -108,7 +108,7 @@ static void err_throw_current()
 /*
  *   Throw an exception 
  */
-void err_throw(err_id_t error_code)
+NORETURN void err_throw(err_id_t error_code)
 {
     /* throw the error, with no parameters */
     err_throw_a(error_code, 0);
@@ -411,11 +411,10 @@ static size_t err_throw_v(err_id_t error_code, int param_count, va_list va,
 /*
  *   Throw an exception with parameters 
  */
-void err_throw_a(err_id_t error_code, int param_count, ...)
+NORETURN void err_throw_a(err_id_t error_code, int param_count, ...)
 {
-    va_list marker;
-
     /* do a dry run to determine the exception object size */
+	va_list marker;
     va_start(marker, param_count);
     size_t siz = err_throw_v(error_code, param_count, marker, 0);
     va_end(marker);
@@ -426,7 +425,19 @@ void err_throw_a(err_id_t error_code, int param_count, ...)
     /* build the argument list and throw the error */
     va_start(marker, param_count);
     err_throw_v(error_code, param_count, marker, exc);
-    va_end(marker);
+	va_end(marker);
+
+	/*
+	 *   We can't mark err_throw_v() as noreturn, since it has its "dry run"
+	 *   mode that returns without throwing, indicated by a null exception
+	 *   parameter ('exc').  But we just provided a non-null exception
+	 *   object, so we know that err_throw_v() won't in fact return from the
+	 *   call above.  Call exit() to make sure the compiler knows we're not
+	 *   returning.  This should never actually be invoked; it's here for the
+	 *   compiler's sake so that it can see that no paths through this
+	 *   function ever return, as declared.
+	 */
+	exit(0);
 }
 
 /* MSVC - restore previous warning state (see above) */

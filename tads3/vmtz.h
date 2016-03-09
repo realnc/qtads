@@ -139,6 +139,9 @@ public:
     /* open the zoneinfo binary file */
     static osfildef *open_zoneinfo_file(VMG0_);
 
+    /* set the local zone name, overriding the operating system defaults */
+    void set_local_zone(const char *name);
+
     /*
      *   Get the system default local time zone.  Returns a CVmTimeZone
      *   object representing the local zone. 
@@ -155,6 +158,9 @@ protected:
 
     /* get or load the CVmTimeZone object for a hash entry */
     CVmTimeZone *tz_from_hash(VMG_ class ZoneHashEntry *entry);
+
+    /* internal zone name parser */
+    class CVmTimeZone *parse_zone_2(VMG_ const char *name, size_t len);
 
     /* parse a "UTC+-h[:mm[:ss]]" offset string into a zone */
     CVmTimeZone *parse_zone_hhmmss(
@@ -179,6 +185,12 @@ protected:
 
     /* did we successfully load the index? */
     int index_loaded_ok_;
+
+    /* 
+     *   Local zone name, if explicitly set by the user.  If this isn't set,
+     *   we'll get the system local zone from the operating system. 
+     */
+    char *local_zone_name_;
 
     /* 
      *   Cached local zone object.  Determining the local time zone can be a
@@ -402,6 +414,9 @@ public:
     /* load from the zoneinfo database file */
     static CVmTimeZone *load(VMG_ class ZoneHashEntry *entry);
 
+    /* reload from our hash entry */
+    CVmTimeZone *reload(VMG0_);
+
     /* get the primary name of the zone */
     const char *get_name(size_t &len) const;
 
@@ -490,5 +505,6 @@ protected:
     /* comments/description from zone.tab */
     char *desc_;
 };
+
 
 #endif

@@ -495,8 +495,8 @@ void err_terminate();
  *   first is a type code of type err_param_type, and the second the
  *   value, whose interpretation depends on the type code.  
  */
-void err_throw(err_id_t error_code);
-void err_throw_a(err_id_t error_code, int param_count, ...);
+NORETURN void err_throw(err_id_t error_code);
+NORETURN void err_throw_a(err_id_t error_code, int param_count, ...);
 
 /*
  *   Rethrow the current exception.  This is valid only in 'catch' blocks.

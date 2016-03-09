@@ -920,9 +920,17 @@ void runpprop(runcxdef *ctx, uchar *noreg *codepp,
     objnum   target;
     int      times_through = 0;
     int      err;
-    objnum   otherobj;
-    
-    NOREG((&obj, &codepp));
+	objnum   otherobj;
+	runsdef *sp_ret;
+
+	NOREG((&obj, &codepp));
+
+	/* 
+	 *   Note the initial stack pointer before arguments.  This is the stack
+	 *   slot where the caller expects the return value to be placed on
+	 *   return. 
+	 */
+	sp_ret = ctx->runcxsp - argc;
 
     if (obj == MCMONINV) runsig(ctx, ERR_RUNNOBJ);
     
@@ -932,7 +940,7 @@ startover:
     /* if nothing was found, push nil */
     if (!pofs)
     {
-        runpush(ctx, DAT_NIL, &sval);
+		runpush(ctx, DAT_NIL, &sval);
         return;
     }
 
@@ -1018,7 +1026,19 @@ startover:
 
         /* try again now that it's been set up */
         goto startover;
-    }
+	}
+
+	/* 
+	 *   If the property invocation didn't push a return value onto the
+	 *   stack, push nil as the default result.  *All* property calls must
+	 *   yield a value, since our caller might assume that they can pop a
+	 *   result.  If the caller pops a result and we don't provide one, the
+	 *   stack will be corrupted.  To ensure this doesn't happen, push a
+	 *   default nil result if the stack pointer is where it was before the
+	 *   caller pushed our arguments.
+	 */
+	if (ctx->runcxsp == sp_ret)
+		runpush(ctx, DAT_NIL, &sval);
 }
 
 /* ======================================================================== */
@@ -1026,6 +1046,8 @@ startover:
  *   user exit callbacks 
  */
 
+#if 0
+/* external functions are obsolete */
 static int runuftyp(runuxdef *ctx)
 {
     return(runtostyp(ctx->runuxctx));
@@ -1086,6 +1108,7 @@ static void runuflpu(runuxdef *ctx, int typ)
     val.runstyp = typ;
     runrepush(ctx->runuxctx, &val);
 }
+#endif /* obsolete external function support */
 
 
 
@@ -1374,7 +1397,7 @@ resume_from_error:
             p += 2;
             obj = runpopobj(ctx);
             runpprop(ctx, &p, target, targprop, obj, prop, FALSE, nargc,
-                     obj);
+					 obj);
             break;
 
         case OPCGETPDATA:
@@ -2418,7 +2441,7 @@ done: ;
  *   single-step function to allow the debugger to trap the error, then
  *   signals the error as usual when the debugger returns.  
  */
-void runsign(runcxdef *ctx, int err)
+NORETURN void runsign(runcxdef *ctx, int err)
 {
     /*
      *   If the debugger isn't capable of resuming from a run-time error,

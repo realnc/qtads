@@ -999,7 +999,7 @@ void CVmFormatter::buffer_expchar(VMG_ wchar_t c)
             {
                 /* gather the tag name if it fits */
                 if (html_passthru_tagp_ - html_passthru_tag_ + 1
-                    < sizeof(html_passthru_tag_))
+					< (ptrdiff_t)sizeof(html_passthru_tag_))
                     *html_passthru_tagp_++ = (char)c;
             }
             else
@@ -1032,7 +1032,7 @@ void CVmFormatter::buffer_expchar(VMG_ wchar_t c)
             {
                 /* add the '/' to the end of the tag name */
                 if (html_passthru_tagp_ - html_passthru_tag_ + 1
-                    < sizeof(html_passthru_tag_))
+					< (ptrdiff_t)sizeof(html_passthru_tag_))
                 {
                     *html_passthru_tagp_++ = (char)c;
                     *html_passthru_tagp_ = '\0';

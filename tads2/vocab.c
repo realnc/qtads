@@ -3583,8 +3583,8 @@ void voc_parse_np(voccxdef *ctx)
         {
             uchar *sublstp;
             int j;
-            int firstidx;
-            int lastidx;
+            int firstidx = -1;
+            int lastidx = -1;
 
             /* store the list type prefix */
             *lstp++ = DAT_LIST;

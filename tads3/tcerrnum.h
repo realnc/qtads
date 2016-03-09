@@ -300,6 +300,9 @@ Modified
 /* cannot create directory "%s" */
 #define TCERR_CANNOT_CREATE_DIR    10610
 
+/* runtime error during preinit */
+#define TCERR_RUNTIME_ERROR_IN_PREINIT  10611
+
 
 /* ------------------------------------------------------------------------ */
 /*

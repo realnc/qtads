@@ -130,25 +130,25 @@ public:
 
 vm_bif_desc CVmBifT3::bif_table[] =
 {
-    { &CVmBifT3::run_gc, 0, 0, FALSE },
-    { &CVmBifT3::set_say, 0, 0, FALSE },
-    { &CVmBifT3::get_vm_vsn, 0, 0, FALSE },
-    { &CVmBifT3::get_vm_id, 0, 0, FALSE },
-    { &CVmBifT3::get_vm_banner, 0, 0, FALSE },
-    { &CVmBifT3::get_vm_preinit_mode, 0, 0, FALSE },
-    { &CVmBifT3::debug_trace, 1, 0, TRUE },
-    { &CVmBifT3::get_global_symtab, 0, 0, FALSE },
-    { &CVmBifT3::alloc_new_prop, 0, 0, FALSE },
-    { &CVmBifT3::get_stack_trace, 0, 1, FALSE },
-    { &CVmBifT3::get_named_arg, 1, 1, FALSE },
-    { &CVmBifT3::get_named_arg_list, 0, 0, FALSE }
+	{ &CVmBifT3::run_gc, 0, 0, FALSE, { }, { } },
+	{ &CVmBifT3::set_say, 0, 0, FALSE, { }, { } },
+	{ &CVmBifT3::get_vm_vsn, 0, 0, FALSE, { }, { } },
+	{ &CVmBifT3::get_vm_id, 0, 0, FALSE, { }, { } },
+	{ &CVmBifT3::get_vm_banner, 0, 0, FALSE, { }, { } },
+	{ &CVmBifT3::get_vm_preinit_mode, 0, 0, FALSE, { }, { } },
+	{ &CVmBifT3::debug_trace, 1, 0, TRUE, { }, { } },
+	{ &CVmBifT3::get_global_symtab, 0, 0, FALSE, { }, { } },
+	{ &CVmBifT3::alloc_new_prop, 0, 0, FALSE, { }, { } },
+	{ &CVmBifT3::get_stack_trace, 0, 1, FALSE, { }, { } },
+	{ &CVmBifT3::get_named_arg, 1, 1, FALSE, { }, { } },
+	{ &CVmBifT3::get_named_arg_list, 0, 0, FALSE, { }, { } }
 };
 
 vm_bif_desc CVmBifT3Test::bif_table[] =
 {
-    { &CVmBifT3Test::get_obj_id, 1, 0, FALSE },
-    { &CVmBifT3Test::get_obj_gc_state, 1, 0, FALSE },
-    { &CVmBifT3Test::get_charcode, 1, 0, FALSE }
+	{ &CVmBifT3Test::get_obj_id, 1, 0, FALSE, { }, { } },
+	{ &CVmBifT3Test::get_obj_gc_state, 1, 0, FALSE, { }, { } },
+	{ &CVmBifT3Test::get_charcode, 1, 0, FALSE, { }, { } }
 };
 
 #endif /* VMBIF_DEFINE_VECTOR */

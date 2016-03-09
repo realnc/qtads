@@ -993,5 +993,34 @@ protected:
     size_t inc_siz_;
 };
 
+/* ------------------------------------------------------------------------ */
+/*
+ *   'register' keyword.  This is used extremely sparingly in the TADS 3 code
+ *   (in a single place, in fact, in vmrun.cpp).  The C language 'register'
+ *   keyword originally told the compiler to assign a specified variable to a
+ *   machine register in generated code.  As C became widely deployed,
+ *   'register' became a more abstract hint that a variable is critical to
+ *   performance, meaning the compiler should give it whatever special
+ *   treatment applies to the local implementation.  Somewhere along the way,
+ *   compilers became smarter about these micro-optimizations than humans
+ *   tend to be, and 'register' hinting became effectively obsolete.  Modern
+ *   compilers therefore mostly ignore it.  In C++ 11, the keyword is
+ *   officially deprecated, and is expected to be removed from the language
+ *   altogether in future C++ language specs, so we define a cover macro here
+ *   rather than using the keyword directly.  The macro expands to nothing
+ *   when compiling for C++ >=11, and expands to the traditional 'register'
+ *   keyword otherwise.  We're retaining 'register' for pre-C++11 compilers
+ *   for the time being, since (a) the one 'register' declaration in the TADS
+ *   3 source code does measurably improve runtime performance with certain
+ *   older compilers (particularly older MSVC versions), and (b) compilers
+ *   that are smart enough to do a better job on their own without the
+ *   hinting should also be smart enough to ignore it.
+ */
+#if __cplusplus < 201103L
+#define REGISTER register
+#else
+#define REGISTER
+#endif
+
 #endif /* T3_STD_INCLUDED */
 

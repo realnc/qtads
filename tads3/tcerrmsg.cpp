@@ -538,7 +538,7 @@ const err_msg_t tc_messages_english[] =
     "with whatever is confusing it so badly." },
 
     { TCERR_MODULE_NAME_COLLISION,
-    "module %s the has same name as an existing module",
+    "module %s has the same name as an existing module",
     "The module \"%s\" has the same name as an existing module elsewhere "
     "in the project.  The root filename of each module must be unique, "
     "because the two modules' object files might otherwise overwrite one "
@@ -564,6 +564,11 @@ const err_msg_t tc_messages_english[] =
     "mean that the name contains invalid characters, the disk is "
     "full, or you don't have the necessary permissions or privileges "
     "to create a new file in the parent folder." },
+
+    { TCERR_RUNTIME_ERROR_IN_PREINIT,
+    "unhandled exception during preinit",
+    "An runtime error or other unhandled exception was thrown during "
+    "pre-initialization." },
 
     { TCERR_CONST_DIV_ZERO,
     "divide by zero in constant expression",

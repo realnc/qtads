@@ -221,7 +221,7 @@ static void trdmain1(errcxdef *ec, int argc, char *argv[],
     char      *restore_file = 0;                    /* .SAV file to restore */
     char      *charmap = 0;                           /* character map file */
     int        charmap_none;       /* explicitly do not use a character set */
-    int        doublespace = TRUE;        /* formatter double-space setting */
+	int        doublespace = TRUE;        /* formatter double-space setting */
     
     NOREG((&loadopen))
 
@@ -342,8 +342,18 @@ static void trdmain1(errcxdef *ec, int argc, char *argv[],
                                              trdusage));
                     break;
                 }
-                break;
-                
+				break;
+
+			case 'n':
+				/* 
+				 *   -nobanner was already parsed and handled by our caller,
+				 *   but it's still in the argument list, so just skip it;
+				 *   anything else starting with -n is invalid
+				 */
+				if (strcmp(arg, "-nobanner") != 0)
+					trdusage(ec);
+				break;
+
             case 't':
                 /* swap file options:  -tf file, -ts size, -t- (no swap) */
                 switch(*(arg+2))
@@ -781,29 +791,65 @@ void trd_close_swapfile(runcxdef *runctx)
     }
 }
 
+/* close global log files */
+static void close_log_files()
+{
+	extern osfildef *cmdfile;
+	extern osfildef *logfp;
+
+	if (cmdfile != 0)
+	{
+		osfcls(cmdfile);
+		cmdfile = 0;
+	}
+	if (logfp != 0)
+	{
+		osfcls(logfp);
+		logfp = 0;
+	}
+}
+
 /* main - called by os main after setting up arguments */
 int trdmain(int argc, char *argv[], appctxdef *appctx, char *save_ext)
 {
     errcxdef  errctx;
     int       err;
-    osfildef *fp;
-    
+	osfildef *fp;
+	int       banner = TRUE;                            /* show the banner? */
+	int       i;
+
+	VARUSED(banner);
+
+	/* set up the error handler */
     errctx.errcxlog = trdlogerr;
     errctx.errcxlgc = &errctx;
     errctx.errcxfp  = (osfildef *)0;
     errctx.errcxofs = 0;
     errctx.errcxappctx = appctx;
     fp = oserrop(argv[0]);
-    errini(&errctx, fp);
+	errini(&errctx, fp);
+
+	/* check for the -nobanner option */
+	for (i = 1 ; i < argc ; ++i)
+	{
+		if (strcmp(argv[i], "-nobanner") == 0)
+		{
+			banner = FALSE;
+			break;
+		}
+	}
     
     /* copyright-date-string */
 #ifndef NO_T2_COPYRIGHT_NOTICE
-    trdptf("%s - A %s TADS %s Interpreter.\n",
-           G_tads_oem_app_name, G_tads_oem_display_mode,
-           TADS_RUNTIME_VERSION);
-    trdptf("%sopyright (c) 1993, 2012 by Michael J. Roberts.\n",
-           G_tads_oem_copyright_prefix ? "TADS c" : "C");
-    trdptf("%s\n", G_tads_oem_author);
+	if (banner)
+	{
+		trdptf("%s - A %s TADS %s Interpreter.\n",
+			   G_tads_oem_app_name, G_tads_oem_display_mode,
+			   TADS_RUNTIME_VERSION);
+		trdptf("%sopyright (c) 1993, 2012 by Michael J. Roberts.\n",
+			   G_tads_oem_copyright_prefix ? "TADS c" : "C");
+		trdptf("%s\n", G_tads_oem_author);
+	}
 #endif
     
     ERRBEGIN(&errctx)
@@ -818,7 +864,10 @@ int trdmain(int argc, char *argv[], appctxdef *appctx, char *save_ext)
     
         /* close the error file */
         if (errctx.errcxfp != 0)
-            osfcls(errctx.errcxfp);
+			osfcls(errctx.errcxfp);
+
+		/* close the command and log files, if open */
+		close_log_files();
 
         /* pause before exiting if the OS desires it */
         os_expause();
@@ -830,6 +879,9 @@ int trdmain(int argc, char *argv[], appctxdef *appctx, char *save_ext)
     /* close the error file if we opened it */
     if (errctx.errcxfp != 0)
         osfcls(errctx.errcxfp);
+	
+	/* close the command and log files, if open */
+	close_log_files();
 
     /* successful completion */
     return(OSEXSUCC);

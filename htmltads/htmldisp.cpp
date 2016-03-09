@@ -2660,7 +2660,7 @@ void CHtmlDispTextGrid::draw_part(CHtmlSysWin *win, int hilite,
         {
             /* get the color of the first character to draw */
             textgrid_cellcolor_t *cp = &colors_[col];
-
+            
             /* find the next cell with a different color */
             for ( ; p < pr ; ++col, p = os_next_char(cs, p, bytes_ - (p - p0)))
             {
@@ -4307,11 +4307,11 @@ void CHtmlDispImgLink::draw(CHtmlSysWin *win,
                             unsigned long sel_end,
                             int /*clicked*/)
 {
-    int clicked;
-    CHtmlResCacheObject *new_pic;
-    
     /* get our link status */
-    clicked = link_->get_clicked();
+	int clicked = link_->get_clicked();
+
+	/* presume the image won't need to change */
+	CHtmlResCacheObject *new_pic = get_site_image();
 
     /* figure out which picture to display based on our status */
     if (clicked == 0)

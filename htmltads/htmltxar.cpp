@@ -392,7 +392,6 @@ unsigned long CHtmlTextArray::dec_ofs_char(
     }
 
     /* get a pointer to the starting character position */
-    size_t rem = pages_[pg].used_ - ofs;
     const textchar_t *p = pages_[pg].text_ + ofs;
 
     /* decrement by the offset to the start of the previous whole character */

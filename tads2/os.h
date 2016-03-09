@@ -187,6 +187,11 @@ extern "C" {
 #include "osfrobtads.h"
 #endif
 
+#ifdef XTADS
+/* Definitions for X TADS */
+#include "osxtads.h"
+#endif
+
 
 /* **************** add other systems here **************** */
 
