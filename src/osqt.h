@@ -359,8 +359,12 @@ osfmode( const char* fname, int follow_links, unsigned long* mode,
          unsigned long* attr );
 
 /* Allocating sprintf and vsprintf. */
-#define os_asprintf asprintf
-#define os_vasprintf vasprintf
+// Currenty this is not used anywhere.
+//int
+//os_asprintf( char** bufptr, const char* fmt, ... );
+
+int
+os_vasprintf( char** bufptr, const char* fmt, va_list ap );
 
 
 #endif /* OSQT_H */

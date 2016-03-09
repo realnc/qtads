@@ -1274,15 +1274,17 @@ os_gen_rand_bytes( unsigned char* buf, size_t len )
 /* --------------------------------------------------------------------
  * Allocating sprintf and vsprintf.
  */
-// FIXME: Implement this.
+// Currently, this is not used anywhere.
 //int
 //os_asprintf( char** bufptr, const char* fmt, ... )
 //{}
 
-// FIXME: Implement this.
-//int
-//os_vasprintf( char** bufptr, const char* fmt, va_list ap )
-//{}
+
+int
+os_vasprintf( char** bufptr, const char* fmt, va_list ap )
+{
+    return vasprintf(bufptr, fmt, ap);
+}
 
 
 /* --------------------------------------------------------------------
