@@ -102,6 +102,9 @@ extern "C" {
  * used with structs. */
 #define OSCPYSTRUCT(x,y) ((x)=(y))
 
+/* For suppression of "unused variable" compiler warnings. */
+#define VARUSED(var) ((void)var)
+
 /* Link error messages into the application. */
 #define ERR_LINK_MESSAGES
 
