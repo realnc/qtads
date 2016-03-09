@@ -93,7 +93,7 @@ class DisplayWidget: public QWidget {
     mouseReleaseEvent( QMouseEvent* e ) override;
 
     void
-    mouseDoubleClickEvent( QMouseEvent* e );
+    mouseDoubleClickEvent( QMouseEvent* e ) override;
 
   public:
     DisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
