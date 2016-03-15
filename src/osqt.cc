@@ -25,6 +25,19 @@
  * that are clearly marked as such.
  */
 
+// Make sure we get vasprintf() from cstdio, which in mingw is a GNU extension.
+#if defined(__MINGW32__) and not defined(_GNU_SOURCE)
+    #define _GNU_SOURCE
+    #define GNU_SOURCE_DEFINED
+#endif
+
+#include <cstdio>
+
+#ifdef GNU_SOURCE_DEFINED
+    #undef _GNU_SOURCE
+    #undef GNU_SOURCE_DEFINED
+#endif
+
 #include <QApplication>
 #if QT_VERSION < 0x050000
     #include <QDesktopServices>
@@ -41,7 +54,6 @@
 #include <QTemporaryFile>
 #include <QDirIterator>
 #include <QDebug>
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>

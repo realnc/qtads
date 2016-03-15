@@ -2,7 +2,7 @@ QT += core gui network
 QT_CONFIG -= no-pkg-config
 contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
-CONFIG += silent warn_off
+CONFIG += silent warn_off c++11
 VERSION = 2.1.7.99
 
 static:DEFINES += STATIC_QT
@@ -86,6 +86,12 @@ QMAKE_CXXFLAGS_WARN_OFF =
 QMAKE_CFLAGS_WARN_OFF =
 
 *-g++*|*-clang* {
+    # We require at least C11.
+    QMAKE_CFLAGS += -std=c11
+
+    # For stat() and lstat().
+    DEFINES += _SVID_SOURCE _DEFAULT_SOURCE
+
     # The code does a lot of type punning, which breaks ANSI/ISO strict
     # aliasing rules.
     QMAKE_CXXFLAGS += -fno-strict-aliasing

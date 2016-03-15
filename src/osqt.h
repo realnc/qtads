@@ -38,6 +38,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <stdarg.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
