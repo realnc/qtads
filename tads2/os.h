@@ -73,6 +73,18 @@ extern "C" {
  */
 
 /*
+ *   Qt.  This isn't *truly* a hardware platform, but it looks like one to
+ *   us, because it provides its own hardware virtualization scheme.  Rather
+ *   than trying to figure out what sort of physical hardware we're
+ *   targeting, we can simply define our hardware virtualization macros and
+ *   functions in terms of Qt's hardware virtualization APIs, and let Qt take
+ *   care of providing the target-specific implementation of those APIs.  
+ */
+#ifdef _M_QT
+#include "h_qt.h"
+#else
+
+/*
  *   Intel x86 processors - 32-bit
  */
 #ifdef _M_IX86
@@ -93,17 +105,7 @@ extern "C" {
 #include "h_ppc.h"
 #endif
 
-/*
- *   Qt.  This isn't *truly* a hardware platform, but it looks like one to
- *   us, because it provides its own hardware virtualization scheme.  Rather
- *   than trying to figure out what sort of physical hardware we're
- *   targeting, we can simply define our hardware virtualization macros and
- *   functions in terms of Qt's hardware virtualization APIs, and let Qt take
- *   care of providing the target-specific implementation of those APIs.  
- */
-#ifdef _M_QT
-#include "h_qt.h"
-#endif
+#endif /* _M_QT */
 
 /* add others here */
 

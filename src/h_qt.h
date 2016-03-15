@@ -1,3 +1,20 @@
+/* Copyright (C) 2013 Nikos Chantziaras.
+ *
+ * This file is part of the QTads program.  This program is free software; you
+ * can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation; either version
+ * 2, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; see the file COPYING.  If not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA.
+ */
 #ifndef H_QT_H
 #define H_QT_H
 
@@ -7,46 +24,14 @@
 
 #include <QtGlobal>
 
-#ifdef __cplusplus
-extern "C" {
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+#include "h_qt_le.h"
+#else
+#error "Big-endian CPUs are currently not supported."
 #endif
 
-#if Q_BYTE_ORDER == Q_BIG_ENDIAN
-
-#  include "h_ppc.h"
-
-#elif QT_POINTER_SIZE == 4
-
-#  include "h_ix86.h"
-
-#else
-
-/* round a size to worst-case alignment boundary */
-#define osrndsz(s) (((s)+3) & ~3)
-
-/* round a pointer to worst-case alignment boundary */
-#define osrndpt(p) ((uchar *)((((ulong)(p)) + 3) & ~3))
-
-/* read unaligned portable unsigned 2-byte value, returning int */
-#define osrp2(p) ((int)*(quint16 *)(p))
-
-/* read unaligned portable signed 2-byte value, returning int */
-#define osrp2s(p) ((int)*(qint16 *)(p))
-
-/* write int to unaligned portable 2-byte value */
-#define oswp2(p, i) (*(quint16 *)(p)=(quint16)(i))
-#define oswp2s(p, i) oswp2(p, i)
-
-/* read unaligned portable 4-byte value, returning long */
-#define osrp4(p) (*(quint32 *)(p))
-
-/* read unaligned portable 4-byte value, returning signed long */
-#define osrp4s(p) (*(qint32 *)(p))
-
-/* write long to unaligned portable 4-byte value */
-#define oswp4(p, l) (*(qint32 *)(p)=(l))
-#define oswp4s(p, l) oswp4(p, l)
-
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #endif
