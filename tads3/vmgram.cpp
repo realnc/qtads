@@ -403,7 +403,7 @@ struct CVmGramProdState
                                    vm_obj_id_t prod_obj,
                                    int circular_alt)
     {
-        size_t match_cnt;
+        int match_cnt;
         CVmGramProdState *state;
 
         /* get the number of match list slots we'll need */
@@ -411,8 +411,8 @@ struct CVmGramProdState
 
         /* allocate space, including space for the match list */
         state = (CVmGramProdState *)
-                mem->alloc(sizeof(CVmGramProdState)
-                           + (match_cnt - 1)*sizeof(CVmGramProdMatch *));
+                mem->alloc((int)sizeof(CVmGramProdState)
+                           + (match_cnt - 1)*(int)sizeof(CVmGramProdMatch *));
 
         /* initialize */
         state->init(tok_pos, alt_pos, enclosing, altp, prod_obj,

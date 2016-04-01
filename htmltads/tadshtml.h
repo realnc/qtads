@@ -917,7 +917,8 @@ protected:
 
     void store(const textchar_t *str, size_t len, size_t offset)
     {
-        memcpy(buf_ + offset, str, len * sizeof(textchar_t));
+        if (str != 0)
+            memcpy(buf_ + offset, str, len * sizeof(textchar_t));
         buf_[offset + len] = 0;
         slen_ = offset + len;
     }

@@ -3108,7 +3108,7 @@ CHtmlDispDIV *CHtmlFormatter::find_div_by_ofs(
      *   Search the <DIV> table for a match.  The <DIV> table is always in
      *   ascending order of text offset, so we can do a binary search. 
      */
-    for (lo = 0, hi = div_list_.get_count() - 1 ; ; )
+    for (lo = 0, hi = int(div_list_.get_count()) - 1 ; ; )
     {
         int cur;
         CHtmlDispDIV *div;

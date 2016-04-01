@@ -110,8 +110,8 @@ HTDIR = htmltads
 DEFINES += \
     QT_NO_CAST_FROM_ASCII \
     QT_NO_CAST_TO_ASCII \
-    TROLLTECH_QT \
-    _M_QT \
+    QTADS \
+    _M_LE_C11 \
     T3_COMPILING_FOR_HTML \
     VM_FLAT_POOL \
     USE_HTML \
@@ -174,7 +174,6 @@ HEADERS += \
     src/osqt.h \
     src/hos_qt.h \
     src/h_qt.h \
-    src/h_qt_le.h \
     src/oswin.h \
     src/hos_w32.h \
     src/missing.h \

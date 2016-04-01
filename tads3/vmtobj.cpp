@@ -89,8 +89,8 @@ vm_tadsobj_hdr *vm_tadsobj_hdr::alloc(VMG_ CVmObjTads *self,
         prop_cnt = hash_siz;
 
     /* figure the size of the structure we need */
-    siz = sizeof(vm_tadsobj_hdr)
-          + (sc_cnt - 1) * sizeof(hdr->sc[0])
+    siz = size_t(int(sizeof(vm_tadsobj_hdr))
+                 + int(sc_cnt-1) * int(sizeof(hdr->sc[0])))
           + (hash_siz) * sizeof(hdr->hash_arr[0])
           + prop_cnt * sizeof(hdr->prop_entry_arr[0]);
 

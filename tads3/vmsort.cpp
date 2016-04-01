@@ -43,11 +43,11 @@ void CVmQSortData::sort(VMG_ size_t l, size_t r)
     /* proceed if we have a non-empty range */
     if (r > l)
     {
-        size_t i, j;
+        int i, j;
         size_t v_idx = r;
 
         /* start at the ends of the range */
-        i = l - 1;
+		i = (int)l - 1;
         j = r;
 
         /* partition the range */
@@ -57,21 +57,21 @@ void CVmQSortData::sort(VMG_ size_t l, size_t r)
             do
             {
                 ++i;
-            } while (i != r && compare(vmg_ i, v_idx) < 0);
+			} while (i != (int)r && compare(vmg_ i, v_idx) < 0);
 
             /* find the rightmost element <= the right element */
             do
             {
                 --j;
-            } while (j != l && compare(vmg_ j, v_idx) > 0);
+			} while (j != (int)l && compare(vmg_ j, v_idx) > 0);
 
             /* exchange elements i and j */
             exchange(vmg_ i, j);
 
             /* if we moved the 'v' element, follow that in the index */
-            if (v_idx == i)
+			if ((int)v_idx == i)
                 v_idx = j;
-            else if (v_idx == j)
+			else if ((int)v_idx == j)
                 v_idx = i;
 
         } while (j > i);
@@ -83,9 +83,9 @@ void CVmQSortData::sort(VMG_ size_t l, size_t r)
         exchange(vmg_ i, r);
 
         /* recursively sort the subranges */
-        if (i > l)
+		if (i > (int)l)
             sort(vmg_ l, i - 1);
-        if (i < r)
+		if (i < (int)r)
             sort(vmg_ i + 1, r);
     }
 }

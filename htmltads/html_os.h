@@ -69,7 +69,7 @@ Modified
 /*
  *   Include definitions for QTads
  */
-#ifdef TROLLTECH_QT
+#ifdef QTADS
 #include "hos_qt.h"
 #endif
 
