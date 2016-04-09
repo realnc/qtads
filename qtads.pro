@@ -5,6 +5,18 @@ TEMPLATE = app
 CONFIG += silent warn_off c++11
 VERSION = 2.1.7.99
 
+# qmake on Qt 5.3 and lower doesn't recognize c++14.
+contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 4) {
+    CONFIG += c++11
+    QMAKE_CXXFLAGS_CXX11 = $$replace(QMAKE_CXXFLAGS_CXX11, "std=c\+\+11", "std=c++1y")
+    QMAKE_CXXFLAGS_CXX11 = $$replace(QMAKE_CXXFLAGS_CXX11, "std=c\+\+0x", "std=c++1y")
+}
+
+# Qt 4 doesn't even know about C++11.
+contains(QT_MAJOR_VERSION, 4) {
+    QMAKE_CXXFLAGS += -std=c++1y
+}
+
 static:DEFINES += STATIC_QT
 
 android {
