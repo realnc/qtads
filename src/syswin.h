@@ -75,6 +75,11 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
     // Our banner background image.
     class CHtmlResCacheObject* fBgImage;
 
+    // Our link colors.
+    HTML_color_t fLinkColor = 0;
+    HTML_color_t fALinkColor = 0;
+    HTML_color_t fHLinkColor = 0;
+
     void
     fSetupPainterForFont( QPainter& painter, bool hilite, CHtmlSysFont* font );
 

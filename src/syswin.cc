@@ -1073,12 +1073,32 @@ CHtmlSysWinQt::set_html_text_color( HTML_color_t color, int use_default )
 
 
 void
-CHtmlSysWinQt::set_html_link_colors( HTML_color_t, int,
-                     HTML_color_t, int,
-                     HTML_color_t, int,
-                     HTML_color_t, int )
+CHtmlSysWinQt::set_html_link_colors( HTML_color_t link_color, int link_use_default,
+                                     HTML_color_t, int, /* vlink color is never used */
+                                     HTML_color_t alink_color, int alink_use_default,
+                                     HTML_color_t hlink_color, int hlink_use_default )
 {
     //qDebug() << Q_FUNC_INFO;
+
+    QColor col;
+    if (link_use_default) {
+        col = qFrame->settings()->unvisitedLinkColor;
+        fLinkColor = HTML_make_color(col.red(), col.green(), col.blue());
+    } else {
+        fLinkColor = link_color;
+    }
+    if (alink_use_default) {
+        col = qFrame->settings()->clickedLinkColor;
+        fALinkColor = HTML_make_color(col.red(), col.green(), col.blue());
+    } else {
+        fALinkColor = alink_color;
+    }
+    if (hlink_use_default) {
+        col = qFrame->settings()->hoveringLinkColor;
+        fHLinkColor = HTML_make_color(col.red(), col.green(), col.blue());
+    } else {
+        fHLinkColor = hlink_color;
+    }
 }
 
 
@@ -1141,8 +1161,7 @@ CHtmlSysWinQt::get_html_link_color() const
 {
     //qDebug() << Q_FUNC_INFO;
 
-    const QColor& col = qFrame->settings()->unvisitedLinkColor;
-    return HTML_make_color(col.red(), col.green(), col.blue());
+    return fLinkColor;
 }
 
 
@@ -1151,8 +1170,7 @@ CHtmlSysWinQt::get_html_alink_color() const
 {
     //qDebug() << Q_FUNC_INFO;
 
-    const QColor& col = qFrame->settings()->clickedLinkColor;
-    return HTML_make_color(col.red(), col.green(), col.blue());
+    return fALinkColor;
 }
 
 
@@ -1161,7 +1179,7 @@ CHtmlSysWinQt::get_html_vlink_color() const
 {
     //qDebug() << Q_FUNC_INFO;
 
-    // Visited links aren't really implemented by the HTML base code.
+    // Visited links aren't used by the base code.
     return this->get_html_link_color();
 }
 
@@ -1171,8 +1189,7 @@ CHtmlSysWinQt::get_html_hlink_color() const
 {
     //qDebug() << Q_FUNC_INFO;
 
-    const QColor& col = qFrame->settings()->hoveringLinkColor;
-    return HTML_make_color(col.red(), col.green(), col.blue());
+    return fHLinkColor;
 }
 
 
