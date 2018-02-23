@@ -78,7 +78,7 @@ class DisplayWidgetInput: public DisplayWidget {
     // Set the height of the text cursor in pixels.
     void
     setCursorHeight( unsigned height )
-    { this->fHeight = height; }
+    { this->fHeight = height - 1; }
 
     // Show/hide the text cursor.
     void
