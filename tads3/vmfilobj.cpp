@@ -2952,7 +2952,7 @@ int vmobjfile_readbuf_t::getch(wchar_t &ch,
     for (;;)
     {
         /* try mapping a character - if we get one, return success */
-        if (charmap->mapchar(ch, (const char *&)ptr, rem))
+        if (rem > 0 && charmap->mapchar(ch, (const char *&)ptr, rem))
             return TRUE;
 
         /* 

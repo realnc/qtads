@@ -3544,6 +3544,9 @@ int CVmObjGramProd::getp_addAlt(VMG_ vm_obj_id_t self,
     /* rebuild the grammarAltProps property for the match object */
     build_alt_props(vmg_ match);
 
+    /* we need to rebuild hashes for any new tokens */
+    get_ext()->hashes_cached_ = FALSE;
+
     /* discard arguments and gc protection */
     G_stk->discard(argc + 1);
 

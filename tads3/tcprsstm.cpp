@@ -3447,7 +3447,6 @@ CTPNStm *CTcParser::parse_try(int *err)
         CTPNStmFinally *fin_stm;
         CTPNStm *fin_body;
         tcprs_scope_t scope_data;
-        CTPNStmEnclosing *old_enclosing;
 
         /* 
          *   the locals we allocate for the 'finally' are in the finally's

@@ -2014,6 +2014,7 @@ tc_toktyp_t CTcTokenizer::next_on_line(utf8_ptr *p, CTcToken *tok,
             return tokenize_string(p, tok, ec, expanding);
         }
         /* not a regex string - fall through to default case */
+        /* fall through */
 
     default:        
         /* check to see if it's a symbol */
@@ -2163,6 +2164,7 @@ tc_toktyp_t CTcTokenizer::next_on_line_xlat(utf8_ptr *p, CTcToken *tok,
             return tokenize_string(p, tok, ec, FALSE);
 
         /* not a regex string - fall through to the default handling */
+        /* fall through */
         
     default:
     do_normal:
@@ -2234,6 +2236,7 @@ tc_toktyp_t CTcTokenizer::next_on_line_xlat_keep()
                 return xlat_string_to_src(&main_in_embedding_, FALSE);
 
             /* not a regex string - fall through to the default case */
+            /* fall through */
             
         default:
         do_normal:

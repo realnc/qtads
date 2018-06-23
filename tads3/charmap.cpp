@@ -233,14 +233,10 @@ osfildef *CCharmap::open_map_file(class CResLoader *res_loader,
         /* it's all double-byte */
         *map_type = CHARMAP_TYPE_DB;
     }
-    else if (found_single)
-    {
-        /* it's all single-byte */
-        *map_type = CHARMAP_TYPE_SB;
-    }
     else
     {
-        /* no mappings found at all - presume it's a single-byte mapper */
+        /* it's either all single-byte, or no mappings were found at all,
+         * in which case presume it's a single-byte mapper */
         *map_type = CHARMAP_TYPE_SB;
     }
 
@@ -2446,7 +2442,7 @@ size_t CCharmapToUniUTF8::map2(char **outp, size_t *outlen,
     }
 
     /* copy the data, if we have an output buffer */
-    if (outp != 0)
+    if (outp != 0 && *outp != 0)
     {
         /* copy the bytes */
         memcpy(*outp, inp, copy_len);

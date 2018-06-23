@@ -2486,8 +2486,6 @@ void CTcGenTarg::remove_jumps_to_jumps(CTcCodeStream *str, ulong start_ofs)
             for (done = FALSE, chain_len = 0 ; !done && chain_len < 20 ;
                  ++chain_len)
             {
-                uchar target_op;
-
                 /* get the target opcode */
                 target_op = str->get_byte_at(target_ofs);
 

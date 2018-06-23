@@ -182,7 +182,7 @@ protected:
         str = (char *)t3malloc(alo + 1);
 
         /* copy the string */
-        if (str != 0)
+        if (str != 0 && s != 0)
             memcpy(str, s, l);
 
         /* null-terminate it */

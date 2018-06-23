@@ -937,7 +937,7 @@ static long intval(VMG_ const vm_val_t *val, long minval, long maxval,
             /* done */
             break;
         }
-        /* FALL THROUGH to default */
+        /* fall through */
 
     default:
         /* use the generic type cast */
@@ -3443,6 +3443,7 @@ void CVmPack::parse_mods(CVmPackPos *p, CVmPackType *t)
             case 'k':
                 t->count_as_type = c;
                 t->count = 1;
+                break;
 
             case 'w':
             case 'W':

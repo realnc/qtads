@@ -1682,7 +1682,8 @@ vm_obj_id_t CVmDynamicCompiler::compile(
                                             TCPRS_CB_NORMAL, 0, 0, 0, 0);
 
                 /* mark it as a dynamic function */
-                cb->set_dyn_func(TRUE);
+                if (cb)
+                    cb->set_dyn_func(TRUE);
             }
             else if (G_tok->cur() == TOKT_METHOD)
             {
@@ -1695,7 +1696,8 @@ vm_obj_id_t CVmDynamicCompiler::compile(
                                             TCPRS_CB_NORMAL, 0, 0, 0, 0);
 
                 /* mark it as a dynamic method */
-                cb->set_dyn_method(TRUE);
+                if (cb)
+                    cb->set_dyn_method(TRUE);
             }
             else
             {
