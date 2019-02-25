@@ -78,16 +78,16 @@ class DisplayWidgetInput: public DisplayWidget {
     // Set the height of the text cursor in pixels.
     void
     setCursorHeight( unsigned height )
-    { this->fHeight = height - 1; }
+    { fHeight = height - 1; }
 
     // Show/hide the text cursor.
     void
     setCursorVisible( bool visible )
-    { this->fCursorVisible = visible; }
+    { fCursorVisible = visible; }
 
     bool
     isCursorVisible()
-    { return this->fCursorVisible; }
+    { return fCursorVisible; }
 
     void
     updateCursorPos(class CHtmlFormatter* formatter, bool keepSelection,
@@ -101,7 +101,7 @@ class DisplayWidgetInput: public DisplayWidget {
     // Set the current input tag.
     void
     setInputTag( CHtmlTagTextInput* inputTag )
-    { this->fInpTag = inputTag; }
+    { fInpTag = inputTag; }
 
     void
     clearSelection() override;

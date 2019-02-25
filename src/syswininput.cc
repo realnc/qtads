@@ -45,45 +45,45 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
       fLastKeyEvent(Qt::Key_Any),
       fTag(0)
 {
-    this->fInputBuffer = new textchar_t[1024];
-    this->fInputBufferSize = 1024;
-    this->fTadsBuffer = new CHtmlInputBuf(this->fInputBuffer, 1024, 100);
-    this->fTadsBuffer->set_utf8_mode(true);
+    fInputBuffer = new textchar_t[1024];
+    fInputBufferSize = 1024;
+    fTadsBuffer = new CHtmlInputBuf(fInputBuffer, 1024, 100);
+    fTadsBuffer->set_utf8_mode(true);
 
     // Replace the default display widget with an input display widget.
-    this->formatter_->unset_win();
-    delete this->dispWidget;
-    this->dispWidget = new DisplayWidgetInput(this, formatter, this->fTadsBuffer);
-    this->fCastDispWidget = static_cast<DisplayWidgetInput*>(this->dispWidget);
-    this->setWidget(this->dispWidget);
-    this->formatter_->set_win(this, &margins);
+    formatter_->unset_win();
+    delete dispWidget;
+    dispWidget = new DisplayWidgetInput(this, formatter, fTadsBuffer);
+    fCastDispWidget = static_cast<DisplayWidgetInput*>(dispWidget);
+    setWidget(dispWidget);
+    formatter_->set_win(this, &margins);
 
-    QPalette p(this->palette());
+    QPalette p(palette());
     p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
     p.setColor(QPalette::Text, qFrame->settings()->mainTextColor);
-    this->setPalette(p);
+    setPalette(p);
 }
 
 
 CHtmlSysWinInputQt::~CHtmlSysWinInputQt()
 {
-    delete this->fTadsBuffer;
-    delete[] this->fInputBuffer;
+    delete fTadsBuffer;
+    delete[] fInputBuffer;
 }
 
 void
 CHtmlSysWinInputQt::fStartKeypressInput()
 {
-    this->fInputReady = false;
-    this->fInputMode = SingleKeyInput;
-    this->fHrefEvent.clear();
+    fInputReady = false;
+    fInputMode = SingleKeyInput;
+    fHrefEvent.clear();
 }
 
 
 void
 CHtmlSysWinInputQt::fProcessPagePauseQueue()
 {
-    if (this->fPagePauseQueue.isEmpty()) {
+    if (fPagePauseQueue.isEmpty()) {
         return;
     }
 
@@ -97,8 +97,8 @@ CHtmlSysWinInputQt::fProcessPagePauseQueue()
     qWinGroup->statusBar()->setUpdatesEnabled(false);
     qWinGroup->statusBar()->addWidget(&moreText);
     qWinGroup->statusBar()->setUpdatesEnabled(true);
-    this->fInputMode = PagePauseInput;
-    while (this->fInputMode == PagePauseInput and qFrame->gameRunning()) {
+    fInputMode = PagePauseInput;
+    while (fInputMode == PagePauseInput and qFrame->gameRunning()) {
         qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
     }
     qWinGroup->statusBar()->setUpdatesEnabled(false);
@@ -109,23 +109,23 @@ CHtmlSysWinInputQt::fProcessPagePauseQueue()
 
 void CHtmlSysWinInputQt::fUpdateInputFormatter()
 {
-    if (this->fTag == 0) {
+    if (fTag == 0) {
         return;
     }
-    this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
-    if (this->fTag->ready_to_format()) {
-        this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
-        this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+    fTag->setlen(static_cast<CHtmlFormatterInput*>(formatter_), fTadsBuffer->getlen());
+    if (fTag->ready_to_format()) {
+        fTag->format(static_cast<CHtmlSysWinQt*>(this), formatter_);
+        verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
     }
-    this->fCastDispWidget->updateCursorPos(this->formatter_, false, true);
+    fCastDispWidget->updateCursorPos(formatter_, false, true);
 }
 
 
 void
 CHtmlSysWinInputQt::setCursorHeight( unsigned height )
 {
-    this->fCastDispWidget->setCursorHeight(height);
-    this->fCastDispWidget->updateCursorPos(this->formatter_, true, true);
+    fCastDispWidget->setCursorHeight(height);
+    fCastDispWidget->updateCursorPos(formatter_, true, true);
 }
 
 
@@ -150,19 +150,19 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
     }
 
     // If we're not currently accepting input, ignore this.
-    if (this->fInputMode == NoInput or this->fInputMode == PagePauseInput) {
+    if (fInputMode == NoInput or fInputMode == PagePauseInput) {
         return;
     }
 
     // If we're waiting for a single key-press event and the command isn't some
     // sort of special OS_CMD command, it's an HREF event.
-    if (this->fInputMode == SingleKeyInput and os_cmd_id == OS_CMD_NONE) {
+    if (fInputMode == SingleKeyInput and os_cmd_id == OS_CMD_NONE) {
         // If the HREF string is empty, use a single space so that we know that
         // an HREF event actually occured.
         if (cmd[0] == '\0') {
-            this->fHrefEvent = QChar::fromLatin1(' ');
+            fHrefEvent = QChar::fromLatin1(' ');
         } else {
-            this->fHrefEvent = QString::fromUtf8(cmd);
+            fHrefEvent = QString::fromUtf8(cmd);
         }
         return;
     }
@@ -170,25 +170,25 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
     // If we're not in APPEND mode, clear out the current command; otherwise,
     // make sure we're at the end of the current text.
     if (!append) {
-        this->fTadsBuffer->del_line();
+        fTadsBuffer->del_line();
     } else {
-        this->fTadsBuffer->end_of_line(false);
+        fTadsBuffer->end_of_line(false);
     }
 
     // Add the command string.
-    this->fTadsBuffer->add_string(cmd, len, true);
-    this->fTag->setlen(static_cast<CHtmlFormatterInput*>(this->formatter_), this->fTadsBuffer->getlen());
-    if (this->fTag->ready_to_format()) {
-        this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
+    fTadsBuffer->add_string(cmd, len, true);
+    fTag->setlen(static_cast<CHtmlFormatterInput*>(formatter_), fTadsBuffer->getlen());
+    if (fTag->ready_to_format()) {
+        fTag->format(static_cast<CHtmlSysWinQt*>(this), formatter_);
     }
-    this->fCastDispWidget->updateCursorPos(this->formatter_, false, true);
+    fCastDispWidget->updateCursorPos(formatter_, false, true);
 
     // If 'enter' is true, indicate that we've finished reading the command, so
     // that getInput() will return the new command as its result; otherwise,
     // let the player continue editing this command.
     if (enter) {
-        this->fInputReady = true;
-        this->fInputMode = NoInput;
+        fInputReady = true;
+        fInputMode = NoInput;
         emit inputReady();
     }
 }
@@ -198,8 +198,8 @@ void
 CHtmlSysWinInputQt::resizeEvent( QResizeEvent* event )
 {
     CHtmlSysWinQt::resizeEvent(event);
-    if (this->fCastDispWidget->isCursorVisible()) {
-        this->fCastDispWidget->updateCursorPos(this->formatter_, true, true);
+    if (fCastDispWidget->isCursorVisible()) {
+        fCastDispWidget->updateCursorPos(formatter_, true, true);
     }
 }
 
@@ -211,163 +211,163 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
 
     //qDebug() << "Key pressed:" << hex << e->key();
 
-    if (this->fInputMode == NoInput or not qFrame->gameRunning()) {
+    if (fInputMode == NoInput or not qFrame->gameRunning()) {
         QScrollArea::keyPressEvent(e);
         return;
     }
 
-    if (this->fInputMode == SingleKeyInput) {
-        this->singleKeyPressEvent(e);
+    if (fInputMode == SingleKeyInput) {
+        singleKeyPressEvent(e);
         return;
     }
 
-    if (this->fInputMode == PagePauseInput) {
+    if (fInputMode == PagePauseInput) {
         if (e->key() == Qt::Key_Space) {
             // Scroll down by a page.
-            this->fPagePauseQueue.head()->scrollDown(true, false);
+            fPagePauseQueue.head()->scrollDown(true, false);
 #if QT_VERSION >= 0x040500
         } else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
 #else
         } else if (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return) {
 #endif
             // Scroll down by a line.
-            this->fPagePauseQueue.head()->scrollDown(true, true);
+            fPagePauseQueue.head()->scrollDown(true, true);
         }
         return;
     }
 
     if (e->matches(QKeySequence::MoveToStartOfLine) or e->matches(QKeySequence::MoveToStartOfBlock)) {
-        this->fTadsBuffer->start_of_line(false);
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->start_of_line(false);
+        fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToEndOfLine) or e->matches(QKeySequence::MoveToEndOfBlock)) {
-        this->fTadsBuffer->end_of_line(false);
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->end_of_line(false);
+        fCastDispWidget->clearSelection();
 #if QT_VERSION >= 0x040500
     } else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
 #else
     } else if (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return) {
 #endif
-        this->fInputReady = true;
-        this->fInputMode = NoInput;
-        this->fTadsBuffer->add_hist();
-        this->fCastDispWidget->clearSelection();
+        fInputReady = true;
+        fInputMode = NoInput;
+        fTadsBuffer->add_hist();
+        fCastDispWidget->clearSelection();
         emit inputReady();
         return;
     } else if (e->matches(QKeySequence::Delete)) {
-        this->fTadsBuffer->del_right();
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->del_right();
+        fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::DeleteEndOfWord)) {
-        this->fTadsBuffer->move_right(true, true);
-        this->fTadsBuffer->del_selection();
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->move_right(true, true);
+        fTadsBuffer->del_selection();
+        fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::DeleteStartOfWord)) {
-        this->fTadsBuffer->move_left(true, true);
-        this->fTadsBuffer->del_selection();
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->move_left(true, true);
+        fTadsBuffer->del_selection();
+        fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToPreviousChar)) {
-        this->fTadsBuffer->move_left(false, false);
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->move_left(false, false);
+        fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToNextChar)) {
-        this->fTadsBuffer->move_right(false, false);
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->move_right(false, false);
+        fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToPreviousWord)) {
-        this->fTadsBuffer->move_left(false, true);
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->move_left(false, true);
+        fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToNextWord)) {
-        this->fTadsBuffer->move_right(false, true);
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->move_right(false, true);
+        fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToPreviousLine)) {
-        this->fTadsBuffer->select_prev_hist();
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->select_prev_hist();
+        fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::MoveToNextLine)) {
-        this->fTadsBuffer->select_next_hist();
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->select_next_hist();
+        fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::Find)) {
-        this->fTadsBuffer->select_prev_hist_prefix();
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->select_prev_hist_prefix();
+        fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::SelectPreviousChar)) {
-        if (not this->fTadsBuffer->has_sel_range()) {
-            this->fCastDispWidget->clearSelection();
+        if (not fTadsBuffer->has_sel_range()) {
+            fCastDispWidget->clearSelection();
         }
-        this->fTadsBuffer->move_left(true, false);
+        fTadsBuffer->move_left(true, false);
     } else if (e->matches(QKeySequence::SelectNextChar)) {
-        if (not this->fTadsBuffer->has_sel_range()) {
-            this->fCastDispWidget->clearSelection();
+        if (not fTadsBuffer->has_sel_range()) {
+            fCastDispWidget->clearSelection();
         }
-        this->fTadsBuffer->move_right(true, false);
+        fTadsBuffer->move_right(true, false);
     } else if (e->matches(QKeySequence::SelectPreviousWord)) {
-        if (not this->fTadsBuffer->has_sel_range()) {
-            this->fCastDispWidget->clearSelection();
+        if (not fTadsBuffer->has_sel_range()) {
+            fCastDispWidget->clearSelection();
         }
-        this->fTadsBuffer->move_left(true, true);
+        fTadsBuffer->move_left(true, true);
     } else if (e->matches(QKeySequence::SelectNextWord)) {
-        if (not this->fTadsBuffer->has_sel_range()) {
-            this->fCastDispWidget->clearSelection();
+        if (not fTadsBuffer->has_sel_range()) {
+            fCastDispWidget->clearSelection();
         }
-        this->fTadsBuffer->move_right(true, true);
+        fTadsBuffer->move_right(true, true);
     } else if (e->matches(QKeySequence::SelectStartOfLine) or e->matches(QKeySequence::SelectStartOfBlock)) {
-        if (not this->fTadsBuffer->has_sel_range()) {
-            this->fCastDispWidget->clearSelection();
+        if (not fTadsBuffer->has_sel_range()) {
+            fCastDispWidget->clearSelection();
         }
-        this->fTadsBuffer->start_of_line(true);
+        fTadsBuffer->start_of_line(true);
     } else if (e->matches(QKeySequence::SelectEndOfLine) or e->matches(QKeySequence::SelectEndOfBlock)) {
-        if (not this->fTadsBuffer->has_sel_range()) {
-            this->fCastDispWidget->clearSelection();
+        if (not fTadsBuffer->has_sel_range()) {
+            fCastDispWidget->clearSelection();
         }
-        this->fTadsBuffer->end_of_line(true);
+        fTadsBuffer->end_of_line(true);
     } else if (e->matches(QKeySequence::SelectAll)) {
-        if (not this->fTadsBuffer->has_sel_range()) {
-            this->fCastDispWidget->clearSelection();
+        if (not fTadsBuffer->has_sel_range()) {
+            fCastDispWidget->clearSelection();
         }
-        this->fTadsBuffer->start_of_line(false);
-        this->fTadsBuffer->end_of_line(true);
+        fTadsBuffer->start_of_line(false);
+        fTadsBuffer->end_of_line(true);
     } else if (e->matches(QKeySequence::Undo)) {
-        if (not this->fTadsBuffer->has_sel_range()) {
-            this->fCastDispWidget->clearSelection();
+        if (not fTadsBuffer->has_sel_range()) {
+            fCastDispWidget->clearSelection();
         }
-        this->fTadsBuffer->undo();
+        fTadsBuffer->undo();
     } else if (e->key() == Qt::Key_Backspace) {
-        this->fTadsBuffer->backspace();
-        this->fCastDispWidget->clearSelection();
+        fTadsBuffer->backspace();
+        fCastDispWidget->clearSelection();
     } else {
         QString strToAdd = e->text();
         if (strToAdd.isEmpty() or not strToAdd.at(0).isPrint()) {
             QScrollArea::keyPressEvent(e);
             return;
         }
-        this->insertText(strToAdd);
+        insertText(strToAdd);
     }
-    this->fUpdateInputFormatter();
+    fUpdateInputFormatter();
 }
 
 
 void
 CHtmlSysWinInputQt::inputMethodEvent( QInputMethodEvent* e )
 {
-    if (this->fInputMode == NoInput or not qFrame->gameRunning() or this->fInputMode == PagePauseInput
+    if (fInputMode == NoInput or not qFrame->gameRunning() or fInputMode == PagePauseInput
         or e->commitString().isEmpty())
     {
         QScrollArea::inputMethodEvent(e);
         return;
     }
 
-    if (this->fInputMode == SingleKeyInput) {
-        this->fLastKeyEvent = static_cast<Qt::Key>(0);
-        this->fLastKeyText = 0;
+    if (fInputMode == SingleKeyInput) {
+        fLastKeyEvent = static_cast<Qt::Key>(0);
+        fLastKeyText = 0;
         // If the keypress doesn't correspond to exactly one character, ignore
         // it.
         if (e->commitString().size() != 1) {
             QScrollArea::inputMethodEvent(e);
             return;
         }
-        this->fLastKeyText = e->commitString().at(0);
-        this->fInputMode = NoInput;
-        this->fInputReady = true;
+        fLastKeyText = e->commitString().at(0);
+        fInputMode = NoInput;
+        fInputReady = true;
         emit inputReady();
         return;
     }
-    this->insertText(e->commitString());
-    this->fUpdateInputFormatter();
+    insertText(e->commitString());
+    fUpdateInputFormatter();
 }
 
 
@@ -375,10 +375,10 @@ void
 CHtmlSysWinInputQt::singleKeyPressEvent( QKeyEvent* event )
 {
     //qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(this->fInputMode == SingleKeyInput);
+    Q_ASSERT(fInputMode == SingleKeyInput);
 
-    this->fLastKeyEvent = static_cast<Qt::Key>(0);
-    this->fLastKeyText = 0;
+    fLastKeyEvent = static_cast<Qt::Key>(0);
+    fLastKeyText = 0;
 
     switch (event->key()) {
       case 0:
@@ -410,7 +410,7 @@ CHtmlSysWinInputQt::singleKeyPressEvent( QKeyEvent* event )
       case Qt::Key_F8:
       case Qt::Key_F9:
       case Qt::Key_F10:
-        this->fLastKeyEvent = static_cast<Qt::Key>(event->key());
+        fLastKeyEvent = static_cast<Qt::Key>(event->key());
         break;
 
       default:
@@ -420,11 +420,11 @@ CHtmlSysWinInputQt::singleKeyPressEvent( QKeyEvent* event )
             QScrollArea::keyPressEvent(event);
             return;
         }
-        this->fLastKeyText = event->text().at(0);
+        fLastKeyText = event->text().at(0);
     }
 
-    this->fInputMode = NoInput;
-    this->fInputReady = true;
+    fInputMode = NoInput;
+    fInputReady = true;
     emit inputReady();
 }
 
@@ -436,23 +436,23 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
     //qDebug() << Q_FUNC_INFO;
     Q_ASSERT(buf != 0);
 
-    CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(this->formatter_);
+    CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(formatter_);
 
-    bool resuming = this->fTag != 0;
+    bool resuming = fTag != 0;
 
     // Correct any ill-formed HTML prior to input.
     formatter->prepare_for_input();
 
     if (resuming) {
         // We're resuming; reuse our existing input tag with the new buffer.
-        this->fTag->change_buf(formatter, this->fTadsBuffer->getbuf());
-        this->fTag->format(static_cast<CHtmlSysWinQt*>(this), this->formatter_);
+        fTag->change_buf(formatter, fTadsBuffer->getbuf());
+        fTag->format(static_cast<CHtmlSysWinQt*>(this), formatter_);
         // We treat canceled inputs with reset=false as if they were resumes.
         // The difference is that in that case, we need to restore the cursor.
-        if (this->fRestoreFromCancel) {
-            this->fCastDispWidget->setCursorVisible(true);
-            this->fCastDispWidget->updateCursorPos(formatter, false, true);
-            this->fRestoreFromCancel = false;
+        if (fRestoreFromCancel) {
+            fCastDispWidget->setCursorVisible(true);
+            fCastDispWidget->updateCursorPos(formatter, false, true);
+            fRestoreFromCancel = false;
         }
     } else {
         // Since we're not resuming, make sure that we've formatted all
@@ -460,30 +460,30 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
         while (formatter->more_to_do()) {
             formatter->do_formatting();
         }
-        this->fTadsBuffer->setbuf(this->fInputBuffer,
-                                  buflen > this->fInputBufferSize ? this->fInputBufferSize - 1 : buflen - 1,
+        fTadsBuffer->setbuf(fInputBuffer,
+                                  buflen > fInputBufferSize ? fInputBufferSize - 1 : buflen - 1,
                                   0);
-        CHtmlTagTextInput* tag = formatter->begin_input(this->fTadsBuffer->getbuf(), 0);
-        this->fTag = tag;
-        this->fCastDispWidget->setInputTag(tag);
+        CHtmlTagTextInput* tag = formatter->begin_input(fTadsBuffer->getbuf(), 0);
+        fTag = tag;
+        fCastDispWidget->setInputTag(tag);
         if (tag->ready_to_format()) {
-            tag->format(this, this->formatter_);
+            tag->format(this, formatter_);
         }
-        this->fTadsBuffer->show_caret();
-        this->fCastDispWidget->setCursorVisible(true);
-        this->fCastDispWidget->updateCursorPos(formatter, false, true);
-        this->fTadsBuffer->set_sel_range(0, 0, 0);
+        fTadsBuffer->show_caret();
+        fCastDispWidget->setCursorVisible(true);
+        fCastDispWidget->updateCursorPos(formatter, false, true);
+        fTadsBuffer->set_sel_range(0, 0, 0);
     }
 
     // If we have banners waiting in page-pause mode, process them first.
-    this->fProcessPagePauseQueue();
+    fProcessPagePauseQueue();
 
-    this->fInputReady = false;
-    this->fInputMode = NormalInput;
+    fInputReady = false;
+    fInputMode = NormalInput;
 
     // Reset the MORE prompt position to this point, since the user has seen
     // everything up to here.
-    this->lastInputHeight = this->formatter_->get_max_y_pos();
+    lastInputHeight = formatter_->get_max_y_pos();
 
     if (useTimeout) {
         QEventLoop idleLoop;
@@ -494,29 +494,29 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
         connect(this, SIGNAL(inputReady()), &idleLoop, SLOT(quit()));
         timer.start(timeout);
         idleLoop.exec();
-        if (timedOut != 0 and not this->fInputReady and qFrame->gameRunning()) {
+        if (timedOut != 0 and not fInputReady and qFrame->gameRunning()) {
             *timedOut = true;
-            this->fInputMode = NoInput;
+            fInputMode = NoInput;
             return;
         }
-    } else while (qFrame->gameRunning() and not this->fInputReady) {
+    } else while (qFrame->gameRunning() and not fInputReady) {
         qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
     }
 
     // We're finished with input.
-    this->cancelInput(true);
+    cancelInput(true);
 
     // If input exceeds the buffer size, make sure we don't overflow.
-    int len = this->fTadsBuffer->getlen() > buflen ? buflen : this->fTadsBuffer->getlen();
+    int len = fTadsBuffer->getlen() > buflen ? buflen : fTadsBuffer->getlen();
 
     // For TADS 3, we use the result as-is; it's already in UTF-8.  For TADS 2,
     // we will need to use the prefered encoding.
     if (qFrame->tads3()) {
-        strncpy(buf, this->fTadsBuffer->getbuf(), len);
+        strncpy(buf, fTadsBuffer->getbuf(), len);
     } else {
         QTextCodec* codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
-        strncpy(buf, codec->fromUnicode(QString::fromUtf8(this->fTadsBuffer->getbuf(),
-                                                          this->fTadsBuffer->getlen())).constData(), len);
+        strncpy(buf, codec->fromUnicode(QString::fromUtf8(fTadsBuffer->getbuf(),
+                                                          fTadsBuffer->getlen())).constData(), len);
     }
     buf[len] = '\0';
 }
@@ -525,17 +525,17 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
 void
 CHtmlSysWinInputQt::cancelInput( bool reset )
 {
-    if (this->fTag == 0) {
+    if (fTag == 0) {
         // There's nothing to cancel.
         return;
     }
 
     // Remember if we are at the bottom of the output.
-    bool wasAtBottom = this->verticalScrollBar()->value() == this->verticalScrollBar()->maximum();
+    bool wasAtBottom = verticalScrollBar()->value() == verticalScrollBar()->maximum();
 
-    this->fTadsBuffer->hide_caret();
-    this->fCastDispWidget->setCursorVisible(false);
-    static_cast<CHtmlFormatterInput*>(this->formatter_)->end_input();
+    fTadsBuffer->hide_caret();
+    fCastDispWidget->setCursorVisible(false);
+    static_cast<CHtmlFormatterInput*>(formatter_)->end_input();
 
     // Add the line-break after the command.
     if (qFrame->get_parser()->get_obey_markups()) {
@@ -549,23 +549,23 @@ CHtmlSysWinInputQt::cancelInput( bool reset )
     // Tell the formatter to add an extra line's worth of spacing, to ensure
     // that we have some immediate visual feedback (in the form of scrolling
     // the window up a line) when the user presses the Enter key.
-    this->formatter_->add_line_to_disp_height();
+    formatter_->add_line_to_disp_height();
 
     // Flush the newline, and update the window immediately, in case the
     // operation takes a while to complete.
     if (wasAtBottom) {
         qFrame->flush_txtbuf(true, true);
-        this->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+        verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
         qFrame->advanceEventLoop();
     }
 
     // Done with the tag.
     if (reset) {
-        this->fTag = 0;
-        this->fCastDispWidget->setInputTag(0);
-        this->fRestoreFromCancel = false;
+        fTag = 0;
+        fCastDispWidget->setInputTag(0);
+        fRestoreFromCancel = false;
     } else {
-        this->fRestoreFromCancel = true;
+        fRestoreFromCancel = true;
     }
 }
 
@@ -588,25 +588,25 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
     }
 
     // Prepare the formatter for input and format all remaining lines.
-    CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(this->formatter_);
+    CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(formatter_);
     formatter->prepare_for_input();
     while (formatter->more_to_do()) {
         formatter->do_formatting();
     }
 
-    //this->scrollDown();
+    //scrollDown();
 
     // If we have banners waiting in page-pause mode, process them first.
-    this->fProcessPagePauseQueue();
+    fProcessPagePauseQueue();
 
     // Clear any pending HREF event.
-    this->fHrefEvent.clear();
+    fHrefEvent.clear();
 
     extKey = 0;
-    this->fStartKeypressInput();
+    fStartKeypressInput();
     // Reset the MORE prompt position to this point, since the user has seen
     // everything up to here.
-    this->lastInputHeight = this->formatter_->get_max_y_pos();
+    lastInputHeight = formatter_->get_max_y_pos();
     if (useTimeout) {
         QEventLoop idleLoop;
         QTimer timer;
@@ -616,7 +616,7 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
         connect(this, SIGNAL(inputReady()), &idleLoop, SLOT(quit()));
         timer.start(timeout);
         idleLoop.exec();
-    } else while (not this->fInputReady and this->fHrefEvent.isEmpty() and qFrame->gameRunning()) {
+    } else while (not fInputReady and fHrefEvent.isEmpty() and qFrame->gameRunning()) {
         qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
     }
 
@@ -626,19 +626,19 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
     }
 
     // If there was an HREF event, tell the caller.
-    if (not this->fHrefEvent.isEmpty()) {
+    if (not fHrefEvent.isEmpty()) {
         return -2;
     }
 
     // If we're using a timeout and it expired, tell the caller.
-    if (useTimeout and qFrame->gameRunning() and not this->fInputReady) {
+    if (useTimeout and qFrame->gameRunning() and not fInputReady) {
         Q_ASSERT(timedOut != 0);
         *timedOut = true;
         return -1;
     }
 
-    if (this->fLastKeyEvent != 0) {
-        switch (this->fLastKeyEvent) {
+    if (fLastKeyEvent != 0) {
+        switch (fLastKeyEvent) {
           case Qt::Key_Escape:   return 27;
           // A Tab is not an extended character, but Tads requires that
           // it is handled as one.
@@ -668,12 +668,12 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
           default:
               // If we got here, something went wrong.  Just report a
               // space.
-              qWarning() << Q_FUNC_INFO << "unrecognized key event in switch:" << hex << this->fLastKeyEvent;
+              qWarning() << Q_FUNC_INFO << "unrecognized key event in switch:" << hex << fLastKeyEvent;
               return ' ';
         }
     } else {
         // It's a textual key press.
-        return this->fLastKeyText.unicode();
+        return fLastKeyText.unicode();
     }
 
     // Prepare to return the extended key-code on
@@ -686,8 +686,8 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 void
 CHtmlSysWinInputQt::addToPagePauseQueue( CHtmlSysWinQt* banner )
 {
-    if (not this->fPagePauseQueue.contains(banner)) {
-        this->fPagePauseQueue.enqueue(banner);
+    if (not fPagePauseQueue.contains(banner)) {
+        fPagePauseQueue.enqueue(banner);
     }
 }
 
@@ -695,12 +695,12 @@ CHtmlSysWinInputQt::addToPagePauseQueue( CHtmlSysWinQt* banner )
 void
 CHtmlSysWinInputQt::removeFromPagePauseQueue( CHtmlSysWinQt* banner )
 {
-    if (this->fPagePauseQueue.isEmpty() or not this->fPagePauseQueue.contains(banner)) {
+    if (fPagePauseQueue.isEmpty() or not fPagePauseQueue.contains(banner)) {
         return;
     }
-    this->fPagePauseQueue.removeOne(banner);
-    if (this->fPagePauseQueue.isEmpty() and this->fInputMode == PagePauseInput) {
-        this->fInputMode = NoInput;
+    fPagePauseQueue.removeOne(banner);
+    if (fPagePauseQueue.isEmpty() and fInputMode == PagePauseInput) {
+        fInputMode = NoInput;
     }
 }
 
@@ -720,7 +720,7 @@ CHtmlSysWinInputQt::insertText( QString str )
     const QByteArray& utfTxt = str.toUtf8();
     // Try to add it to the input buffer. Do not allow truncation; it
     // won't work with UTF-8 strings and we'll crash if it doesn't fit.
-    if (not this->fTadsBuffer->add_string(utfTxt.constData(), utfTxt.length(), false)) {
+    if (not fTadsBuffer->add_string(utfTxt.constData(), utfTxt.length(), false)) {
         // It didn't fit.  Try to add the largest part of it that fits.
         int i = str.length();
         QString subStr;
@@ -729,10 +729,10 @@ CHtmlSysWinInputQt::insertText( QString str )
             --i;
             subStr = str.left(i);
             subUtf = subStr.toUtf8();
-        } while (not this->fTadsBuffer->add_string(subUtf.constData(), subUtf.length(), false) and i > 1);
+        } while (not fTadsBuffer->add_string(subUtf.constData(), subUtf.length(), false) and i > 1);
     }
-    this->fCastDispWidget->clearSelection();
-    this->fUpdateInputFormatter();
+    fCastDispWidget->clearSelection();
+    fUpdateInputFormatter();
 }
 
 
@@ -745,6 +745,6 @@ CHtmlSysWinInputQt::set_html_input_color(HTML_color_t clr, int use_default)
         const QColor& def = qFrame->settings()->inputColor;
         qFrame->inputColor(HTML_make_color(def.red(), def.green(), def.blue()));
     } else {
-        qFrame->inputColor(this->map_system_color(clr));
+        qFrame->inputColor(map_system_color(clr));
     }
 }

@@ -100,21 +100,21 @@ QTadsSound::QTadsSound(QObject* parent, Aulib::AudioStream* stream, SoundType ty
     } else {
         fLength = 0ms;
     }
-    //qDebug() << "Sound length:" << this->fLength;
+    //qDebug() << "Sound length:" << fLength;
     connect(this, SIGNAL(readyToFadeOut()), SLOT(fPrepareFadeOut()));
-    connect(this->fFadeOutTimer, SIGNAL(timeout()), this, SLOT(fDoFadeOut()));
+    connect(fFadeOutTimer, SIGNAL(timeout()), this, SLOT(fDoFadeOut()));
     connect(this, SIGNAL(destroyed()), SLOT(fDeleteTimer()));
 
     // Make sure the timer only calls our fade-out slot *once* and then stops.
-    this->fFadeOutTimer->setSingleShot(true);
+    fFadeOutTimer->setSingleShot(true);
 }
 
 
 QTadsSound::~QTadsSound()
 {
     //qDebug() << Q_FUNC_INFO;
-    this->fRepeatsWanted = -1;
-    delete this->fAudStream;
+    fRepeatsWanted = -1;
+    delete fAudStream;
 }
 
 
@@ -124,9 +124,9 @@ QTadsSound::fFinishCallback( Aulib::Stream& strm )
     //qDebug() << Q_FUNC_INFO;
 
     // Invoke the TADS callback, if there is one.
-    this->fPlaying = false;
-    if (this->fDone_func) {
-        this->fDone_func(this->fDone_func_ctx, this->fRepeats);
+    fPlaying = false;
+    if (fDone_func) {
+        fDone_func(fDone_func_ctx, fRepeats);
     }
 }
 
@@ -136,8 +136,8 @@ QTadsSound::fLoopCallback( Aulib::Stream& strm )
 {
     //qDebug() << Q_FUNC_INFO;
 
-    ++this->fRepeats;
-    this->fTimePos.start();
+    ++fRepeats;
+    fTimePos.start();
 
     // If this is the last iteration and we have a fade-out, set the fade-out
     // timer.
@@ -151,15 +151,15 @@ QTadsSound::fLoopCallback( Aulib::Stream& strm )
 void
 QTadsSound::fDoFadeOut()
 {
-    Q_ASSERT(this->fAudStream->isPlaying());
+    Q_ASSERT(fAudStream->isPlaying());
 
     // If we need to do a crossfade, call the TADS callback now.
-    if (this->fCrossFade and this->fDone_func) {
-        this->fDone_func(this->fDone_func_ctx, this->fRepeats);
+    if (fCrossFade and fDone_func) {
+        fDone_func(fDone_func_ctx, fRepeats);
         // Make sure our AudioStream callback won't call the TADS callback a second
         // time.
-        this->fDone_func = 0;
-        this->fDone_func_ctx = 0;
+        fDone_func = 0;
+        fDone_func_ctx = 0;
     }
     fAudStream->stop(chrono::milliseconds(fFadeOut));
 }
@@ -168,14 +168,14 @@ QTadsSound::fDoFadeOut()
 void
 QTadsSound::fPrepareFadeOut()
 {
-    this->fFadeOutTimer->start(this->fLength - this->fFadeOut);
+    fFadeOutTimer->start(fLength - fFadeOut);
 }
 
 
 void
 QTadsSound::fDeleteTimer()
 {
-    delete this->fFadeOutTimer;
+    delete fFadeOutTimer;
 }
 
 
@@ -190,7 +190,7 @@ QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done
         return 1;
     }
 
-    Q_ASSERT(not this->fPlaying);
+    Q_ASSERT(not fPlaying);
 
     // Adjust volume if it exceeds min/max levels.
     if (vol < 0) {
@@ -200,31 +200,31 @@ QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done
     }
 
     // Set the volume level.
-    this->fAudStream->setVolume(static_cast<float>(vol) / 100.f);
+    fAudStream->setVolume(static_cast<float>(vol) / 100.f);
 
     if (repeat < 0) {
         repeat = 0;
     }
-    this->fRepeatsWanted = repeat;
+    fRepeatsWanted = repeat;
     bool playOk;
     if (fadeIn > 0) {
-        playOk = this->fAudStream->play(repeat, chrono::milliseconds(fadeIn));
+        playOk = fAudStream->play(repeat, chrono::milliseconds(fadeIn));
     } else {
-        playOk = this->fAudStream->play(repeat);
+        playOk = fAudStream->play(repeat);
     }
     if (not playOk) {
         qWarning() << "ERROR:" << SDL_GetError();
         SDL_ClearError();
         return 1;
     } else {
-        this->fTimePos.start();
-        this->fPlaying = true;
-        this->fCrossFade = crossFade;
-        this->fRepeats = 1;
-        this->fDone_func = done_func;
-        this->fDone_func_ctx = done_func_ctx;
+        fTimePos.start();
+        fPlaying = true;
+        fCrossFade = crossFade;
+        fRepeats = 1;
+        fDone_func = done_func;
+        fDone_func_ctx = done_func_ctx;
         if (fadeOut > 0) {
-            this->fFadeOut = chrono::milliseconds(fadeOut);
+            fFadeOut = chrono::milliseconds(fadeOut);
             if (repeat == 1) {
                 // The sound should only be played once.  We need to set the
                 // fade-out timer here since otherwise the sound won't get a
@@ -240,31 +240,31 @@ QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done
 void
 QTadsSound::cancelPlaying( bool sync, int fadeOut, bool fadeOutInBg )
 {
-    if (not this->fPlaying) {
+    if (not fPlaying) {
         return;
     }
 
-    this->fRepeatsWanted = -1;
+    fRepeatsWanted = -1;
 
     if (not sync and fadeOut > 0) {
-        if (fadeOutInBg and this->fDone_func) {
+        if (fadeOutInBg and fDone_func) {
             // We need to do fade-out in the background; call the TADS callback
             // now.
-            this->fDone_func(this->fDone_func_ctx, this->fRepeats);
+            fDone_func(fDone_func_ctx, fRepeats);
             // Make sure our SDL callback won't call the TADS callback a second
             // time.
-            this->fDone_func = 0;
-            this->fDone_func_ctx = 0;
+            fDone_func = 0;
+            fDone_func_ctx = 0;
         }
-        this->fAudStream->stop(chrono::milliseconds(fadeOut));
+        fAudStream->stop(chrono::milliseconds(fadeOut));
     } else {
-        this->fAudStream->stop();
-        this->fFinishCallback(*this->fAudStream);
+        fAudStream->stop();
+        fFinishCallback(*fAudStream);
     }
 
     if (sync) {
         // The operation needs to be synchronous; wait for the sound to finish.
-        while (this->fAudStream->isPlaying()) {
+        while (fAudStream->isPlaying()) {
             SDL_Delay(10);
         }
     }
@@ -274,17 +274,17 @@ QTadsSound::cancelPlaying( bool sync, int fadeOut, bool fadeOutInBg )
 void
 QTadsSound::addCrossFade( int ms )
 {
-    this->fCrossFade = true;
+    fCrossFade = true;
     fFadeOut = chrono::milliseconds(ms);
 
-    if (this->fPlaying) {
-        this->fRepeatsWanted = -1;
+    if (fPlaying) {
+        fRepeatsWanted = -1;
         auto timeFromNow = fLength - fFadeOut - chrono::milliseconds(fTimePos.elapsed());
         if (timeFromNow < 1ms) {
             timeFromNow = 1ms;
             fFadeOut = fLength - chrono::milliseconds(fTimePos.elapsed());
         }
-        this->fFadeOutTimer->start(timeFromNow);
+        fFadeOutTimer->start(timeFromNow);
     }
 }
 #endif

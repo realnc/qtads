@@ -36,7 +36,7 @@ CHtmlSysSoundMidiQt::play_sound( CHtmlSysWin*, void (*done_func)(void*, int repe
 #ifndef NO_AUDIO
 {
     //qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-    return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out, crossfade);
+    return startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out, crossfade);
 }
 #else
 {
@@ -49,7 +49,7 @@ void
 CHtmlSysSoundMidiQt::add_crossfade( CHtmlSysWin*, long ms )
 #ifndef NO_AUDIO
 {
-    this->addCrossFade(ms);
+    addCrossFade(ms);
 }
 #else
 { }
@@ -62,7 +62,7 @@ CHtmlSysSoundMidiQt::cancel_sound( CHtmlSysWin*, int sync, long fade_out_ms, int
 {
     //qDebug() << Q_FUNC_INFO;
 
-    this->cancelPlaying(sync, fade_out_ms, fade_in_bg);
+    cancelPlaying(sync, fade_out_ms, fade_in_bg);
 }
 #else
 { }
@@ -86,7 +86,7 @@ CHtmlSysSoundWavQt::play_sound( CHtmlSysWin*, void (*done_func)(void*, int repea
 #ifndef NO_AUDIO
 {
     //qDebug() << "play_sound url:" << url << "repeat:" << repeat;
-    return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out, crossfade);
+    return startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out, crossfade);
 }
 #else
 {
@@ -99,7 +99,7 @@ void
 CHtmlSysSoundWavQt::add_crossfade( CHtmlSysWin*, long ms )
 #ifndef NO_AUDIO
 {
-    this->addCrossFade(ms);
+    addCrossFade(ms);
 }
 #else
 {
@@ -113,7 +113,7 @@ CHtmlSysSoundWavQt::cancel_sound( CHtmlSysWin*, int sync, long fade_out_ms, int 
 {
     //qDebug() << Q_FUNC_INFO;
 
-    this->cancelPlaying(sync, fade_out_ms, fade_in_bg);
+    cancelPlaying(sync, fade_out_ms, fade_in_bg);
 }
 #else
 {
@@ -138,7 +138,7 @@ CHtmlSysSoundOggQt::play_sound( CHtmlSysWin*, void (*done_func)(void*, int repea
 {
     //qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 #ifndef NO_AUDIO
-    return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out, crossfade);
+    return startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out, crossfade);
 #else
     return 1;
 #endif
@@ -149,7 +149,7 @@ void
 CHtmlSysSoundOggQt::add_crossfade( CHtmlSysWin*, long ms )
 {
 #ifndef NO_AUDIO
-    this->addCrossFade(ms);
+    addCrossFade(ms);
 #endif
 }
 
@@ -160,7 +160,7 @@ CHtmlSysSoundOggQt::cancel_sound( CHtmlSysWin*, int sync, long fade_out_ms, int 
     //qDebug() << Q_FUNC_INFO;
 
 #ifndef NO_AUDIO
-    this->cancelPlaying(sync, fade_out_ms, fade_in_bg);
+    cancelPlaying(sync, fade_out_ms, fade_in_bg);
 #endif
 }
 
@@ -182,7 +182,7 @@ CHtmlSysSoundMpegQt::play_sound( CHtmlSysWin*, void (*done_func)(void*, int repe
 {
     //qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 #ifndef NO_AUDIO
-    return this->startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out, crossfade);
+    return startPlaying(done_func, done_func_ctx, repeat, vol, fade_in, fade_out, crossfade);
 #else
     return 1;
 #endif
@@ -193,7 +193,7 @@ void
 CHtmlSysSoundMpegQt::add_crossfade( CHtmlSysWin*, long ms )
 {
 #ifndef NO_AUDIO
-    this->addCrossFade(ms);
+    addCrossFade(ms);
 #endif
 }
 
@@ -204,7 +204,7 @@ CHtmlSysSoundMpegQt::cancel_sound( CHtmlSysWin*, int sync, long fade_out_ms, int
     //qDebug() << Q_FUNC_INFO;
 
 #ifndef NO_AUDIO
-    this->cancelPlaying(sync, fade_out_ms, fade_in_bg);
+    cancelPlaying(sync, fade_out_ms, fade_in_bg);
 #endif
 }
 

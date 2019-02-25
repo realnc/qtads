@@ -128,7 +128,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
     // Returns our display widget.
     class DisplayWidget*
     displayWidget() const
-    { return this->dispWidget; }
+    { return dispWidget; }
 
     // Calculate and adjust the sizes of our child banners.  On entry,
     // 'parentSize' contains the size of the full parent window area; on
@@ -148,7 +148,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
     // Our parent banner, if there is one.
     CHtmlSysWinQt*
     parentBanner() const
-    { return this->fParentBanner; }
+    { return fParentBanner; }
 
     // Scroll down by a page while keeping track of when to page-pause.  The
     // 'force' flag controls whether we should scroll even while waiting for
@@ -171,11 +171,11 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
 
     long
     get_disp_width() override
-    { return this->viewport()->width() - 3; }
+    { return viewport()->width() - 3; }
 
     long
     get_disp_height() override
-    { return this->viewport()->height(); }
+    { return viewport()->height(); }
 
     long
     get_pix_per_inch() override
@@ -231,7 +231,7 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
     CHtmlSysFont*
     get_font( const CHtmlFontDesc* font_desc ) override
     {
-        if (this->fBannerStyleGrid) {
+        if (fBannerStyleGrid) {
             // We're a text grid banner; use our internal font face,
             // "qtads-grid", which will result in createFont() using the fixed
             // width font configured in the user settings.

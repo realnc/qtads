@@ -24,17 +24,17 @@
 CHtmlSysWinAboutBoxQt::CHtmlSysWinAboutBoxQt( class CHtmlFormatter* formatter, QWidget* parent )
     : CHtmlSysWinQt(formatter, parent)
 {
-    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    this->setMinimumSize(200,140);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setMinimumSize(200,140);
 }
 
 
 void
 CHtmlSysWinAboutBoxQt::resizeEvent( QResizeEvent* e )
 {
-    this->formatter_->start_at_top(false);
-    this->do_formatting(true, false, true);
+    formatter_->start_at_top(false);
+    do_formatting(true, false, true);
     QScrollArea::resizeEvent(e);
 }
 
@@ -44,7 +44,7 @@ CHtmlSysWinAboutBoxQt::sizeHint() const
 {
     // Ensure that we're always large enough to show the whole contents of the
     // "about" content.
-    return this->dispWidget->size();
+    return dispWidget->size();
 }
 
 
@@ -52,11 +52,11 @@ void
 CHtmlSysWinAboutBoxQt::set_banner_size( long width, HTML_BannerWin_Units_t, int,
                                         long height, HTML_BannerWin_Units_t height_units, int )
 {
-    this->bannerSize = height;
-    this->bannerSizeUnits = height_units;
-    this->dispWidget->resize(width + this->margins.left + this->margins.right,
-                             height + this->margins.top + this->margins.bottom);
-    QRect rec(this->geometry());
-    this->calcChildBannerSizes(rec);
-    this->adjustSize();
+    bannerSize = height;
+    bannerSizeUnits = height_units;
+    dispWidget->resize(width + margins.left + margins.right,
+                             height + margins.top + margins.bottom);
+    QRect rec(geometry());
+    calcChildBannerSizes(rec);
+    adjustSize();
 }

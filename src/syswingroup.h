@@ -42,7 +42,7 @@ class QTadsFrame: public QFrame {
   public:
     QTadsFrame( QWidget* parent )
     : QFrame(parent)
-    { this->setAcceptDrops(true); }
+    { setAcceptDrops(true); }
 };
 
 
@@ -142,7 +142,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
     void
     fActivateWindow()
-    { this->activateWindow(); }
+    { activateWindow(); }
 
   protected:
     void
@@ -183,7 +183,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
     CHtmlSysWinAboutBoxQt*
     aboutBox()
-    { return this->fAboutBox; }
+    { return fAboutBox; }
 
     void
     updateRecentGames();
@@ -193,7 +193,7 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
 
     bool
     wantsToQuit() const
-    { return this->fWantsToQuit; }
+    { return fWantsToQuit; }
 
     void
     enableCopyAction( bool f );

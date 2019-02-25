@@ -49,11 +49,11 @@ class CHtmlSysWinAboutBoxQt: public CHtmlSysWinQt {
     // viewport only reports a valid size after show() is called.
     long
     get_disp_width() override
-    { return this->width(); }
+    { return width(); }
 
     long
     get_disp_height() override
-    { return this->height(); }
+    { return height(); }
 
     void
     set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,

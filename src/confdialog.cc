@@ -171,7 +171,7 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
 #ifdef Q_OS_MAC
     // On Mac OS X, the dialog should not have any buttons, and settings
     // changes should apply instantly.
-    this->fMakeInstantApply();
+    fMakeInstantApply();
     ui->buttonBox->setStandardButtons(QDialogButtonBox::NoButton);
 #else
     QDialogButtonBox::ButtonLayout layoutPolicy
@@ -180,7 +180,7 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
         // On Gnome (and other Gtk-based environments, like XFCE), we follow
         // Gnome standards. We only provide a "Close" button and settings
         // changes should apply instantly.
-        this->fMakeInstantApply();
+        fMakeInstantApply();
         ui->buttonBox->setStandardButtons(QDialogButtonBox::Close);
     } else {
         // Assume KDE/MS Windows standards. No instant apply, and use OK/Apply/Cancel

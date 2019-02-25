@@ -43,11 +43,11 @@ DisplayWidgetInput::DisplayWidgetInput(CHtmlSysWinQt* parent, CHtmlFormatter* fo
       fInpTag(0),
       fTadsBuffer(tadsBuffer)
 {
-    connect(this->fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
-    this->resetCursorBlinking();
+    connect(fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
+    resetCursorBlinking();
 
     // Our initial caret height is the height of the current input font.
-    this->fHeight = QFontMetrics(qFrame->settings()->inputFont).height() - 1;
+    fHeight = QFontMetrics(qFrame->settings()->inputFont).height() - 1;
 
     // We need to check whether the application lost focus.
     connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), SLOT(fHandleFocusChange(QWidget*,QWidget*)));
@@ -61,9 +61,9 @@ DisplayWidgetInput::paintEvent( QPaintEvent* e )
 
     DisplayWidget::paintEvent(e);
     QPainter painter(this);
-    if (this->fCursorVisible and this->fBlinkVisible) {
-        painter.drawLine(this->fCursorPos.x(), this->fCursorPos.y(), this->fCursorPos.x(),
-                         this->fCursorPos.y() + this->fHeight);
+    if (fCursorVisible and fBlinkVisible) {
+        painter.drawLine(fCursorPos.x(), fCursorPos.y(), fCursorPos.x(),
+                         fCursorPos.y() + fHeight);
     }
 }
 
@@ -72,16 +72,16 @@ void
 DisplayWidgetInput::mousePressEvent( QMouseEvent* e )
 {
     DisplayWidget::mousePressEvent(e);
-    if (not this->fInpTag or not e->isAccepted()) {
+    if (not fInpTag or not e->isAccepted()) {
         return;
     }
 
     // We have a current input tag. If the mouse press was inside it, update
     // the input caret position.
     unsigned long offs = formatter->find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
-    if (offs >= this->fInpTag->get_text_ofs()) {
-        fTadsBuffer->set_caret(offs - this->fInpTag->get_text_ofs());
-        this->updateCursorPos(formatter, false, true);
+    if (offs >= fInpTag->get_text_ofs()) {
+        fTadsBuffer->set_caret(offs - fInpTag->get_text_ofs());
+        updateCursorPos(formatter, false, true);
     }
 }
 
@@ -91,7 +91,7 @@ DisplayWidgetInput::mouseMoveEvent( QMouseEvent* e )
 {
     DisplayWidget::mouseMoveEvent(e);
 
-    if (not this->inSelectMode or (~e->buttons() & Qt::LeftButton)
+    if (not inSelectMode or (~e->buttons() & Qt::LeftButton)
         or not fInpTag or not fTadsBuffer)
     {
         return;
@@ -100,7 +100,7 @@ DisplayWidgetInput::mouseMoveEvent( QMouseEvent* e )
     // If we have a selection and it extends into the input tag, sync the
     // selection range with the tag.
     unsigned long selStart, selEnd;
-    this->formatter->get_sel_range(&selStart, &selEnd);
+    formatter->get_sel_range(&selStart, &selEnd);
     if (selEnd < fInpTag->get_text_ofs()) {
         // The selection doesn't extend into our input tag.
         return;
@@ -127,16 +127,16 @@ DisplayWidgetInput::mouseMoveEvent( QMouseEvent* e )
         unsigned long inpSelEnd = selEnd - fInpTag->get_text_ofs();
         fTadsBuffer->set_sel_range(inpSelStart, inpSelEnd, caretPos);
     }
-    this->updateCursorPos(formatter, true, false);
+    updateCursorPos(formatter, true, false);
 }
 
 
 void
 DisplayWidgetInput::fBlinkCursor()
 {
-    this->fBlinkVisible = not this->fBlinkVisible;
-    this->update(this->fCursorPos.x() - 5, this->fCursorPos.y() - 5,
-                 this->fCursorPos.x() + 5, this->fCursorPos.y() + this->fHeight + 5);
+    fBlinkVisible = not fBlinkVisible;
+    update(fCursorPos.x() - 5, fCursorPos.y() - 5,
+                 fCursorPos.x() + 5, fCursorPos.y() + fHeight + 5);
 }
 
 
@@ -145,21 +145,21 @@ DisplayWidgetInput::fHandleFocusChange( QWidget* old, QWidget* now )
 {
     if (now == 0) {
         // The application window lost focus.  Disable cursor blinking.
-        this->fBlinkTimer->stop();
+        fBlinkTimer->stop();
 #ifdef Q_OS_MAC
         // On the Mac, when applications lose focus the cursor must be disabled.
-        if (this->fBlinkVisible) {
-            this->fBlinkCursor();
+        if (fBlinkVisible) {
+            fBlinkCursor();
         }
 #else
         // On all other systems we assume the cursor must stay visible.
-        if (not this->fBlinkVisible) {
-            this->fBlinkCursor();
+        if (not fBlinkVisible) {
+            fBlinkCursor();
         }
 #endif
     } else if (old == 0 and now != 0) {
         // The application window gained focus.  Reset cursor blinking.
-        this->resetCursorBlinking();
+        resetCursorBlinking();
     }
 }
 
@@ -169,24 +169,24 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter , bool keepSelect
                                      bool updateFormatterSelection )
 {
     // Ignore the call if there's currently no active tag.
-    if (this->fInpTag == 0) {
+    if (fInpTag == 0) {
         return;
     }
 
     // Reset the blink timer.
-    if (this->fBlinkTimer->isActive()) {
-        this->fBlinkTimer->start();
+    if (fBlinkTimer->isActive()) {
+        fBlinkTimer->start();
     }
 
     // Blink-out first to ensure the cursor won't stay visible at the previous
     // position after we move it.
-    if (this->fBlinkVisible) {
-        this->fBlinkCursor();
+    if (fBlinkVisible) {
+        fBlinkCursor();
     }
 
-    const CHtmlPoint& cursorPos = formatter->get_text_pos(this->fInpTag->get_text_ofs()
-                                                          + this->fTadsBuffer->get_caret());
-    this->fCursorPos = QPoint(cursorPos.x, cursorPos.y);
+    const CHtmlPoint& cursorPos = formatter->get_text_pos(fInpTag->get_text_ofs()
+                                                          + fTadsBuffer->get_caret());
+    fCursorPos = QPoint(cursorPos.x, cursorPos.y);
     // If there's another window with an active selection, moving the cursor
     // must clear it, unless we've been explicitly told otherwise.
     if (not keepSelection and DisplayWidget::curSelWidget and DisplayWidget::curSelWidget != this) {
@@ -198,8 +198,8 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter , bool keepSelect
     // the "Copy" action.
     if (updateFormatterSelection) {
         size_t start, end, caret;
-        unsigned long inp_txt_ofs = this->fInpTag->get_text_ofs();
-        this->fTadsBuffer->get_sel_range(&start, &end, &caret);
+        unsigned long inp_txt_ofs = fInpTag->get_text_ofs();
+        fTadsBuffer->get_sel_range(&start, &end, &caret);
         if (start != end) {
             formatter->set_sel_range(start + inp_txt_ofs, end + inp_txt_ofs);
             DisplayWidget::curSelWidget = this;
@@ -208,8 +208,8 @@ DisplayWidgetInput::updateCursorPos( CHtmlFormatter* formatter , bool keepSelect
     }
 
     // Blink-in.
-    if (not this->fBlinkVisible) {
-        this->fBlinkCursor();
+    if (not fBlinkVisible) {
+        fBlinkCursor();
     }
 }
 
@@ -219,7 +219,7 @@ DisplayWidgetInput::resetCursorBlinking()
 {
     // Start the timer unless cursor blinking is disabled.
     if (QApplication::cursorFlashTime() > 1) {
-        this->fBlinkTimer->start(QApplication::cursorFlashTime() / 2);
+        fBlinkTimer->start(QApplication::cursorFlashTime() / 2);
     }
 }
 
@@ -228,7 +228,7 @@ void
 DisplayWidgetInput::clearSelection()
 {
     DisplayWidget::clearSelection();
-    if (this->fTadsBuffer->has_sel_range()) {
-        this->fTadsBuffer->set_sel_range(0, 0, this->fTadsBuffer->get_caret());
+    if (fTadsBuffer->has_sel_range()) {
+        fTadsBuffer->set_sel_range(0, 0, fTadsBuffer->get_caret());
     }
 }

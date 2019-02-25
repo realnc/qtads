@@ -161,8 +161,8 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
     QString
     pendingHrefEvent()
     {
-        QString ret(this->fHrefEvent);
-        this->fHrefEvent.clear();
+        QString ret(fHrefEvent);
+        fHrefEvent.clear();
         return ret;
     }
 
@@ -174,7 +174,7 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
     // Do we currently accept text insertion?
     bool
     acceptsText()
-    { return this->fInputMode == NormalInput; }
+    { return fInputMode == NormalInput; }
 
     //
     // CHtmlSysWin interface implementation.

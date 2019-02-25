@@ -38,8 +38,8 @@ class QTadsTimer: public QTimer, public CHtmlSysTimer {
     trigger()
     {
         // If we have a callback, call it.
-        if (this->func_ != 0) {
-            this->invoke_callback();
+        if (func_ != 0) {
+            invoke_callback();
         }
     }
 

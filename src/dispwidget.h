@@ -106,8 +106,8 @@ class DisplayWidget: public QWidget {
     {
         // When clearing contents, the display items are already gone. Set them
         // Null so we won't try to access them.
-        this->fClickedLink = this->fHoverLink = 0;
-        this->fInvalidateLinkTracking();
+        fClickedLink = fHoverLink = 0;
+        fInvalidateLinkTracking();
     }
 
     // Clear the selection range.

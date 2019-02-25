@@ -41,8 +41,8 @@ class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
     void
     updateDisplay( const QRect& rect )
     {
-        if (this->fDispSite != 0) {
-            this->fDispSite->dispsite_inval(rect.x(), rect.y(), rect.width(), rect.height());
+        if (fDispSite != 0) {
+            fDispSite->dispsite_inval(rect.x(), rect.y(), rect.width(), rect.height());
         }
     }
 
@@ -56,31 +56,31 @@ class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
     //
     void
     set_display_site ( CHtmlSysImageDisplaySite* dispSite ) override
-    { this->fDispSite = dispSite; }
+    { fDispSite = dispSite; }
 
     void
     cancel_playback() override
-    { this->stop(); }
+    { stop(); }
 
     void
     pause_playback() override
-    { this->setPaused(true); }
+    { setPaused(true); }
 
     void
     resume_playback() override
-    { this->setPaused(false); }
+    { setPaused(false); }
 
     void
     draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode ) override
-    { QTadsImage(this->currentImage()).drawFromPaintEvent(win, pos, mode); }
+    { QTadsImage(currentImage()).drawFromPaintEvent(win, pos, mode); }
 
     unsigned long
     get_width() const override
-    { return this->frameRect().width(); }
+    { return frameRect().width(); }
 
     unsigned long
     get_height() const override
-    { return this->frameRect().height(); }
+    { return frameRect().height(); }
 
     int
     map_palette( CHtmlSysWin*, int ) override

@@ -26,46 +26,46 @@ QTadsGameInfoEnum::tads_enum_game_info( const char* name, const char* val )
         #endif
 
     if (nameStr == QString::fromLatin1("name")) {
-        this->gameName = QString::fromLatin1("<b><center><font size=\"+1\">") + htmlValStr
+        gameName = QString::fromLatin1("<b><center><font size=\"+1\">") + htmlValStr
                          + QString::fromLatin1("</font></center></b><p>");
-        this->plainGameName = valStr;
+        plainGameName = valStr;
     } else if (nameStr == QString::fromLatin1("headline")) {
-        this->headline = QString::fromLatin1("<center>") + htmlValStr
+        headline = QString::fromLatin1("<center>") + htmlValStr
                          + QString::fromLatin1("</center><p>");
     } else if (nameStr == QString::fromLatin1("byline")) {
-        this->byLine = QString::fromLatin1("<i><center>") + htmlValStr
+        byLine = QString::fromLatin1("<i><center>") + htmlValStr
                        + QString::fromLatin1("</center></i><p>");
     } else if (nameStr == QString::fromLatin1("htmlbyline")) {
-        this->htmlByLine = QString::fromLatin1("<i><center>") + valStr + QString::fromLatin1("</center></i><p>");
+        htmlByLine = QString::fromLatin1("<i><center>") + valStr + QString::fromLatin1("</center></i><p>");
     } else if (nameStr == QString::fromLatin1("authoremail")) {
-        this->email = valStr;
+        email = valStr;
     } else if (nameStr == QString::fromLatin1("desc")) {
-        this->desc = htmlValStr;
-        this->desc.replace(QString::fromLatin1("\\n"), QString::fromLatin1("<p>"));
+        desc = htmlValStr;
+        desc.replace(QString::fromLatin1("\\n"), QString::fromLatin1("<p>"));
     } else if (nameStr == QString::fromLatin1("htmldesc")) {
-        this->htmlDesc = valStr;
+        htmlDesc = valStr;
     } else if (nameStr == QString::fromLatin1("version")) {
-        this->version = valStr;
+        version = valStr;
     } else if (nameStr == QString::fromLatin1("firstpublished")) {
-        this->published = valStr;
+        published = valStr;
     } else if (nameStr == QString::fromLatin1("releasedate")) {
-        this->date = valStr;
+        date = valStr;
     } else if (nameStr == QString::fromLatin1("language")) {
-        this->lang = valStr;
+        lang = valStr;
     } else if (nameStr == QString::fromLatin1("series")) {
-        this->series = valStr;
+        series = valStr;
     } else if (nameStr == QString::fromLatin1("seriesnumber")) {
-        this->seriesNumber = valStr;
+        seriesNumber = valStr;
     } else if (nameStr == QString::fromLatin1("genre")) {
-        this->genre = valStr;
+        genre = valStr;
     } else if (nameStr == QString::fromLatin1("forgiveness")) {
-        this->forgiveness = valStr;
+        forgiveness = valStr;
     } else if (nameStr == QString::fromLatin1("licensetype")) {
-        this->license = valStr;
+        license = valStr;
     } else if (nameStr == QString::fromLatin1("copyingrules")) {
-        this->copyRules = valStr;
+        copyRules = valStr;
     } else if (nameStr == QString::fromLatin1("ifid")) {
-        this->ifid = valStr;
+        ifid = valStr;
     }
 }
 
@@ -172,7 +172,7 @@ GameInfoDialog::GameInfoDialog( const QByteArray& fname, QWidget* parent )
     if (not image.isNull()) {
         ui->description->document()->addResource(QTextDocument::ImageResource,
                                                  QUrl(QString::fromLatin1("CoverArt")), image);
-        this->resize(this->width(), this->height() + image.height());
+        resize(width(), height() + image.height());
     }
 
     info.read_from_file(fname.constData());

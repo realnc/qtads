@@ -31,29 +31,29 @@ Settings::loadFromDisk()
     QSettings sett;
 
     sett.beginGroup(QString::fromLatin1("media"));
-    this->enableGraphics = sett.value(QString::fromLatin1("graphics"), true).toBool();
+    enableGraphics = sett.value(QString::fromLatin1("graphics"), true).toBool();
 #ifndef NO_AUDIO
-    this->enableSoundEffects = sett.value(QString::fromLatin1("sounds"), true).toBool();
-    this->enableMusic = sett.value(QString::fromLatin1("music"), true).toBool();
+    enableSoundEffects = sett.value(QString::fromLatin1("sounds"), true).toBool();
+    enableMusic = sett.value(QString::fromLatin1("music"), true).toBool();
 #else
-    this->enableSoundEffects = false;
-    this->enableMusic = false;
+    enableSoundEffects = false;
+    enableMusic = false;
 #endif
-    this->enableLinks = sett.value(QString::fromLatin1("links"), true).toBool();
-    this->useSmoothScaling = sett.value(QString::fromLatin1("smoothImageScaling"), true).toBool();
+    enableLinks = sett.value(QString::fromLatin1("links"), true).toBool();
+    useSmoothScaling = sett.value(QString::fromLatin1("smoothImageScaling"), true).toBool();
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("colors"));
-    this->mainBgColor = sett.value(QString::fromLatin1("mainbg"), QColor(Qt::white)).value<QColor>();
-    this->mainTextColor = sett.value(QString::fromLatin1("maintext"), QColor(Qt::black)).value<QColor>();
-    this->bannerBgColor = sett.value(QString::fromLatin1("bannerbg"), QColor(Qt::lightGray)).value<QColor>();
-    this->bannerTextColor = sett.value(QString::fromLatin1("bannertext"), QColor(Qt::black)).value<QColor>();
-    this->inputColor = sett.value(QString::fromLatin1("input"), QColor(70, 70, 70)).value<QColor>();
-    this->underlineLinks = sett.value(QString::fromLatin1("underlinelinks"), false).toBool();
-    this->highlightLinks = sett.value(QString::fromLatin1("highlightlinks"), true).toBool();
-    this->unvisitedLinkColor = sett.value(QString::fromLatin1("unvisitedlinks"), QColor(Qt::blue)).value<QColor>();
-    this->hoveringLinkColor = sett.value(QString::fromLatin1("hoveringlinks"), QColor(Qt::red)).value<QColor>();
-    this->clickedLinkColor = sett.value(QString::fromLatin1("clickedlinks"), QColor(Qt::cyan)).value<QColor>();
+    mainBgColor = sett.value(QString::fromLatin1("mainbg"), QColor(Qt::white)).value<QColor>();
+    mainTextColor = sett.value(QString::fromLatin1("maintext"), QColor(Qt::black)).value<QColor>();
+    bannerBgColor = sett.value(QString::fromLatin1("bannerbg"), QColor(Qt::lightGray)).value<QColor>();
+    bannerTextColor = sett.value(QString::fromLatin1("bannertext"), QColor(Qt::black)).value<QColor>();
+    inputColor = sett.value(QString::fromLatin1("input"), QColor(70, 70, 70)).value<QColor>();
+    underlineLinks = sett.value(QString::fromLatin1("underlinelinks"), false).toBool();
+    highlightLinks = sett.value(QString::fromLatin1("highlightlinks"), true).toBool();
+    unvisitedLinkColor = sett.value(QString::fromLatin1("unvisitedlinks"), QColor(Qt::blue)).value<QColor>();
+    hoveringLinkColor = sett.value(QString::fromLatin1("hoveringlinks"), QColor(Qt::red)).value<QColor>();
+    clickedLinkColor = sett.value(QString::fromLatin1("clickedlinks"), QColor(Qt::cyan)).value<QColor>();
     sett.endGroup();
 
 #ifdef Q_OS_MAC
@@ -82,44 +82,44 @@ Settings::loadFromDisk()
 #endif
 #endif
     sett.beginGroup(QString::fromLatin1("fonts"));
-    this->mainFont.fromString(sett.value(QString::fromLatin1("main"), DEFAULT_SERIF).toString());
-    this->fixedFont.fromString(sett.value(QString::fromLatin1("fixed"), DEFAULT_MONO).toString());
-    this->serifFont.fromString(sett.value(QString::fromLatin1("serif"), DEFAULT_SERIF).toString());
-    this->sansFont.fromString(sett.value(QString::fromLatin1("sans"), DEFAULT_SANS).toString());
-    this->scriptFont.fromString(sett.value(QString::fromLatin1("script"), DEFAULT_SCRIPT).toString());
-    this->writerFont.fromString(sett.value(QString::fromLatin1("typewriter"), DEFAULT_MONO).toString());
-    this->inputFont.fromString(sett.value(QString::fromLatin1("input"), DEFAULT_SERIF).toString());
-    this->useMainFontForInput = sett.value(QString::fromLatin1("useMainFontForInput"), true).toBool();
+    mainFont.fromString(sett.value(QString::fromLatin1("main"), DEFAULT_SERIF).toString());
+    fixedFont.fromString(sett.value(QString::fromLatin1("fixed"), DEFAULT_MONO).toString());
+    serifFont.fromString(sett.value(QString::fromLatin1("serif"), DEFAULT_SERIF).toString());
+    sansFont.fromString(sett.value(QString::fromLatin1("sans"), DEFAULT_SANS).toString());
+    scriptFont.fromString(sett.value(QString::fromLatin1("script"), DEFAULT_SCRIPT).toString());
+    writerFont.fromString(sett.value(QString::fromLatin1("typewriter"), DEFAULT_MONO).toString());
+    inputFont.fromString(sett.value(QString::fromLatin1("input"), DEFAULT_SERIF).toString());
+    useMainFontForInput = sett.value(QString::fromLatin1("useMainFontForInput"), true).toBool();
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("misc"));
-    this->ioSafetyLevelRead = sett.value(QString::fromLatin1("ioSafetyLevelRead"), 2).toInt();
-    this->ioSafetyLevelWrite = sett.value(QString::fromLatin1("ioSafetyLevelWrite"), 2).toInt();
-    this->tads2Encoding = sett.value(QString::fromLatin1("tads2encoding"), QByteArray("windows-1252")).toByteArray();
-    this->pasteOnDblClk = sett.value(QString::fromLatin1("pasteondoubleclick"), true).toBool();
-    this->softScrolling = sett.value(QString::fromLatin1("softscrolling"), true).toBool();
-    this->askForGameFile = sett.value(QString::fromLatin1("askforfileatstart"), false).toBool();
-    this->confirmRestartGame = sett.value(QString::fromLatin1("confirmrestartgame"), true).toBool();
-    this->confirmQuitGame = sett.value(QString::fromLatin1("confirmquitgame"), true).toBool();
-    this->lastFileOpenDir = sett.value(QString::fromLatin1("lastFileOpenDir"), QString::fromLatin1("")).toString();
+    ioSafetyLevelRead = sett.value(QString::fromLatin1("ioSafetyLevelRead"), 2).toInt();
+    ioSafetyLevelWrite = sett.value(QString::fromLatin1("ioSafetyLevelWrite"), 2).toInt();
+    tads2Encoding = sett.value(QString::fromLatin1("tads2encoding"), QByteArray("windows-1252")).toByteArray();
+    pasteOnDblClk = sett.value(QString::fromLatin1("pasteondoubleclick"), true).toBool();
+    softScrolling = sett.value(QString::fromLatin1("softscrolling"), true).toBool();
+    askForGameFile = sett.value(QString::fromLatin1("askforfileatstart"), false).toBool();
+    confirmRestartGame = sett.value(QString::fromLatin1("confirmrestartgame"), true).toBool();
+    confirmQuitGame = sett.value(QString::fromLatin1("confirmquitgame"), true).toBool();
+    lastFileOpenDir = sett.value(QString::fromLatin1("lastFileOpenDir"), QString::fromLatin1("")).toString();
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("recent"));
-    this->recentGamesList = sett.value(QString::fromLatin1("games"), QStringList()).toStringList();
-    Q_ASSERT(this->recentGamesList.size() <= this->recentGamesCapacity);
+    recentGamesList = sett.value(QString::fromLatin1("games"), QStringList()).toStringList();
+    Q_ASSERT(recentGamesList.size() <= recentGamesCapacity);
     // Remove any files that don't exist or aren't readable.
-    for (int i = 0; i < this->recentGamesList.size(); ++i) {
-        QFileInfo file(this->recentGamesList.at(i));
+    for (int i = 0; i < recentGamesList.size(); ++i) {
+        QFileInfo file(recentGamesList.at(i));
         if (not file.exists() or not (file.isFile() or file.isSymLink()) or not file.isReadable()) {
-            this->recentGamesList.removeAt(i);
+            recentGamesList.removeAt(i);
             --i;
         }
     }
     sett.endGroup();
 
-    this->appSize = sett.value(QString::fromLatin1("geometry/size"), QSize(740, 540)).toSize();
-    this->lastUpdateDate = sett.value(QString::fromLatin1("update/lastupdatedate"), QDate()).toDate();
-    this->updateFreq = static_cast<UpdateFreq>(
+    appSize = sett.value(QString::fromLatin1("geometry/size"), QSize(740, 540)).toSize();
+    lastUpdateDate = sett.value(QString::fromLatin1("update/lastupdatedate"), QDate()).toDate();
+    updateFreq = static_cast<UpdateFreq>(
         sett.value(QString::fromLatin1("update/updatefreq"), UpdateDaily).toInt()
     );
 }
@@ -131,57 +131,57 @@ Settings::saveToDisk()
     QSettings sett;
 
     sett.beginGroup(QString::fromLatin1("media"));
-    sett.setValue(QString::fromLatin1("graphics"), this->enableGraphics);
+    sett.setValue(QString::fromLatin1("graphics"), enableGraphics);
 #ifndef NO_AUDIO
-    sett.setValue(QString::fromLatin1("sounds"), this->enableSoundEffects);
-    sett.setValue(QString::fromLatin1("music"), this->enableMusic);
+    sett.setValue(QString::fromLatin1("sounds"), enableSoundEffects);
+    sett.setValue(QString::fromLatin1("music"), enableMusic);
 #endif
-    sett.setValue(QString::fromLatin1("links"), this->enableLinks);
-    sett.setValue(QString::fromLatin1("smoothImageScaling"), this->useSmoothScaling);
+    sett.setValue(QString::fromLatin1("links"), enableLinks);
+    sett.setValue(QString::fromLatin1("smoothImageScaling"), useSmoothScaling);
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("colors"));
-    sett.setValue(QString::fromLatin1("mainbg"), this->mainBgColor);
-    sett.setValue(QString::fromLatin1("maintext"), this->mainTextColor);
-    sett.setValue(QString::fromLatin1("bannerbg"), this->bannerBgColor);
-    sett.setValue(QString::fromLatin1("bannertext"), this->bannerTextColor);
-    sett.setValue(QString::fromLatin1("input"), this->inputColor);
-    sett.setValue(QString::fromLatin1("underlinelinks"), this->underlineLinks);
-    sett.setValue(QString::fromLatin1("highlightlinks"), this->highlightLinks);
-    sett.setValue(QString::fromLatin1("unvisitedlinks"), this->unvisitedLinkColor);
-    sett.setValue(QString::fromLatin1("hoveringlinks"), this->hoveringLinkColor);
-    sett.setValue(QString::fromLatin1("clickedlinks"), this->clickedLinkColor);
+    sett.setValue(QString::fromLatin1("mainbg"), mainBgColor);
+    sett.setValue(QString::fromLatin1("maintext"), mainTextColor);
+    sett.setValue(QString::fromLatin1("bannerbg"), bannerBgColor);
+    sett.setValue(QString::fromLatin1("bannertext"), bannerTextColor);
+    sett.setValue(QString::fromLatin1("input"), inputColor);
+    sett.setValue(QString::fromLatin1("underlinelinks"), underlineLinks);
+    sett.setValue(QString::fromLatin1("highlightlinks"), highlightLinks);
+    sett.setValue(QString::fromLatin1("unvisitedlinks"), unvisitedLinkColor);
+    sett.setValue(QString::fromLatin1("hoveringlinks"), hoveringLinkColor);
+    sett.setValue(QString::fromLatin1("clickedlinks"), clickedLinkColor);
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("fonts"));
-    sett.setValue(QString::fromLatin1("main"), this->mainFont.toString());
-    sett.setValue(QString::fromLatin1("fixed"), this->fixedFont.toString());
-    sett.setValue(QString::fromLatin1("serif"), this->serifFont.toString());
-    sett.setValue(QString::fromLatin1("sans"), this->sansFont.toString());
-    sett.setValue(QString::fromLatin1("script"), this->scriptFont.toString());
-    sett.setValue(QString::fromLatin1("typewriter"), this->writerFont.toString());
-    sett.setValue(QString::fromLatin1("input"), this->inputFont.toString());
-    sett.setValue(QString::fromLatin1("useMainFontForInput"), this->useMainFontForInput);
+    sett.setValue(QString::fromLatin1("main"), mainFont.toString());
+    sett.setValue(QString::fromLatin1("fixed"), fixedFont.toString());
+    sett.setValue(QString::fromLatin1("serif"), serifFont.toString());
+    sett.setValue(QString::fromLatin1("sans"), sansFont.toString());
+    sett.setValue(QString::fromLatin1("script"), scriptFont.toString());
+    sett.setValue(QString::fromLatin1("typewriter"), writerFont.toString());
+    sett.setValue(QString::fromLatin1("input"), inputFont.toString());
+    sett.setValue(QString::fromLatin1("useMainFontForInput"), useMainFontForInput);
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("misc"));
-    sett.setValue(QString::fromLatin1("ioSafetyLevelRead"), this->ioSafetyLevelRead);
-    sett.setValue(QString::fromLatin1("ioSafetyLevelWrite"), this->ioSafetyLevelWrite);
-    sett.setValue(QString::fromLatin1("tads2encoding"), this->tads2Encoding);
-    sett.setValue(QString::fromLatin1("pasteondoubleclick"), this->pasteOnDblClk);
-    sett.setValue(QString::fromLatin1("softscrolling"), this->softScrolling);
-    sett.setValue(QString::fromLatin1("askforfileatstart"), this->askForGameFile);
-    sett.setValue(QString::fromLatin1("confirmrestartgame"), this->confirmRestartGame);
-    sett.setValue(QString::fromLatin1("confirmquitgame"), this->confirmQuitGame);
-    sett.setValue(QString::fromLatin1("lastFileOpenDir"), this->lastFileOpenDir);
+    sett.setValue(QString::fromLatin1("ioSafetyLevelRead"), ioSafetyLevelRead);
+    sett.setValue(QString::fromLatin1("ioSafetyLevelWrite"), ioSafetyLevelWrite);
+    sett.setValue(QString::fromLatin1("tads2encoding"), tads2Encoding);
+    sett.setValue(QString::fromLatin1("pasteondoubleclick"), pasteOnDblClk);
+    sett.setValue(QString::fromLatin1("softscrolling"), softScrolling);
+    sett.setValue(QString::fromLatin1("askforfileatstart"), askForGameFile);
+    sett.setValue(QString::fromLatin1("confirmrestartgame"), confirmRestartGame);
+    sett.setValue(QString::fromLatin1("confirmquitgame"), confirmQuitGame);
+    sett.setValue(QString::fromLatin1("lastFileOpenDir"), lastFileOpenDir);
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("recent"));
-    sett.setValue(QString::fromLatin1("games"), this->recentGamesList);
+    sett.setValue(QString::fromLatin1("games"), recentGamesList);
     sett.endGroup();
 
     sett.setValue(QString::fromLatin1("geometry/size"), qWinGroup->size());
-    sett.setValue(QString::fromLatin1("update/lastupdatedate"), this->lastUpdateDate);
-    sett.setValue(QString::fromLatin1("update/updatefreq"), this->updateFreq);
+    sett.setValue(QString::fromLatin1("update/lastupdatedate"), lastUpdateDate);
+    sett.setValue(QString::fromLatin1("update/updatefreq"), updateFreq);
     sett.sync();
 }

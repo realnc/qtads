@@ -138,39 +138,39 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 
     class Settings*
     settings()
-    { return this->fSettings; }
+    { return fSettings; }
 
     class CHtmlSysWinInputQt*
     gameWindow()
-    { return this->fGameWin; }
+    { return fGameWin; }
 
     const QList<class CHtmlSysWinQt*>&
     bannerList()
-    { return this->fBannerList; }
+    { return fBannerList; }
 
     HTML_color_t
     inputColor()
-    { return this->fInputColor; }
+    { return fInputColor; }
 
     void
     inputColor( HTML_color_t color )
-    { this->fInputColor = color; }
+    { fInputColor = color; }
 
     CHtmlSysFontQt*
     createFont( const CHtmlFontDesc* font_desc );
 
     bool
     gameRunning()
-    { return this->fGameRunning; }
+    { return fGameRunning; }
 
     const QString&
     gameFile()
-    { return this->fGameFile; }
+    { return fGameFile; }
 
     void
     setGameRunning( bool f )
     {
-        this->fGameRunning = f;
+        fGameRunning = f;
         if (f == false) {
             emit gameQuitting();
         }
@@ -179,23 +179,23 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
     void
     setNextGame( const QString& fname )
     {
-        this->fNextGame = fname;
+        fNextGame = fname;
         // If no game is currently executing, run it now. Otherwise, end the
         // current game.
-        if (not this->fGameRunning) {
-            this->fRunGame();
+        if (not fGameRunning) {
+            fRunGame();
         } else {
-            this->setGameRunning(false);
+            setGameRunning(false);
         }
     }
 
     bool
     tads3()
-    { return this->fTads3; }
+    { return fTads3; }
 
     bool
     nonStopMode()
-    { return this->fNonStopMode; }
+    { return fNonStopMode; }
 
     // Recalculate and adjust the sizes of all HTML banners.
     void
@@ -208,7 +208,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
     // Schedule a reformat.
     void
     scheduleReformat()
-    { this->fReformatPending = true; }
+    { fReformatPending = true; }
 
     // Prune the main window's parse tree, if we're using too much memory.
     // This should be called before getting user input; we'll check to see how
@@ -239,11 +239,11 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
         // On OS X, this causes CPU utilization to go through the roof.  Not
         // sure why.  Disable this for now on OS X until further information
         // is available on this.
-        this->sendPostedEvents(0, QEvent::DeferredDelete);
+        sendPostedEvents(0, QEvent::DeferredDelete);
 #endif
-        this->sendPostedEvents();
-        this->processEvents(flags);
-        this->sendPostedEvents();
+        sendPostedEvents();
+        processEvents(flags);
+        sendPostedEvents();
         working = false;
     }
 
@@ -259,11 +259,11 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
         working = true;
 
 #ifndef Q_OS_MAC
-        this->sendPostedEvents(0, QEvent::DeferredDelete);
+        sendPostedEvents(0, QEvent::DeferredDelete);
 #endif
-        this->sendPostedEvents();
-        this->processEvents(flags, maxtime);
-        this->sendPostedEvents();
+        sendPostedEvents();
+        processEvents(flags, maxtime);
+        sendPostedEvents();
         working = false;
     }
 
@@ -275,7 +275,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
 
     class CHtmlParser*
     get_parser() override
-    { return this->fParser; }
+    { return fParser; }
 
     void
     start_new_page() override;

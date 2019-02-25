@@ -79,7 +79,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     Q_ASSERT(qWinGroup == 0);
 
     // Make sure we can drag&drop (files in our case) into the main window.
-    this->setAcceptDrops(true);
+    setAcceptDrops(true);
 
     // We make our menu bar parentless so it will be shared by all our windows
     // in Mac OS X.
@@ -98,40 +98,40 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 #if QT_VERSION >= 0x040600
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("document-open-recent")));
 #endif
-    this->fRecentGamesMenu = new QMenu(this);
-    act->setMenu(this->fRecentGamesMenu);
+    fRecentGamesMenu = new QMenu(this);
+    act->setMenu(fRecentGamesMenu);
     menu->addAction(act);
-    connect(this->fRecentGamesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fRecentGameTriggered(QAction*)));
-    this->fRestartCurrentGameAction = new QAction(tr("Re&start"), this);
+    connect(fRecentGamesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fRecentGameTriggered(QAction*)));
+    fRestartCurrentGameAction = new QAction(tr("Re&start"), this);
 #if QT_VERSION >= 0x040600
-    this->fRestartCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("view-refresh")));
+    fRestartCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("view-refresh")));
 #endif
-    this->fRestartCurrentGameAction->setShortcut(QKeySequence(QString::fromLatin1("Ctrl+R")));
-    menu->addAction(this->fRestartCurrentGameAction);
-    this->fRestartCurrentGameAction->setEnabled(false);
-    connect(this->fRestartCurrentGameAction, SIGNAL(triggered()), this, SLOT(fRestartCurrentGame()));
-    this->fEndCurrentGameAction = new QAction(tr("Qui&t"), this);
-    this->fEndCurrentGameAction->setMenuRole(QAction::NoRole);
+    fRestartCurrentGameAction->setShortcut(QKeySequence(QString::fromLatin1("Ctrl+R")));
+    menu->addAction(fRestartCurrentGameAction);
+    fRestartCurrentGameAction->setEnabled(false);
+    connect(fRestartCurrentGameAction, SIGNAL(triggered()), this, SLOT(fRestartCurrentGame()));
+    fEndCurrentGameAction = new QAction(tr("Qui&t"), this);
+    fEndCurrentGameAction->setMenuRole(QAction::NoRole);
 #if QT_VERSION >= 0x040600
-    this->fEndCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("process-stop")));
+    fEndCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("process-stop")));
 #endif
-    this->fEndCurrentGameAction->setShortcuts(QKeySequence::Close);
-    menu->addAction(this->fEndCurrentGameAction);
-    this->fEndCurrentGameAction->setEnabled(false);
-    connect(this->fEndCurrentGameAction, SIGNAL(triggered()), this, SLOT(fEndCurrentGame()));
+    fEndCurrentGameAction->setShortcuts(QKeySequence::Close);
+    menu->addAction(fEndCurrentGameAction);
+    fEndCurrentGameAction->setEnabled(false);
+    connect(fEndCurrentGameAction, SIGNAL(triggered()), this, SLOT(fEndCurrentGame()));
     menu->addSeparator();
-    this->fAboutGameAction = new QAction(tr("&About This Game"), this);
-    this->fAboutGameAction->setMenuRole(QAction::NoRole);
-    this->fAboutGameAction->setEnabled(false);
-    menu->addAction(this->fAboutGameAction);
-    connect(this->fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
-    this->fGameInfoAction = new QAction(tr("View Metadata"), this);
+    fAboutGameAction = new QAction(tr("&About This Game"), this);
+    fAboutGameAction->setMenuRole(QAction::NoRole);
+    fAboutGameAction->setEnabled(false);
+    menu->addAction(fAboutGameAction);
+    connect(fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
+    fGameInfoAction = new QAction(tr("View Metadata"), this);
 #if QT_VERSION >= 0x040600
-    this->fGameInfoAction->setIcon(QIcon::fromTheme(QString::fromLatin1("document-properties")));
+    fGameInfoAction->setIcon(QIcon::fromTheme(QString::fromLatin1("document-properties")));
 #endif
-    menu->addAction(this->fGameInfoAction);
-    this->fGameInfoAction->setEnabled(false);
-    connect(this->fGameInfoAction, SIGNAL(triggered()), this, SLOT(fShowGameInfoDialog()));
+    menu->addAction(fGameInfoAction);
+    fGameInfoAction->setEnabled(false);
+    connect(fGameInfoAction, SIGNAL(triggered()), this, SLOT(fShowGameInfoDialog()));
     menu->addSeparator();
     act = new QAction(tr("&Quit QTads"), this);
     act->setMenuRole(QAction::QuitRole);
@@ -144,22 +144,22 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
     // "Edit" menu.
     menu = menuBar->addMenu(tr("&Edit"));
-    this->fCopyAction = new QAction(tr("&Copy"), this);
+    fCopyAction = new QAction(tr("&Copy"), this);
 #if QT_VERSION >= 0x040600
-    this->fCopyAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-copy")));
-    this->fCopyAction->setShortcuts(QKeySequence::Copy);
+    fCopyAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-copy")));
+    fCopyAction->setShortcuts(QKeySequence::Copy);
 #endif
-    this->fCopyAction->setEnabled(false);
-    menu->addAction(this->fCopyAction);
-    connect(this->fCopyAction, SIGNAL(triggered()), SLOT(copyToClipboard()));
-    this->fPasteAction = new QAction(tr("&Paste"), this);
+    fCopyAction->setEnabled(false);
+    menu->addAction(fCopyAction);
+    connect(fCopyAction, SIGNAL(triggered()), SLOT(copyToClipboard()));
+    fPasteAction = new QAction(tr("&Paste"), this);
 #if QT_VERSION >= 0x040600
-    this->fPasteAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-paste")));
-    this->fPasteAction->setShortcuts(QKeySequence::Paste);
+    fPasteAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-paste")));
+    fPasteAction->setShortcuts(QKeySequence::Paste);
 #endif
-    this->fPasteAction->setDisabled(true);
-    menu->addAction(this->fPasteAction);
-    connect(this->fPasteAction, SIGNAL(triggered()), SLOT(pasteFromClipboard()));
+    fPasteAction->setDisabled(true);
+    menu->addAction(fPasteAction);
+    connect(fPasteAction, SIGNAL(triggered()), SLOT(pasteFromClipboard()));
     connect(QApplication::clipboard(), SIGNAL(dataChanged()), SLOT(updatePasteAction()));
     menu->addSeparator();
     act = new QAction(tr("&Preferences..."), this);
@@ -172,32 +172,32 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
     // "Help" menu.
     menu = menuBar->addMenu(tr("&Help"));
-    this->fAboutQtadsAction = new QAction(tr("A&bout QTads"), this);
+    fAboutQtadsAction = new QAction(tr("A&bout QTads"), this);
 #if QT_VERSION >= 0x040600
-    this->fAboutQtadsAction->setIcon(QIcon::fromTheme(QString::fromLatin1("help-about")));
+    fAboutQtadsAction->setIcon(QIcon::fromTheme(QString::fromLatin1("help-about")));
 #endif
-    menu->addAction(this->fAboutQtadsAction);
-    connect(this->fAboutQtadsAction, SIGNAL(triggered()), this, SLOT(fShowAboutQtads()));
+    menu->addAction(fAboutQtadsAction);
+    connect(fAboutQtadsAction, SIGNAL(triggered()), this, SLOT(fShowAboutQtads()));
     act = new QAction(tr("&Check for Updates"), this);
     act->setMenuRole(QAction::ApplicationSpecificRole);
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(fCheckForUpdates()));
 
-    this->setMenuBar(menuBar);
+    setMenuBar(menuBar);
 
     // Create a default status bar.
-    this->statusBar();
+    statusBar();
 
     // Set up our central widget.
-    this->fFrame = new QTadsFrame(this);
-    this->fFrame->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
-    this->fFrame->setLineWidth(0);
-    this->fFrame->setContentsMargins(0,0,0,0);
-    this->setCentralWidget(this->fFrame);
+    fFrame = new QTadsFrame(this);
+    fFrame->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+    fFrame->setLineWidth(0);
+    fFrame->setContentsMargins(0,0,0,0);
+    setCentralWidget(fFrame);
 
     // Use a sane minimum size; by default Qt would allow us to be resized
     // to almost zero.
-    this->setMinimumSize(240, 180);
+    setMinimumSize(240, 180);
 
     // Receive notification when a game is about to quit/start so we can
     // enable/disable related actions.
@@ -292,15 +292,15 @@ void
 CHtmlSysWinGroupQt::fCheckForUpdates()
 {
     // If there's already an update check in progress, don't do anything.
-    if (this->fNetManager != 0) {
+    if (fNetManager != 0) {
         return;
     }
 
-    this->fNetManager = new QNetworkAccessManager(this);
-    connect(this->fNetManager, SIGNAL(finished(QNetworkReply*)), SLOT(fReplyFinished(QNetworkReply*)));
+    fNetManager = new QNetworkAccessManager(this);
+    connect(fNetManager, SIGNAL(finished(QNetworkReply*)), SLOT(fReplyFinished(QNetworkReply*)));
 
-    this->fHttpRedirectCount = 0;
-    this->fReply = sendNetRequest(this->fNetManager,
+    fHttpRedirectCount = 0;
+    fReply = sendNetRequest(fNetManager,
                                   QUrl(QString::fromLatin1("http://qtads.sourceforge.net/currentversion")));
 }
 
@@ -324,22 +324,22 @@ void
 CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
 {
     if (reply->error() != QNetworkReply::NoError) {
-        showUpdateErrorMsg(this->fReply->errorString());
-        this->fNetManager->deleteLater();
-        this->fReply->deleteLater();
-        this->fNetManager = 0;
+        showUpdateErrorMsg(fReply->errorString());
+        fNetManager->deleteLater();
+        fReply->deleteLater();
+        fNetManager = 0;
         return;
     }
 
     // If we get an HTTP redirect, retry the request with the new URL.
     if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 302) {
-        ++this->fHttpRedirectCount;
+        ++fHttpRedirectCount;
         // If we got more than 5 redirects by now, something's wrong. Abort.
-        if (this->fHttpRedirectCount > 5) {
+        if (fHttpRedirectCount > 5) {
             showUpdateErrorMsg(tr("Too many HTTP redirects"));
-            this->fNetManager->deleteLater();
-            this->fReply->deleteLater();
-            this->fNetManager = 0;
+            fNetManager->deleteLater();
+            fReply->deleteLater();
+            fNetManager = 0;
             return;
         }
         QUrl newUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
@@ -347,7 +347,7 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
             newUrl = reply->url().resolved(newUrl);
         }
         reply->deleteLater();
-        this->fReply = sendNetRequest(this->fNetManager, newUrl);
+        fReply = sendNetRequest(fNetManager, newUrl);
         return;
     }
 
@@ -360,9 +360,9 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
             errMsg += QString::fromLatin1(" (") + httpReason + QString::fromLatin1(")");
         }
         showUpdateErrorMsg(errMsg);
-        this->fNetManager->deleteLater();
-        this->fReply->deleteLater();
-        this->fNetManager = 0;
+        fNetManager->deleteLater();
+        fReply->deleteLater();
+        fNetManager = 0;
         return;
     }
 
@@ -418,7 +418,7 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
         if (msgBox->exec() == QMessageBox::Yes) {
             QDesktopServices::openUrl(QUrl(QString::fromLatin1("http://qtads.sourceforge.net/downloads.shtml")));
         }
-    } else if (not this->fSilentIfNoUpdates) {
+    } else if (not fSilentIfNoUpdates) {
 #ifdef Q_OS_MAC
         msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
 #else
@@ -427,10 +427,10 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
         msgBox->setText(tr("This version of QTads is up to date."));
         msgBox->exec();
     }
-    this->fSilentIfNoUpdates = false;
-    this->fNetManager->deleteLater();
-    this->fReply->deleteLater();
-    this->fNetManager = 0;
+    fSilentIfNoUpdates = false;
+    fNetManager->deleteLater();
+    fReply->deleteLater();
+    fNetManager = 0;
     qFrame->settings()->lastUpdateDate = QDate::currentDate();
 }
 
@@ -439,25 +439,25 @@ void
 CHtmlSysWinGroupQt::fShowGameInfoDialog()
 {
     // If the dialog is already open, simply activate and raise it.
-    if (this->fGameInfoDialog != 0) {
-        this->fGameInfoDialog->activateWindow();
-        this->fGameInfoDialog->raise();
+    if (fGameInfoDialog != 0) {
+        fGameInfoDialog->activateWindow();
+        fGameInfoDialog->raise();
         return;
     }
-    this->fGameInfoDialog = new GameInfoDialog(qStrToFname(qFrame->gameFile()), this);
-    this->fGameInfoDialog->setWindowTitle(tr("Game Information"));
+    fGameInfoDialog = new GameInfoDialog(qStrToFname(qFrame->gameFile()), this);
+    fGameInfoDialog->setWindowTitle(tr("Game Information"));
     connect(fGameInfoDialog, SIGNAL(finished(int)), SLOT(fHideGameInfoDialog()));
     connect(fGameInfoDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
-    this->fGameInfoDialog->show();
+    fGameInfoDialog->show();
 }
 
 
 void
 CHtmlSysWinGroupQt::fHideGameInfoDialog()
 {
-    if (this->fGameInfoDialog != 0) {
-        this->fGameInfoDialog->deleteLater();
-        this->fGameInfoDialog = 0;
+    if (fGameInfoDialog != 0) {
+        fGameInfoDialog->deleteLater();
+        fGameInfoDialog = 0;
     }
 }
 
@@ -466,34 +466,34 @@ void
 CHtmlSysWinGroupQt::fShowConfDialog()
 {
     // If the dialog is already open, simply activate and raise it.
-    if (this->fConfDialog != 0) {
-        this->fConfDialog->activateWindow();
-        this->fConfDialog->raise();
+    if (fConfDialog != 0) {
+        fConfDialog->activateWindow();
+        fConfDialog->raise();
         return;
     }
-    this->fConfDialog = new ConfDialog(this);
-    this->fConfDialog->setWindowTitle(tr("QTads Preferences"));
-    connect(this->fConfDialog, SIGNAL(finished(int)), this, SLOT(fHideConfDialog()));
+    fConfDialog = new ConfDialog(this);
+    fConfDialog->setWindowTitle(tr("QTads Preferences"));
+    connect(fConfDialog, SIGNAL(finished(int)), this, SLOT(fHideConfDialog()));
 #ifdef Q_OS_MAC
     // There's a bug in Qt for OS X that results in a visual glitch with
     // QFontComboBox widgets inside QFormLayouts.  Making the dialog 4 pixels
     // higher fixes it.
     //
     // See: http://bugreports.qt.nokia.com/browse/QTBUG-10460
-    this->fConfDialog->layout()->activate();
-    this->fConfDialog->setMinimumHeight(this->fConfDialog->minimumHeight() + 4);
+    fConfDialog->layout()->activate();
+    fConfDialog->setMinimumHeight(fConfDialog->minimumHeight() + 4);
 #endif
     connect(fConfDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
-    this->fConfDialog->show();
+    fConfDialog->show();
 }
 
 
 void
 CHtmlSysWinGroupQt::fHideConfDialog()
 {
-    if (this->fConfDialog != 0) {
-        this->fConfDialog->deleteLater();
-        this->fConfDialog = 0;
+    if (fConfDialog != 0) {
+        fConfDialog->deleteLater();
+        fConfDialog = 0;
     }
 }
 
@@ -501,26 +501,26 @@ CHtmlSysWinGroupQt::fHideConfDialog()
 void
 CHtmlSysWinGroupQt::fShowAboutGame()
 {
-    if (this->fAboutBox == 0) {
+    if (fAboutBox == 0) {
         return;
     }
-    if (this->fAboutBoxDialog != 0 and this->fAboutBoxDialog->isVisible()) {
-        this->fAboutBoxDialog->activateWindow();
-        this->fAboutBoxDialog->raise();
+    if (fAboutBoxDialog != 0 and fAboutBoxDialog->isVisible()) {
+        fAboutBoxDialog->activateWindow();
+        fAboutBoxDialog->raise();
         return;
     }
-    if (this->fAboutBoxDialog == 0) {
-        this->fAboutBoxDialog = new QDialog(this, Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-        this->fAboutBoxDialog->setWindowTitle(tr("About This Game"));
-        this->fAboutBox->setParent(this->fAboutBoxDialog);
-        QVBoxLayout* layout = new QVBoxLayout(this->fAboutBoxDialog);
+    if (fAboutBoxDialog == 0) {
+        fAboutBoxDialog = new QDialog(this, Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        fAboutBoxDialog->setWindowTitle(tr("About This Game"));
+        fAboutBox->setParent(fAboutBoxDialog);
+        QVBoxLayout* layout = new QVBoxLayout(fAboutBoxDialog);
         layout->setContentsMargins(0, 0, 0, 0);
-        layout->addWidget(this->fAboutBox);
-        connect(this->fAboutBoxDialog, SIGNAL(finished(int)), SLOT(fHideAboutGame()));
+        layout->addWidget(fAboutBox);
+        connect(fAboutBoxDialog, SIGNAL(finished(int)), SLOT(fHideAboutGame()));
     }
-    this->fAboutBoxDialog->resize(this->fAboutBox->size());
+    fAboutBoxDialog->resize(fAboutBox->size());
     connect(fAboutBoxDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
-    this->fAboutBoxDialog->show();
+    fAboutBoxDialog->show();
 }
 
 
@@ -529,10 +529,10 @@ CHtmlSysWinGroupQt::fHideAboutGame()
 {
     // Destroy the dialog, but not the about box HTML banner.  We reparent
     // the banner so it won't be automatically deleted by its parent.
-    this->fAboutBox->setParent(0);
-    this->fAboutBoxDialog->hide();
-    this->fAboutBoxDialog->deleteLater();
-    this->fAboutBoxDialog = 0;
+    fAboutBox->setParent(0);
+    fAboutBoxDialog->hide();
+    fAboutBoxDialog->deleteLater();
+    fAboutBoxDialog = 0;
 }
 
 
@@ -540,30 +540,30 @@ void
 CHtmlSysWinGroupQt::fShowAboutQtads()
 {
     // If the dialog is already open, simply activate and raise it.
-    if (this->fAboutQtadsDialog != 0) {
-        this->fAboutQtadsDialog->activateWindow();
-        this->fAboutQtadsDialog->raise();
+    if (fAboutQtadsDialog != 0) {
+        fAboutQtadsDialog->activateWindow();
+        fAboutQtadsDialog->raise();
         return;
     }
 
-    this->fAboutQtadsDialog = new AboutQtadsDialog(this);
-    connect(this->fAboutQtadsDialog, SIGNAL(finished(int)), this, SLOT(fHideAboutQtads()));
+    fAboutQtadsDialog = new AboutQtadsDialog(this);
+    connect(fAboutQtadsDialog, SIGNAL(finished(int)), this, SLOT(fHideAboutQtads()));
 #ifdef Q_OS_MAC
     // Similar bug to the config dialog one.  Again, 4 pixels higher fixes it.
-    this->fAboutQtadsDialog->layout()->activate();
-    this->fAboutQtadsDialog->setMinimumHeight(this->fAboutQtadsDialog->minimumHeight() + 4);
+    fAboutQtadsDialog->layout()->activate();
+    fAboutQtadsDialog->setMinimumHeight(fAboutQtadsDialog->minimumHeight() + 4);
 #endif
     connect(fAboutQtadsDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
-    this->fAboutQtadsDialog->show();
+    fAboutQtadsDialog->show();
 }
 
 
 void
 CHtmlSysWinGroupQt::fHideAboutQtads()
 {
-    if (this->fAboutQtadsDialog != 0) {
-        this->fAboutQtadsDialog->deleteLater();
-        this->fAboutQtadsDialog = 0;
+    if (fAboutQtadsDialog != 0) {
+        fAboutQtadsDialog->deleteLater();
+        fAboutQtadsDialog = 0;
     }
 }
 
@@ -575,7 +575,7 @@ CHtmlSysWinGroupQt::fOpenNewGame()
                                                         qFrame->settings()->lastFileOpenDir,
                                                         tr("TADS Games")
                                                         + QString::fromLatin1(" (*.gam *.Gam *.GAM *.t3 *.T3)"));
-    this->activateWindow();
+    activateWindow();
     if (not fname.isEmpty()) {
         qFrame->settings()->lastFileOpenDir = QFileInfo(fname).absolutePath();
         qFrame->setNextGame(fname);
@@ -586,7 +586,7 @@ CHtmlSysWinGroupQt::fOpenNewGame()
 void
 CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 {
-    if (this->fAskQuitGameDialog()) {
+    if (fAskQuitGameDialog()) {
         qFrame->setNextGame(action->statusTip());
     }
 }
@@ -595,7 +595,7 @@ CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
 void
 CHtmlSysWinGroupQt::fEndCurrentGame()
 {
-    if (this->fAskQuitGameDialog()) {
+    if (fAskQuitGameDialog()) {
         qFrame->setGameRunning(false);
     }
 }
@@ -604,7 +604,7 @@ CHtmlSysWinGroupQt::fEndCurrentGame()
 void
 CHtmlSysWinGroupQt::fRestartCurrentGame()
 {
-    if (this->fAskRestartGameDialog()) {
+    if (fAskRestartGameDialog()) {
         qFrame->setNextGame(qFrame->gameFile());
     }
 }
@@ -613,19 +613,19 @@ CHtmlSysWinGroupQt::fRestartCurrentGame()
 void
 CHtmlSysWinGroupQt::fNotifyGameQuitting()
 {
-    this->fGameInfoAction->setEnabled(false);
-    this->fRestartCurrentGameAction->setEnabled(false);
-    this->fEndCurrentGameAction->setEnabled(false);
+    fGameInfoAction->setEnabled(false);
+    fRestartCurrentGameAction->setEnabled(false);
+    fEndCurrentGameAction->setEnabled(false);
 }
 
 
 void
 CHtmlSysWinGroupQt::fNotifyGameStarting()
 {
-    this->fHideGameInfoDialog();
-    this->fGameInfoAction->setEnabled(GameInfoDialog::gameHasMetaInfo(qStrToFname(qFrame->gameFile())));
-    this->fRestartCurrentGameAction->setEnabled(true);
-    this->fEndCurrentGameAction->setEnabled(true);
+    fHideGameInfoDialog();
+    fGameInfoAction->setEnabled(GameInfoDialog::gameHasMetaInfo(qStrToFname(qFrame->gameFile())));
+    fRestartCurrentGameAction->setEnabled(true);
+    fEndCurrentGameAction->setEnabled(true);
 }
 
 
@@ -651,7 +651,7 @@ CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
     if (not qFrame->settings()->confirmQuitGame or msgBox->exec() == QMessageBox::Yes) {
         qFrame->setGameRunning(false);
         // Make sure the VM knows that we're closing.
-        this->fWantsToQuit = true;
+        fWantsToQuit = true;
         e->accept();
     } else {
         e->ignore();
@@ -676,7 +676,7 @@ void
 CHtmlSysWinGroupQt::dropEvent( QDropEvent* e )
 {
     e->acceptProposedAction();
-    this->fGameFileFromDropEvent = e->mimeData()->urls().at(0).toLocalFile();
+    fGameFileFromDropEvent = e->mimeData()->urls().at(0).toLocalFile();
     QTimer::singleShot(100, this, SLOT(fRunDropEventFile()));
 }
 
@@ -701,8 +701,8 @@ CHtmlSysWinGroupQt::pasteFromClipboard()
 void
 CHtmlSysWinGroupQt::fRunDropEventFile()
 {
-    if (this->fAskQuitGameDialog()) {
-        qFrame->setNextGame(this->fGameFileFromDropEvent);
+    if (fAskQuitGameDialog()) {
+        qFrame->setNextGame(fGameFileFromDropEvent);
     }
 }
 
@@ -710,7 +710,7 @@ CHtmlSysWinGroupQt::fRunDropEventFile()
 void
 CHtmlSysWinGroupQt::updatePasteAction()
 {
-    this->fPasteAction->setDisabled(QApplication::clipboard()->text().isEmpty()
+    fPasteAction->setDisabled(QApplication::clipboard()->text().isEmpty()
                                     or not qFrame->gameWindow());
 }
 
@@ -719,33 +719,33 @@ CHtmlSysWinAboutBoxQt*
 CHtmlSysWinGroupQt::createAboutBox( class CHtmlFormatter* formatter )
 {
     // If there's already an "about" box, destroy it first.
-    if (this->fAboutBoxDialog != 0) {
-        this->fHideAboutGame();
+    if (fAboutBoxDialog != 0) {
+        fHideAboutGame();
     } else {
-        this->fAboutGameAction->setEnabled(true);
+        fAboutGameAction->setEnabled(true);
     }
 
     // We will reparent the banner when we show the actual dialog.
-    this->fAboutBox = new CHtmlSysWinAboutBoxQt(formatter, 0);
+    fAboutBox = new CHtmlSysWinAboutBoxQt(formatter, 0);
     // Only set the width to something comfortable.  The height will be
     // calculated later when set_banner_size() is called on the about box.
-    this->fAboutBox->resize(500, 0);
-    return this->fAboutBox;
+    fAboutBox->resize(500, 0);
+    return fAboutBox;
 }
 
 
 void
 CHtmlSysWinGroupQt::deleteAboutBox()
 {
-    if (this->fAboutBox == 0) {
+    if (fAboutBox == 0) {
         return;
     }
-    if (this->fAboutBoxDialog != 0) {
-        this->fHideAboutGame();
+    if (fAboutBoxDialog != 0) {
+        fHideAboutGame();
     }
-    delete this->fAboutBox;
-    this->fAboutBox = 0;
-    this->fAboutGameAction->setEnabled(false);
+    delete fAboutBox;
+    fAboutBox = 0;
+    fAboutGameAction->setEnabled(false);
 }
 
 
@@ -753,17 +753,17 @@ void
 CHtmlSysWinGroupQt::updateRecentGames()
 {
     // We simply clear the menu of all items and re-populate it.
-    this->fRecentGamesMenu->clear();
+    fRecentGamesMenu->clear();
 
     // If the list is empty, disable the menu.
     if (qFrame->settings()->recentGamesList.isEmpty()) {
-        this->fRecentGamesMenu->setEnabled(false);
+        fRecentGamesMenu->setEnabled(false);
         return;
     }
 
     // The list is not empty.  If the menu was disabled, enable it.
-    if (not this->fRecentGamesMenu->isEnabled()) {
-        this->fRecentGamesMenu->setEnabled(true);
+    if (not fRecentGamesMenu->isEnabled()) {
+        fRecentGamesMenu->setEnabled(true);
     }
 
     // Populate it.
@@ -774,7 +774,7 @@ CHtmlSysWinGroupQt::updateRecentGames()
             gameName = QFileInfo(list.at(i)).fileName();
         }
         gameName = gameName.replace(QString::fromLatin1("&"), QString::fromLatin1("&&"));
-        QAction* act = this->fRecentGamesMenu->addAction(gameName);
+        QAction* act = fRecentGamesMenu->addAction(gameName);
         // Elide the text in case it's too long.
         act->setText(QFontMetrics(act->font()).elidedText(gameName, Qt::ElideRight, 300));
         act->setStatusTip(QString(list.at(i)));
@@ -784,15 +784,15 @@ CHtmlSysWinGroupQt::updateRecentGames()
 void
 CHtmlSysWinGroupQt::checkForUpdates()
 {
-    this->fSilentIfNoUpdates = true;
-    this->fCheckForUpdates();
+    fSilentIfNoUpdates = true;
+    fCheckForUpdates();
 }
 
 
 void
 CHtmlSysWinGroupQt::enableCopyAction( bool f )
 {
-    this->fCopyAction->setEnabled(f);
+    fCopyAction->setEnabled(f);
 }
 
 
@@ -805,7 +805,7 @@ CHtmlSysWinGroupQt::handleFileOpenEvent( class QFileOpenEvent* e )
         return false;
     }
     e->accept();
-    this->fGameFileFromDropEvent = e->file();
+    fGameFileFromDropEvent = e->file();
     QTimer::singleShot(100, this, SLOT(fRunDropEventFile()));
     return true;
 }

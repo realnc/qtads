@@ -65,38 +65,38 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
     //qDebug() << Q_FUNC_INFO;
     Q_ASSERT(qFrame == 0);
 
-    this->setApplicationName(QString::fromLatin1(appName));
-    this->setApplicationVersion(QString::fromLatin1(appVersion));
-    this->setOrganizationName(QString::fromLatin1(orgName));
-    this->setOrganizationDomain(QString::fromLatin1(orgDomain));
+    setApplicationName(QString::fromLatin1(appName));
+    setApplicationVersion(QString::fromLatin1(appVersion));
+    setOrganizationName(QString::fromLatin1(orgName));
+    setOrganizationDomain(QString::fromLatin1(orgDomain));
 
     // Load our persistent settings.
-    this->fSettings = new Settings;
-    this->fSettings->loadFromDisk();
+    fSettings = new Settings;
+    fSettings->loadFromDisk();
 
     // Initialize the input color with the user-configured one.  The game is
     // free to change the input color later on.
-    const QColor& tmpCol = this->fSettings->inputColor;
-    this->fInputColor = HTML_make_color(tmpCol.red(), tmpCol.green(), tmpCol.blue());
+    const QColor& tmpCol = fSettings->inputColor;
+    fInputColor = HTML_make_color(tmpCol.red(), tmpCol.green(), tmpCol.blue());
 
-    this->fParser = 0;
-    this->fFormatter = 0;
+    fParser = 0;
+    fFormatter = 0;
 
     // Clear the TADS appctx; all unused fields must be 0.
-    memset(&this->fAppctx, 0, sizeof(this->fAppctx));
-    this->fAppctx.get_io_safety_level = CHtmlSysFrameQt::fCtxGetIOSafetyLevel;
+    memset(&fAppctx, 0, sizeof(fAppctx));
+    fAppctx.get_io_safety_level = CHtmlSysFrameQt::fCtxGetIOSafetyLevel;
 
     // Create the TADS host and client application interfaces.
-    this->fHostifc = new QTadsHostIfc(&this->fAppctx);
-    this->fClientifc = new CVmMainClientConsole;
+    fHostifc = new QTadsHostIfc(&fAppctx);
+    fClientifc = new CVmMainClientConsole;
 
     // Set our global pointer.
     qFrame = this;
 
     // Create our main application window.
-    this->fMainWin = new CHtmlSysWinGroupQt;
-    this->fMainWin->setWindowTitle(QString::fromLatin1(appName));
-    this->fMainWin->updateRecentGames();
+    fMainWin = new CHtmlSysWinGroupQt;
+    fMainWin->setWindowTitle(QString::fromLatin1(appName));
+    fMainWin->updateRecentGames();
 
     // Automatically quit the application when the last window has closed.
     connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
@@ -107,7 +107,7 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
     // Set application window icon, unless we're on OS X where the bundle
     // icon is used.
 #ifndef Q_OS_MAC
-    this->setWindowIcon(QIcon(QString::fromLatin1(":/qtads_48x48.png")));
+    setWindowIcon(QIcon(QString::fromLatin1(":/qtads_48x48.png")));
 #endif
 }
 
@@ -118,64 +118,64 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
     Q_ASSERT(qFrame != 0);
 
     // Delete the "about this game" box.
-    this->fMainWin->deleteAboutBox();
+    fMainWin->deleteAboutBox();
 
     // We're no longer the main frame object.
     CHtmlSysFrame::set_frame_obj(0);
 
     // Save our persistent settings.
-    this->fSettings->saveToDisk();
+    fSettings->saveToDisk();
 
     // We're being destroyed, so our global pointer is no longer valid.
     qFrame = 0;
 
     // Delete HTML banners, orphaned banners and main game window.
-    while (not this->fBannerList.isEmpty()) {
-        delete this->fBannerList.takeLast();
+    while (not fBannerList.isEmpty()) {
+        delete fBannerList.takeLast();
     }
-    while (not this->fOrhpanBannerList.isEmpty()) {
-        os_banner_delete(this->fOrhpanBannerList.takeLast());
+    while (not fOrhpanBannerList.isEmpty()) {
+        os_banner_delete(fOrhpanBannerList.takeLast());
     }
-    if (this->fGameWin != 0) {
-        delete this->fGameWin;
+    if (fGameWin != 0) {
+        delete fGameWin;
     }
 
     // Release the parser and delete our parser and formatter.
-    if (this->fFormatter != 0) {
-        this->fFormatter->release_parser();
+    if (fFormatter != 0) {
+        fFormatter->release_parser();
     }
-    if (this->fParser != 0) {
-        delete this->fParser;
+    if (fParser != 0) {
+        delete fParser;
     }
-    if (this->fFormatter != 0) {
-        delete this->fFormatter;
+    if (fFormatter != 0) {
+        delete fFormatter;
     }
 
     // Delete cached fonts.
-    while (not this->fFontList.isEmpty()) {
-        delete this->fFontList.takeLast();
+    while (not fFontList.isEmpty()) {
+        delete fFontList.takeLast();
     }
 
     // Delete our TADS application interfaces and settings.
-    delete this->fClientifc;
-    delete this->fHostifc;
-    delete this->fSettings;
+    delete fClientifc;
+    delete fHostifc;
+    delete fSettings;
 
-    delete this->fMainWin;
+    delete fMainWin;
 }
 
 
 void
 CHtmlSysFrameQt::fRunGame()
 {
-    if (this->fNextGame.isEmpty()) {
+    if (fNextGame.isEmpty()) {
         // Nothing to run.
         return;
     }
 
-    while (not this->fNextGame.isEmpty()) {
-        QFileInfo finfo(QFileInfo(this->fNextGame).absoluteFilePath());
-        this->fNextGame.clear();
+    while (not fNextGame.isEmpty()) {
+        QFileInfo finfo(QFileInfo(fNextGame).absoluteFilePath());
+        fNextGame.clear();
 
         // Change to the game file's directory.
         QDir::setCurrent(finfo.absolutePath());
@@ -184,43 +184,43 @@ CHtmlSysFrameQt::fRunGame()
         int vmType = vm_get_game_type(qStrToFname(finfo.absoluteFilePath()).constData(), 0, 0, 0, 0);
         if (vmType == VM_GGT_TADS2 or vmType == VM_GGT_TADS3) {
             // Delete all HTML and orphaned banners.
-            while (not this->fOrhpanBannerList.isEmpty()) {
-                os_banner_delete(this->fOrhpanBannerList.takeLast());
+            while (not fOrhpanBannerList.isEmpty()) {
+                os_banner_delete(fOrhpanBannerList.takeLast());
             }
-            while (not this->fBannerList.isEmpty()) {
-                delete this->fBannerList.takeLast();
+            while (not fBannerList.isEmpty()) {
+                delete fBannerList.takeLast();
             }
 
             // Delete the current main HTML game window.
-            if (this->fGameWin != 0) {
-                delete this->fGameWin;
+            if (fGameWin != 0) {
+                delete fGameWin;
             }
 
             // Delete current HTML parser and main game window formatter.
-            if (this->fFormatter != 0) {
-                this->fFormatter->release_parser();
+            if (fFormatter != 0) {
+                fFormatter->release_parser();
             }
-            if (this->fParser != 0) {
-                delete this->fParser;
+            if (fParser != 0) {
+                delete fParser;
             }
-            if (this->fFormatter != 0) {
-                delete this->fFormatter;
+            if (fFormatter != 0) {
+                delete fFormatter;
             }
 
             // Delete cached fonts.
-            while (not this->fFontList.isEmpty()) {
-                delete this->fFontList.takeLast();
+            while (not fFontList.isEmpty()) {
+                delete fFontList.takeLast();
             }
 
             // Recreate them.
-            this->fParser = new CHtmlParser(true);
-            this->fFormatter = new CHtmlFormatterInput(this->fParser);
+            fParser = new CHtmlParser(true);
+            fFormatter = new CHtmlFormatterInput(fParser);
             // Tell the resource finder about our appctx.
-            this->fFormatter->get_res_finder()->init_appctx(&this->fAppctx);
-            this->fGameWin = new CHtmlSysWinInputQt(this->fFormatter, qWinGroup->centralWidget());
-            this->fGameWin->resize(qWinGroup->centralWidget()->size());
-            this->fGameWin->show();
-            this->fGameWin->setFocus();
+            fFormatter->get_res_finder()->init_appctx(&fAppctx);
+            fGameWin = new CHtmlSysWinInputQt(fFormatter, qWinGroup->centralWidget());
+            fGameWin->resize(qWinGroup->centralWidget()->size());
+            fGameWin->show();
+            fGameWin->setFocus();
 
             // Set the application's window title to contain the filename of
             // the game we're running or the game's name as at appears in the
@@ -241,7 +241,7 @@ CHtmlSysFrameQt::fRunGame()
             }
 
             // Add the game file to our "recent games" list.
-            QStringList& gamesList = this->fSettings->recentGamesList;
+            QStringList& gamesList = fSettings->recentGamesList;
             int recentIdx = gamesList.indexOf(finfo.absoluteFilePath());
             if (recentIdx > 0) {
                 // It's already in the list and it's not the first item.  Make
@@ -265,42 +265,42 @@ CHtmlSysFrameQt::fRunGame()
                 } else {
                     // It's not in the list.  Prepend it as the most recent item
                     // and, if the list is full, delete the oldest one.
-                    if (gamesList.size() >= this->fSettings->recentGamesCapacity) {
+                    if (gamesList.size() >= fSettings->recentGamesCapacity) {
                         gamesList.removeLast();
                     }
                     gamesList.prepend(finfo.absoluteFilePath());
                 }
             }
-            this->fMainWin->updateRecentGames();
-            this->fSettings->saveToDisk();
+            fMainWin->updateRecentGames();
+            fSettings->saveToDisk();
             qWinGroup->updatePasteAction();
 
             // Run the appropriate VM.
-            this->fGameRunning = true;
-            this->fGameFile = finfo.absoluteFilePath();
+            fGameRunning = true;
+            fGameFile = finfo.absoluteFilePath();
             emit gameStarting();
             if (vmType == VM_GGT_TADS2) {
-                this->fRunT2Game(finfo.absoluteFilePath());
+                fRunT2Game(finfo.absoluteFilePath());
             } else {
-                this->fRunT3Game(finfo.absoluteFilePath());
+                fRunT3Game(finfo.absoluteFilePath());
             }
-            this->fGameRunning = false;
-            this->fGameFile.clear();
+            fGameRunning = false;
+            fGameFile.clear();
             emit gameHasQuit();
 
             // Flush any pending output and cancel all sounds and animations.
-            this->flush_txtbuf(true, false);
-            this->fFormatter->cancel_sound(HTML_Attrib_invalid, 0.0, false, false);
-            this->fFormatter->cancel_playback();
+            flush_txtbuf(true, false);
+            fFormatter->cancel_sound(HTML_Attrib_invalid, 0.0, false, false);
+            fFormatter->cancel_playback();
 
             // Display a "game has ended" message. We use HTML, so Make sure
             // the parser is in markup mode.
-            this->fParser->obey_markups(true);
+            fParser->obey_markups(true);
             QString endMsg(QString::fromLatin1("<p><br><font face=tads-serif size=-1>(The game has ended.)</font></p>"));
-            this->display_output(endMsg.toUtf8().constData(), endMsg.length());
-            this->flush_txtbuf(true, false);
+            display_output(endMsg.toUtf8().constData(), endMsg.length());
+            flush_txtbuf(true, false);
         } else {
-            QMessageBox::critical(this->fMainWin, tr("Open Game"), finfo.fileName() + tr(" is not a TADS game file."));
+            QMessageBox::critical(fMainWin, tr("Open Game"), finfo.fileName() + tr(" is not a TADS game file."));
         }
     }
 
@@ -313,7 +313,7 @@ void
 CHtmlSysFrameQt::fRunT2Game( const QString& fname )
 {
     // We'll be loading a T2 game.
-    this->fTads3 = false;
+    fTads3 = false;
 
     // T2 requires argc/argv style arguments.
     char argv0[] = "qtads";
@@ -325,7 +325,7 @@ CHtmlSysFrameQt::fRunT2Game( const QString& fname )
     char savExt[] = "sav";
 
     // Start the T2 VM.
-    trdmain(2, argv, &this->fAppctx, savExt);
+    trdmain(2, argv, &fAppctx, savExt);
 
     delete[] argv1;
 }
@@ -338,8 +338,8 @@ CHtmlSysFrameQt::fRunT3Game( const QString& fname )
     // the pointer directly.  We therefore need to hold a reference to
     // the data so that it won't go out of scope.
     const QByteArray& fnameData = qStrToFname(fname);
-    vm_run_image_params params(this->fClientifc, this->fHostifc, fnameData.constData());
-    this->fTads3 = true;
+    vm_run_image_params params(fClientifc, fHostifc, fnameData.constData());
+    fTads3 = true;
     vm_run_image(&params);
 }
 
@@ -362,29 +362,29 @@ void
 CHtmlSysFrameQt::entryPoint( QString gameFileName )
 {
     // Restore the application's size.
-    this->fMainWin->resize(this->fSettings->appSize);
-    this->fMainWin->show();
+    fMainWin->resize(fSettings->appSize);
+    fMainWin->show();
 
     // Do an online update check.
     int daysRequired;
-    switch (this->fSettings->updateFreq) {
+    switch (fSettings->updateFreq) {
       case Settings::UpdateOnEveryStart: daysRequired = 0; break;
       case Settings::UpdateDaily:        daysRequired = 1; break;
       case Settings::UpdateWeekly:       daysRequired = 7; break;
       default:                           daysRequired = -1;
     }
-    if (not this->fSettings->lastUpdateDate.isValid()) {
+    if (not fSettings->lastUpdateDate.isValid()) {
         // Force update check.
         daysRequired = 0;
     }
-    int daysPassed = this->fSettings->lastUpdateDate.daysTo(QDate::currentDate());
+    int daysPassed = fSettings->lastUpdateDate.daysTo(QDate::currentDate());
     if (daysPassed >= daysRequired and daysRequired > -1) {
-        this->fMainWin->checkForUpdates();
+        fMainWin->checkForUpdates();
     }
 
     // If a game file was specified, try to run it.
     if (not gameFileName.isEmpty()) {
-        this->setNextGame(gameFileName);
+        setNextGame(gameFileName);
     }
 }
 
@@ -466,7 +466,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
     // particular name given, the player has no way to directly specify the
     // base size for that font, so the best we can do is use the default text
     // font size for guidance.
-    int base_point_size = this->fSettings->mainFont.pointSize();
+    int base_point_size = fSettings->mainFont.pointSize();
 
     // System font name that is to be used.
     QString fontName;
@@ -486,27 +486,27 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
         for (int i = 0; i < strList.size() and not matchFound; ++i) {
             const QString& s = strList.at(i).simplified().toLower();
             if (s == QString::fromLatin1(HTMLFONT_TADS_SERIF).toLower()) {
-                fontName = this->fSettings->serifFont.family();
-                base_point_size = this->fSettings->serifFont.pointSize();
+                fontName = fSettings->serifFont.family();
+                base_point_size = fSettings->serifFont.pointSize();
                 matchFound = true;
             } else if (s == QString::fromLatin1(HTMLFONT_TADS_SANS).toLower()) {
-                fontName = this->fSettings->sansFont.family();
-                base_point_size = this->fSettings->sansFont.pointSize();
+                fontName = fSettings->sansFont.family();
+                base_point_size = fSettings->sansFont.pointSize();
                 matchFound = true;
             } else if (s == QString::fromLatin1(HTMLFONT_TADS_SCRIPT).toLower()) {
-                fontName = this->fSettings->scriptFont.family();
-                base_point_size = this->fSettings->scriptFont.pointSize();
+                fontName = fSettings->scriptFont.family();
+                base_point_size = fSettings->scriptFont.pointSize();
                 matchFound = true;
             } else if (s == QString::fromLatin1(HTMLFONT_TADS_TYPEWRITER).toLower()) {
-                fontName = this->fSettings->writerFont.family();
-                base_point_size = this->fSettings->writerFont.pointSize();
+                fontName = fSettings->writerFont.family();
+                base_point_size = fSettings->writerFont.pointSize();
                 matchFound = true;
             } else if (s == QString::fromLatin1(HTMLFONT_TADS_INPUT).toLower()) {
-                fontName = this->fSettings->inputFont.family();
-                base_point_size = this->fSettings->inputFont.pointSize();
+                fontName = fSettings->inputFont.family();
+                base_point_size = fSettings->inputFont.pointSize();
                 if (newFontDesc.face_set_explicitly) {
-                    newFont.setBold(this->fSettings->inputFont.bold());
-                    newFont.setItalic(this->fSettings->inputFont.italic());
+                    newFont.setBold(fSettings->inputFont.bold());
+                    newFont.setItalic(fSettings->inputFont.italic());
                     newFontDesc.color = HTML_COLOR_INPUT;
                     newFont.color(HTML_COLOR_INPUT);
                 } else if (newFontDesc.default_color) {
@@ -517,8 +517,8 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
             } else if (s == QString::fromLatin1("qtads-grid")) {
                 // "qtads-grid" is an internal face name; it means we should
                 // return a font suitable for a text grid banner.
-                fontName = this->fSettings->fixedFont.family();
-                base_point_size = this->fSettings->fixedFont.pointSize();
+                fontName = fSettings->fixedFont.family();
+                base_point_size = fSettings->fixedFont.pointSize();
                 matchFound = true;
             } else {
                 newFont.setFamily(s);
@@ -531,25 +531,25 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
         // If we didn't find a match, use the main game font as set by
         // the user.
         if (not matchFound) {
-            fontName = this->fSettings->mainFont.family();
+            fontName = fSettings->mainFont.family();
         }
     // Apply characteristics only if the face wasn't specified.
     } else {
         // See if fixed-pitch is desired.
         if (newFontDesc.fixed_pitch) {
             // Use prefered monospaced font.
-            fontName = this->fSettings->fixedFont.family();
-            base_point_size = this->fSettings->fixedFont.pointSize();
+            fontName = fSettings->fixedFont.family();
+            base_point_size = fSettings->fixedFont.pointSize();
         } else {
             // Use prefered proportional font.
-            fontName = this->fSettings->mainFont.family();
-            base_point_size = this->fSettings->mainFont.pointSize();
+            fontName = fSettings->mainFont.family();
+            base_point_size = fSettings->mainFont.pointSize();
         }
 
         // See if serifs are desired for a variable-pitch font.
         if (not newFontDesc.serif and not newFontDesc.fixed_pitch) {
-            fontName = this->fSettings->serifFont.family();
-            base_point_size = this->fSettings->serifFont.pointSize();
+            fontName = fSettings->serifFont.family();
+            base_point_size = fSettings->serifFont.pointSize();
         }
 
         // See if emphasis (EM) is desired - render italic if so.
@@ -580,8 +580,8 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
             if (newFontDesc.pe_kbd) {
                 newFont.setWeight(QFont::Bold);
             }
-            fontName = this->fSettings->fixedFont.family();
-            base_point_size = this->fSettings->fixedFont.pointSize();
+            fontName = fSettings->fixedFont.family();
+            base_point_size = fSettings->fixedFont.pointSize();
         }
 
         // See if this is a citation (CITE) - render in italics if so.
@@ -631,20 +631,20 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
     }
 
     // Check whether a matching font is already in our cache.
-    for (int i = 0; i < this->fFontList.size(); ++i) {
-        if (*this->fFontList.at(i) == newFont) {
-            return this->fFontList[i];
+    for (int i = 0; i < fFontList.size(); ++i) {
+        if (*fFontList.at(i) == newFont) {
+            return fFontList[i];
         }
     }
 
     //qDebug() << "Font not found in cache; creating new font:" << newFont
-    //      << "\nFonts so far:" << this->fFontList.size() + 1;
+    //      << "\nFonts so far:" << fFontList.size() + 1;
 
     // There was no match in our cache. Create a new font and store it in our
     // cache.
     CHtmlSysFontQt* font = new CHtmlSysFontQt(newFont);
     font->set_font_desc(&newFontDesc);
-    this->fFontList.append(font);
+    fFontList.append(font);
     return font;
 }
 
@@ -652,34 +652,34 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
 void
 CHtmlSysFrameQt::adjustBannerSizes()
 {
-    if (this->fGameWin == 0) {
+    if (fGameWin == 0) {
         return;
     }
 
     // Start with the main game window.  Its area can never exceed the
     // application's central frame.
     QRect siz(qWinGroup->centralWidget()->rect());
-    this->fGameWin->calcChildBannerSizes(siz);
+    fGameWin->calcChildBannerSizes(siz);
 }
 
 
 void
 CHtmlSysFrameQt::reformatBanners( bool showStatus, bool freezeDisplay, bool resetSounds )
 {
-    if (this->fGameWin == 0) {
+    if (fGameWin == 0) {
         return;
     }
 
     // Recalculate the banner layout, in case any of the underlying units (such
     // as the default font size) changed.
-    this->adjustBannerSizes();
+    adjustBannerSizes();
 
     // Always reformat the main panel window.
-    this->fGameWin->doReformat(showStatus, freezeDisplay, resetSounds);
+    fGameWin->doReformat(showStatus, freezeDisplay, resetSounds);
 
     // Reformat each banner window.
-    for (int i = 0; i < this->fBannerList.size(); ++i) {
-        this->fBannerList.at(i)->doReformat(showStatus, freezeDisplay, false);
+    for (int i = 0; i < fBannerList.size(); ++i) {
+        fBannerList.at(i)->doReformat(showStatus, freezeDisplay, false);
     }
 }
 
@@ -690,9 +690,9 @@ CHtmlSysFrameQt::pruneParseTree()
     static int checkCount = 0;
 
     // If there's a reformat pending, perform it.
-    if (this->fReformatPending) {
-        this->fReformatPending = false;
-        this->reformatBanners(true, true, false);
+    if (fReformatPending) {
+        fReformatPending = false;
+        reformatBanners(true, true, false);
     }
 
     // Skip this entirely most of the time; only check every so often, so that
@@ -705,13 +705,13 @@ CHtmlSysFrameQt::pruneParseTree()
 
     // Check to see if we're consuming too much memory - if not, there's
     // nothing we need to do here.
-    if (this->fParser->get_text_array()->get_mem_in_use() < 65536) {
+    if (fParser->get_text_array()->get_mem_in_use() < 65536) {
         return;
     }
 
     // Perform the pruning and reformat all banners.
-    this->fParser->prune_tree(65536 / 2);
-    this->reformatBanners(false, true, false);
+    fParser->prune_tree(65536 / 2);
+    reformatBanners(false, true, false);
 }
 
 
@@ -719,29 +719,29 @@ void
 CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
 {
     // Bail out if we currently don't have an active formatter.
-    if (this->fFormatter == 0) {
+    if (fFormatter == 0) {
         return;
     }
 
     // If digital sounds are now turned off, cancel sound playback in the
     // effects layers
     if (not sett->enableSoundEffects) {
-        this->fFormatter->cancel_sound(HTML_Attrib_ambient, 0.0, false, false);
-        this->fFormatter->cancel_sound(HTML_Attrib_bgambient, 0.0, false, false);
-        this->fFormatter->cancel_sound(HTML_Attrib_foreground, 0.0, false, false);
+        fFormatter->cancel_sound(HTML_Attrib_ambient, 0.0, false, false);
+        fFormatter->cancel_sound(HTML_Attrib_bgambient, 0.0, false, false);
+        fFormatter->cancel_sound(HTML_Attrib_foreground, 0.0, false, false);
     }
 
     // If background music is now turned off, cancel playback in the music layer.
     if (not sett->enableMusic) {
-        this->fFormatter->cancel_sound(HTML_Attrib_background, 0.0, false, false);
+        fFormatter->cancel_sound(HTML_Attrib_background, 0.0, false, false);
     }
 
     // Links in the main game window are not invalidated for some reason, so we
     // invalidate them manually here.
-    const QRect& widgetRect = this->fGameWin->widget()->visibleRegion().boundingRect();
+    const QRect& widgetRect = fGameWin->widget()->visibleRegion().boundingRect();
     CHtmlRect documentRect(widgetRect.x(), widgetRect.y(),
                            widgetRect.x() + widgetRect.width(), widgetRect.y() + widgetRect.height());
-    this->fFormatter->inval_links_on_screen(&documentRect);
+    fFormatter->inval_links_on_screen(&documentRect);
 
     // Reformat everything so that changes in fonts/colors/etc become visible
     // immediately.
@@ -772,22 +772,22 @@ void
 CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
 {
     // Flush and clear the buffer.
-    this->fParser->parse(&this->fBuffer, qWinGroup);
-    this->fBuffer.clear();
+    fParser->parse(&fBuffer, qWinGroup);
+    fBuffer.clear();
 
     // If desired, run the parsed source through the formatter and display it.
     if (fmt) {
-        this->fGameWin->do_formatting(false, false, false);
+        fGameWin->do_formatting(false, false, false);
     }
 
     // Also flush all banner windows.
-    for (int i = 0; i < this->fBannerList.size(); ++i) {
-        this->fBannerList.at(i)->get_formatter()->flush_txtbuf(fmt);
+    for (int i = 0; i < fBannerList.size(); ++i) {
+        fBannerList.at(i)->get_formatter()->flush_txtbuf(fmt);
     }
 
     // If desired, immediately update the display.
     if (immediate_redraw) {
-        this->fMainWin->centralWidget()->update();
+        fMainWin->centralWidget()->update();
     }
 }
 
@@ -798,29 +798,29 @@ CHtmlSysFrameQt::start_new_page()
     //qDebug() << Q_FUNC_INFO;
 
     // Don't bother if the game is quitting.
-    if (not this->fGameRunning) {
+    if (not fGameRunning) {
         return;
     }
 
     // Flush any pending output.
-    this->flush_txtbuf(true, false);
+    flush_txtbuf(true, false);
 
     // Cancel all animations.
-    this->fFormatter->cancel_playback();
+    fFormatter->cancel_playback();
 
     // Tell the parser to clear the page.
-    this->fParser->clear_page();
+    fParser->clear_page();
 
     // Remove all banners.  The formatter will do the right thing and only
     // remove banners that have not been created programmatically (like those
     // created with <BANNER> tags.)
-    this->fFormatter->remove_all_banners(false);
+    fFormatter->remove_all_banners(false);
 
     // Notify the main game window that we're clearing the page.
-    this->fGameWin->notify_clear_contents();
+    fGameWin->notify_clear_contents();
 
     // Reformat the window for the new blank page.
-    this->reformatBanners(false, false, true);
+    reformatBanners(false, false, true);
 }
 
 
@@ -829,7 +829,7 @@ CHtmlSysFrameQt::set_nonstop_mode( int flag )
 {
     //qDebug() << Q_FUNC_INFO;
 
-    this->fNonStopMode = flag;
+    fNonStopMode = flag;
 }
 
 
@@ -840,12 +840,12 @@ CHtmlSysFrameQt::display_output( const textchar_t *buf, size_t len )
 
     // Just add the new text to our buffer.  Append it as-is if we're running
     // a TADS 3 game, since it's already UTF-8 encoded.
-    if (this->fTads3) {
-        this->fBuffer.append(buf, len);
+    if (fTads3) {
+        fBuffer.append(buf, len);
     } else {
         // TADS 2 does not use UTF-8; use the encoding from our settings.
-        QTextCodec* codec = QTextCodec::codecForName(this->fSettings->tads2Encoding);
-        this->fBuffer.append(codec->toUnicode(buf, len).toUtf8().constData());
+        QTextCodec* codec = QTextCodec::codecForName(fSettings->tads2Encoding);
+        fBuffer.append(codec->toUnicode(buf, len).toUtf8().constData());
     }
 }
 
@@ -865,7 +865,7 @@ CHtmlSysFrameQt::get_input( textchar_t* buf, size_t bufsiz )
 {
     //qDebug() << Q_FUNC_INFO;
 
-    if (this->get_input_timeout(buf, bufsiz, 0, false) == OS_EVT_EOF) {
+    if (get_input_timeout(buf, bufsiz, 0, false) == OS_EVT_EOF) {
         return false;
     }
     return true;
@@ -878,21 +878,21 @@ CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned lon
     //qDebug() << Q_FUNC_INFO;
 
     // Flush and prune before input.
-    this->flush_txtbuf(true, false);
-    this->pruneParseTree();
+    flush_txtbuf(true, false);
+    pruneParseTree();
 
     if (use_timeout) {
         bool timedOut = false;
-        this->fGameWin->getInput(buf, buflen, timeout, true, &timedOut);
+        fGameWin->getInput(buf, buflen, timeout, true, &timedOut);
         if (timedOut) {
             return OS_EVT_TIMEOUT;
         }
     } else {
-        this->fGameWin->getInput(buf, buflen);
+        fGameWin->getInput(buf, buflen);
     }
 
     // Return EOF if we're quitting the game.
-    if (not this->fGameRunning) {
+    if (not fGameRunning) {
         return OS_EVT_EOF;
     }
     return OS_EVT_LINE;
@@ -903,7 +903,7 @@ void
 CHtmlSysFrameQt::get_input_cancel( int reset )
 {
     //qDebug() << Q_FUNC_INFO;
-    this->fGameWin->cancelInput(reset);
+    fGameWin->cancelInput(reset);
 }
 
 
@@ -913,15 +913,15 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
     //qDebug() << Q_FUNC_INFO << "use_timeout:" << use_timeout;
 
     // Flush and prune before input.
-    this->flush_txtbuf(true, false);
-    this->pruneParseTree();
+    flush_txtbuf(true, false);
+    pruneParseTree();
 
     // Get the input.
     bool timedOut = false;
-    int res = this->fGameWin->getKeypress(timeout, use_timeout, &timedOut);
+    int res = fGameWin->getKeypress(timeout, use_timeout, &timedOut);
 
     // Return EOF if we're quitting the game.
-    if (not this->fGameRunning) {
+    if (not fGameRunning) {
         return OS_EVT_EOF;
     }
 
@@ -935,12 +935,12 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
         // pending HREF event.
         // For TADS 3, we use the result as-is; it's already in UTF-8.  For TADS 2,
         // we will need to use the prefered encoding.
-        if (this->fTads3) {
-            strncpy(info->href, this->fGameWin->pendingHrefEvent().toUtf8().constData(),
+        if (fTads3) {
+            strncpy(info->href, fGameWin->pendingHrefEvent().toUtf8().constData(),
                     sizeof(info->href) - 1);
         } else {
-            QTextCodec* codec = QTextCodec::codecForName(this->fSettings->tads2Encoding);
-            strncpy(info->href, codec->fromUnicode(this->fGameWin->pendingHrefEvent()).constData(),
+            QTextCodec* codec = QTextCodec::codecForName(fSettings->tads2Encoding);
+            strncpy(info->href, codec->fromUnicode(fGameWin->pendingHrefEvent()).constData(),
                     sizeof(info->href) - 1);
         }
         info->href[sizeof(info->href) - 1] = '\0';
@@ -949,7 +949,7 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
         // It was an extended character; call again to get the
         // extended code.
         info->key[0] = 0;
-        info->key[1] = this->fGameWin->getKeypress();
+        info->key[1] = fGameWin->getKeypress();
     } else {
         // A normal character.  Return it as is.
         info->key[0] = res;
@@ -991,7 +991,7 @@ CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
 
     // Get the input.
     os_event_info_t info;
-    ret = this->get_input_event(0, false, &info);
+    ret = get_input_event(0, false, &info);
 
     // Remove the status message.
     qWinGroup->statusBar()->setUpdatesEnabled(false);
@@ -1019,7 +1019,7 @@ CHtmlSysFrameQt::pause_for_exit()
     qDebug() << Q_FUNC_INFO;
 
     // Just wait for a keystroke and discard it.
-    this->wait_for_keystroke(true);
+    wait_for_keystroke(true);
 }
 
 
@@ -1028,7 +1028,7 @@ CHtmlSysFrameQt::pause_for_more()
 {
     //qDebug() << Q_FUNC_INFO;
 
-    this->wait_for_keystroke(true);
+    wait_for_keystroke(true);
 }
 
 
@@ -1068,7 +1068,7 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
     // If no parent was specified, it means that it's a child of the main
     // game window.
     if (parent == 0) {
-        parent = castParent = this->fGameWin;
+        parent = castParent = fGameWin;
     }
 
     // If BEFORE or AFTER is requested but 'other' isn't a child of the
@@ -1082,7 +1082,7 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
 
     // Add the banner and store it in our list.
     castParent->addBanner(banner, window_type, where, castOther, pos, style);
-    this->fBannerList.append(banner);
+    fBannerList.append(banner);
     return banner;
 }
 
@@ -1092,7 +1092,7 @@ CHtmlSysFrameQt::orphan_banner_window( CHtmlFormatterBannerExt* banner )
 {
     //qDebug() << Q_FUNC_INFO;
 
-    this->fOrhpanBannerList.append(banner);
+    fOrhpanBannerList.append(banner);
 }
 
 
@@ -1101,7 +1101,7 @@ CHtmlSysFrameQt::create_aboutbox_window( CHtmlFormatter* formatter )
 {
     //qDebug() << Q_FUNC_INFO;
 
-    return this->fMainWin->createAboutBox(formatter);
+    return fMainWin->createAboutBox(formatter);
 }
 
 
@@ -1111,8 +1111,8 @@ CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
     //qDebug() << Q_FUNC_INFO;
 
     // If this is the "about this game" box, ask the main window to delete it.
-    if (win == this->fMainWin->aboutBox()) {
-        this->fMainWin->deleteAboutBox();
+    if (win == fMainWin->aboutBox()) {
+        fMainWin->deleteAboutBox();
         return;
     }
 
@@ -1120,14 +1120,14 @@ CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
 
     // Before deleting it, remove it from our list and give keyboard focus to
     // its parent, if it has one.
-    this->fBannerList.removeAll(castWin);
+    fBannerList.removeAll(castWin);
     if (castWin->parentBanner() != 0) {
         castWin->parentBanner()->setFocus();
     }
 
     // Delete it and recalculate the banner layout.
     delete win;
-    this->adjustBannerSizes();
+    adjustBannerSizes();
 }
 
 

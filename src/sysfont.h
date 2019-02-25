@@ -42,33 +42,33 @@ class CHtmlSysFontQt: public QFont, public CHtmlSysFont {
     // the foreground color when drawing text in this font.
     const QColor&
     color() const
-    { return this->fColor; }
+    { return fColor; }
 
     HTML_color_t
     htmlColor() const
-    { return HTML_make_color(this->fColor.red(), this->fColor.green(), this->fColor.blue()); }
+    { return HTML_make_color(fColor.red(), fColor.green(), fColor.blue()); }
 
     void
     color( HTML_color_t color )
-    { this->fColor = QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)); }
+    { fColor = QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)); }
 
     // When bgColor() is a valid color (QColor::isValid()) it should be used as
     // the background color when drawing text in this font.
     const QColor&
     bgColor() const
-    { return this->fBgColor; }
+    { return fBgColor; }
 
     HTML_color_t
     htmlBgColor() const
-    { return HTML_make_color(this->fBgColor.red(), this->fBgColor.green(), this->fBgColor.blue()); }
+    { return HTML_make_color(fBgColor.red(), fBgColor.green(), fBgColor.blue()); }
 
     void
     bgColor( HTML_color_t color )
-    { this->fBgColor = QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)); }
+    { fBgColor = QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)); }
 
     bool
     operator ==( const CHtmlSysFontQt& f ) const
-    { return QFont::operator ==(f) and this->fColor == f.fColor and this->fBgColor == f.fBgColor; }
+    { return QFont::operator ==(f) and fColor == f.fColor and fBgColor == f.fBgColor; }
 
     CHtmlSysFontQt&
     operator =( const QFont& f )

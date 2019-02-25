@@ -32,15 +32,15 @@ QTadsImage::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, ht
         // image is smaller than pos, adjust the drawing area to avoid scaling.
         int targetWidth;
         int targetHeight;
-        if (this->width() > pos->right - pos->left) {
+        if (width() > pos->right - pos->left) {
             targetWidth = pos->right - pos->left;
         } else {
-            targetWidth = this->width();
+            targetWidth = width();
         }
-        if (this->height() > pos->bottom - pos->top) {
+        if (height() > pos->bottom - pos->top) {
             targetHeight = pos->bottom - pos->top;
         } else {
-            targetHeight = this->height();
+            targetHeight = height();
         }
         painter.drawImage(pos->left, pos->top, *this, 0, 0, targetWidth, targetHeight);
         return;
@@ -52,9 +52,9 @@ QTadsImage::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, ht
         // the settings.
         Qt::TransformationMode mode = qFrame->settings()->useSmoothScaling ?
                                       Qt::SmoothTransformation : Qt::FastTransformation;
-        if (this->width() != pos->right - pos->left or this->height() != pos->bottom - pos->top) {
+        if (width() != pos->right - pos->left or height() != pos->bottom - pos->top) {
             painter.drawImage(QPoint(pos->left, pos->top),
-                              this->scaled(pos->right - pos->left, pos->bottom - pos->top,
+                              scaled(pos->right - pos->left, pos->bottom - pos->top,
                                            Qt::IgnoreAspectRatio, mode));
         } else {
             painter.drawImage(QPoint(pos->left, pos->top), *this);
