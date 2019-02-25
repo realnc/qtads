@@ -1,3 +1,25 @@
+Git
+===
+
+  - Improved audio engine. Game audio data is now streamed directly from the
+    game and decoded on the fly rather than being decoded in advance,
+    eliminating the delay and memory use spike when playing large audio tracks.
+
+    Also, MIDI music is now rendered using an internal synthesizer (FluidSynth)
+    and thus it no longer matters whether or not the operating system supports
+    MIDI.
+
+  - Fixed an issue that prevented games from coloring links.
+
+  - Building the interpreter now requires at least C11 and C++14.
+
+  - TADS VM code fixes.
+
+  - It's now possible to build the interpreter without audio support:
+
+      qmake -config disable-audio
+
+
 2.1.7 - 2016-01-21
 ==================
 
