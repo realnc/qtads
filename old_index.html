@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>QTads, an interpreter for Tads games</title>
+<meta name="author" content="Nikos Chantziaras" />
+<meta name="description" content="Home page of QTads, an open source interpreter for Tads games." />
+<meta name="keywords" content="qtads,tads,interpreter,linux,unix" />
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<h1 align="center"><font face="sans-serif, Verdana, Arial, Helvetica">QTads</font></h1>
+<blockquote>
+  <blockquote>
+	<p align="center"><i>This page is kept only for historical purposes and contains information about the
+	  old, non-multimedia version of QTads.
+	  <br>
+	  The <a href="/">new version</a> provides full multimedia/HTML capabilities.</i></p>
+  </blockquote>
+  <br><br>
+  <blockquote>
+    <p align="center"><i>This is the homepage of QTads; previous versions and 
+      some other useful information can be found at the <a href="http://sourceforge.net/projects/qtads">QTads 
+      project page</a>.</i></p>
+  </blockquote>
+  <p><a href="#About">About</a><br/>
+    <a href="#Features">Features</a><br/>
+    <a href="#Download">Download</a><br/>
+    <a href="#Screenshots">Screenshots</a><br/>
+    <a href="#Games">Games</a><br/>
+    <a href="#Community">Community</a></p>
+</blockquote>
+<h2 align="left"><a name="About"></a>About</h2>
+<p align="left">QTads is a GUI interpreter for <a href="http://www.tads.org">Tads</a> 
+  games, running under Unix-based systems (it has been tested in Linux, Mac OS 
+  X and FreeBSD, but it should compile and run in many more, like Solaris and 
+  Irix). Tads is a programming language for implementing Interactive Fiction (text-adventures). 
+  If you ever played an Infocom game like &#8220;Zork&#8221; or &#8220;Trinity&#8221;, 
+  or the classic game &#8220;Adventure&#8221; by Crowther and Woods (also known 
+  as &#8220;ADVENT&#8221;; it has also been ported to Tads), then you know what 
+  this is about.</p>
+<p align="left">The Tads compiler generates executables that run on the Tads Virtual 
+  Machine; much like Java. QTads is such a virtual machine; it runs Tads executables. 
+  Some Tads games use graphics and sound (Multimedia Tads), but QTads doesn't 
+  support that yet. You can play these games with QTads, but you won't see graphics 
+  or hear sounds. Only a subset of Multimedia Tads is supported (text-formatting 
+  effects and HTML character entities). On the plus-side, QTads supports more 
+  HTML tags than most other text-only interpreters.</p>
+<p align="left"> Since QTads uses <a href="http://www.trolltech.com">Trolltech</a>'s 
+  Qt library for its user interface, it should be easy to port to other platforms 
+  as well, including Windows and embedded devices (cell phones, PDAs, etc.) It 
+  supports Tads 2 as well as Tads 3 games (although the Tads 3 support is somewhat 
+  half-assed, because it lacks banners). A multimedia-enabled version for HTML 
+  Tads games will be available Real Soon Now&#153; (which means somewhere between 
+  next month, next year, or next century). Note though, that this will be a different 
+  interpreter; QTads itself will remain text-only.</p>
+<p align="left">QTads has a rather nice feature that none of the available Multimedia 
+  Tads interpreters can provide: text justification. This is only possible in 
+  non-Multimedia interpreters and is, more or less, the main reason QTads has 
+  been written.</p>
+<p align="left">QTads is known to compile with Qt 3.1 and above. You also need 
+  a good C++ compiler. GCC versions 2.95.x and above are known to work. (I recommend 
+  GCC 3.2 and higher.) Although it hasn't been tested yet, Project Builder in 
+  Mac OS X should work. Other compilers should work as well, by the way.</p>
+<h2 align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><a name="Features"></a>Features</font></h2>
+<p align="left">Here are some common and uncommon features of QTads:</p>
+<ul>
+  <li> Unicode support for Tads 3 and full support for Tads 2 character mapping 
+    files; you can play games written in any language.</li>
+  <li>Text-color support for Tads 3 games.</li>
+  <li>Configurable text justification.</li>
+  <li>Configurable themes; you can save your settings (colors, fonts, etc) in 
+    &#8220;Themes&#8221; and switch them at runtime.</li>
+  <li> Multimedia Tads Character Entity support, which means that typographical 
+    quotes, dashes and other special characters are available in both Tads 3 as 
+    well as Tads 2.</li>
+  <li>Curly apostrophes and em-dashes in every game, even if the game doesn't 
+    support this (can be disabled).</li>
+  <li>Configurable margins (dead space to the left and right).</li>
+  <li>Fullscreen mode without switching resolution, with removable menu-, tool- 
+    and scrollbar.</li>
+  <li>Internationalization; as of now, the GUI is available in English and German.</li>
+</ul>
+<h2 align="left"><a name="Download"></a><font face="Verdana, Arial, Helvetica, sans-serif">Download</font></h2>
+<!--
+<p align="left">Note that although binaries are provided for download, it's usually 
+  better to compile the interpreter from source, especially when the KDE 3 support 
+  doesn't seem to work or the word-wrapping in games is broken. An exception is 
+  Mac OS X; just get the binary (if available), and you're done. It should work 
+  &#8220;out of the box.&#8221; Another exception are SuSE Linux 9.1 systems; if 
+  you're using such a system, the Qt 3.3.x binary should work just fine.</p>
+-->
+<h3 align="left"><a name="Debian"></a><font face="Verdana, Arial, Helvetica, sans-serif">Debian</font></h3>
+<p align="left">Debian packages can be downloaded from your nearest Debian mirror,
+  but the version provided is usually very old. You might be able to find a newer
+  version in IFiction-FR (see below.)</p>
+<h3 align="left"><a name="Gentoo"></a><font face="Verdana, Arial, Helvetica, sans-serif">Gentoo</font></h3>
+<p align="left">Gentoo Linux users can usually find the most recent version either in
+  Portage or in the &#8220;interactive-fiction&#8221; overlay which is accessible with the &#8220;layman&#8221;
+  utility: &#8220;layman -L&#8221; followed by &#8220;layman -a interactive-fiction&#8221;. You can then &#8220;emerge qtads&#8221;. Note that the version in the overlay is keyworded as ~arch so you will have
+  to keyword it in your package.keywords first.</p>
+<h3 align="left"><a name="Mandriva"></a><font face="Verdana, Arial, Helvetica, sans-serif">Mandriva</font></h3>
+<p align="left">Mandriva packages can be downloaded from your nearest mandriva mirror. Depending
+  on your Mandriva version, you'll find the latest QTads either in contrib/release, contrib/updates
+  or contrib/backports.</p>
+<h3 align="left"><a name="Sources"></a><font face="Verdana, Arial, Helvetica, sans-serif">Sources</font></h3>
+<p align="left">Both *.bz2 as well as *.gz compressed tar archives are provided. 
+  Since bz2 compresses better, this is what you should choose to minimize download
+  time. The gz compressed archives are provided just in case you don't have the
+  bzip2/bunzip2 utility installed.</p>
+<p align="left">Here you can only download the most current version of QTads. 
+  For past releases, visit the <a href="http://sourceforge.net/projects/qtads">Project
+  Page</a>.</p>
+<p align="left">Time to choose:</p>
+<blockquote>
+  <p><a href="http://prdownloads.sourceforge.net/qtads/qtads-1.9.tar.bz2?download"><b>QTads 
+    1.9</b></a> - Source-code archive (bzip2)<br/>
+    A Unix tar archive compressed with bzip2 that contains everything you need 
+    to compile QTads on your system. Documentation is included.</p>
+  <p><a href="http://prdownloads.sourceforge.net/qtads/qtads-1.9.tar.gz?download"><b>QTads 
+    1.9</b></a> - Source-code archive (gzip)<br/>
+    Like the above, but compressed with GNU Zip (gzip). Get it only if you don't 
+    have the bzip2 program installed.</p>
+<!--
+  <p><a href="http://prdownloads.sourceforge.net/qtads/qtads-1.6c-qt-3.3.x.tar.bz2?download"> 
+    </a><a href="http://prdownloads.sourceforge.net/qtads/qtads-1.6c-qt-3.3.x.tar.bz2?download"><b>QTads 
+    1.6c</b></a> - Linux binaries for 3.3.x versions of the Qt runtime (bzip2)<br/>
+    A bzip2 compressed tar archive that contains a ready-to-run Linux-binary (without 
+    the sources); compiled with GCC 3.3.3. Documentation is included. Only for 
+    Intel x86 compatibles and versions 3.3.0 or higher of the Qt runtime library.</p>
+  <p><a href="http://prdownloads.sourceforge.net/qtads/qtads-1.6c-qt-3.3.x.tar.gz?download"> 
+    </a><a href="http://prdownloads.sourceforge.net/qtads/qtads-1.6c-qt-3.3.x.tar.gz?download"><b>QTads 
+    1.6c</b></a> - Linux binaries for 3.3.x versions of the Qt runtime (gzip)<br/>
+    Like the above, but compressed with GNU Zip (gzip). Get it only if you don't 
+    have the program bzip2 installed.</p>
+  <p><a href="http://prdownloads.sourceforge.net/qtads/qtads-1.6c-qt-3.1.x.tar.bz2?download"><b>QTads 
+    1.6c</b></a> - Linux binaries for 3.1.x versions of the Qt runtime (bzip2)<br/>
+    A bzip2 compressed tar archive that contains a ready-to-run Linux-binary (without 
+    the sources); compiled with GCC 3.3.3. Documentation is included. Suitable 
+    for Intel x86 compatibles and versions 3.1.0 or higher of the Qt runtime library 
+    (if you have a 3.3.x or higher version of Qt, this binary will work, but it's 
+    better to download the binary for 3.3.x and higher versions of Qt).</p>
+  <p><a href="http://prdownloads.sourceforge.net/qtads/qtads-1.6c-qt-3.1.x.tar.gz?download"><b>QTads 
+    1.6c</b></a> - Linux binaries for 3.1.x versions of the Qt runtime (gzip)<br/>
+    Like the above, but compressed with GNU Zip (gzip). Get it only if you don't 
+    have the program bzip2 installed.</p>
+  <p><a href="http://prdownloads.sourceforge.net/qtads/aQuaTads1.6c.dmg?download"><b>aQuaTads 
+    1.6c</b></a> - Max OS X application package (dmg image file)<br/>
+    A ready-to-run version of QTads for Mac OS X systems. The Qt runtime library 
+    is included in the executable, so it should run on virtually every OS X system.</p>
+-->
+  <p><a href="http://ifiction.free.fr/index.php?id=iflinux">
+    <b>IFiction-FR's &#8220;Packages for Linux&#8221; page</b></a><br/>
+    Sometimes provides recent RPM and/or Debian packages of QTads.</p>
+</blockquote>
+
+<h2 align="left"><a name="Screenshots"></a><font face="Verdana, Arial, Helvetica, sans-serif">Screenshots</font></h2>
+<p align="left">Here are some screenshots of QTads v1.8 running in KDE 3. (Note 
+  that QTads runs in every window manager or desktop environment, not just in 
+  KDE. But if you happen to use KDE 3, QTads will support it natively, as can 
+  be seen in the screenshots below.) You can click on the images to enlarge or 
+  download them, since the ones below are just miniatures.</p>
+<table width="100%" cellspacing="15">
+  <tr>
+    <td>
+      <div align="center"><a href="shots/2.png"><img src="shots/2small.png" width="327" height="275" border="0" alt="Screenshot of QTads"/></a><br/>
+        <font face="Verdana, Arial, Helvetica, sans-serif" size="-1"> Michael 
+        J.&nbsp;Roberts' &#8220;The Plant&#8221;</font></div>
+    </td>
+    <td>
+      <div align="center"><a href="shots/4.png"><img src="shots/4small.png" width="327" height="201" border="0" alt="Screenshot of QTads"/></a><br/>
+        <font face="Verdana, Arial, Helvetica, sans-serif" size="-1">The configuration 
+        dialog.</font></div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan ="2">
+      <div align="center"><a href="shots/1.png"><img src="shots/1small.png" width="640" height="512" border="0" alt="Screenshot of QTads"/></a><br/>
+        <font face="Verdana, Arial, Helvetica, sans-serif" size="-1"> Michael 
+        J. Sousa's/Jon Ingold's &#8220;Till Death Makes A Monk-Fish Out Of Me&#8221; 
+        in fullscreen-mode</font></div>
+    </td>
+  </tr>
+</table>
+<h2 align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><a name="Games"></a>Games</font></h2>
+<p align="left">The QTads distribution doesn't contain games, but fear not! There's 
+  a large repository for IF-related stuff (with <i>lots</i> of games!) called 
+  <a href="http://mirror.ifarchive.org">The Interactive Fiction Archive</a>.</p>
+<p align="left">Since the archive is actually just a (huge) bunch of data thrown 
+  together (more or less), a nice fellow has created a site that will guide you 
+  through the archive. The site is called <a href="http://wurb.com/if">Baf's Guide 
+  to the IF Archive</a> and contains many cool things, like a &#8220;Genre Map&#8221; 
+  for the games located in the archive along with descriptions, reviews and ratings, 
+  links, and other useful things. Make sure to check it out!</p>
+<h2 align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><a name="Community"></a>Community</font></h2>
+<p align="left">Interactive Fiction is alive and kicking! New games are released 
+  all the time. Some of them are even better that Infocom or Legend classics.</p>
+<p align="left">There are two Usenet newsgroups for IF related things. The first 
+  is RGIF, which is short for:</p>
+<blockquote>
+  <p> <a href="news:rec.games.int-fiction">rec.games.int-fiction</a></p>
+</blockquote>
+<p>where people are talking about IF games in general; things they like in games, 
+  things they don't like, things they hope to see in future games, requests for 
+  hints and solutions, reviews of games, announcements of new games/software or 
+  happenings, stuff like that.</p>
+<p>The other newsgroup is RAIF, which stands for:</p>
+<blockquote>
+  <p> <a href="news:rec.arts.int-fiction">rec.arts.int-fiction</a></p>
+</blockquote>
+<p>This newsgroup is for everyone who is interested in creating games. Most IF 
+  authors use to hang around there, so this newsgroup is an excellent place to 
+  post questions about IF theory or authorship (like programming questions).</p>
+<hr/>
+<table width="100%" border="0" frame="void">
+  <tr> 
+    <td height="20"> 
+      <div align="left"><a href="mailto:realnc@users.sourceforge.net">Contact 
+        me</a></div>
+    </td>
+    <td height="20"> 
+      <div align="right"><i><font size="-1"><a href="http://www.anybrowser.org/campaign/">Best 
+        viewed with Microscape Explorator v948756.0642b</a></font></i></div>
+    </td>
+  </tr>
+</table>
+<p align="center"><font size="-1">QTads and its homepage are hosted by <a href="http://sourceforge.net">SourceForge</a>, 
+  which I recommend to every Open Source project. It provides services like CVS/Subversion 
+  as well as web space for your project.</font></p>
+<div align="center">
+  <a href="http://sourceforge.net/projects/qtads"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=77278&amp;type=15" width="150" height="40" border="0" alt="Get QTads at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
+</div>
+</body>
+</html>

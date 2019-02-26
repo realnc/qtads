@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>QTads - A Multimedia TADS Interpreter</title>
+	<meta name="author" content="Nikos Chantziaras">
+	<meta name="description" content="Homepage of QTads, an Open Source, multimedia interpreter for Tads games.">
+	<meta name="keywords" content="qtads, html tads, linux, unix, mac os x, multimedia tads, tads, interpreter">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+<div id="navigation">
+	<p><img src="qtads-logo.png" alt="QTads logo"></p>
+	<ul>
+		<li><a href="#top"        >About</a></li>
+		<li><a href="#downloads"  >Downloads</a></li>
+		<li><a href="#games"      >Games</a></li>
+		<li><a href="#license"    >License</a></li>
+	</ul>
+	<ul>
+		<li><a href="#related"        >See Also</a></li>
+		<li><a href="#acknowledgments">Acknowledgments</a></li>
+		<li><a href="#contact"        >Contact Information</a></li>
+	</ul>
+	<ul>
+		<li><a href="https://github.com/realnc/qtads">View on GitHub</a></li>
+        </ul>
+</div>
+
+<div class="section">
+	<h1 id="about">About</h1>
+	<p>
+	QTads is a cross-platform, multimedia interpreter for <a href="https://tads.org">TADS</a> games. It is
+	fully compatible with HTML TADS (aka "Multimedia TADS.") Both TADS versions in use today (v2 and v3)
+	are supported. It runs on Linux, macOS and Microsoft Windows.
+	</p>
+
+	<p style="text-align: center;"><a href="beetmongers.png">
+	<img src="beetmongers_small.jpg" alt="Screenshot of QTads running The Beetmonger's Journal">
+	</a><p>
+	<p>
+
+	TADS stands for "Text Adventure Development System" and comes with its own programming language and virtual
+	machine (the TADS VM.) QTads uses the reference implementations of the T2 and T3 VMs written by Michael
+	J.&nbsp;Roberts.
+	</p>
+</div>
+
+<div class="section">
+<h1 id="downloads">Downloads</h1>
+	<h3>Source Code</h3>
+
+	<blockquote><p>
+	<a href="https://github.com/realnc/qtads/releases/download/2.1.7/qtads-2.1.7.tar.bz2">
+	Source code</a> v2.1.7
+	</p></blockquote>
+
+	<h3>Gentoo Linux (and other Portage-based distros)</h3>
+
+	<p>
+	QTads is included in Portage; simply emerge &ldquo;games-engines/qtads&rdquo;. If you're not on ~arch (aka
+	&ldquo;testing&rdquo;), you might want to keyword it in your package.keywords to ensure that you get the
+	latest version available.
+	</p>
+	<p>Sometimes Portage (even ~arch) does not offer the absolutely newest version
+	though. In that case, an ebuild for the most recent version (including a live ebuild) can be found in the
+	<a href="https://repo.or.cz/w/gentoo-interactive-fiction.git">interactive-fiction overlay</a>. It is
+	accessible with the &ldquo;layman&rdquo; utility (app-portage/layman). If you don't already have layman
+	installed, please read its documentation on how to configure your make.conf before adding overlays.
+	</p>
+
+	<h3>Arch Linux</h3>
+
+	<p>
+	You should be able to find QTads on <a href="https://aur.archlinux.org">AUR</a>. Another place of interest for
+	Arch Linux users is <a href="https://esclinux.tuxfamily.org">ESCLINUX</a>. Note that if you can't find a
+	recent version of QTads in the above places, the binaries provided here should work on Arch without problems.
+	</p>
+
+	<h3>Other Linux Distros</h3>
+
+	<blockquote><p>
+	<a href="https://github.com/realnc/qtads/releases/download/2.1.7/qtads-2.1.7-linux.tar.bz2">
+	Linux (32-bit and 64-bit)</a> v2.1.7
+	</p></blockquote>
+
+	<p>
+	The Linux binaries require that the Qt4-GUI and SDL runtime libraries are installed
+	on the system.  Please refer to the included README file for information about needed
+	library dependencies.
+	</p>
+
+	<p>
+	Qt version 4.8 or newer is required for the binaries. If you want to use an older version of Qt,
+	you need to build QTads from source code.
+	</p>
+
+	<p>
+	For correct MIDI support it is recommended to install the &ldquo;eawpatches&rdquo;; a complete GM-compatible MIDI
+	sound set. You can find an easy to install package for Ubuntu at
+	<a href="https://help.ubuntu.com/community/Midi/SoftwareSynthesisHowTo?action=show&amp;redirect=MidiSoftwareSynthesisHowTo#Install%20samples">
+	help.ubuntu.com</a>. Note that QTads does not use Timidity, though a "timidify.cfg" file that points at the
+	correct MIDI patches is still needed.
+	</p>
+
+	<h3>macOS 10.7 (Lion) and newer</h3>
+	<blockquote><p>
+	<a href="https://github.com/realnc/qtads/releases/download/2.1.7/QTads-2.1.7.dmg">
+	macOS DMG file</a> v2.1.7
+	</p></blockquote>
+
+	<p>
+	The Mac OS X application is self-contained and does not need any external runtime libraries.
+	</p>
+
+	<h3>Microsoft Windows (XP and higher)</h3>
+
+	<blockquote><p>
+	<a href="https://github.com/realnc/qtads/releases/download/2.1.7/QTads-2.1.7-w32.zip">
+	Microsoft Windows (XP and newer)</a> v2.1.7
+	</p></blockquote>
+
+	<p>
+	Like the Mac OS X application, this is a self-contained application. Simply unzip and run it. Note that
+	Windows XP hasn't been tested much, but it should work.
+	</p>
+</div>
+
+<div class="section">
+<h1 id="games">Games</h1>
+	<p>
+	There's a large repository of IF-related stuff (with <em>lots</em> of games) called
+	<a href="https://www.ifarchive.org">The&nbsp;Interactive&nbsp;Fiction&nbsp;Archive</a>.
+	</p>
+
+	<p>
+	An easier site for finding games is the
+	<a href="https://ifdb.tads.org">Interactive Fiction Database</a> (&ldquo;IFDB&rdquo;, for short). The
+	Interactive Fiction Database is an IF game catalog and recommendation engine, as well as a Wiki-style
+	community project:&nbsp;members can add new game listings, write reviews, exchange game recommendations,
+	and more.
+	</p>
+</div>
+
+<div class="section">
+<h1 id="license">License</h1>
+	<p>
+	QTads is dual-licensed; the source code can be redistributed and/or modified either under the terms of the
+	<a href="LICENSE.TXT">HTML TADS Freeware Source Code License</a>, or under the terms of the
+	<a href="gpl-3.0-standalone.html">GNU General Public License</a> as published by the Free Software Foundation
+	(either version 2 of the license, or, at your option, any later version).
+	</p>
+</div>
+
+<div class="section">
+<h1 id="related">Related Projects</h1>
+	<ul>
+	<li>
+		<a href="https://tads.org/tads3.htm">HTML TADS</a>
+		<br>The official Multimedia Tads interpreter for Microsoft Windows.
+	</li>
+	<li>
+		<a href="http://ccxvii.net/gargoyle">Gargoyle</a>
+		<br>An interpreter that supports all the major interactive fiction formats with a strong focus on
+		typography. Like Zoom, Multimedia Tads features are not supported and games run in text-only mode.
+	</li>
+	<li>
+		<a href="http://ccxvii.net/spatterlight">Spatterlight</a>
+		<br>An interpreter for Mac&nbsp;OS&nbsp;X that supports all the major interactive fiction formats.
+		Like Gargoyle, it places a strong focus on typography. Tads games run in text-only mode.
+	</li>
+	<li>
+		<a href="https://tads.org/frobtads.htm">FrobTADS</a>
+		<br>Cross-platform terminal (curses/ncurses) interpreter and development tool. It supports
+		most of the latest text-mode Tads user interface features, including colored text and backgrounds,
+		Tads&nbsp;3 banner windows, and timed input. There is no support for Multimedia Tads games;
+		they always run in text-only mode. Most importantly, it provides the Tads development tools
+		(Tads&nbsp;2 and Tads&nbsp;3 command-line compilers and supporting libraries) which allows for authoring
+		your own Tads games.
+	</li>
+	</ul>
+</div>
+
+<div class="section">
+<h1 id="acknowledgments">Acknowledgments</h1>
+	<p>
+	Quite a few people contributed to the development of QTads over the years. Thanks fly out to:
+	</p>
+
+	<blockquote><p>
+	Adam Thornton<br>
+	Adrien Beau<br>
+	Andrew Plotkin<br>
+	Alan Mead<br>
+	Beni Serfaty<br>
+	C.E.J. Pacian<br>
+	Chris Odhner<br>
+	Christophe Antoine<br>
+	Curt Siffert<br>
+	Daniel Schepler<br>
+	Denis Pokataev<br>
+	Emily Boegheim<br>
+	Eric Eve<br>
+	Eric Forgeot<br>
+	Erik Temple<br>
+	Greg Boettcher<br>
+	Guilherme De Sousa<br>
+	Jim Aikin<br>
+	Joe Mason<br>
+	Kodath duMatri<br>
+	Kris Kennaway<br>
+	Krister Fundin<br>
+	Leif Huhn<br>
+	Marc Simpson<br>
+	Ming Hua<br>
+	Nicolas Lécureuil<br>
+	Ornithopter<br>
+	Petter Sjölund<br>
+	Poster<br>
+	Rémi Verschelde<br>
+	Rune Berg<br>
+	Samuel Verschelde<br>
+	Stefan Müller<br>
+	tetzank<br>
+	Thom Brown<br>
+	Tomas Blaha<br>
+	Tony Houlbrooke<br>
+	Xenius
+	</p></blockquote>
+
+	<p>
+	Thanks everyone for the ideas, source code and bug reports. Also thanks to everyone who donated to this project.
+	And of course, Mike Roberts; if there would be no Mike, there would be no Tads!
+	</p>
+
+	<p>
+	The design for this web page was inspired by the <a href="https://mxe.cc">MXE project page</a>.
+	</p>
+</div>
+
+<div class="section">
+<h1 id="contact">Contact Information</h1>
+	<p>
+	For issues, queries, bug reports, or any other form of feedback, either about this site or QTads, please
+	contact:
+	</p>
+
+	<blockquote><p>
+	Nikos Chantziaras &lt;<a href="mailto:&#114;&#101;&#097;&#108;&#110;&#099;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;">&#114;&#101;&#097;&#108;&#110;&#099;&#064;&#103;&#109;&#097;&#105;&#108;&#046;&#099;&#111;&#109;</a>&gt;
+	</p></blockquote>
+</div>
+
+<div class="full-height">
+</div>
+
+</body>
+</html>

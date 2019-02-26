@@ -1,0 +1,20 @@
+2.1.7
+Version 2.1.7 is now available. The changes since 2.1.6 are:
+
+The TADS virtual machines have been updated to 2.5.17/3.1.3
+
+Added support for Mac OS X high resolution (retina) displays.
+
+The interpreter will now try to detect whether a game is stuck in an infinite loop when quitting.  This should avoid the situation where the QTads window is closed, but a process is still running in the background, consuming CPU cycles.
+
+Selecting text with the mouse is now supported, as is drag&drop of text to and from the game window.  Furthermore, you can paste the current word under the mouse cursor instead of selecting it by holding down the "Ctrl" key ("Command" key on the Mac) while double clicking.  This behavior can be disabled in the configuration dialog in the "Misc" section.
+
+On Mac OS X, the main window should now properly get focus again when closing a dialog.
+
+Text-grid banner windows should now be able to correctly show their background color instead of always using black.
+
+Printing a table without any cells in it will no longer result in the screen getting "stuck" and failing to update.
+
+Fixed a problem with the online update check, which would result in a a connection error, or sometimes an application crash. Thanks to Denis Pokataev for finding and fixing the crash case.
+
+Added Ctrl+F command history search. It finds previous commands that begin with the same text as the text that is currently to the left of the input caret. If multiple matches are found, repeatedly pressing Ctrl+F will cycle through all matches. Thanks to tetzank for the patch.
