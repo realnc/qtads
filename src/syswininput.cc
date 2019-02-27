@@ -16,34 +16,33 @@
  * USA.
  */
 
+#include <QClipboard>
+#include <QDesktopServices>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QScrollBar>
 #include <QStatusBar>
-#include <QLabel>
-#include <QTimer>
-#include <QTime>
-#include <QDesktopServices>
-#include <QClipboard>
-#include <QUrl>
 #include <QTextCodec>
+#include <QTime>
+#include <QTimer>
+#include <QUrl>
 
-#include "settings.h"
 #include "dispwidgetinput.h"
+#include "settings.h"
 #include "syswininput.h"
 
 #include "htmlfmt.h"
 #include "htmlinp.h"
-#include "htmltags.h"
 #include "htmlprs.h"
+#include "htmltags.h"
 
-
-CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* parent )
-    : CHtmlSysWinQt(formatter, parent),
-      fInputMode(NoInput),
-      fInputReady(false),
-      fRestoreFromCancel(false),
-      fLastKeyEvent(Qt::Key_Any),
-      fTag(0)
+CHtmlSysWinInputQt::CHtmlSysWinInputQt(CHtmlFormatter* formatter, QWidget* parent)
+    : CHtmlSysWinQt(formatter, parent)
+    , fInputMode(NoInput)
+    , fInputReady(false)
+    , fRestoreFromCancel(false)
+    , fLastKeyEvent(Qt::Key_Any)
+    , fTag(0)
 {
     fInputBuffer = new textchar_t[1024];
     fInputBufferSize = 1024;
@@ -64,24 +63,20 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt( CHtmlFormatter* formatter, QWidget* pare
     setPalette(p);
 }
 
-
 CHtmlSysWinInputQt::~CHtmlSysWinInputQt()
 {
     delete fTadsBuffer;
     delete[] fInputBuffer;
 }
 
-void
-CHtmlSysWinInputQt::fStartKeypressInput()
+void CHtmlSysWinInputQt::fStartKeypressInput()
 {
     fInputReady = false;
     fInputMode = SingleKeyInput;
     fHrefEvent.clear();
 }
 
-
-void
-CHtmlSysWinInputQt::fProcessPagePauseQueue()
+void CHtmlSysWinInputQt::fProcessPagePauseQueue()
 {
     if (fPagePauseQueue.isEmpty()) {
         return;
@@ -106,7 +101,6 @@ CHtmlSysWinInputQt::fProcessPagePauseQueue()
     qWinGroup->statusBar()->setUpdatesEnabled(true);
 }
 
-
 void CHtmlSysWinInputQt::fUpdateInputFormatter()
 {
     if (fTag == 0) {
@@ -120,17 +114,14 @@ void CHtmlSysWinInputQt::fUpdateInputFormatter()
     fCastDispWidget->updateCursorPos(formatter_, false, true);
 }
 
-
-void
-CHtmlSysWinInputQt::setCursorHeight( unsigned height )
+void CHtmlSysWinInputQt::setCursorHeight(unsigned height)
 {
     fCastDispWidget->setCursorHeight(height);
     fCastDispWidget->updateCursorPos(formatter_, true, true);
 }
 
-
-void
-CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int append, int enter, int os_cmd_id )
+void CHtmlSysWinInputQt::processCommand(const textchar_t* cmd, size_t len, int append, int enter,
+                                        int os_cmd_id)
 {
     if (not qFrame->gameRunning()) {
         return;
@@ -143,7 +134,8 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
         QDesktopServices::openUrl(QUrl::fromEncoded(cmd, QUrl::StrictMode));
         return;
     }
-    if (strnicmp(cmd, "news:", 5) == 0 || strnicmp(cmd, "mailto:", 7) == 0 || strnicmp(cmd, "telnet:", 7) == 0) {
+    if (strnicmp(cmd, "news:", 5) == 0 || strnicmp(cmd, "mailto:", 7) == 0
+        || strnicmp(cmd, "telnet:", 7) == 0) {
         // Parse news, mailto and telnet URLs in tolerant mode.
         QDesktopServices::openUrl(QUrl::fromEncoded(cmd, QUrl::TolerantMode));
         return;
@@ -193,9 +185,7 @@ CHtmlSysWinInputQt::processCommand( const textchar_t* cmd, size_t len, int appen
     }
 }
 
-
-void
-CHtmlSysWinInputQt::resizeEvent( QResizeEvent* event )
+void CHtmlSysWinInputQt::resizeEvent(QResizeEvent* event)
 {
     CHtmlSysWinQt::resizeEvent(event);
     if (fCastDispWidget->isCursorVisible()) {
@@ -203,13 +193,11 @@ CHtmlSysWinInputQt::resizeEvent( QResizeEvent* event )
     }
 }
 
-
-void
-CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
+void CHtmlSysWinInputQt::keyPressEvent(QKeyEvent* e)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
-    //qDebug() << "Key pressed:" << hex << e->key();
+    // qDebug() << "Key pressed:" << hex << e->key();
 
     if (fInputMode == NoInput or not qFrame->gameRunning()) {
         QScrollArea::keyPressEvent(e);
@@ -236,10 +224,12 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
         return;
     }
 
-    if (e->matches(QKeySequence::MoveToStartOfLine) or e->matches(QKeySequence::MoveToStartOfBlock)) {
+    if (e->matches(QKeySequence::MoveToStartOfLine)
+        or e->matches(QKeySequence::MoveToStartOfBlock)) {
         fTadsBuffer->start_of_line(false);
         fCastDispWidget->clearSelection();
-    } else if (e->matches(QKeySequence::MoveToEndOfLine) or e->matches(QKeySequence::MoveToEndOfBlock)) {
+    } else if (e->matches(QKeySequence::MoveToEndOfLine)
+               or e->matches(QKeySequence::MoveToEndOfBlock)) {
         fTadsBuffer->end_of_line(false);
         fCastDispWidget->clearSelection();
 #if QT_VERSION >= 0x040500
@@ -305,12 +295,14 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
             fCastDispWidget->clearSelection();
         }
         fTadsBuffer->move_right(true, true);
-    } else if (e->matches(QKeySequence::SelectStartOfLine) or e->matches(QKeySequence::SelectStartOfBlock)) {
+    } else if (e->matches(QKeySequence::SelectStartOfLine)
+               or e->matches(QKeySequence::SelectStartOfBlock)) {
         if (not fTadsBuffer->has_sel_range()) {
             fCastDispWidget->clearSelection();
         }
         fTadsBuffer->start_of_line(true);
-    } else if (e->matches(QKeySequence::SelectEndOfLine) or e->matches(QKeySequence::SelectEndOfBlock)) {
+    } else if (e->matches(QKeySequence::SelectEndOfLine)
+               or e->matches(QKeySequence::SelectEndOfBlock)) {
         if (not fTadsBuffer->has_sel_range()) {
             fCastDispWidget->clearSelection();
         }
@@ -340,13 +332,10 @@ CHtmlSysWinInputQt::keyPressEvent( QKeyEvent* e )
     fUpdateInputFormatter();
 }
 
-
-void
-CHtmlSysWinInputQt::inputMethodEvent( QInputMethodEvent* e )
+void CHtmlSysWinInputQt::inputMethodEvent(QInputMethodEvent* e)
 {
     if (fInputMode == NoInput or not qFrame->gameRunning() or fInputMode == PagePauseInput
-        or e->commitString().isEmpty())
-    {
+        or e->commitString().isEmpty()) {
         QScrollArea::inputMethodEvent(e);
         return;
     }
@@ -370,50 +359,48 @@ CHtmlSysWinInputQt::inputMethodEvent( QInputMethodEvent* e )
     fUpdateInputFormatter();
 }
 
-
-void
-CHtmlSysWinInputQt::singleKeyPressEvent( QKeyEvent* event )
+void CHtmlSysWinInputQt::singleKeyPressEvent(QKeyEvent* event)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(fInputMode == SingleKeyInput);
 
     fLastKeyEvent = static_cast<Qt::Key>(0);
     fLastKeyText = 0;
 
     switch (event->key()) {
-      case 0:
-      case Qt::Key_unknown:
+    case 0:
+    case Qt::Key_unknown:
         QScrollArea::keyPressEvent(event);
         return;
 
-      case Qt::Key_Escape:
-      case Qt::Key_Tab:
-      case Qt::Key_Backspace:
-      case Qt::Key_Return:
-      case Qt::Key_Enter:
-      case Qt::Key_Delete:
-      case Qt::Key_Home:
-      case Qt::Key_End:
-      case Qt::Key_Left:
-      case Qt::Key_Up:
-      case Qt::Key_Right:
-      case Qt::Key_Down:
-      case Qt::Key_PageUp:
-      case Qt::Key_PageDown:
-      case Qt::Key_F1:
-      case Qt::Key_F2:
-      case Qt::Key_F3:
-      case Qt::Key_F4:
-      case Qt::Key_F5:
-      case Qt::Key_F6:
-      case Qt::Key_F7:
-      case Qt::Key_F8:
-      case Qt::Key_F9:
-      case Qt::Key_F10:
+    case Qt::Key_Escape:
+    case Qt::Key_Tab:
+    case Qt::Key_Backspace:
+    case Qt::Key_Return:
+    case Qt::Key_Enter:
+    case Qt::Key_Delete:
+    case Qt::Key_Home:
+    case Qt::Key_End:
+    case Qt::Key_Left:
+    case Qt::Key_Up:
+    case Qt::Key_Right:
+    case Qt::Key_Down:
+    case Qt::Key_PageUp:
+    case Qt::Key_PageDown:
+    case Qt::Key_F1:
+    case Qt::Key_F2:
+    case Qt::Key_F3:
+    case Qt::Key_F4:
+    case Qt::Key_F5:
+    case Qt::Key_F6:
+    case Qt::Key_F7:
+    case Qt::Key_F8:
+    case Qt::Key_F9:
+    case Qt::Key_F10:
         fLastKeyEvent = static_cast<Qt::Key>(event->key());
         break;
 
-      default:
+    default:
         // If the keypress doesn't correspond to exactly one character, ignore
         // it.
         if (event->text().size() != 1) {
@@ -428,12 +415,10 @@ CHtmlSysWinInputQt::singleKeyPressEvent( QKeyEvent* event )
     emit inputReady();
 }
 
-
-void
-CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long timeout, bool useTimeout,
-                              bool* timedOut )
+void CHtmlSysWinInputQt::getInput(textchar_t* buf, size_t buflen, unsigned long timeout,
+                                  bool useTimeout, bool* timedOut)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(buf != 0);
 
     CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(formatter_);
@@ -461,8 +446,7 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
             formatter->do_formatting();
         }
         fTadsBuffer->setbuf(fInputBuffer,
-                                  buflen > fInputBufferSize ? fInputBufferSize - 1 : buflen - 1,
-                                  0);
+                            buflen > fInputBufferSize ? fInputBufferSize - 1 : buflen - 1, 0);
         CHtmlTagTextInput* tag = formatter->begin_input(fTadsBuffer->getbuf(), 0);
         fTag = tag;
         fCastDispWidget->setInputTag(tag);
@@ -499,9 +483,10 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
             fInputMode = NoInput;
             return;
         }
-    } else while (qFrame->gameRunning() and not fInputReady) {
-        qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
-    }
+    } else
+        while (qFrame->gameRunning() and not fInputReady) {
+            qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
+        }
 
     // We're finished with input.
     cancelInput(true);
@@ -515,15 +500,15 @@ CHtmlSysWinInputQt::getInput( textchar_t* buf, size_t buflen, unsigned long time
         strncpy(buf, fTadsBuffer->getbuf(), len);
     } else {
         QTextCodec* codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
-        strncpy(buf, codec->fromUnicode(QString::fromUtf8(fTadsBuffer->getbuf(),
-                                                          fTadsBuffer->getlen())).constData(), len);
+        strncpy(buf,
+                codec->fromUnicode(QString::fromUtf8(fTadsBuffer->getbuf(), fTadsBuffer->getlen()))
+                    .constData(),
+                len);
     }
     buf[len] = '\0';
 }
 
-
-void
-CHtmlSysWinInputQt::cancelInput( bool reset )
+void CHtmlSysWinInputQt::cancelInput(bool reset)
 {
     if (fTag == 0) {
         // There's nothing to cancel.
@@ -569,11 +554,9 @@ CHtmlSysWinInputQt::cancelInput( bool reset )
     }
 }
 
-
-int
-CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* timedOut )
+int CHtmlSysWinInputQt::getKeypress(unsigned long timeout, bool useTimeout, bool* timedOut)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     // If 'done' is false, it means that we have been previously called and
     // returned 0, so this time we should return the extended key-code we
     // stored last time in 'extKey'.
@@ -594,7 +577,7 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
         formatter->do_formatting();
     }
 
-    //scrollDown();
+    // scrollDown();
 
     // If we have banners waiting in page-pause mode, process them first.
     fProcessPagePauseQueue();
@@ -616,9 +599,10 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
         connect(this, SIGNAL(inputReady()), &idleLoop, SLOT(quit()));
         timer.start(timeout);
         idleLoop.exec();
-    } else while (not fInputReady and fHrefEvent.isEmpty() and qFrame->gameRunning()) {
-        qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
-    }
+    } else
+        while (not fInputReady and fHrefEvent.isEmpty() and qFrame->gameRunning()) {
+            qFrame->advanceEventLoop(QEventLoop::WaitForMoreEvents | QEventLoop::AllEvents);
+        }
 
     if (not qFrame->gameRunning()) {
         // Game is quitting.
@@ -639,37 +623,81 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
 
     if (fLastKeyEvent != 0) {
         switch (fLastKeyEvent) {
-          case Qt::Key_Escape:   return 27;
-          // A Tab is not an extended character, but Tads requires that
-          // it is handled as one.
-          case Qt::Key_Tab:      extKey = CMD_TAB; break;
-          case Qt::Key_Return:
-          case Qt::Key_Enter:    return 13;
-          case Qt::Key_Down:     extKey = CMD_DOWN; break;
-          case Qt::Key_Up:       extKey = CMD_UP; break;
-          case Qt::Key_Left:     extKey = CMD_LEFT; break;
-          case Qt::Key_Right:    extKey = CMD_RIGHT; break;
-          case Qt::Key_Home:     extKey = CMD_HOME; break;
-          case Qt::Key_Backspace: return 8;
-          case Qt::Key_F1:       extKey = CMD_F1; break;
-          case Qt::Key_F2:       extKey = CMD_F2; break;
-          case Qt::Key_F3:       extKey = CMD_F3; break;
-          case Qt::Key_F4:       extKey = CMD_F4; break;
-          case Qt::Key_F5:       extKey = CMD_F5; break;
-          case Qt::Key_F6:       extKey = CMD_F6; break;
-          case Qt::Key_F7:       extKey = CMD_F7; break;
-          case Qt::Key_F8:       extKey = CMD_F8; break;
-          case Qt::Key_F9:       extKey = CMD_F9; break;
-          case Qt::Key_F10:      extKey = CMD_F10; break;
-          case Qt::Key_Delete:   extKey = CMD_DEL; break;
-          case Qt::Key_PageDown: extKey = CMD_PGDN; break;
-          case Qt::Key_PageUp:   extKey = CMD_PGUP; break;
-          case Qt::Key_End:      extKey = CMD_END; break;
-          default:
-              // If we got here, something went wrong.  Just report a
-              // space.
-              qWarning() << Q_FUNC_INFO << "unrecognized key event in switch:" << hex << fLastKeyEvent;
-              return ' ';
+        case Qt::Key_Escape:
+            return 27;
+        // A Tab is not an extended character, but Tads requires that
+        // it is handled as one.
+        case Qt::Key_Tab:
+            extKey = CMD_TAB;
+            break;
+        case Qt::Key_Return:
+        case Qt::Key_Enter:
+            return 13;
+        case Qt::Key_Down:
+            extKey = CMD_DOWN;
+            break;
+        case Qt::Key_Up:
+            extKey = CMD_UP;
+            break;
+        case Qt::Key_Left:
+            extKey = CMD_LEFT;
+            break;
+        case Qt::Key_Right:
+            extKey = CMD_RIGHT;
+            break;
+        case Qt::Key_Home:
+            extKey = CMD_HOME;
+            break;
+        case Qt::Key_Backspace:
+            return 8;
+        case Qt::Key_F1:
+            extKey = CMD_F1;
+            break;
+        case Qt::Key_F2:
+            extKey = CMD_F2;
+            break;
+        case Qt::Key_F3:
+            extKey = CMD_F3;
+            break;
+        case Qt::Key_F4:
+            extKey = CMD_F4;
+            break;
+        case Qt::Key_F5:
+            extKey = CMD_F5;
+            break;
+        case Qt::Key_F6:
+            extKey = CMD_F6;
+            break;
+        case Qt::Key_F7:
+            extKey = CMD_F7;
+            break;
+        case Qt::Key_F8:
+            extKey = CMD_F8;
+            break;
+        case Qt::Key_F9:
+            extKey = CMD_F9;
+            break;
+        case Qt::Key_F10:
+            extKey = CMD_F10;
+            break;
+        case Qt::Key_Delete:
+            extKey = CMD_DEL;
+            break;
+        case Qt::Key_PageDown:
+            extKey = CMD_PGDN;
+            break;
+        case Qt::Key_PageUp:
+            extKey = CMD_PGUP;
+            break;
+        case Qt::Key_End:
+            extKey = CMD_END;
+            break;
+        default:
+            // If we got here, something went wrong.  Just report a
+            // space.
+            qWarning() << Q_FUNC_INFO << "unrecognized key event in switch:" << hex
+                       << fLastKeyEvent;
+            return ' ';
         }
     } else {
         // It's a textual key press.
@@ -682,18 +710,14 @@ CHtmlSysWinInputQt::getKeypress( unsigned long timeout, bool useTimeout, bool* t
     return 0;
 }
 
-
-void
-CHtmlSysWinInputQt::addToPagePauseQueue( CHtmlSysWinQt* banner )
+void CHtmlSysWinInputQt::addToPagePauseQueue(CHtmlSysWinQt* banner)
 {
     if (not fPagePauseQueue.contains(banner)) {
         fPagePauseQueue.enqueue(banner);
     }
 }
 
-
-void
-CHtmlSysWinInputQt::removeFromPagePauseQueue( CHtmlSysWinQt* banner )
+void CHtmlSysWinInputQt::removeFromPagePauseQueue(CHtmlSysWinQt* banner)
 {
     if (fPagePauseQueue.isEmpty() or not fPagePauseQueue.contains(banner)) {
         return;
@@ -704,9 +728,7 @@ CHtmlSysWinInputQt::removeFromPagePauseQueue( CHtmlSysWinQt* banner )
     }
 }
 
-
-void
-CHtmlSysWinInputQt::insertText( QString str )
+void CHtmlSysWinInputQt::insertText(QString str)
 {
     if (fInputMode != NormalInput or str.isEmpty() or not qFrame->gameRunning()) {
         return;
@@ -735,11 +757,9 @@ CHtmlSysWinInputQt::insertText( QString str )
     fUpdateInputFormatter();
 }
 
-
-void
-CHtmlSysWinInputQt::set_html_input_color(HTML_color_t clr, int use_default)
+void CHtmlSysWinInputQt::set_html_input_color(HTML_color_t clr, int use_default)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     if (use_default) {
         const QColor& def = qFrame->settings()->inputColor;

@@ -19,32 +19,30 @@
 #define SYSWINGROUP_H
 
 #include <QMainWindow>
-#include <QScrollArea>
 #include <QNetworkReply>
+#include <QScrollArea>
 
-#include "htmlsys.h"
 #include "config.h"
+#include "htmlsys.h"
 
-
-class QTadsFrame: public QFrame {
+class QTadsFrame: public QFrame
+{
     Q_OBJECT
 
-  protected:
-    void
-    resizeEvent( QResizeEvent* e ) override;
+protected:
+    void resizeEvent(QResizeEvent* e) override;
 
-    void
-    dragEnterEvent( QDragEnterEvent* e ) override;
+    void dragEnterEvent(QDragEnterEvent* e) override;
 
-    void
-    dropEvent( QDropEvent* e ) override;
+    void dropEvent(QDropEvent* e) override;
 
-  public:
-    QTadsFrame( QWidget* parent )
-    : QFrame(parent)
-    { setAcceptDrops(true); }
+public:
+    QTadsFrame(QWidget* parent)
+        : QFrame(parent)
+    {
+        setAcceptDrops(true);
+    }
 };
-
 
 /* Tads HTML layer class whose interface needs to be implemented by the
  * interpreter.
@@ -52,10 +50,11 @@ class QTadsFrame: public QFrame {
  * See htmltads/htmlsys.h and htmltads/notes/porting.htm for information
  * about this class.
  */
-class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
+class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup
+{
     Q_OBJECT
 
-  private:
+private:
     class ConfDialog* fConfDialog;
     class GameInfoDialog* fGameInfoDialog;
     QTadsFrame* fFrame;
@@ -82,138 +81,107 @@ class CHtmlSysWinGroupQt: public QMainWindow, public CHtmlSysWinGroup {
     // update checker finds no available updates.
     bool fSilentIfNoUpdates;
 
-    bool
-    fAskQuitGameDialog();
+    bool fAskQuitGameDialog();
 
-    bool
-    fAskRestartGameDialog();
+    bool fAskRestartGameDialog();
 
-  private slots:
-    void
-    fCheckForUpdates();
+private slots:
+    void fCheckForUpdates();
 
-    void
-    fReplyFinished( QNetworkReply* reply );
+    void fReplyFinished(QNetworkReply* reply);
 
-    void
-    fShowGameInfoDialog();
+    void fShowGameInfoDialog();
 
-    void
-    fHideGameInfoDialog();
+    void fHideGameInfoDialog();
 
-    void
-    fShowConfDialog();
+    void fShowConfDialog();
 
-    void
-    fHideConfDialog();
+    void fHideConfDialog();
 
-    void
-    fShowAboutGame();
+    void fShowAboutGame();
 
-    void
-    fHideAboutGame();
+    void fHideAboutGame();
 
-    void
-    fShowAboutQtads();
+    void fShowAboutQtads();
 
-    void
-    fHideAboutQtads();
+    void fHideAboutQtads();
 
-    void
-    fOpenNewGame();
+    void fOpenNewGame();
 
-    void
-    fRecentGameTriggered( QAction* action );
+    void fRecentGameTriggered(QAction* action);
 
-    void
-    fEndCurrentGame();
+    void fEndCurrentGame();
 
-    void
-    fRestartCurrentGame();
+    void fRestartCurrentGame();
 
-    void
-    fNotifyGameQuitting();
+    void fNotifyGameQuitting();
 
-    void
-    fNotifyGameStarting();
+    void fNotifyGameStarting();
 
-    void
-    fRunDropEventFile();
+    void fRunDropEventFile();
 
-    void
-    fActivateWindow()
-    { activateWindow(); }
+    void fActivateWindow()
+    {
+        activateWindow();
+    }
 
-  protected:
-    void
-    closeEvent( QCloseEvent* e ) override;
+protected:
+    void closeEvent(QCloseEvent* e) override;
 
-    void
-    dragEnterEvent( QDragEnterEvent* e ) override;
+    void dragEnterEvent(QDragEnterEvent* e) override;
 
-    void
-    dropEvent( QDropEvent* e ) override;
+    void dropEvent(QDropEvent* e) override;
 
-  public slots:
+public slots:
     // Copy the current selection to the clipboard. No action is performed if
     // there's no selection in any of the game windows.
-    void
-    copyToClipboard();
+    void copyToClipboard();
 
     // Paste the current contents of the clipboard into the input window's
     // editor. Does nothing if the input window is not currently in line input
     // mode.
-    void
-    pasteFromClipboard();
+    void pasteFromClipboard();
 
     // Enable or disable the paste action according to whether there's text
     // in the clipboard and a game window currently exists.
-    void
-    updatePasteAction();
+    void updatePasteAction();
 
-  public:
+public:
     CHtmlSysWinGroupQt();
     ~CHtmlSysWinGroupQt() override;
 
-    CHtmlSysWinAboutBoxQt*
-    createAboutBox( class CHtmlFormatter* formatter );
+    CHtmlSysWinAboutBoxQt* createAboutBox(class CHtmlFormatter* formatter);
 
-    void
-    deleteAboutBox();
+    void deleteAboutBox();
 
-    CHtmlSysWinAboutBoxQt*
-    aboutBox()
-    { return fAboutBox; }
+    CHtmlSysWinAboutBoxQt* aboutBox()
+    {
+        return fAboutBox;
+    }
 
-    void
-    updateRecentGames();
+    void updateRecentGames();
 
-    void
-    checkForUpdates();
+    void checkForUpdates();
 
-    bool
-    wantsToQuit() const
-    { return fWantsToQuit; }
+    bool wantsToQuit() const
+    {
+        return fWantsToQuit;
+    }
 
-    void
-    enableCopyAction( bool f );
+    void enableCopyAction(bool f);
 
 #ifdef Q_OS_MAC
     // Handler for FileOpen events.  They only occur in OS X.
-    bool
-    handleFileOpenEvent( class QFileOpenEvent* e );
+    bool handleFileOpenEvent(class QFileOpenEvent* e);
 #endif
 
     //
     // CHtmlSysWinGroup interface implementation.
     //
-    oshtml_charset_id_t
-    get_default_win_charset() const override;
+    oshtml_charset_id_t get_default_win_charset() const override;
 
-    size_t
-    xlat_html4_entity( textchar_t* result, size_t result_size, unsigned int charval,
-                       oshtml_charset_id_t* charset, int* changed_charset ) override;
+    size_t xlat_html4_entity(textchar_t* result, size_t result_size, unsigned int charval,
+                             oshtml_charset_id_t* charset, int* changed_charset) override;
 };
-
 
 #endif

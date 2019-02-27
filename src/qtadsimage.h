@@ -22,26 +22,24 @@
 
 #include "htmlsys.h"
 
-
 /* We handle all types of images the same way, so we implement that handling
  * in this class and derive the various CHtmlSysImage* classes from this one.
  */
-class QTadsImage: public QImage {
-  public:
+class QTadsImage: public QImage
+{
+public:
     QTadsImage()
-    { }
+    {}
 
-    QTadsImage( const QImage& qImg )
-    : QImage(qImg)
-    { }
+    QTadsImage(const QImage& qImg)
+        : QImage(qImg)
+    {}
 
     // A call to this method is only allowed to happen from inside
     // QTadsDisplayWidget::paintEvent().  This always happens indirectly
     // through CHtmlFormatter::draw(), which QTadsDisplayWidget::painEvent() is
     // using to repaint the window.
-    void
-    drawFromPaintEvent( CHtmlSysWin* win, class CHtmlRect* pos, htmlimg_draw_mode_t mode );
+    void drawFromPaintEvent(CHtmlSysWin* win, class CHtmlRect* pos, htmlimg_draw_mode_t mode);
 };
-
 
 #endif

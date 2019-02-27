@@ -17,31 +17,29 @@
  */
 
 #include <QDebug>
-#include <QLayout>
-#include <QLabel>
-#include <QIcon>
-#include <QStatusBar>
 #include <QDir>
-#include <QTextCodec>
+#include <QIcon>
+#include <QLabel>
+#include <QLayout>
 #include <QMessageBox>
+#include <QStatusBar>
+#include <QTextCodec>
 #include <cstdlib>
 
+#include "gameinfodialog.h"
 #include "qtadshostifc.h"
+#include "qtadssound.h"
 #include "settings.h"
 #include "syswinaboutbox.h"
 #include "syswininput.h"
-#include "gameinfodialog.h"
-#include "qtadssound.h"
 
-#include "htmlprs.h"
 #include "htmlfmt.h"
+#include "htmlprs.h"
 #include "htmlrf.h"
 #include "htmltxar.h"
 #include "vmmaincn.h"
 
-
-void
-CHtmlSysFrameQt::fCtxGetIOSafetyLevel( void*, int* read, int* write )
+void CHtmlSysFrameQt::fCtxGetIOSafetyLevel(void*, int* read, int* write)
 {
     Q_ASSERT(qFrame != 0);
     if (read != 0) {
@@ -52,17 +50,16 @@ CHtmlSysFrameQt::fCtxGetIOSafetyLevel( void*, int* read, int* write )
     }
 }
 
-
-CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion,
-                                  const char* orgName, const char* orgDomain )
-    : QApplication(argc, argv),
-      fGameWin(0),
-      fGameRunning(false),
-      fTads3(true),
-      fReformatPending(false),
-      fNonStopMode(false)
+CHtmlSysFrameQt::CHtmlSysFrameQt(int& argc, char* argv[], const char* appName,
+                                 const char* appVersion, const char* orgName, const char* orgDomain)
+    : QApplication(argc, argv)
+    , fGameWin(0)
+    , fGameRunning(false)
+    , fTads3(true)
+    , fReformatPending(false)
+    , fNonStopMode(false)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(qFrame == 0);
 
     setApplicationName(QString::fromLatin1(appName));
@@ -111,10 +108,9 @@ CHtmlSysFrameQt::CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, 
 #endif
 }
 
-
 CHtmlSysFrameQt::~CHtmlSysFrameQt()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(qFrame != 0);
 
     // Delete the "about this game" box.
@@ -164,9 +160,7 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
     delete fMainWin;
 }
 
-
-void
-CHtmlSysFrameQt::fRunGame()
+void CHtmlSysFrameQt::fRunGame()
 {
     if (fNextGame.isEmpty()) {
         // Nothing to run.
@@ -181,7 +175,8 @@ CHtmlSysFrameQt::fRunGame()
         QDir::setCurrent(finfo.absolutePath());
 
         // Run the appropriate TADS VM.
-        int vmType = vm_get_game_type(qStrToFname(finfo.absoluteFilePath()).constData(), 0, 0, 0, 0);
+        int vmType =
+            vm_get_game_type(qStrToFname(finfo.absoluteFilePath()).constData(), 0, 0, 0, 0);
         if (vmType == VM_GGT_TADS2 or vmType == VM_GGT_TADS3) {
             // Delete all HTML and orphaned banners.
             while (not fOrhpanBannerList.isEmpty()) {
@@ -225,8 +220,8 @@ CHtmlSysFrameQt::fRunGame()
             // Set the application's window title to contain the filename of
             // the game we're running or the game's name as at appears in the
             // gameinfo. The game is free to change that later on.
-            const QString& titleStr
-                    = GameInfoDialog::getMetaInfo(qStrToFname(finfo.absoluteFilePath())).plainGameName;
+            const QString& titleStr =
+                GameInfoDialog::getMetaInfo(qStrToFname(finfo.absoluteFilePath())).plainGameName;
             if (titleStr.simplified().isEmpty()) {
                 // The game doesn't provide a game name.  Just use the filename.
 #ifdef Q_OS_MAC
@@ -234,7 +229,8 @@ CHtmlSysFrameQt::fRunGame()
                 qWinGroup->setWindowTitle(finfo.fileName());
 #else
                 // On all other systems, also append the application name.
-                qWinGroup->setWindowTitle(finfo.fileName() + QString::fromLatin1(" - ") + qFrame->applicationName());
+                qWinGroup->setWindowTitle(finfo.fileName() + QString::fromLatin1(" - ")
+                                          + qFrame->applicationName());
 #endif
             } else {
                 qWinGroup->setWindowTitle(titleStr.trimmed());
@@ -296,11 +292,13 @@ CHtmlSysFrameQt::fRunGame()
             // Display a "game has ended" message. We use HTML, so Make sure
             // the parser is in markup mode.
             fParser->obey_markups(true);
-            QString endMsg(QString::fromLatin1("<p><br><font face=tads-serif size=-1>(The game has ended.)</font></p>"));
+            QString endMsg(QString::fromLatin1(
+                "<p><br><font face=tads-serif size=-1>(The game has ended.)</font></p>"));
             display_output(endMsg.toUtf8().constData(), endMsg.length());
             flush_txtbuf(true, false);
         } else {
-            QMessageBox::critical(fMainWin, tr("Open Game"), finfo.fileName() + tr(" is not a TADS game file."));
+            QMessageBox::critical(fMainWin, tr("Open Game"),
+                                  finfo.fileName() + tr(" is not a TADS game file."));
         }
     }
 
@@ -308,9 +306,7 @@ CHtmlSysFrameQt::fRunGame()
     qWinGroup->setWindowTitle(qFrame->applicationName());
 }
 
-
-void
-CHtmlSysFrameQt::fRunT2Game( const QString& fname )
+void CHtmlSysFrameQt::fRunT2Game(const QString& fname)
 {
     // We'll be loading a T2 game.
     fTads3 = false;
@@ -330,9 +326,7 @@ CHtmlSysFrameQt::fRunT2Game( const QString& fname )
     delete[] argv1;
 }
 
-
-void
-CHtmlSysFrameQt::fRunT3Game( const QString& fname )
+void CHtmlSysFrameQt::fRunT3Game(const QString& fname)
 {
     // vm_run_image_params doesn't copy the filename string but stores
     // the pointer directly.  We therefore need to hold a reference to
@@ -343,11 +337,9 @@ CHtmlSysFrameQt::fRunT3Game( const QString& fname )
     vm_run_image(&params);
 }
 
-
 #ifdef Q_OS_MAC
 #include <QFileOpenEvent>
-bool
-CHtmlSysFrameQt::event( QEvent* e )
+bool CHtmlSysFrameQt::event(QEvent* e)
 {
     // We only handle the FileOpen event.
     if (e->type() != QEvent::FileOpen) {
@@ -357,9 +349,7 @@ CHtmlSysFrameQt::event( QEvent* e )
 }
 #endif
 
-
-void
-CHtmlSysFrameQt::entryPoint( QString gameFileName )
+void CHtmlSysFrameQt::entryPoint(QString gameFileName)
 {
     // Restore the application's size.
     fMainWin->resize(fSettings->appSize);
@@ -368,10 +358,17 @@ CHtmlSysFrameQt::entryPoint( QString gameFileName )
     // Do an online update check.
     int daysRequired;
     switch (fSettings->updateFreq) {
-      case Settings::UpdateOnEveryStart: daysRequired = 0; break;
-      case Settings::UpdateDaily:        daysRequired = 1; break;
-      case Settings::UpdateWeekly:       daysRequired = 7; break;
-      default:                           daysRequired = -1;
+    case Settings::UpdateOnEveryStart:
+        daysRequired = 0;
+        break;
+    case Settings::UpdateDaily:
+        daysRequired = 1;
+        break;
+    case Settings::UpdateWeekly:
+        daysRequired = 7;
+        break;
+    default:
+        daysRequired = -1;
     }
     if (not fSettings->lastUpdateDate.isValid()) {
         // Force update check.
@@ -388,10 +385,8 @@ CHtmlSysFrameQt::entryPoint( QString gameFileName )
     }
 }
 
-
 #if QT_VERSION < 0x040700
-static int
-qtRuntimeVersion()
+static int qtRuntimeVersion()
 {
     const QList<QByteArray> verList(QByteArray(qVersion()).split('.'));
     if (verList.size() < 3) {
@@ -416,11 +411,9 @@ qtRuntimeVersion()
 }
 #endif
 
-
-CHtmlSysFontQt*
-CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
+CHtmlSysFontQt* CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(font_desc != 0);
 
     CHtmlFontDesc newFontDesc = *font_desc;
@@ -482,7 +475,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
         // commas.  We split them into a list and try each one individualy.
         bool matchFound = false;
         const QStringList& strList = QString(QString::fromLatin1(newFontDesc.face))
-                                     .split(QChar::fromLatin1(','), QString::SkipEmptyParts);
+                                         .split(QChar::fromLatin1(','), QString::SkipEmptyParts);
         for (int i = 0; i < strList.size() and not matchFound; ++i) {
             const QString& s = strList.at(i).simplified().toLower();
             if (s == QString::fromLatin1(HTMLFONT_TADS_SERIF).toLower()) {
@@ -533,7 +526,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
         if (not matchFound) {
             fontName = fSettings->mainFont.family();
         }
-    // Apply characteristics only if the face wasn't specified.
+        // Apply characteristics only if the face wasn't specified.
     } else {
         // See if fixed-pitch is desired.
         if (newFontDesc.fixed_pitch) {
@@ -599,7 +592,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
     // If a valid HTML size is specified, map it to a point size.
     int pointsize;
     if (htmlsize >= 1 and htmlsize <= 7) {
-        static const int size_pct[] = { 60, 80, 100, 120, 150, 200, 300 };
+        static const int size_pct[] = {60, 80, 100, 120, 150, 200, 300};
 
         // An HTML size is specified -- if a BIG or SMALL attribute is present,
         // bump the HTML size by 1 in the appropriate direction, if we're not
@@ -637,7 +630,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
         }
     }
 
-    //qDebug() << "Font not found in cache; creating new font:" << newFont
+    // qDebug() << "Font not found in cache; creating new font:" << newFont
     //      << "\nFonts so far:" << fFontList.size() + 1;
 
     // There was no match in our cache. Create a new font and store it in our
@@ -648,9 +641,7 @@ CHtmlSysFrameQt::createFont( const CHtmlFontDesc* font_desc )
     return font;
 }
 
-
-void
-CHtmlSysFrameQt::adjustBannerSizes()
+void CHtmlSysFrameQt::adjustBannerSizes()
 {
     if (fGameWin == 0) {
         return;
@@ -662,9 +653,7 @@ CHtmlSysFrameQt::adjustBannerSizes()
     fGameWin->calcChildBannerSizes(siz);
 }
 
-
-void
-CHtmlSysFrameQt::reformatBanners( bool showStatus, bool freezeDisplay, bool resetSounds )
+void CHtmlSysFrameQt::reformatBanners(bool showStatus, bool freezeDisplay, bool resetSounds)
 {
     if (fGameWin == 0) {
         return;
@@ -683,9 +672,7 @@ CHtmlSysFrameQt::reformatBanners( bool showStatus, bool freezeDisplay, bool rese
     }
 }
 
-
-void
-CHtmlSysFrameQt::pruneParseTree()
+void CHtmlSysFrameQt::pruneParseTree()
 {
     static int checkCount = 0;
 
@@ -714,9 +701,7 @@ CHtmlSysFrameQt::pruneParseTree()
     reformatBanners(false, true, false);
 }
 
-
-void
-CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
+void CHtmlSysFrameQt::notifyPreferencesChange(const Settings* sett)
 {
     // Bail out if we currently don't have an active formatter.
     if (fFormatter == 0) {
@@ -739,8 +724,8 @@ CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
     // Links in the main game window are not invalidated for some reason, so we
     // invalidate them manually here.
     const QRect& widgetRect = fGameWin->widget()->visibleRegion().boundingRect();
-    CHtmlRect documentRect(widgetRect.x(), widgetRect.y(),
-                           widgetRect.x() + widgetRect.width(), widgetRect.y() + widgetRect.height());
+    CHtmlRect documentRect(widgetRect.x(), widgetRect.y(), widgetRect.x() + widgetRect.width(),
+                           widgetRect.y() + widgetRect.height());
     fFormatter->inval_links_on_screen(&documentRect);
 
     // Reformat everything so that changes in fonts/colors/etc become visible
@@ -751,25 +736,19 @@ CHtmlSysFrameQt::notifyPreferencesChange( const Settings* sett )
     qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett->inputFont).height());
 }
 
-
-void
-CHtmlSysFrame::kill_process()
+void CHtmlSysFrame::kill_process()
 {
     quitSound();
     delete qFrame;
     ::exit(0);
 }
 
-
-int
-CHtmlSysFrame::eof_on_console()
+int CHtmlSysFrame::eof_on_console()
 {
     return qWinGroup->wantsToQuit();
 }
 
-
-void
-CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
+void CHtmlSysFrameQt::flush_txtbuf(int fmt, int immediate_redraw)
 {
     // Flush and clear the buffer.
     fParser->parse(&fBuffer, qWinGroup);
@@ -791,11 +770,9 @@ CHtmlSysFrameQt::flush_txtbuf( int fmt, int immediate_redraw )
     }
 }
 
-
-void
-CHtmlSysFrameQt::start_new_page()
+void CHtmlSysFrameQt::start_new_page()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // Don't bother if the game is quitting.
     if (not fGameRunning) {
@@ -823,20 +800,16 @@ CHtmlSysFrameQt::start_new_page()
     reformatBanners(false, false, true);
 }
 
-
-void
-CHtmlSysFrameQt::set_nonstop_mode( int flag )
+void CHtmlSysFrameQt::set_nonstop_mode(int flag)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     fNonStopMode = flag;
 }
 
-
-void
-CHtmlSysFrameQt::display_output( const textchar_t *buf, size_t len )
+void CHtmlSysFrameQt::display_output(const textchar_t* buf, size_t len)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // Just add the new text to our buffer.  Append it as-is if we're running
     // a TADS 3 game, since it's already UTF-8 encoded.
@@ -849,21 +822,17 @@ CHtmlSysFrameQt::display_output( const textchar_t *buf, size_t len )
     }
 }
 
-
-int
-CHtmlSysFrameQt::check_break_key()
+int CHtmlSysFrameQt::check_break_key()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // TODO: We don't check for any such shortcut yet.
     return false;
 }
 
-
-int
-CHtmlSysFrameQt::get_input( textchar_t* buf, size_t bufsiz )
+int CHtmlSysFrameQt::get_input(textchar_t* buf, size_t bufsiz)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     if (get_input_timeout(buf, bufsiz, 0, false) == OS_EVT_EOF) {
         return false;
@@ -871,11 +840,10 @@ CHtmlSysFrameQt::get_input( textchar_t* buf, size_t bufsiz )
     return true;
 }
 
-
-int
-CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned long timeout, int use_timeout )
+int CHtmlSysFrameQt::get_input_timeout(textchar_t* buf, size_t buflen, unsigned long timeout,
+                                       int use_timeout)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // Flush and prune before input.
     flush_txtbuf(true, false);
@@ -898,19 +866,15 @@ CHtmlSysFrameQt::get_input_timeout( textchar_t* buf, size_t buflen, unsigned lon
     return OS_EVT_LINE;
 }
 
-
-void
-CHtmlSysFrameQt::get_input_cancel( int reset )
+void CHtmlSysFrameQt::get_input_cancel(int reset)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     fGameWin->cancelInput(reset);
 }
 
-
-int
-CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_event_info_t* info )
+int CHtmlSysFrameQt::get_input_event(unsigned long timeout, int use_timeout, os_event_info_t* info)
 {
-    //qDebug() << Q_FUNC_INFO << "use_timeout:" << use_timeout;
+    // qDebug() << Q_FUNC_INFO << "use_timeout:" << use_timeout;
 
     // Flush and prune before input.
     flush_txtbuf(true, false);
@@ -959,12 +923,10 @@ CHtmlSysFrameQt::get_input_event( unsigned long timeout, int use_timeout, os_eve
     return OS_EVT_KEY;
 }
 
-
 // FIXME: OS_EVT_HREF isn't handled and shouldn't be allowed here.
-textchar_t
-CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
+textchar_t CHtmlSysFrameQt::wait_for_keystroke(int pause_only)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     static int pendingCmd = 0;
     int ret;
@@ -974,11 +936,12 @@ CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
     if (pendingCmd != 0) {
         ret = pendingCmd;
         pendingCmd = 0;
-        //qDebug() << ret;
+        // qDebug() << ret;
         return ret;
     }
 
-    QLabel moreText(pause_only ? tr("*** MORE ***  [press a key to continue]") : tr("Please press a key"));
+    QLabel moreText(pause_only ? tr("*** MORE ***  [press a key to continue]")
+                               : tr("Please press a key"));
     // Display a permanent QLabel instead of a temporary message.  This allows
     // other status bar messages (like when hovering over hyperlinks) to
     // temporary remove the MORE text instead of replacing it.
@@ -1012,9 +975,7 @@ CHtmlSysFrameQt::wait_for_keystroke( int pause_only )
     return info.key[0];
 }
 
-
-void
-CHtmlSysFrameQt::pause_for_exit()
+void CHtmlSysFrameQt::pause_for_exit()
 {
     qDebug() << Q_FUNC_INFO;
 
@@ -1022,32 +983,29 @@ CHtmlSysFrameQt::pause_for_exit()
     wait_for_keystroke(true);
 }
 
-
-void
-CHtmlSysFrameQt::pause_for_more()
+void CHtmlSysFrameQt::pause_for_more()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     wait_for_keystroke(true);
 }
 
-
-void
-CHtmlSysFrameQt::dbg_print( const char* /*msg*/ )
+void CHtmlSysFrameQt::dbg_print(const char* /*msg*/)
 {
-    //qDebug() << "HTML TADS Debug message:" << msg;
+    // qDebug() << "HTML TADS Debug message:" << msg;
 }
 
-
-CHtmlSysWin*
-CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_t window_type,
-                                       CHtmlFormatter* formatter, int where, CHtmlSysWin* other,
-                                       HTML_BannerWin_Pos_t pos, unsigned long style )
+CHtmlSysWin* CHtmlSysFrameQt::create_banner_window(CHtmlSysWin* parent,
+                                                   HTML_BannerWin_Type_t window_type,
+                                                   CHtmlFormatter* formatter, int where,
+                                                   CHtmlSysWin* other, HTML_BannerWin_Pos_t pos,
+                                                   unsigned long style)
 {
-    //qDebug() << Q_FUNC_INFO;
-    //return 0;
+    // qDebug() << Q_FUNC_INFO;
+    // return 0;
 
-    //qDebug() << "Creating new banner. parent:" << parent << "type:" << window_type << "where:" << where
+    // qDebug() << "Creating new banner. parent:" << parent << "type:" << window_type << "where:" <<
+    // where
     //      << "other:" << other << "pos:" << pos << "style:" << style;
 
     // Create the banner window.
@@ -1086,29 +1044,23 @@ CHtmlSysFrameQt::create_banner_window( CHtmlSysWin* parent, HTML_BannerWin_Type_
     return banner;
 }
 
-
-void
-CHtmlSysFrameQt::orphan_banner_window( CHtmlFormatterBannerExt* banner )
+void CHtmlSysFrameQt::orphan_banner_window(CHtmlFormatterBannerExt* banner)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     fOrhpanBannerList.append(banner);
 }
 
-
-CHtmlSysWin*
-CHtmlSysFrameQt::create_aboutbox_window( CHtmlFormatter* formatter )
+CHtmlSysWin* CHtmlSysFrameQt::create_aboutbox_window(CHtmlFormatter* formatter)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     return fMainWin->createAboutBox(formatter);
 }
 
-
-void
-CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
+void CHtmlSysFrameQt::remove_banner_window(CHtmlSysWin* win)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // If this is the "about this game" box, ask the main window to delete it.
     if (win == fMainWin->aboutBox()) {
@@ -1130,14 +1082,12 @@ CHtmlSysFrameQt::remove_banner_window( CHtmlSysWin* win )
     adjustBannerSizes();
 }
 
-
-int
-CHtmlSysFrameQt::get_exe_resource( const textchar_t* /*resname*/, size_t /*resnamelen*/,
-                                   textchar_t* /*fname_buf*/, size_t /*fname_buf_len*/,
-                                   unsigned long* /*seek_pos*/, unsigned long* /*siz*/ )
+int CHtmlSysFrameQt::get_exe_resource(const textchar_t* /*resname*/, size_t /*resnamelen*/,
+                                      textchar_t* /*fname_buf*/, size_t /*fname_buf_len*/,
+                                      unsigned long* /*seek_pos*/, unsigned long* /*siz*/)
 {
-    //qDebug() << Q_FUNC_INFO;
-    //qDebug() << "resname:" << resname << "fname_buf:" << fname_buf << "seek_pos:" << seek_pos;
+    // qDebug() << Q_FUNC_INFO;
+    // qDebug() << "resname:" << resname << "fname_buf:" << fname_buf << "seek_pos:" << seek_pos;
 
     return false;
 }

@@ -18,9 +18,8 @@
 #ifndef SYSIMAGEPNG_H
 #define SYSIMAGEPNG_H
 
-#include "qtadsimage.h"
 #include "config.h"
-
+#include "qtadsimage.h"
 
 /* Tads HTML layer class whose interface needs to be implemented by the
  * interpreter.
@@ -28,27 +27,31 @@
  * See htmltads/htmlsys.h and htmltads/notes/porting.htm for information
  * about this class.
  */
-class CHtmlSysImagePngQt: public QTadsImage, public CHtmlSysImagePng {
-  public:
+class CHtmlSysImagePngQt: public QTadsImage, public CHtmlSysImagePng
+{
+public:
     //
     // CHtmlSysImagePng interface implementation.
     //
-    void
-    draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode ) override
-    { QTadsImage::drawFromPaintEvent(win, pos, mode); }
+    void draw_image(CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode) override
+    {
+        QTadsImage::drawFromPaintEvent(win, pos, mode);
+    }
 
-    unsigned long
-    get_width() const override
-    { return QTadsImage::width(); }
+    unsigned long get_width() const override
+    {
+        return QTadsImage::width();
+    }
 
-    unsigned long
-    get_height() const override
-    { return QTadsImage::height(); }
+    unsigned long get_height() const override
+    {
+        return QTadsImage::height();
+    }
 
-    int
-    map_palette( CHtmlSysWin*, int ) override
-    { return false; }
+    int map_palette(CHtmlSysWin*, int) override
+    {
+        return false;
+    }
 };
-
 
 #endif

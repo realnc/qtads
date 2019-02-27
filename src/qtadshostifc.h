@@ -20,28 +20,28 @@
 
 #include <cstddef>
 
-#include "vmhost.h"
-#include "resload.h"
 #include "appctx.h"
 #include "config.h"
-
+#include "resload.h"
+#include "vmhost.h"
 
 /* Host application interface.  This provides a bridge between the T3 VM host
  * interface (class CVmHostIfc) and the TADS 2 application context (struct
  * appctxdef) mechanism.
  */
-class QTadsHostIfc: public CVmHostIfc {
-  private:
+class QTadsHostIfc: public CVmHostIfc
+{
+private:
     appctxdef* fAppctx;
     int fIoSafetyRead;
     int fIoSafetyWrite;
     CResLoader* fCmapResLoader;
 
-  public:
-    QTadsHostIfc( struct appctxdef* appctx )
-    : fAppctx(appctx),
-      fIoSafetyRead(VM_IO_SAFETY_READWRITE_CUR),
-      fIoSafetyWrite(VM_IO_SAFETY_READWRITE_CUR)
+public:
+    QTadsHostIfc(struct appctxdef* appctx)
+        : fAppctx(appctx)
+        , fIoSafetyRead(VM_IO_SAFETY_READWRITE_CUR)
+        , fIoSafetyWrite(VM_IO_SAFETY_READWRITE_CUR)
     {
         // TODO: Use the directory where charmap files are stored.
         fCmapResLoader = new CResLoader("./");
@@ -56,8 +56,7 @@ class QTadsHostIfc: public CVmHostIfc {
     // CVmHostIfc interface implementation.
     //
 
-    int
-    get_io_safety_read() override
+    int get_io_safety_read() override
     {
         if (fAppctx != 0 and fAppctx->get_io_safety_level != 0) {
             // Ask the app context to handle it.
@@ -70,8 +69,7 @@ class QTadsHostIfc: public CVmHostIfc {
         }
     }
 
-    int
-    get_io_safety_write() override
+    int get_io_safety_write() override
     {
         if (fAppctx != 0 and fAppctx->get_io_safety_level != 0) {
             // Ask the app context to handle it.
@@ -84,8 +82,7 @@ class QTadsHostIfc: public CVmHostIfc {
         }
     }
 
-    void
-    set_io_safety( int readLvl, int writeLvl ) override
+    void set_io_safety(int readLvl, int writeLvl) override
     {
         if (fAppctx != 0 and fAppctx->set_io_safety_level != 0) {
             // Let the app context handle it.
@@ -98,8 +95,7 @@ class QTadsHostIfc: public CVmHostIfc {
     }
 
     // FIXME: Implement
-    void
-    get_net_safety( int* client_level, int* server_level ) override
+    void get_net_safety(int* client_level, int* server_level) override
     {
         if (client_level != 0)
             *client_level = 0;
@@ -108,17 +104,15 @@ class QTadsHostIfc: public CVmHostIfc {
     }
 
     // FIXME: Implement
-    void
-    set_net_safety( int /*client_level*/, int /*server_level*/ ) override
+    void set_net_safety(int /*client_level*/, int /*server_level*/) override
+    {}
+
+    class CResLoader* get_sys_res_loader() override
     {
+        return fCmapResLoader;
     }
 
-    class CResLoader*
-    get_sys_res_loader() override
-    { return fCmapResLoader; }
-
-    void
-    set_image_name( const char* fname ) override
+    void set_image_name(const char* fname) override
     {
         // Pass it through the app context if possible.
         if (fAppctx != 0 and fAppctx->set_game_name != 0) {
@@ -126,8 +120,7 @@ class QTadsHostIfc: public CVmHostIfc {
         }
     }
 
-    void
-    set_res_dir( const char* fname ) override
+    void set_res_dir(const char* fname) override
     {
         // Pass it through the app context if possible.
         if (fAppctx != 0 and fAppctx->set_res_dir != 0) {
@@ -135,8 +128,7 @@ class QTadsHostIfc: public CVmHostIfc {
         }
     }
 
-    int
-    add_resfile( const char* fname ) override
+    int add_resfile(const char* fname) override
     {
         // Pass it through the app context if possible.
         if (fAppctx != 0 and fAppctx->add_resfile != 0) {
@@ -147,45 +139,41 @@ class QTadsHostIfc: public CVmHostIfc {
     }
 
     // We suport add_resfile() if the application context does.
-    int
-    can_add_resfiles() override
+    int can_add_resfiles() override
     {
         // If the add_resfile function is defined in the application context,
         // we support adding resource files.
         return (fAppctx != 0 and fAppctx->add_resfile != 0);
     }
 
-    void
-    add_resource( unsigned long ofs, unsigned long siz, const char* res_name, size_t res_name_len,
-                  int fileno ) override
+    void add_resource(unsigned long ofs, unsigned long siz, const char* res_name,
+                      size_t res_name_len, int fileno) override
     {
         // Pass it through the app context if possible.
         if (fAppctx != 0 and fAppctx->add_resource != 0) {
-            (*fAppctx->add_resource)(fAppctx->add_resource_ctx, ofs, siz, res_name,
-                                           res_name_len, fileno);
+            (*fAppctx->add_resource)(fAppctx->add_resource_ctx, ofs, siz, res_name, res_name_len,
+                                     fileno);
         }
     }
 
-    void
-    add_resource( const char* fname, size_t fname_len, const char* res_name, size_t res_name_len) override
+    void add_resource(const char* fname, size_t fname_len, const char* res_name,
+                      size_t res_name_len) override
     {
         // Pass it through the app context if possible.
         if (fAppctx != 0 and fAppctx->add_resource_link != 0) {
-            (*fAppctx->add_resource_link)
-                    (fAppctx->add_resource_link_ctx, fname, fname_len, res_name, res_name_len);
+            (*fAppctx->add_resource_link)(fAppctx->add_resource_link_ctx, fname, fname_len,
+                                          res_name, res_name_len);
         }
     }
 
-    const char*
-    get_res_path() override
+    const char* get_res_path() override
     {
         // Get the path from the app context if possible.
         return (fAppctx != 0 ? fAppctx->ext_res_path : 0);
     }
 
     // Determine if a resource exists.
-    int
-    resfile_exists( const char* res_name, size_t res_name_len ) override
+    int resfile_exists(const char* res_name, size_t res_name_len) override
     {
         // Let the application context handle it if possible; if not, just
         // return false, since we can't otherwise provide resource operations.
@@ -196,21 +184,21 @@ class QTadsHostIfc: public CVmHostIfc {
         }
     }
 
-    osfildef*
-    find_resource( const char* res_name, size_t res_name_len, unsigned long* res_size ) override
+    osfildef* find_resource(const char* res_name, size_t res_name_len,
+                            unsigned long* res_size) override
     {
         // Let the application context handle it; if we don't have an
         // application context, we don't provide resource operation, so simply
         // return failure.
         if (fAppctx != 0 and fAppctx->find_resource != 0) {
-            return (*fAppctx->find_resource)(fAppctx->find_resource_ctx, res_name, res_name_len, res_size);
+            return (*fAppctx->find_resource)(fAppctx->find_resource_ctx, res_name, res_name_len,
+                                             res_size);
         } else {
             return 0;
         }
     }
 
-    vmhost_gin_t
-    get_image_name( char* buf, size_t buflen ) override
+    vmhost_gin_t get_image_name(char* buf, size_t buflen) override
     {
         // Let the application context handle it if possible; otherwise, return
         // false, since we can't otherwise ask for an image name.
@@ -228,12 +216,10 @@ class QTadsHostIfc: public CVmHostIfc {
     }
 
     // Get a special file system path.
-    void
-    get_special_file_path( char* buf, size_t buflen, int id ) override
+    void get_special_file_path(char* buf, size_t buflen, int id) override
     {
         return os_get_special_path(buf, buflen, 0, id);
     }
 };
-
 
 #endif

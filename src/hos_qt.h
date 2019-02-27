@@ -27,7 +27,6 @@
 #ifndef HOS_QT_H
 #define HOS_QT_H
 
-
 /* ------------------------------------------------------------------------ */
 /*
  *   System debugging console messages
@@ -42,10 +41,8 @@
  *   compiled.
  */
 #ifdef TADSHTML_DEBUG
-void
-os_dbg_sys_msg( const textchar_t* msg );
+void os_dbg_sys_msg(const textchar_t* msg);
 #endif
-
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -63,11 +60,8 @@ os_dbg_sys_msg( const textchar_t* msg );
 // Qt always uses Unicode, so this is pretty much a dummy definition.
 typedef unsigned int oshtml_charset_id_t;
 
-
 /* get the system default character set */
-oshtml_charset_id_t
-os_get_default_charset();
-
+oshtml_charset_id_t os_get_default_charset();
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -92,9 +86,7 @@ os_get_default_charset();
  *   like this is a security breach or anything; the caller can always use
  *   an ordinary type-cast if they really want to remove the const-ness.)
  */
-textchar_t*
-os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/ );
-
+textchar_t* os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/);
 
 /*
  *   Decrement a character string pointer to point to the previous character
@@ -111,9 +103,7 @@ os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/ );
  *   multi-byte character but should always be at a byte that starts a
  *   character OR at the byte just after the end of the string...
  */
-textchar_t*
-os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart );
-
+textchar_t* os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart);
 
 /*
  *   Determine if the character at the given string position is a word
@@ -129,9 +119,7 @@ os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t*
  *   additional characters following the character of interest, so 'len'
  *   isn't necessary the number of bytes in the single character at 'p').
  */
-int
-os_is_word_char( oshtml_charset_id_t id, const textchar_t *p, size_t len );
-
+int os_is_word_char(oshtml_charset_id_t id, const textchar_t* p, size_t len);
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -157,7 +145,6 @@ os_timer_t os_get_time();
 // Qt emulates a resolution of 1 ms even on systems with a lower resolution.
 #define OS_TIMER_UNITS_PER_SECOND 1000
 
-
 /* ------------------------------------------------------------------------ */
 /*
  *   Huge memory block manipulation - for use with blocks of memory over
@@ -171,7 +158,7 @@ os_timer_t os_get_time();
  *   appropriate type declaration for a huge pointer to that datatype.  On
  *   win32 and Unix, this just returns a plain pointer to the type.
  */
-#define OS_HUGEPTR(type) type *
+#define OS_HUGEPTR(type) type*
 
 /*
  *   Allocate a huge (>64k) buffer.  On win32/Unix, we can use the normal
@@ -211,6 +198,5 @@ os_timer_t os_get_time();
 // We assume 8-byte alignment instead of 4-byte, since we need to support
 // 64-bit compilers.
 #define os_align_size(siz) (((siz) + 7) & ~7)
-
 
 #endif /* HOS_QT_H */

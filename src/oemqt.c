@@ -20,12 +20,11 @@
  *     2002/12/17 Niko  - Creation
  */
 
-#include "std.h"
 #include "globals.h"
+#include "std.h"
 
-char G_tads_oem_app_name[] = "QTads "QTADS_VERSION;
+char G_tads_oem_app_name[] = "QTads " QTADS_VERSION;
 char G_tads_oem_dbg_name[] = ""; /* No debugger for Qt (yet). */
 char G_tads_oem_display_mode[] = "multimedia";
-char G_tads_oem_author[] =
-    "QTads copyright (C) 2013 by Nikos Chantziaras <realnc@gmail.com>\n";
+char G_tads_oem_author[] = "QTads copyright (C) 2013 by Nikos Chantziaras <realnc@gmail.com>\n";
 int G_tads_oem_copyright_prefix = TRUE;

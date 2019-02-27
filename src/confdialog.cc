@@ -16,23 +16,22 @@
  * USA.
  */
 
-#include <QColorDialog>
-#include <QSignalMapper>
-#include <QPushButton>
 #include <QCheckBox>
+#include <QColorDialog>
+#include <QPushButton>
+#include <QSignalMapper>
 #include <QTextCodec>
 
 #include "confdialog.h"
-#include "ui_confdialog.h"
 #include "globals.h"
 #include "settings.h"
 #include "sysframe.h"
 #include "syswingroup.h"
+#include "ui_confdialog.h"
 
-
-ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
-    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
-      ui(new Ui::ConfDialog)
+ConfDialog::ConfDialog(CHtmlSysWinGroupQt* parent)
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
+    , ui(new Ui::ConfDialog)
 {
     ui->setupUi(this);
     Settings* sett = qFrame->settings();
@@ -103,22 +102,40 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
         ui->inputFontBox->setCurrentFont(sett->inputFont);
     }
     ui->useMainFontCheckBox->setChecked(sett->useMainFontForInput);
-    connect(ui->useMainFontCheckBox, SIGNAL(toggled(bool)), ui->inputFontBox, SLOT(setDisabled(bool)));
-    connect(ui->useMainFontCheckBox, SIGNAL(toggled(bool)), ui->inputFontSizeSpinBox, SLOT(setDisabled(bool)));
+    connect(ui->useMainFontCheckBox, SIGNAL(toggled(bool)), ui->inputFontBox,
+            SLOT(setDisabled(bool)));
+    connect(ui->useMainFontCheckBox, SIGNAL(toggled(bool)), ui->inputFontSizeSpinBox,
+            SLOT(setDisabled(bool)));
     ui->inputFontItalicCheckBox->setChecked(sett->inputFont.italic());
     ui->inputFontBoldCheckBox->setChecked(sett->inputFont.bold());
 
     switch (sett->ioSafetyLevelRead) {
-      case 0: ui->safetyRead0RadioButton->setChecked(true); break;
-      case 2: ui->safetyRead2RadioButton->setChecked(true); break;
-      case 4: ui->safetyRead4RadioButton->setChecked(true); break;
-      default: ui->safetyRead2RadioButton->setChecked(true); break;
+    case 0:
+        ui->safetyRead0RadioButton->setChecked(true);
+        break;
+    case 2:
+        ui->safetyRead2RadioButton->setChecked(true);
+        break;
+    case 4:
+        ui->safetyRead4RadioButton->setChecked(true);
+        break;
+    default:
+        ui->safetyRead2RadioButton->setChecked(true);
+        break;
     }
     switch (sett->ioSafetyLevelWrite) {
-      case 0: ui->safetyWrite0RadioButton->setChecked(true); break;
-      case 2: ui->safetyWrite2RadioButton->setChecked(true); break;
-      case 4: ui->safetyWrite4RadioButton->setChecked(true); break;
-      default: ui->safetyWrite2RadioButton->setChecked(true); break;
+    case 0:
+        ui->safetyWrite0RadioButton->setChecked(true);
+        break;
+    case 2:
+        ui->safetyWrite2RadioButton->setChecked(true);
+        break;
+    case 4:
+        ui->safetyWrite4RadioButton->setChecked(true);
+        break;
+    default:
+        ui->safetyWrite2RadioButton->setChecked(true);
+        break;
     }
 
     const QList<QByteArray>& aliases = QTextCodec::availableCodecs();
@@ -130,15 +147,10 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
         // encoding we allow is UTF-8, since it's a single-byte character set
         // and therefore can be used by TADS 2 games (though I'm not aware of
         // any that actually use UTF-8.)
-        if (codecName == "UTF-8"
-            or codecName.startsWith("windows-")
-            or codecName.startsWith("ISO-")
-            or codecName.startsWith("KOI8-")
-            or codecName.startsWith("IBM")
-            or codecName.startsWith("EUC-")
-            or codecName.startsWith("jisx020")
-            or codecName.startsWith("cp949"))
-        {
+        if (codecName == "UTF-8" or codecName.startsWith("windows-") or codecName.startsWith("ISO-")
+            or codecName.startsWith("KOI8-") or codecName.startsWith("IBM")
+            or codecName.startsWith("EUC-") or codecName.startsWith("jisx020")
+            or codecName.startsWith("cp949")) {
             codecs.append(codecName);
         }
     }
@@ -148,7 +160,8 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
             ui->encodingComboBox->addItem(QString::fromLatin1(codecs.at(i)));
         }
     }
-    ui->encodingComboBox->setCurrentIndex(ui->encodingComboBox->findText(QString::fromLatin1(sett->tads2Encoding)));
+    ui->encodingComboBox->setCurrentIndex(
+        ui->encodingComboBox->findText(QString::fromLatin1(sett->tads2Encoding)));
 
     QString txt(QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText));
     if (txt.endsWith(QChar::fromLatin1('+'))) {
@@ -162,10 +175,18 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
     ui->confirmQuitCheckBox->setChecked(sett->confirmQuitGame);
 
     switch (sett->updateFreq) {
-      case Settings::UpdateOnEveryStart: ui->updateOnStartRadioButton->setChecked(true); break;
-      case Settings::UpdateDaily: ui->updateDailyRadioButton->setChecked(true); break;
-      case Settings::UpdateWeekly: ui->updateWeeklyRadioButton->setChecked(true); break;
-      default: ui->updateNeverRadioButton->setChecked(true); break;
+    case Settings::UpdateOnEveryStart:
+        ui->updateOnStartRadioButton->setChecked(true);
+        break;
+    case Settings::UpdateDaily:
+        ui->updateDailyRadioButton->setChecked(true);
+        break;
+    case Settings::UpdateWeekly:
+        ui->updateWeeklyRadioButton->setChecked(true);
+        break;
+    default:
+        ui->updateNeverRadioButton->setChecked(true);
+        break;
     }
 
 #ifdef Q_OS_MAC
@@ -174,8 +195,8 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
     fMakeInstantApply();
     ui->buttonBox->setStandardButtons(QDialogButtonBox::NoButton);
 #else
-    QDialogButtonBox::ButtonLayout layoutPolicy
-        = QDialogButtonBox::ButtonLayout(ui->buttonBox->style()->styleHint(QStyle::SH_DialogButtonLayout));
+    QDialogButtonBox::ButtonLayout layoutPolicy = QDialogButtonBox::ButtonLayout(
+        ui->buttonBox->style()->styleHint(QStyle::SH_DialogButtonLayout));
     if (layoutPolicy == QDialogButtonBox::GnomeLayout) {
         // On Gnome (and other Gtk-based environments, like XFCE), we follow
         // Gnome standards. We only provide a "Close" button and settings
@@ -185,21 +206,21 @@ ConfDialog::ConfDialog( CHtmlSysWinGroupQt* parent )
     } else {
         // Assume KDE/MS Windows standards. No instant apply, and use OK/Apply/Cancel
         // buttons.
-        ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
-        connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(fApplySettings()));
+        ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply
+                                          | QDialogButtonBox::Cancel);
+        connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this,
+                SLOT(fApplySettings()));
         connect(this, SIGNAL(accepted()), this, SLOT(fApplySettings()));
     }
 #endif
 }
-
 
 ConfDialog::~ConfDialog()
 {
     delete ui;
 }
 
-
-void ConfDialog::changeEvent(QEvent *e)
+void ConfDialog::changeEvent(QEvent* e)
 {
     QDialog::changeEvent(e);
     switch (e->type()) {
@@ -211,9 +232,7 @@ void ConfDialog::changeEvent(QEvent *e)
     }
 }
 
-
-void
-ConfDialog::fMakeInstantApply()
+void ConfDialog::fMakeInstantApply()
 {
     connect(ui->mainFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
     connect(ui->fixedFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
@@ -277,9 +296,7 @@ ConfDialog::fMakeInstantApply()
     connect(ui->confirmQuitCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
 }
 
-
-void
-ConfDialog::fApplySettings()
+void ConfDialog::fApplySettings()
 {
     if (ui->useMainFontCheckBox->isChecked()) {
         ui->inputFontBox->setCurrentFont(ui->mainFontBox->currentFont());

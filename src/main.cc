@@ -16,20 +16,20 @@
  * USA.
  */
 #include <QDebug>
-#include <QMetaType>
 #include <QFileDialog>
+#include <QMetaType>
 
+#include "qtadssound.h"
 #include "settings.h"
 #include "sysframe.h"
-#include "qtadssound.h"
 
 // Static Qt4 builds on OS X need the text codec plugins.
 #if defined(STATIC_QT) and defined(Q_OS_MAC) and QT_VERSION < 0x050000
-    #include <QtPlugin>
-    Q_IMPORT_PLUGIN(qcncodecs)
-    Q_IMPORT_PLUGIN(qjpcodecs)
-    Q_IMPORT_PLUGIN(qtwcodecs)
-    Q_IMPORT_PLUGIN(qkrcodecs)
+#include <QtPlugin>
+Q_IMPORT_PLUGIN(qcncodecs)
+Q_IMPORT_PLUGIN(qjpcodecs)
+Q_IMPORT_PLUGIN(qtwcodecs)
+Q_IMPORT_PLUGIN(qkrcodecs)
 #endif
 
 // On some platforms, SDL redefines main in order to provide a
@@ -40,11 +40,10 @@
 // or setting up the application menu on OS X, or redirecting stdout and stderr
 // to text files on Windows), which would break things.
 #if !defined(NO_AUDIO) && defined(main)
-#  undef main
+#undef main
 #endif
 
-
-int main( int argc, char** argv )
+int main(int argc, char** argv)
 {
     CHtmlResType::add_basic_types();
     CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", "2.0", "Nikos Chantziaras",
@@ -67,10 +66,9 @@ int main( int argc, char** argv )
     }
 
     if (gameFileName.isEmpty() and app->settings()->askForGameFile) {
-        gameFileName = QFileDialog::getOpenFileName(0, QObject::tr("Choose the TADS game you wish to run"),
-                                                    QString::fromLatin1(""),
-                                                    QObject::tr("TADS Games")
-                                                    + QString::fromLatin1("(*.gam *.Gam *.GAM *.t3 *.T3)"));
+        gameFileName = QFileDialog::getOpenFileName(
+            0, QObject::tr("Choose the TADS game you wish to run"), QString::fromLatin1(""),
+            QObject::tr("TADS Games") + QString::fromLatin1("(*.gam *.Gam *.GAM *.t3 *.T3)"));
     }
 
 #ifndef NO_AUDIO
@@ -80,7 +78,8 @@ int main( int argc, char** argv )
     }
 #endif
 
-    QMetaObject::invokeMethod(app, "entryPoint", Qt::QueuedConnection, Q_ARG(QString, gameFileName));
+    QMetaObject::invokeMethod(app, "entryPoint", Qt::QueuedConnection,
+                              Q_ARG(QString, gameFileName));
     int ret = app->exec();
 
     delete app;

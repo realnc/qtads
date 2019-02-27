@@ -21,9 +21,8 @@
 #include <QDebug>
 #include <QMovie>
 
-#include "qtadsimage.h"
 #include "config.h"
-
+#include "qtadsimage.h"
 
 /* Tads HTML layer class whose interface needs to be implemented by the
  * interpreter.
@@ -31,69 +30,80 @@
  * See htmltads/htmlsys.h and htmltads/notes/porting.htm for information
  * about this class.
  */
-class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng {
+class CHtmlSysImageMngQt: public QMovie, public CHtmlSysImageMng
+{
     Q_OBJECT
 
-  private:
+private:
     CHtmlSysImageDisplaySite* fDispSite;
 
-  private slots:
-    void
-    updateDisplay( const QRect& rect )
+private slots:
+    void updateDisplay(const QRect& rect)
     {
         if (fDispSite != 0) {
             fDispSite->dispsite_inval(rect.x(), rect.y(), rect.width(), rect.height());
         }
     }
 
-  public:
+public:
     CHtmlSysImageMngQt()
-    : fDispSite(0)
-    { connect(this, SIGNAL(updated(QRect)), this, SLOT(updateDisplay(QRect))); }
+        : fDispSite(0)
+    {
+        connect(this, SIGNAL(updated(QRect)), this, SLOT(updateDisplay(QRect)));
+    }
 
     //
     // CHtmlSysImageMng interface implementation.
     //
-    void
-    set_display_site ( CHtmlSysImageDisplaySite* dispSite ) override
-    { fDispSite = dispSite; }
+    void set_display_site(CHtmlSysImageDisplaySite* dispSite) override
+    {
+        fDispSite = dispSite;
+    }
 
-    void
-    cancel_playback() override
-    { stop(); }
+    void cancel_playback() override
+    {
+        stop();
+    }
 
-    void
-    pause_playback() override
-    { setPaused(true); }
+    void pause_playback() override
+    {
+        setPaused(true);
+    }
 
-    void
-    resume_playback() override
-    { setPaused(false); }
+    void resume_playback() override
+    {
+        setPaused(false);
+    }
 
-    void
-    draw_image( CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode ) override
-    { QTadsImage(currentImage()).drawFromPaintEvent(win, pos, mode); }
+    void draw_image(CHtmlSysWin* win, CHtmlRect* pos, htmlimg_draw_mode_t mode) override
+    {
+        QTadsImage(currentImage()).drawFromPaintEvent(win, pos, mode);
+    }
 
-    unsigned long
-    get_width() const override
-    { return frameRect().width(); }
+    unsigned long get_width() const override
+    {
+        return frameRect().width();
+    }
 
-    unsigned long
-    get_height() const override
-    { return frameRect().height(); }
+    unsigned long get_height() const override
+    {
+        return frameRect().height();
+    }
 
-    int
-    map_palette( CHtmlSysWin*, int ) override
-    { return false; }
+    int map_palette(CHtmlSysWin*, int) override
+    {
+        return false;
+    }
 
-    void
-    notify_timer() override
-    { qDebug() << Q_FUNC_INFO; }
+    void notify_timer() override
+    {
+        qDebug() << Q_FUNC_INFO;
+    }
 
-    void
-    notify_image_change( int, int, int, int ) override
-    { qDebug() << Q_FUNC_INFO; }
+    void notify_image_change(int, int, int, int) override
+    {
+        qDebug() << Q_FUNC_INFO;
+    }
 };
-
 
 #endif

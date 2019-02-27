@@ -17,40 +17,39 @@
  */
 #include <QDebug>
 #include <QFileInfo>
-#include <QTimer>
 #include <QResource>
+#include <QTimer>
 
 #ifndef NO_AUDIO
-#include <functional>
-#include <cstring>
-#include <cerrno>
-#include <cstdio>
+#include "Aulib/AudioDecoderFluidsynth.h"
+#include "Aulib/AudioDecoderMpg123.h"
+#include "Aulib/AudioDecoderSndfile.h"
+#include "Aulib/AudioDecoderVorbis.h"
+#include "Aulib/AudioResamplerSpeex.h"
+#include "aulib.h"
+#include "rwopsbundle.h"
 #include <SDL.h>
 #include <SDL_error.h>
 #include <SDL_rwops.h>
-#include "aulib.h"
-#include "Aulib/AudioResamplerSpeex.h"
-#include "Aulib/AudioDecoderVorbis.h"
-#include "Aulib/AudioDecoderMpg123.h"
-#include "Aulib/AudioDecoderFluidsynth.h"
-#include "Aulib/AudioDecoderSndfile.h"
-#include "rwopsbundle.h"
+#include <cerrno>
+#include <cstdio>
+#include <cstring>
+#include <functional>
 #endif
 
-#include "qtadssound.h"
 #include "globals.h"
-#include "sysframe.h"
+#include "qtadssound.h"
 #include "settings.h"
-#include "syssoundwav.h"
-#include "syssoundogg.h"
-#include "syssoundmpeg.h"
+#include "sysframe.h"
 #include "syssoundmidi.h"
+#include "syssoundmpeg.h"
+#include "syssoundogg.h"
+#include "syssoundwav.h"
 
 namespace chrono = std::chrono;
 using namespace std::chrono_literals;
 
-bool
-initSound()
+bool initSound()
 {
 #ifndef NO_AUDIO
     if (SDL_Init(SDL_INIT_AUDIO) != 0) {
@@ -68,9 +67,7 @@ initSound()
 #endif
 }
 
-
-void
-quitSound()
+void quitSound()
 {
 #ifndef NO_AUDIO
     Aulib::quit();
@@ -78,20 +75,19 @@ quitSound()
 #endif
 }
 
-
 #ifndef NO_AUDIO
-QTadsSound::QTadsSound(QObject* parent, Aulib::AudioStream* stream, SoundType type )
-    : QObject(parent),
-      fAudStream(stream),
-      fType(type),
-      fPlaying(false),
-      fCrossFade(false),
-      fFadeOutTimer(new QTimer(0)),
-      fDone_func(0),
-      fDone_func_ctx(0),
-      fRepeats(0),
-      fRepeatsWanted(1),
-      fLength(chrono::duration_cast<chrono::milliseconds>(stream->duration()))
+QTadsSound::QTadsSound(QObject* parent, Aulib::AudioStream* stream, SoundType type)
+    : QObject(parent)
+    , fAudStream(stream)
+    , fType(type)
+    , fPlaying(false)
+    , fCrossFade(false)
+    , fFadeOutTimer(new QTimer(0))
+    , fDone_func(0)
+    , fDone_func_ctx(0)
+    , fRepeats(0)
+    , fRepeatsWanted(1)
+    , fLength(chrono::duration_cast<chrono::milliseconds>(stream->duration()))
 {
     // Pretend that the sound is 30ms shorter than it really is in order to
     // compensate for wacky OS timers (Windows and low-ticks systems).
@@ -100,7 +96,7 @@ QTadsSound::QTadsSound(QObject* parent, Aulib::AudioStream* stream, SoundType ty
     } else {
         fLength = 0ms;
     }
-    //qDebug() << "Sound length:" << fLength;
+    // qDebug() << "Sound length:" << fLength;
     connect(this, SIGNAL(readyToFadeOut()), SLOT(fPrepareFadeOut()));
     connect(fFadeOutTimer, SIGNAL(timeout()), this, SLOT(fDoFadeOut()));
     connect(this, SIGNAL(destroyed()), SLOT(fDeleteTimer()));
@@ -109,19 +105,16 @@ QTadsSound::QTadsSound(QObject* parent, Aulib::AudioStream* stream, SoundType ty
     fFadeOutTimer->setSingleShot(true);
 }
 
-
 QTadsSound::~QTadsSound()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     fRepeatsWanted = -1;
     delete fAudStream;
 }
 
-
-void
-QTadsSound::fFinishCallback( Aulib::Stream& strm )
+void QTadsSound::fFinishCallback(Aulib::Stream& strm)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // Invoke the TADS callback, if there is one.
     fPlaying = false;
@@ -130,11 +123,9 @@ QTadsSound::fFinishCallback( Aulib::Stream& strm )
     }
 }
 
-
-void
-QTadsSound::fLoopCallback( Aulib::Stream& strm )
+void QTadsSound::fLoopCallback(Aulib::Stream& strm)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     ++fRepeats;
     fTimePos.start();
@@ -142,14 +133,13 @@ QTadsSound::fLoopCallback( Aulib::Stream& strm )
     // If this is the last iteration and we have a fade-out, set the fade-out
     // timer.
     if (fFadeOut.count() > 0 and (fRepeatsWanted == -1 or fRepeats == fRepeatsWanted)) {
-        // Clamp the interval to 0 (= now), in case the fade out time is larger than the sound length.
+        // Clamp the interval to 0 (= now), in case the fade out time is larger than the sound
+        // length.
         fFadeOutTimer->start(std::max(0ms, fLength - fFadeOut));
     }
 }
 
-
-void
-QTadsSound::fDoFadeOut()
+void QTadsSound::fDoFadeOut()
 {
     Q_ASSERT(fAudStream->isPlaying());
 
@@ -164,26 +154,20 @@ QTadsSound::fDoFadeOut()
     fAudStream->stop(chrono::milliseconds(fFadeOut));
 }
 
-
-void
-QTadsSound::fPrepareFadeOut()
+void QTadsSound::fPrepareFadeOut()
 {
     fFadeOutTimer->start(fLength - fFadeOut);
 }
 
-
-void
-QTadsSound::fDeleteTimer()
+void QTadsSound::fDeleteTimer()
 {
     delete fFadeOutTimer;
 }
 
-
-int
-QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
-                          int vol, int fadeIn, int fadeOut, bool crossFade )
+int QTadsSound::startPlaying(void (*done_func)(void*, int repeat_count), void* done_func_ctx,
+                             int repeat, int vol, int fadeIn, int fadeOut, bool crossFade)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // Check if user disabled digital sound.
     if (not qFrame->settings()->enableSoundEffects) {
@@ -236,9 +220,7 @@ QTadsSound::startPlaying( void (*done_func)(void*, int repeat_count), void* done
     return 0;
 }
 
-
-void
-QTadsSound::cancelPlaying( bool sync, int fadeOut, bool fadeOutInBg )
+void QTadsSound::cancelPlaying(bool sync, int fadeOut, bool fadeOutInBg)
 {
     if (not fPlaying) {
         return;
@@ -270,9 +252,7 @@ QTadsSound::cancelPlaying( bool sync, int fadeOut, bool fadeOutInBg )
     }
 }
 
-
-void
-QTadsSound::addCrossFade( int ms )
+void QTadsSound::addCrossFade(int ms)
 {
     fCrossFade = true;
     fFadeOut = chrono::milliseconds(ms);
@@ -289,13 +269,12 @@ QTadsSound::addCrossFade( int ms )
 }
 #endif
 
-
-CHtmlSysSound*
-QTadsSound::createSound( const CHtmlUrl* /*url*/, const textchar_t* filename, unsigned long seekpos,
-                         unsigned long filesize, CHtmlSysWin*, SoundType type )
+CHtmlSysSound* QTadsSound::createSound(const CHtmlUrl* /*url*/, const textchar_t* filename,
+                                       unsigned long seekpos, unsigned long filesize, CHtmlSysWin*,
+                                       SoundType type)
 #ifndef NO_AUDIO
 {
-    //qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
+    // qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
     //      << "url:" << url->get_url();
 
     // Check if the file exists and is readable.
@@ -309,15 +288,16 @@ QTadsSound::createSound( const CHtmlUrl* /*url*/, const textchar_t* filename, un
     FILE* file = std::fopen(inf.filePath().toLocal8Bit().constData(), "rb");
     if (file == 0) {
         int errtmp = errno;
-        qWarning() << "ERROR: Can't open file" << inf.filePath() << " (" << std::strerror(errtmp) << ")";
+        qWarning() << "ERROR: Can't open file" << inf.filePath() << " (" << std::strerror(errtmp)
+                   << ")";
         return 0;
     }
     if (std::fseek(file, seekpos, SEEK_SET) < 0) {
         int errtmp = errno;
-        qWarning() << "ERROR: Can't seek in file" << inf.filePath() << " (" << std::strerror(errtmp) << ")";
+        qWarning() << "ERROR: Can't seek in file" << inf.filePath() << " (" << std::strerror(errtmp)
+                   << ")";
         std::fclose(file);
         return 0;
-
     }
 
     // Create the RWops through which the data will be read later.
@@ -331,29 +311,28 @@ QTadsSound::createSound( const CHtmlUrl* /*url*/, const textchar_t* filename, un
 
     std::unique_ptr<Aulib::AudioDecoder> decoder = nullptr;
     switch (type) {
-        case MPEG:
-            decoder = std::make_unique<Aulib::AudioDecoderMpg123>();
-            break;
-        case OGG:
-            decoder = std::make_unique<Aulib::AudioDecoderVorbis>();
-            break;
-        case WAV:
-            decoder = std::make_unique<Aulib::AudioDecoderSndfile>();
-            break;
-        case MIDI: {
-            decoder = std::make_unique<Aulib::AudioDecoderFluidSynth>();
-            QResource sf2Res(QStringLiteral(":/soundfont.sf2"));
-            auto* sf2_rwops = SDL_RWFromConstMem(sf2Res.data(), sf2Res.size());
-            auto fsynth = static_cast<Aulib::AudioDecoderFluidSynth*>(decoder.get());
-            fsynth->loadSoundfont(sf2_rwops);
-            fsynth->setGain(0.6f);
-            break;
-        }
+    case MPEG:
+        decoder = std::make_unique<Aulib::AudioDecoderMpg123>();
+        break;
+    case OGG:
+        decoder = std::make_unique<Aulib::AudioDecoderVorbis>();
+        break;
+    case WAV:
+        decoder = std::make_unique<Aulib::AudioDecoderSndfile>();
+        break;
+    case MIDI: {
+        decoder = std::make_unique<Aulib::AudioDecoderFluidSynth>();
+        QResource sf2Res(QStringLiteral(":/soundfont.sf2"));
+        auto* sf2_rwops = SDL_RWFromConstMem(sf2Res.data(), sf2Res.size());
+        auto fsynth = static_cast<Aulib::AudioDecoderFluidSynth*>(decoder.get());
+        fsynth->loadSoundfont(sf2_rwops);
+        fsynth->setGain(0.6f);
+        break;
+    }
     }
 
-    Aulib::AudioStream* stream = new Aulib::AudioStream(rw, std::move(decoder),
-                                                        std::make_unique<Aulib::AudioResamplerSpeex>(),
-                                                        true);
+    Aulib::AudioStream* stream = new Aulib::AudioStream(
+        rw, std::move(decoder), std::make_unique<Aulib::AudioResamplerSpeex>(), true);
     if (not stream->open()) {
         qWarning() << "ERROR:" << SDL_GetError();
         SDL_ClearError();
@@ -361,30 +340,30 @@ QTadsSound::createSound( const CHtmlUrl* /*url*/, const textchar_t* filename, un
         return 0;
     }
 
-    // Create the sound object.  It is *important* not to pass the CHtmlSysWin object as the parent in the
-    // constructor; doing so would result in Qt deleting the sound object when the parent object gets
-    // destroyed.  Therefore, we simply pass 0 to make the sound object parentless.
+    // Create the sound object.  It is *important* not to pass the CHtmlSysWin object as the parent
+    // in the constructor; doing so would result in Qt deleting the sound object when the parent
+    // object gets destroyed.  Therefore, we simply pass 0 to make the sound object parentless.
     QTadsSound* sound = NULL;
     switch (type) {
-        case WAV:
-            //qDebug() << "Sound type: WAV";
-            sound = new CHtmlSysSoundWavQt(0, stream, WAV);
-            break;
+    case WAV:
+        // qDebug() << "Sound type: WAV";
+        sound = new CHtmlSysSoundWavQt(0, stream, WAV);
+        break;
 
-        case OGG:
-            //qDebug() << "Sound type: OGG";
-            sound = new CHtmlSysSoundOggQt(0, stream, OGG);
-            break;
+    case OGG:
+        // qDebug() << "Sound type: OGG";
+        sound = new CHtmlSysSoundOggQt(0, stream, OGG);
+        break;
 
-        case MPEG:
-            //qDebug() << "Sound type: MPEG";
-            sound = new CHtmlSysSoundMpegQt(0, stream, MPEG);
-            break;
+    case MPEG:
+        // qDebug() << "Sound type: MPEG";
+        sound = new CHtmlSysSoundMpegQt(0, stream, MPEG);
+        break;
 
-        case MIDI:
-            //qDebug() << "Sound type: MIDI";
-            sound = new CHtmlSysSoundMidiQt(0, stream, MIDI);
-            break;
+    case MIDI:
+        // qDebug() << "Sound type: MIDI";
+        sound = new CHtmlSysSoundMidiQt(0, stream, MIDI);
+        break;
     }
     using namespace std::placeholders;
     stream->setFinishCallback(std::bind(&QTadsSound::fFinishCallback, sound, _1));

@@ -15,14 +15,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA.
  */
-#include <QFileInfo>
 #include <QBuffer>
+#include <QFileInfo>
 
 #include "qtadsimage.h"
 #include "sysimagejpeg.h"
-#include "sysimagepng.h"
 #include "sysimagemng.h"
-
+#include "sysimagepng.h"
 
 /* Helper routine.  Loads any type of image from the specified offset inside
  * the given file and returns it.  Has the same semantics as the various
@@ -30,11 +29,11 @@
  * 'imageType'.  It has the same format as the list returned by
  * QImageReader::supportedImageFormats() (like "JPG", "PNG", etc.)
  */
-static CHtmlSysResource*
-createImageFromFile( const CHtmlUrl* /*url*/, const textchar_t* filename, unsigned long seekpos,
-                     unsigned long filesize, CHtmlSysWin* /*win*/, const QString& imageType )
+static CHtmlSysResource* createImageFromFile(const CHtmlUrl* /*url*/, const textchar_t* filename,
+                                             unsigned long seekpos, unsigned long filesize,
+                                             CHtmlSysWin* /*win*/, const QString& imageType)
 {
-    //qDebug() << "Loading" << imageType << "image from" << filename << "at offset" << seekpos
+    // qDebug() << "Loading" << imageType << "image from" << filename << "at offset" << seekpos
     //      << "with size" << filesize << "url:" << url->get_url();
 
     // Check if the file exists and is readable.
@@ -103,26 +102,23 @@ createImageFromFile( const CHtmlUrl* /*url*/, const textchar_t* filename, unsign
     return image;
 }
 
-
-CHtmlSysResource*
-CHtmlSysImageJpeg::create_jpeg( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-                                unsigned long filesize, CHtmlSysWin* win )
+CHtmlSysResource* CHtmlSysImageJpeg::create_jpeg(const CHtmlUrl* url, const textchar_t* filename,
+                                                 unsigned long seekpos, unsigned long filesize,
+                                                 CHtmlSysWin* win)
 {
     return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromLatin1("JPG"));
 }
 
-
-CHtmlSysResource*
-CHtmlSysImagePng::create_png( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-                              unsigned long filesize, CHtmlSysWin* win )
+CHtmlSysResource* CHtmlSysImagePng::create_png(const CHtmlUrl* url, const textchar_t* filename,
+                                               unsigned long seekpos, unsigned long filesize,
+                                               CHtmlSysWin* win)
 {
     return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromLatin1("PNG"));
 }
 
-
-CHtmlSysResource*
-CHtmlSysImageMng::create_mng( const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-                              unsigned long filesize, CHtmlSysWin* win )
+CHtmlSysResource* CHtmlSysImageMng::create_mng(const CHtmlUrl* url, const textchar_t* filename,
+                                               unsigned long seekpos, unsigned long filesize,
+                                               CHtmlSysWin* win)
 {
     return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromLatin1("MNG"));
 }

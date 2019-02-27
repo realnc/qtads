@@ -17,38 +17,37 @@
  */
 #include <QBoxLayout>
 #include <QPainter>
-#include <QScrollBar>
 #include <QResizeEvent>
+#include <QScrollBar>
 #include <qdrawutil.h>
 
 #include "dispwidget.h"
 #include "qtadstimer.h"
 #include "settings.h"
-#include "syswininput.h"
 #include "sysimagejpeg.h"
 #include "sysimagepng.h"
+#include "syswininput.h"
 
 #include "htmlfmt.h"
 #include "htmlrc.h"
 
-
-CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QWidget* parent )
-    : QScrollArea(parent),
-      CHtmlSysWin(formatter),
-      fBannerPos(HTML_BANNERWIN_POS_TOP),
-      fBannerStyleModeMode(true),
-      fBannerStyleAutoVScroll(true),
-      fBannerStyleGrid(false),
-      fBannerStyleBorder(0),
-      fBorderLine(qWinGroup->centralWidget()),
-      fDontReformat(0),
-      fInPagePauseMode(false),
-      fParentBanner(0),
-      fBgImage(0),
-      lastInputHeight(0),
-      margins(8, 2, 8, 2),
-      bannerSize(0),
-      bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
+CHtmlSysWinQt::CHtmlSysWinQt(CHtmlFormatter* formatter, QWidget* parent)
+    : QScrollArea(parent)
+    , CHtmlSysWin(formatter)
+    , fBannerPos(HTML_BANNERWIN_POS_TOP)
+    , fBannerStyleModeMode(true)
+    , fBannerStyleAutoVScroll(true)
+    , fBannerStyleGrid(false)
+    , fBannerStyleBorder(0)
+    , fBorderLine(qWinGroup->centralWidget())
+    , fDontReformat(0)
+    , fInPagePauseMode(false)
+    , fParentBanner(0)
+    , fBgImage(0)
+    , lastInputHeight(0)
+    , margins(8, 2, 8, 2)
+    , bannerSize(0)
+    , bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
 {
     dispWidget = new DisplayWidget(this, formatter);
     setWidget(dispWidget);
@@ -73,13 +72,12 @@ CHtmlSysWinQt::CHtmlSysWinQt( CHtmlFormatter* formatter, QWidget* parent )
     setAttribute(Qt::WA_InputMethodEnabled);
 
     // TEMP: Just to make the area of this widget visibly more apparent.
-    //viewport()->setBackgroundRole(QPalette::ToolTipBase);
+    // viewport()->setBackgroundRole(QPalette::ToolTipBase);
 }
-
 
 CHtmlSysWinQt::~CHtmlSysWinQt()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // Remove my reference on the background image if I have one.
     if (fBgImage != 0) {
@@ -102,9 +100,7 @@ CHtmlSysWinQt::~CHtmlSysWinQt()
     }
 }
 
-
-void
-CHtmlSysWinQt::fSetupPainterForFont( QPainter& painter, bool hilite, CHtmlSysFont* font )
+void CHtmlSysWinQt::fSetupPainterForFont(QPainter& painter, bool hilite, CHtmlSysFont* font)
 {
     const CHtmlSysFontQt& fontCast = *static_cast<CHtmlSysFontQt*>(font);
     painter.setFont(fontCast);
@@ -112,7 +108,8 @@ CHtmlSysWinQt::fSetupPainterForFont( QPainter& painter, bool hilite, CHtmlSysFon
     if (fontCast.use_font_color()) {
         // The font has its own color; use it.
         HTML_color_t color = fontCast.get_font_color();
-        painter.setPen(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
+        painter.setPen(
+            QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
     } else if (font->get_font_color() == static_cast<HTML_color_t>(HTML_COLOR_INPUT)) {
         painter.setPen(qFrame->inputColor());
     }
@@ -126,27 +123,22 @@ CHtmlSysWinQt::fSetupPainterForFont( QPainter& painter, bool hilite, CHtmlSysFon
     if (fontCast.use_font_bgcolor()) {
         painter.setBackgroundMode(Qt::OpaqueMode);
         HTML_color_t color = fontCast.get_font_bgcolor();
-        painter.setBackground(QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
+        painter.setBackground(
+            QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
     }
 }
 
-
-void
-CHtmlSysWinQt::keyPressEvent( QKeyEvent* event )
+void CHtmlSysWinQt::keyPressEvent(QKeyEvent* event)
 {
     qFrame->gameWindow()->keyPressEvent(event);
 }
 
-
-void
-CHtmlSysWinQt::inputMethodEvent( QInputMethodEvent* e )
+void CHtmlSysWinQt::inputMethodEvent(QInputMethodEvent* e)
 {
     qFrame->gameWindow()->inputMethodEvent(e);
 }
 
-
-void
-CHtmlSysWinQt::scrollContentsBy(int dx, int dy)
+void CHtmlSysWinQt::scrollContentsBy(int dx, int dy)
 {
     QScrollArea::scrollContentsBy(dx, dy);
 
@@ -159,9 +151,7 @@ CHtmlSysWinQt::scrollContentsBy(int dx, int dy)
     }
 }
 
-
-void
-CHtmlSysWinQt::wheelEvent( QWheelEvent* e )
+void CHtmlSysWinQt::wheelEvent(QWheelEvent* e)
 {
     // Only allow the event if the banner has a vertical scrollbar.  Banners
     // without one are not supposed to be scrollable.
@@ -172,9 +162,7 @@ CHtmlSysWinQt::wheelEvent( QWheelEvent* e )
     }
 }
 
-
-void
-CHtmlSysWinQt::resizeEvent( QResizeEvent* e )
+void CHtmlSysWinQt::resizeEvent(QResizeEvent* e)
 {
     QScrollArea::resizeEvent(e);
 
@@ -189,9 +177,7 @@ CHtmlSysWinQt::resizeEvent( QResizeEvent* e )
     }
 }
 
-
-void
-CHtmlSysWinQt::mousePressEvent( QMouseEvent* e )
+void CHtmlSysWinQt::mousePressEvent(QMouseEvent* e)
 {
     // This is a work-around for KDE's Oxygen style window grabbing. Oxygen
     // allows window grabbing by clicking on any "empty" area of an
@@ -202,11 +188,9 @@ CHtmlSysWinQt::mousePressEvent( QMouseEvent* e )
     e->accept();
 }
 
-
-void
-CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
+void CHtmlSysWinQt::calcChildBannerSizes(QRect& parentSize)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     ++fDontReformat;
 
     QRect newSize;
@@ -245,7 +229,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
 
         // Convert the width units to pixels.
         switch (bannerSizeUnits) {
-          case HTML_BANNERWIN_UNITS_PIX:
+        case HTML_BANNERWIN_UNITS_PIX:
             // Pixels - use the stored width directly.
             wid = bannerSize;
             ht = bannerSize;
@@ -256,7 +240,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
             }
             break;
 
-          case HTML_BANNERWIN_UNITS_CHARS:
+        case HTML_BANNERWIN_UNITS_CHARS:
             // Character cells - calculate the size in terms of the width of a
             // "0" character in the window's default font.
             wid = bannerSize * measure_text(get_default_font(), "0", 1, 0).x;
@@ -271,7 +255,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
             ht += margins.top + margins.bottom;
             break;
 
-          case HTML_BANNERWIN_UNITS_PCT:
+        case HTML_BANNERWIN_UNITS_PCT:
             // Percentage - calculate the width as a percentage of the parent
             // size.
             wid = (bannerSize * parentSize.width()) / 100;
@@ -288,15 +272,16 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
         }
 
         // Position the banner according to our alignment type.
-        switch(fBannerPos) {
-          case HTML_BANNERWIN_POS_TOP:
+        switch (fBannerPos) {
+        case HTML_BANNERWIN_POS_TOP:
             if (drawBorder) {
                 // Adjust for the border by taking the space for it out of
                 // the banner.
                 newSize.setBottom(newSize.top() + ht - 2);
 
                 // Position the border window at the bottom of our area.
-                borderLine.setGeometry(newSize.left(), newSize.top() + ht - 1, newSize.left() + newSize.width(), 1);
+                borderLine.setGeometry(newSize.left(), newSize.top() + ht - 1,
+                                       newSize.left() + newSize.width(), 1);
             } else {
                 // Align the banner at the top of the window.
                 newSize.setBottom(newSize.top() + ht - 1);
@@ -306,14 +291,15 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
             parentSize.setTop(parentSize.top() + ht);
             break;
 
-          case HTML_BANNERWIN_POS_BOTTOM:
+        case HTML_BANNERWIN_POS_BOTTOM:
             if (drawBorder) {
                 // Adjust for the border by taking the space for it out of
                 // the banner.
                 newSize.setTop(newSize.top() + newSize.height() - ht + 2);
 
                 // Position the border window at the top of our area.
-                borderLine.setGeometry(newSize.left(), newSize.top() - 1, newSize.left() + newSize.width(), 1);
+                borderLine.setGeometry(newSize.left(), newSize.top() - 1,
+                                       newSize.left() + newSize.width(), 1);
             } else {
                 // Align the banner at the bottom of the window.
                 newSize.setTop(newSize.top() + newSize.height() - ht + 1);
@@ -323,14 +309,15 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
             parentSize.setBottom((parentSize.top() + parentSize.height()) - ht);
             break;
 
-          case HTML_BANNERWIN_POS_LEFT:
+        case HTML_BANNERWIN_POS_LEFT:
             if (drawBorder) {
                 // Adjust for the border by taking the space for it out of
                 // the banner.
                 newSize.setRight(newSize.left() + wid - 2);
 
                 // Position the border window at the right of our area.
-                borderLine.setGeometry(newSize.left() + width(), newSize.top(), 1, newSize.height());
+                borderLine.setGeometry(newSize.left() + width(), newSize.top(), 1,
+                                       newSize.height());
             } else {
                 // Align the banner at the left of the window.
                 newSize.setRight(newSize.left() + wid - 1);
@@ -340,7 +327,7 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
             parentSize.setLeft(parentSize.left() + wid);
             break;
 
-          case HTML_BANNERWIN_POS_RIGHT:
+        case HTML_BANNERWIN_POS_RIGHT:
             if (drawBorder) {
                 // Adjust for the border by taking the space for it out of
                 // the banner.
@@ -381,22 +368,20 @@ CHtmlSysWinQt::calcChildBannerSizes( QRect& parentSize )
         // idea why; the problem probably lies elsewhere, but for now, this
         // seems to fix it.
         dispWidget->resize(dispWidget->width(),
-                                 dispWidget->height() + (newSize.height() - oldSize.height()));
+                           dispWidget->height() + (newSize.height() - oldSize.height()));
 
         // Since we changed size, we will need a reformat.
-        //if (this != qFrame->gameWindow())
-        //qDebug() << newSize.width();
-        //if (newSize.width() != oldSize.width())
+        // if (this != qFrame->gameWindow())
+        // qDebug() << newSize.width();
+        // if (newSize.width() != oldSize.width())
         qFrame->scheduleReformat();
     }
 
-    //qFrame->gameWindow()->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
+    // qFrame->gameWindow()->verticalScrollBar()->triggerAction(QAbstractSlider::SliderToMaximum);
     --fDontReformat;
 }
 
-
-void
-CHtmlSysWinQt::doReformat( int showStatus, int freezeDisplay, int resetSounds )
+void CHtmlSysWinQt::doReformat(int showStatus, int freezeDisplay, int resetSounds)
 {
     // Forget any tracking links.
     dispWidget->notifyClearContents();
@@ -413,10 +398,8 @@ CHtmlSysWinQt::doReformat( int showStatus, int freezeDisplay, int resetSounds )
     lastInputHeight = formatter_->get_max_y_pos() - formatter_->get_phys_margins().top;
 }
 
-
-void
-CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int where,
-                          CHtmlSysWinQt* other, HTML_BannerWin_Pos_t pos, unsigned long style )
+void CHtmlSysWinQt::addBanner(CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int where,
+                              CHtmlSysWinQt* other, HTML_BannerWin_Pos_t pos, unsigned long style)
 {
     Q_ASSERT(banner->fParentBanner == 0);
 
@@ -453,36 +436,33 @@ CHtmlSysWinQt::addBanner( CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int
     // Add the banner to our child list.
     Q_ASSERT(not fChildBanners.contains(banner));
     switch (where) {
-      case OS_BANNER_FIRST:
+    case OS_BANNER_FIRST:
         fChildBanners.prepend(banner);
         break;
-      case OS_BANNER_LAST:
+    case OS_BANNER_LAST:
         fChildBanners.append(banner);
         break;
-      case OS_BANNER_BEFORE:
+    case OS_BANNER_BEFORE:
         Q_ASSERT(fChildBanners.contains(other));
         fChildBanners.insert(fChildBanners.indexOf(other), banner);
         break;
-      default:
+    default:
         Q_ASSERT(where == OS_BANNER_AFTER);
         Q_ASSERT(fChildBanners.contains(other));
         fChildBanners.insert(fChildBanners.indexOf(other) + 1, banner);
     }
 }
 
-extern void
-os_sleep_ms( long ms );
+extern void os_sleep_ms(long ms);
 
-void
-CHtmlSysWinQt::scrollDown( bool force, bool justOneLine )
+void CHtmlSysWinQt::scrollDown(bool force, bool justOneLine)
 {
     QScrollBar* bar = verticalScrollBar();
 
     // If we're very small, or shouldn't scroll, or there's nothing to scroll,
     // ignore the call.
     if (width() < 10 or height() < 10 or not fBannerStyleAutoVScroll
-        or bar->maximum() == bar->minimum())
-    {
+        or bar->maximum() == bar->minimum()) {
         return;
     }
 
@@ -538,11 +518,9 @@ CHtmlSysWinQt::scrollDown( bool force, bool justOneLine )
     return;
 }
 
-
-void
-CHtmlSysWinQt::notify_clear_contents()
+void CHtmlSysWinQt::notify_clear_contents()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // Tell our display widget about it.
     dispWidget->notifyClearContents();
@@ -554,20 +532,17 @@ CHtmlSysWinQt::notify_clear_contents()
     qFrame->gameWindow()->removeFromPagePauseQueue(this);
 }
 
-
-int
-CHtmlSysWinQt::close_window( int force )
+int CHtmlSysWinQt::close_window(int force)
 {
     qDebug() << Q_FUNC_INFO;
 
     return force ? true : false;
 }
 
-
-CHtmlPoint
-CHtmlSysWinQt::measure_text( CHtmlSysFont* font, const textchar_t* str, size_t len, int* ascent )
+CHtmlPoint CHtmlSysWinQt::measure_text(CHtmlSysFont* font, const textchar_t* str, size_t len,
+                                       int* ascent)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     const QFontMetrics& tmpMetr = QFontMetrics(*static_cast<CHtmlSysFontQt*>(font));
     if (ascent != 0) {
@@ -580,9 +555,8 @@ CHtmlSysWinQt::measure_text( CHtmlSysFont* font, const textchar_t* str, size_t l
     return CHtmlPoint(tmpMetr.width(QString::fromUtf8(str, len)), tmpMetr.height());
 }
 
-
-size_t
-CHtmlSysWinQt::get_max_chars_in_width( CHtmlSysFont* font, const textchar_t* str, size_t len, long wid )
+size_t CHtmlSysWinQt::get_max_chars_in_width(CHtmlSysFont* font, const textchar_t* str, size_t len,
+                                             long wid)
 {
     // We bisect the results of measure_text() for the maximum amount of
     // characters that fit.
@@ -618,19 +592,17 @@ CHtmlSysWinQt::get_max_chars_in_width( CHtmlSysFont* font, const textchar_t* str
     return mid > 0 ? mid : 0;
 }
 
-
-void
-CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str, size_t len )
+void CHtmlSysWinQt::draw_text(int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str,
+                              size_t len)
 {
     if (len == 0) {
         // Huh?
         return;
     }
 
-    if ((0x80 & *str) != 0x00 and (0xE0 & *str) != 0xC0
-        and (0xF0 & *str) != 0xE0 and (0xF8 & *str) != 0xF0)
-    {
-        //qDebug() << "ERROR";
+    if ((0x80 & *str) != 0x00 and (0xE0 & *str) != 0xC0 and (0xF0 & *str) != 0xE0
+        and (0xF8 & *str) != 0xF0) {
+        // qDebug() << "ERROR";
         ++str;
         --len;
     }
@@ -638,15 +610,14 @@ CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const 
         return;
     }
 
-
     if (fBannerStyleGrid) {
-        //qDebug() << QString::fromUtf8(str, len);
+        // qDebug() << QString::fromUtf8(str, len);
         const QString qStr(QString::fromUtf8(str, len));
-        //qDebug() << qStr;
+        // qDebug() << qStr;
         if (qStr.startsWith(QString::fromUtf8("α"))) {
-            //qDebug() << len;
-            //abort();
-            //printf("%.*s\n", (int)len, str);
+            // qDebug() << len;
+            // abort();
+            // printf("%.*s\n", (int)len, str);
         }
     }
 
@@ -655,9 +626,7 @@ CHtmlSysWinQt::draw_text( int hilite, long x, long y, CHtmlSysFont* font, const 
     painter.drawText(x, y + painter.fontMetrics().ascent(), QString::fromUtf8(str, len));
 }
 
-
-void
-CHtmlSysWinQt::draw_text_space( int hilite, long x, long y, CHtmlSysFont* font, long wid )
+void CHtmlSysWinQt::draw_text_space(int hilite, long x, long y, CHtmlSysFont* font, long wid)
 {
     QPainter painter(dispWidget);
     fSetupPainterForFont(painter, hilite, font);
@@ -672,22 +641,21 @@ CHtmlSysWinQt::draw_text_space( int hilite, long x, long y, CHtmlSysFont* font, 
     painter.drawText(x, y, wid, metr.height(), Qt::AlignLeft, str);
 }
 
-
-void
-CHtmlSysWinQt::draw_bullet( int hilite, long x, long y, CHtmlSysFont* font, HTML_SysWin_Bullet_t style )
+void CHtmlSysWinQt::draw_bullet(int hilite, long x, long y, CHtmlSysFont* font,
+                                HTML_SysWin_Bullet_t style)
 {
     int unicode;
     switch (style) {
-      case HTML_SYSWIN_BULLET_SQUARE:
+    case HTML_SYSWIN_BULLET_SQUARE:
         unicode = 0x25AA;
         break;
-      case HTML_SYSWIN_BULLET_CIRCLE:
+    case HTML_SYSWIN_BULLET_CIRCLE:
         unicode = 0x25CB;
         break;
-      case HTML_SYSWIN_BULLET_DISC:
+    case HTML_SYSWIN_BULLET_DISC:
         unicode = 0x2022;
         break;
-      default:
+    default:
         Q_ASSERT(style == HTML_SYSWIN_BULLET_PLAIN);
         // Nothing to draw.
         return;
@@ -696,20 +664,19 @@ CHtmlSysWinQt::draw_bullet( int hilite, long x, long y, CHtmlSysFont* font, HTML
     draw_text(hilite, x, y, font, utf8.constData(), utf8.size());
 }
 
-
-void
-CHtmlSysWinQt::draw_hrule( const CHtmlRect* pos, int shade )
+void CHtmlSysWinQt::draw_hrule(const CHtmlRect* pos, int shade)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(pos != 0);
 
     QPainter painter(dispWidget);
     if (shade) {
         if (pos->bottom - pos->top > 2) {
-            qDrawShadePanel(&painter, pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top,
-                            palette(), true, 1, 0);
+            qDrawShadePanel(&painter, pos->left, pos->top, pos->right - pos->left,
+                            pos->bottom - pos->top, palette(), true, 1, 0);
         } else {
-            qDrawShadeLine(&painter, pos->left, pos->top, pos->right, pos->top, palette(), true, 1, 0);
+            qDrawShadeLine(&painter, pos->left, pos->top, pos->right, pos->top, palette(), true, 1,
+                           0);
         }
     } else {
         painter.fillRect(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top,
@@ -717,24 +684,21 @@ CHtmlSysWinQt::draw_hrule( const CHtmlRect* pos, int shade )
     }
 }
 
-
-void
-CHtmlSysWinQt::draw_table_border( const CHtmlRect* pos, int width, int cell )
+void CHtmlSysWinQt::draw_table_border(const CHtmlRect* pos, int width, int cell)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     QPainter pnt(dispWidget);
     QPalette pal;
     // Use Midlight for Light to closer match Windows HTML TADS appearance.
     pal.setColor(QPalette::Light, QApplication::palette().color(QPalette::Midlight));
-    qDrawShadePanel(&pnt, pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top, pal, cell, width);
+    qDrawShadePanel(&pnt, pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top, pal,
+                    cell, width);
 }
 
-
-void
-CHtmlSysWinQt::draw_table_bkg( const CHtmlRect* pos, HTML_color_t bgcolor )
+void CHtmlSysWinQt::draw_table_bkg(const CHtmlRect* pos, HTML_color_t bgcolor)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     QPainter painter(dispWidget);
     int red = HTML_color_red(bgcolor);
@@ -744,18 +708,14 @@ CHtmlSysWinQt::draw_table_bkg( const CHtmlRect* pos, HTML_color_t bgcolor )
                      QColor(red, green, blue));
 }
 
-
-void
-CHtmlSysWinQt::draw_dbgsrc_icon( const CHtmlRect*, unsigned int )
+void CHtmlSysWinQt::draw_dbgsrc_icon(const CHtmlRect*, unsigned int)
 {
     qDebug() << Q_FUNC_INFO;
 }
 
-
-int
-CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_display )
+int CHtmlSysWinQt::do_formatting(int /*show_status*/, int update_win, int freeze_display)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     if (fDontReformat != 0) {
         qWarning() << "Reentrancy detected in" << Q_FUNC_INFO << "\nThis should not happen.";
@@ -778,7 +738,8 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
     // ignore the presence or absence of a horizontal scrollbar, since it could
     // come or go while we're formatting; by assuming that it won't be there,
     // we'll be maximally conservative about redrawing the whole area.
-    //unsigned long winBottom = qMax(static_cast<unsigned long>(height()), formatter_->get_max_y_pos());
+    // unsigned long winBottom = qMax(static_cast<unsigned long>(height()),
+    // formatter_->get_max_y_pos());
 
     // We don't have enough formatting done yet to draw the window.
     bool drawn = false;
@@ -849,11 +810,9 @@ CHtmlSysWinQt::do_formatting( int /*show_status*/, int update_win, int freeze_di
     return drawn;
 }
 
-
-CHtmlSysFont*
-CHtmlSysWinQt::get_default_font()
+CHtmlSysFont* CHtmlSysWinQt::get_default_font()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     CHtmlFontDesc desc;
     qFrame->settings()->mainFont.get_font_desc(&desc);
@@ -861,9 +820,7 @@ CHtmlSysWinQt::get_default_font()
     return get_font(&desc);
 }
 
-
-void
-CHtmlSysWinQt::register_timer_func( void (*timer_func)(void*), void* func_ctx )
+void CHtmlSysWinQt::register_timer_func(void (*timer_func)(void*), void* func_ctx)
 {
     QTadsTimer* timer = new QTadsTimer(timer_func, func_ctx, this);
     timer->setSingleShot(false);
@@ -873,9 +830,7 @@ CHtmlSysWinQt::register_timer_func( void (*timer_func)(void*), void* func_ctx )
     fTimerList.append(timer);
 }
 
-
-void
-CHtmlSysWinQt::unregister_timer_func( void (*timer_func)( void * ), void* )
+void CHtmlSysWinQt::unregister_timer_func(void (*timer_func)(void*), void*)
 {
     for (int i = 0; i < fTimerList.size(); ++i) {
         if (fTimerList.at(i)->func_ == timer_func) {
@@ -885,18 +840,14 @@ CHtmlSysWinQt::unregister_timer_func( void (*timer_func)( void * ), void* )
     }
 }
 
-
-CHtmlSysTimer*
-CHtmlSysWinQt::create_timer( void (*timer_func)( void* ), void *func_ctx )
+CHtmlSysTimer* CHtmlSysWinQt::create_timer(void (*timer_func)(void*), void* func_ctx)
 {
     qDebug() << Q_FUNC_INFO;
 
     return new QTadsTimer(timer_func, func_ctx, this);
 }
 
-
-void
-CHtmlSysWinQt::set_timer( CHtmlSysTimer* timer, long interval_ms, int repeat )
+void CHtmlSysWinQt::set_timer(CHtmlSysTimer* timer, long interval_ms, int repeat)
 {
     qDebug() << Q_FUNC_INFO;
 
@@ -905,29 +856,23 @@ CHtmlSysWinQt::set_timer( CHtmlSysTimer* timer, long interval_ms, int repeat )
     static_cast<QTadsTimer*>(timer)->start(interval_ms);
 }
 
-
-void
-CHtmlSysWinQt::cancel_timer( CHtmlSysTimer* timer )
+void CHtmlSysWinQt::cancel_timer(CHtmlSysTimer* timer)
 {
     qDebug() << Q_FUNC_INFO;
 
     static_cast<QTadsTimer*>(timer)->stop();
 }
 
-
-void
-CHtmlSysWinQt::delete_timer( CHtmlSysTimer* timer )
+void CHtmlSysWinQt::delete_timer(CHtmlSysTimer* timer)
 {
     qDebug() << Q_FUNC_INFO;
 
     delete timer;
 }
 
-
-void
-CHtmlSysWinQt::fmt_adjust_hscroll()
+void CHtmlSysWinQt::fmt_adjust_hscroll()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     if (fBannerStyleGrid) {
         dispWidget->resize(viewport()->width(), dispWidget->height());
@@ -945,11 +890,9 @@ CHtmlSysWinQt::fmt_adjust_hscroll()
     }
 }
 
-
-void
-CHtmlSysWinQt::fmt_adjust_vscroll()
+void CHtmlSysWinQt::fmt_adjust_vscroll()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // Get the target height.
     int targetHt = static_cast<int>(formatter_->get_max_y_pos());
@@ -969,62 +912,48 @@ CHtmlSysWinQt::fmt_adjust_vscroll()
     }
 }
 
-
-void
-CHtmlSysWinQt::inval_doc_coords( const CHtmlRect* area )
+void CHtmlSysWinQt::inval_doc_coords(const CHtmlRect* area)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
-    //qDebug() << "Invalidating area" << area->left << area->top << area->right << area->bottom;
+    // qDebug() << "Invalidating area" << area->left << area->top << area->right << area->bottom;
 
-    long width = area->right == HTMLSYSWIN_MAX_RIGHT ?
-                 dispWidget->width() - area->left
-                 : area->right - area->left;
-    long height = area->bottom == HTMLSYSWIN_MAX_BOTTOM ?
-                  dispWidget->height() - area->top
-                  : area->bottom - area->top;
+    long width = area->right == HTMLSYSWIN_MAX_RIGHT ? dispWidget->width() - area->left
+                                                     : area->right - area->left;
+    long height = area->bottom == HTMLSYSWIN_MAX_BOTTOM ? dispWidget->height() - area->top
+                                                        : area->bottom - area->top;
 
     dispWidget->update(QRect(area->left, area->top, width, height));
 }
 
-
-void
-CHtmlSysWinQt::advise_clearing_disp_list()
+void CHtmlSysWinQt::advise_clearing_disp_list()
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     dispWidget->notifyClearContents();
 }
 
-
-void
-CHtmlSysWinQt::scroll_to_doc_coords( const CHtmlRect* )
+void CHtmlSysWinQt::scroll_to_doc_coords(const CHtmlRect*)
 {
     qDebug() << Q_FUNC_INFO;
 
-    //qFrame->advanceEventLoop();
+    // qFrame->advanceEventLoop();
 }
 
-
-void
-CHtmlSysWinQt::get_scroll_doc_coords( CHtmlRect* )
+void CHtmlSysWinQt::get_scroll_doc_coords(CHtmlRect*)
 {
     qDebug() << Q_FUNC_INFO;
 }
 
-
-void
-CHtmlSysWinQt::set_window_title( const textchar_t* title )
+void CHtmlSysWinQt::set_window_title(const textchar_t* title)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     qWinGroup->setWindowTitle(QString::fromUtf8(title));
 }
 
-
-void
-CHtmlSysWinQt::set_html_bg_color( HTML_color_t color, int use_default )
+void CHtmlSysWinQt::set_html_bg_color(HTML_color_t color, int use_default)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // If we have an active background image, ignore the call.
     if (fBgImage != 0) {
@@ -1044,15 +973,14 @@ CHtmlSysWinQt::set_html_bg_color( HTML_color_t color, int use_default )
 
     color = map_system_color(color);
     QPalette p(palette());
-    p.setColor(QPalette::Base, QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
+    p.setColor(QPalette::Base,
+               QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
     setPalette(p);
 }
 
-
-void
-CHtmlSysWinQt::set_html_text_color( HTML_color_t color, int use_default )
+void CHtmlSysWinQt::set_html_text_color(HTML_color_t color, int use_default)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     if (use_default) {
         QPalette p(palette());
@@ -1067,18 +995,17 @@ CHtmlSysWinQt::set_html_text_color( HTML_color_t color, int use_default )
 
     color = map_system_color(color);
     QPalette p(palette());
-    p.setColor(QPalette::Text, QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
+    p.setColor(QPalette::Text,
+               QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color)));
     setPalette(p);
 }
 
-
-void
-CHtmlSysWinQt::set_html_link_colors( HTML_color_t link_color, int link_use_default,
-                                     HTML_color_t, int, /* vlink color is never used */
-                                     HTML_color_t alink_color, int alink_use_default,
-                                     HTML_color_t hlink_color, int hlink_use_default )
+void CHtmlSysWinQt::set_html_link_colors(HTML_color_t link_color, int link_use_default,
+                                         HTML_color_t, int, /* vlink color is never used */
+                                         HTML_color_t alink_color, int alink_use_default,
+                                         HTML_color_t hlink_color, int hlink_use_default)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     QColor col;
     if (link_use_default) {
@@ -1101,11 +1028,9 @@ CHtmlSysWinQt::set_html_link_colors( HTML_color_t link_color, int link_use_defau
     }
 }
 
-
-HTML_color_t
-CHtmlSysWinQt::map_system_color( HTML_color_t color )
+HTML_color_t CHtmlSysWinQt::map_system_color(HTML_color_t color)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // If it's just an RGB value, return it unchanged.
     if (not html_is_color_special(color)) {
@@ -1115,39 +1040,39 @@ CHtmlSysWinQt::map_system_color( HTML_color_t color )
     QColor col;
 
     switch (color) {
-      case HTML_COLOR_STATUSBG:
+    case HTML_COLOR_STATUSBG:
         col = qFrame->settings()->bannerBgColor;
         break;
 
-      case HTML_COLOR_STATUSTEXT:
+    case HTML_COLOR_STATUSTEXT:
         col = qFrame->settings()->bannerTextColor;
         break;
 
-      case HTML_COLOR_LINK:
+    case HTML_COLOR_LINK:
         col = qFrame->settings()->unvisitedLinkColor;
         break;
 
-      case HTML_COLOR_ALINK:
+    case HTML_COLOR_ALINK:
         col = qFrame->settings()->clickedLinkColor;
         break;
 
-      case HTML_COLOR_TEXT:
+    case HTML_COLOR_TEXT:
         col = qFrame->settings()->mainTextColor;
         break;
 
-      case HTML_COLOR_BGCOLOR:
+    case HTML_COLOR_BGCOLOR:
         col = qFrame->settings()->mainBgColor;
         break;
 
-      case HTML_COLOR_INPUT:
+    case HTML_COLOR_INPUT:
         col = qFrame->settings()->inputColor;
         break;
 
-      case HTML_COLOR_HLINK:
+    case HTML_COLOR_HLINK:
         col = qFrame->settings()->hoveringLinkColor;
         break;
 
-      default:
+    default:
         // Return black for everything else.
         return 0;
     }
@@ -1155,75 +1080,59 @@ CHtmlSysWinQt::map_system_color( HTML_color_t color )
     return HTML_make_color(col.red(), col.green(), col.blue());
 }
 
-
-HTML_color_t
-CHtmlSysWinQt::get_html_link_color() const
+HTML_color_t CHtmlSysWinQt::get_html_link_color() const
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     return fLinkColor;
 }
 
-
-HTML_color_t
-CHtmlSysWinQt::get_html_alink_color() const
+HTML_color_t CHtmlSysWinQt::get_html_alink_color() const
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     return fALinkColor;
 }
 
-
-HTML_color_t
-CHtmlSysWinQt::get_html_vlink_color() const
+HTML_color_t CHtmlSysWinQt::get_html_vlink_color() const
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     // Visited links aren't used by the base code.
     return get_html_link_color();
 }
 
-
-HTML_color_t
-CHtmlSysWinQt::get_html_hlink_color() const
+HTML_color_t CHtmlSysWinQt::get_html_hlink_color() const
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     return fHLinkColor;
 }
 
-
-int
-CHtmlSysWinQt::get_html_link_underline() const
+int CHtmlSysWinQt::get_html_link_underline() const
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     return qFrame->settings()->underlineLinks;
 }
 
-
-int
-CHtmlSysWinQt::get_html_show_links() const
+int CHtmlSysWinQt::get_html_show_links() const
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     return qFrame->settings()->enableLinks;
 }
 
-
-int
-CHtmlSysWinQt::get_html_show_graphics() const
+int CHtmlSysWinQt::get_html_show_graphics() const
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     return qFrame->settings()->enableGraphics;
 }
 
-
-void
-CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
+void CHtmlSysWinQt::set_html_bg_image(CHtmlResCacheObject* image)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     if (image == 0 or image->get_image() == 0) {
         // No image specified; forget the current image if we have one and
@@ -1238,17 +1147,17 @@ CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
 
     QTadsImage* castImg;
     switch (image->get_image()->get_res_type()) {
-      case HTML_res_type_JPEG:
+    case HTML_res_type_JPEG:
         castImg = static_cast<CHtmlSysImageJpegQt*>(image->get_image());
         break;
-      case HTML_res_type_PNG:
+    case HTML_res_type_PNG:
         castImg = static_cast<CHtmlSysImagePngQt*>(image->get_image());
         break;
-      case HTML_res_type_MNG:
+    case HTML_res_type_MNG:
         // FIXME: Handle MNG backgrounds.
-        //castImg = static_cast<CHtmlSysImageMngQt*>(image->get_image());
+        // castImg = static_cast<CHtmlSysImageMngQt*>(image->get_image());
         return;
-      default:
+    default:
         qWarning() << Q_FUNC_INFO << "Unknown resource type";
         castImg = reinterpret_cast<QTadsImage*>(image->get_image());
     }
@@ -1260,19 +1169,16 @@ CHtmlSysWinQt::set_html_bg_image( CHtmlResCacheObject* image )
     fBgImage = image;
 }
 
-
-void
-CHtmlSysWinQt::inval_html_bg_image( unsigned int, unsigned int, unsigned int, unsigned int )
+void CHtmlSysWinQt::inval_html_bg_image(unsigned int, unsigned int, unsigned int, unsigned int)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 }
 
-
-void
-CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width,
-                                long height, HTML_BannerWin_Units_t height_units, int use_height )
+void CHtmlSysWinQt::set_banner_size(long width, HTML_BannerWin_Units_t width_units, int use_width,
+                                    long height, HTML_BannerWin_Units_t height_units,
+                                    int use_height)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     if (this == qFrame->gameWindow()) {
         // We're the main game window.  Ignore the call.
@@ -1300,11 +1206,9 @@ CHtmlSysWinQt::set_banner_size( long width, HTML_BannerWin_Units_t width_units, 
     return;
 }
 
-
-void
-CHtmlSysWinQt::set_banner_info( HTML_BannerWin_Pos_t pos, unsigned long style )
+void CHtmlSysWinQt::set_banner_info(HTML_BannerWin_Pos_t pos, unsigned long style)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
 
     fBannerStyleModeMode = style & OS_BANNER_STYLE_MOREMODE;
     fBannerStyleAutoVScroll = (style & OS_BANNER_STYLE_AUTO_VSCROLL) or fBannerStyleModeMode;
@@ -1314,11 +1218,9 @@ CHtmlSysWinQt::set_banner_info( HTML_BannerWin_Pos_t pos, unsigned long style )
     // FIXME: ignore the scrollbar changes (for now, anyway)
 }
 
-
-void
-CHtmlSysWinQt::get_banner_info( HTML_BannerWin_Pos_t* pos, unsigned long* style )
+void CHtmlSysWinQt::get_banner_info(HTML_BannerWin_Pos_t* pos, unsigned long* style)
 {
-    //qDebug() << Q_FUNC_INFO;
+    // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(pos != 0);
     Q_ASSERT(style != 0);
 

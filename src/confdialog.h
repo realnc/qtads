@@ -22,33 +22,29 @@
 
 #include "config.h"
 
-
 namespace Ui {
-    class ConfDialog;
+class ConfDialog;
 }
 
-class ConfDialog: public QDialog {
+class ConfDialog: public QDialog
+{
     Q_OBJECT
 
-  public:
-    ConfDialog( class CHtmlSysWinGroupQt* parent = 0 );
+public:
+    ConfDialog(class CHtmlSysWinGroupQt* parent = 0);
     ~ConfDialog() override;
 
-  protected:
-    void
-    changeEvent( QEvent* e ) override;
+protected:
+    void changeEvent(QEvent* e) override;
 
-  private:
+private:
     Ui::ConfDialog* ui;
 
     // Makes the dialog's controls apply instantly when they change.
-    void
-    fMakeInstantApply();
+    void fMakeInstantApply();
 
-  private slots:
-    void
-    fApplySettings();
+private slots:
+    void fApplySettings();
 };
-
 
 #endif

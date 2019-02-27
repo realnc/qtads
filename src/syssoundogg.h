@@ -18,13 +18,12 @@
 #ifndef SYSSOUNDOGG_H
 #define SYSSOUNDOGG_H
 
-#include "qtadssound.h"
-#include "htmlsys.h"
 #include "config.h"
+#include "htmlsys.h"
+#include "qtadssound.h"
 #ifndef Q_OS_ANDROID
 #include "Aulib/AudioStream.h"
 #endif
-
 
 /* Tads HTML layer class whose interface needs to be implemented by the
  * interpreter.
@@ -32,38 +31,36 @@
  * See htmltads/htmlsys.h and htmltads/notes/porting.htm for information
  * about this class.
  */
-class CHtmlSysSoundOggQt: public QTadsSound, public CHtmlSysSoundOgg {
+class CHtmlSysSoundOggQt: public QTadsSound, public CHtmlSysSoundOgg
+{
     Q_OBJECT
 
-  public:
+public:
 #ifndef NO_AUDIO
-    CHtmlSysSoundOggQt( QObject* parent, Aulib::AudioStream* stream, SoundType type )
+    CHtmlSysSoundOggQt(QObject* parent, Aulib::AudioStream* stream, SoundType type)
         : QTadsSound(parent, stream, type)
-    { }
+    {}
 #endif
 
     //
     // CHtmlSysSoundOgg interface implementation.
     //
-    int
-    play_sound( CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
-                const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade ) override;
+    int play_sound(CHtmlSysWin* win, void (*done_func)(void*, int repeat_count),
+                   void* done_func_ctx, int repeat, const textchar_t* url, int vol, long fade_in,
+                   long fade_out, int crossfade) override;
 
-    void
-    add_crossfade( CHtmlSysWin* win, long ms ) override;
+    void add_crossfade(CHtmlSysWin* win, long ms) override;
 
-    void
-    cancel_sound( CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg ) override;
+    void cancel_sound(CHtmlSysWin* win, int sync, long fade_out_ms, int fade_in_bg) override;
 
-    int
-    maybe_suspend( CHtmlSysSound* ) override
+    int maybe_suspend(CHtmlSysSound*) override
     // We always return false since we have no limitation regarding the amount
     // of sounds we can play simultaneously.
-    { return false; }
+    {
+        return false;
+    }
 
-    void
-    resume() override;
+    void resume() override;
 };
-
 
 #endif

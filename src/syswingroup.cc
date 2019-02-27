@@ -15,67 +15,59 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA.
  */
-#include <Qt>
-#include <QDebug>
-#include <QTimer>
-#include <QMenuBar>
-#include <QCloseEvent>
-#include <QFileDialog>
-#include <QVBoxLayout>
-#include <QMessageBox>
-#include <QUrl>
-#include <QDesktopServices>
 #include <QClipboard>
+#include <QCloseEvent>
+#include <QDebug>
+#include <QDesktopServices>
+#include <QFileDialog>
+#include <QMenuBar>
+#include <QMessageBox>
 #include <QMimeData>
+#include <QTimer>
+#include <QUrl>
+#include <QVBoxLayout>
+#include <Qt>
 
-#include "syswininput.h"
-#include "syswinaboutbox.h"
-#include "confdialog.h"
-#include "settings.h"
-#include "gameinfodialog.h"
 #include "aboutqtadsdialog.h"
+#include "confdialog.h"
 #include "dispwidget.h"
+#include "gameinfodialog.h"
+#include "settings.h"
+#include "syswinaboutbox.h"
+#include "syswininput.h"
 
-
-void
-QTadsFrame::resizeEvent( QResizeEvent* )
+void QTadsFrame::resizeEvent(QResizeEvent*)
 {
     qFrame->reformatBanners(true, true, false);
 }
 
-
-void
-QTadsFrame::dragEnterEvent( QDragEnterEvent* e )
+void QTadsFrame::dragEnterEvent(QDragEnterEvent* e)
 {
     CHtmlSysWinInputQt* gameWindow = qFrame->gameWindow();
     // Only accept text. URLs are handled by the main window instead.
     if (e->mimeData()->hasText() and not e->mimeData()->hasUrls()
-        and (gameWindow and gameWindow->acceptsText()))
-    {
+        and (gameWindow and gameWindow->acceptsText())) {
         e->acceptProposedAction();
     }
 }
 
-
-void
-QTadsFrame::dropEvent( QDropEvent* e )
+void QTadsFrame::dropEvent(QDropEvent* e)
 {
     qFrame->gameWindow()->insertText(e->mimeData()->text());
 }
 
-
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
-    : fConfDialog(0),
-      fGameInfoDialog(0),
-      fAboutBoxDialog(0),
-      fAboutBox(0),
-      fAboutQtadsDialog(0),
-      fNetManager(0),
-      fHttpRedirectCount(0),
-      fWantsToQuit(false),
-      fSilentIfNoUpdates(false)
+    : fConfDialog(0)
+    , fGameInfoDialog(0)
+    , fAboutBoxDialog(0)
+    , fAboutBox(0)
+    , fAboutQtadsDialog(0)
+    , fNetManager(0)
+    , fHttpRedirectCount(0)
+    , fWantsToQuit(false)
+    , fSilentIfNoUpdates(false)
 {
-    //qDebug() << Q_FUNC_INFO << "called";
+    // qDebug() << Q_FUNC_INFO << "called";
     Q_ASSERT(qWinGroup == 0);
 
     // Make sure we can drag&drop (files in our case) into the main window.
@@ -101,7 +93,8 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     fRecentGamesMenu = new QMenu(this);
     act->setMenu(fRecentGamesMenu);
     menu->addAction(act);
-    connect(fRecentGamesMenu, SIGNAL(triggered(QAction*)), this, SLOT(fRecentGameTriggered(QAction*)));
+    connect(fRecentGamesMenu, SIGNAL(triggered(QAction*)), this,
+            SLOT(fRecentGameTriggered(QAction*)));
     fRestartCurrentGameAction = new QAction(tr("Re&start"), this);
 #if QT_VERSION >= 0x040600
     fRestartCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("view-refresh")));
@@ -192,7 +185,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     fFrame = new QTadsFrame(this);
     fFrame->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
     fFrame->setLineWidth(0);
-    fFrame->setContentsMargins(0,0,0,0);
+    fFrame->setContentsMargins(0, 0, 0, 0);
     setCentralWidget(fFrame);
 
     // Use a sane minimum size; by default Qt would allow us to be resized
@@ -208,27 +201,24 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     qWinGroup = this;
 }
 
-
 CHtmlSysWinGroupQt::~CHtmlSysWinGroupQt()
 {
     Q_ASSERT(qWinGroup != 0);
     qWinGroup = 0;
 }
 
-
-bool
-CHtmlSysWinGroupQt::fAskQuitGameDialog()
+bool CHtmlSysWinGroupQt::fAskQuitGameDialog()
 {
     if (not qFrame->settings()->confirmQuitGame or not qFrame->gameRunning()) {
         return true;
     }
 
-    QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
-                                          tr("Quit Current Game") + QString::fromLatin1(" - ")
-                                          + qFrame->applicationName(),
-                                          tr("If you didn't save the current game, all progress will"
-                                             " be lost. Do you wish to quit the game?"),
-                                          QMessageBox::Yes | QMessageBox::Cancel, this);
+    QMessageBox* msgBox = new QMessageBox(
+        QMessageBox::Question,
+        tr("Quit Current Game") + QString::fromLatin1(" - ") + qFrame->applicationName(),
+        tr("If you didn't save the current game, all progress will"
+           " be lost. Do you wish to quit the game?"),
+        QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setDefaultButton(QMessageBox::Cancel);
 #ifdef Q_OS_MAC
@@ -243,20 +233,18 @@ CHtmlSysWinGroupQt::fAskQuitGameDialog()
     return false;
 }
 
-
-bool
-CHtmlSysWinGroupQt::fAskRestartGameDialog()
+bool CHtmlSysWinGroupQt::fAskRestartGameDialog()
 {
     if (not qFrame->settings()->confirmRestartGame or not qFrame->gameRunning()) {
         return true;
     }
 
-    QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
-                                          tr("Restart Current Game") + QString::fromLatin1(" - ")
-                                          + qFrame->applicationName(),
-                                          tr("If you didn't save the current game, all progress will be lost."
-                                             " Do you wish to restart the game?"),
-                                          QMessageBox::Yes | QMessageBox::Cancel, this);
+    QMessageBox* msgBox = new QMessageBox(
+        QMessageBox::Question,
+        tr("Restart Current Game") + QString::fromLatin1(" - ") + qFrame->applicationName(),
+        tr("If you didn't save the current game, all progress will be lost."
+           " Do you wish to restart the game?"),
+        QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setDefaultButton(QMessageBox::Cancel);
 #ifdef Q_OS_MAC
@@ -271,9 +259,7 @@ CHtmlSysWinGroupQt::fAskRestartGameDialog()
     return false;
 }
 
-
-static QNetworkReply*
-sendNetRequest( QNetworkAccessManager* nam, const QUrl& url )
+static QNetworkReply* sendNetRequest(QNetworkAccessManager* nam, const QUrl& url)
 {
     QByteArray userAgent = "QTads/";
     userAgent += QByteArray(QTADS_VERSION).replace(' ', '_');
@@ -287,9 +273,7 @@ sendNetRequest( QNetworkAccessManager* nam, const QUrl& url )
     return nam->get(req);
 }
 
-
-void
-CHtmlSysWinGroupQt::fCheckForUpdates()
+void CHtmlSysWinGroupQt::fCheckForUpdates()
 {
     // If there's already an update check in progress, don't do anything.
     if (fNetManager != 0) {
@@ -300,28 +284,23 @@ CHtmlSysWinGroupQt::fCheckForUpdates()
     connect(fNetManager, SIGNAL(finished(QNetworkReply*)), SLOT(fReplyFinished(QNetworkReply*)));
 
     fHttpRedirectCount = 0;
-    fReply = sendNetRequest(fNetManager,
-                                  QUrl(QString::fromLatin1("http://qtads.sourceforge.net/currentversion")));
+    fReply = sendNetRequest(
+        fNetManager, QUrl(QString::fromLatin1("http://qtads.sourceforge.net/currentversion")));
 }
 
-
-static void
-showUpdateErrorMsg( const QString& detailedText )
+static void showUpdateErrorMsg(const QString& detailedText)
 {
     QMessageBox* msg = new QMessageBox(
-                QMessageBox::Critical, QObject::tr("Check for Updates - Error"),
-                QObject::tr("It was not possible to retrieve update information. Please try again later,"
-                            " as the problem might be temporary. If the problem persists, feel free to"
-                            " contact the author.")
-    );
+        QMessageBox::Critical, QObject::tr("Check for Updates - Error"),
+        QObject::tr("It was not possible to retrieve update information. Please try again later,"
+                    " as the problem might be temporary. If the problem persists, feel free to"
+                    " contact the author."));
     msg->setAttribute(Qt::WA_DeleteOnClose);
     msg->setDetailedText(detailedText);
     msg->show();
 }
 
-
-void
-CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
+void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
 {
     if (reply->error() != QNetworkReply::NoError) {
         showUpdateErrorMsg(fReply->errorString());
@@ -355,7 +334,8 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
     if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200) {
         QString errMsg = tr("Expected HTTP status code 200, got:\n");
         errMsg += reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString();
-        QString httpReason = reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
+        QString httpReason =
+            reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
         if (not httpReason.isEmpty()) {
             errMsg += QString::fromLatin1(" (") + httpReason + QString::fromLatin1(")");
         }
@@ -373,7 +353,8 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
         str.chop(4);
     }
     QStringList strList = str.split(QChar::fromLatin1('.'));
-    int curVersion = QT_VERSION_CHECK(strList.at(0).toInt(), strList.at(1).toInt(), strList.at(2).toInt());
+    int curVersion =
+        QT_VERSION_CHECK(strList.at(0).toInt(), strList.at(1).toInt(), strList.at(2).toInt());
 
     // Do the same with the retrieved version.
     str = QString::fromUtf8(reply->readLine(10));
@@ -384,7 +365,8 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
             str.chop(1);
         }
         strList = str.split(QChar::fromLatin1('.'));
-        newVersion = QT_VERSION_CHECK(strList.at(0).toInt(), strList.at(1).toInt(), strList.at(2).toInt());
+        newVersion =
+            QT_VERSION_CHECK(strList.at(0).toInt(), strList.at(1).toInt(), strList.at(2).toInt());
     }
     QMessageBox* msgBox = new QMessageBox(this);
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
@@ -410,13 +392,16 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
 #else
         msgBox->setIcon(QMessageBox::Question);
 #endif
-        msgBox->setText(tr("A newer version of QTads is available. Do you want to visit the download page?"));
-        msgBox->setInformativeText(tr("Note that this is only a check for new versions. Nothing will be downloaded"
-                                      " or installed automatically."));
+        msgBox->setText(
+            tr("A newer version of QTads is available. Do you want to visit the download page?"));
+        msgBox->setInformativeText(
+            tr("Note that this is only a check for new versions. Nothing will be downloaded"
+               " or installed automatically."));
         msgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox->setDefaultButton(QMessageBox::Yes);
         if (msgBox->exec() == QMessageBox::Yes) {
-            QDesktopServices::openUrl(QUrl(QString::fromLatin1("http://qtads.sourceforge.net/downloads.shtml")));
+            QDesktopServices::openUrl(
+                QUrl(QString::fromLatin1("http://qtads.sourceforge.net/downloads.shtml")));
         }
     } else if (not fSilentIfNoUpdates) {
 #ifdef Q_OS_MAC
@@ -434,9 +419,7 @@ CHtmlSysWinGroupQt::fReplyFinished( QNetworkReply* reply )
     qFrame->settings()->lastUpdateDate = QDate::currentDate();
 }
 
-
-void
-CHtmlSysWinGroupQt::fShowGameInfoDialog()
+void CHtmlSysWinGroupQt::fShowGameInfoDialog()
 {
     // If the dialog is already open, simply activate and raise it.
     if (fGameInfoDialog != 0) {
@@ -451,9 +434,7 @@ CHtmlSysWinGroupQt::fShowGameInfoDialog()
     fGameInfoDialog->show();
 }
 
-
-void
-CHtmlSysWinGroupQt::fHideGameInfoDialog()
+void CHtmlSysWinGroupQt::fHideGameInfoDialog()
 {
     if (fGameInfoDialog != 0) {
         fGameInfoDialog->deleteLater();
@@ -461,9 +442,7 @@ CHtmlSysWinGroupQt::fHideGameInfoDialog()
     }
 }
 
-
-void
-CHtmlSysWinGroupQt::fShowConfDialog()
+void CHtmlSysWinGroupQt::fShowConfDialog()
 {
     // If the dialog is already open, simply activate and raise it.
     if (fConfDialog != 0) {
@@ -487,9 +466,7 @@ CHtmlSysWinGroupQt::fShowConfDialog()
     fConfDialog->show();
 }
 
-
-void
-CHtmlSysWinGroupQt::fHideConfDialog()
+void CHtmlSysWinGroupQt::fHideConfDialog()
 {
     if (fConfDialog != 0) {
         fConfDialog->deleteLater();
@@ -497,9 +474,7 @@ CHtmlSysWinGroupQt::fHideConfDialog()
     }
 }
 
-
-void
-CHtmlSysWinGroupQt::fShowAboutGame()
+void CHtmlSysWinGroupQt::fShowAboutGame()
 {
     if (fAboutBox == 0) {
         return;
@@ -523,9 +498,7 @@ CHtmlSysWinGroupQt::fShowAboutGame()
     fAboutBoxDialog->show();
 }
 
-
-void
-CHtmlSysWinGroupQt::fHideAboutGame()
+void CHtmlSysWinGroupQt::fHideAboutGame()
 {
     // Destroy the dialog, but not the about box HTML banner.  We reparent
     // the banner so it won't be automatically deleted by its parent.
@@ -535,9 +508,7 @@ CHtmlSysWinGroupQt::fHideAboutGame()
     fAboutBoxDialog = 0;
 }
 
-
-void
-CHtmlSysWinGroupQt::fShowAboutQtads()
+void CHtmlSysWinGroupQt::fShowAboutQtads()
 {
     // If the dialog is already open, simply activate and raise it.
     if (fAboutQtadsDialog != 0) {
@@ -557,9 +528,7 @@ CHtmlSysWinGroupQt::fShowAboutQtads()
     fAboutQtadsDialog->show();
 }
 
-
-void
-CHtmlSysWinGroupQt::fHideAboutQtads()
+void CHtmlSysWinGroupQt::fHideAboutQtads()
 {
     if (fAboutQtadsDialog != 0) {
         fAboutQtadsDialog->deleteLater();
@@ -567,14 +536,11 @@ CHtmlSysWinGroupQt::fHideAboutQtads()
     }
 }
 
-
-void
-CHtmlSysWinGroupQt::fOpenNewGame()
+void CHtmlSysWinGroupQt::fOpenNewGame()
 {
-    const QString& fname = QFileDialog::getOpenFileName(0, tr("Choose the TADS game you wish to run"),
-                                                        qFrame->settings()->lastFileOpenDir,
-                                                        tr("TADS Games")
-                                                        + QString::fromLatin1(" (*.gam *.Gam *.GAM *.t3 *.T3)"));
+    const QString& fname = QFileDialog::getOpenFileName(
+        0, tr("Choose the TADS game you wish to run"), qFrame->settings()->lastFileOpenDir,
+        tr("TADS Games") + QString::fromLatin1(" (*.gam *.Gam *.GAM *.t3 *.T3)"));
     activateWindow();
     if (not fname.isEmpty()) {
         qFrame->settings()->lastFileOpenDir = QFileInfo(fname).absolutePath();
@@ -582,45 +548,35 @@ CHtmlSysWinGroupQt::fOpenNewGame()
     }
 }
 
-
-void
-CHtmlSysWinGroupQt::fRecentGameTriggered( QAction* action )
+void CHtmlSysWinGroupQt::fRecentGameTriggered(QAction* action)
 {
     if (fAskQuitGameDialog()) {
         qFrame->setNextGame(action->statusTip());
     }
 }
 
-
-void
-CHtmlSysWinGroupQt::fEndCurrentGame()
+void CHtmlSysWinGroupQt::fEndCurrentGame()
 {
     if (fAskQuitGameDialog()) {
         qFrame->setGameRunning(false);
     }
 }
 
-
-void
-CHtmlSysWinGroupQt::fRestartCurrentGame()
+void CHtmlSysWinGroupQt::fRestartCurrentGame()
 {
     if (fAskRestartGameDialog()) {
         qFrame->setNextGame(qFrame->gameFile());
     }
 }
 
-
-void
-CHtmlSysWinGroupQt::fNotifyGameQuitting()
+void CHtmlSysWinGroupQt::fNotifyGameQuitting()
 {
     fGameInfoAction->setEnabled(false);
     fRestartCurrentGameAction->setEnabled(false);
     fEndCurrentGameAction->setEnabled(false);
 }
 
-
-void
-CHtmlSysWinGroupQt::fNotifyGameStarting()
+void CHtmlSysWinGroupQt::fNotifyGameStarting()
 {
     fHideGameInfoDialog();
     fGameInfoAction->setEnabled(GameInfoDialog::gameHasMetaInfo(qStrToFname(qFrame->gameFile())));
@@ -628,18 +584,16 @@ CHtmlSysWinGroupQt::fNotifyGameStarting()
     fEndCurrentGameAction->setEnabled(true);
 }
 
-
-void
-CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
+void CHtmlSysWinGroupQt::closeEvent(QCloseEvent* e)
 {
     if (not qFrame->gameRunning()) {
         return;
     }
 
-    QMessageBox* msgBox = new QMessageBox(QMessageBox::Question,
-                                          tr("Quit QTads"),
-                                          tr("A game is currently running. Abandon the game and quit the interpreter?"),
-                                          QMessageBox::Yes | QMessageBox::Cancel, this);
+    QMessageBox* msgBox = new QMessageBox(
+        QMessageBox::Question, tr("Quit QTads"),
+        tr("A game is currently running. Abandon the game and quit the interpreter?"),
+        QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setDefaultButton(QMessageBox::Cancel);
 #ifdef Q_OS_MAC
@@ -658,31 +612,24 @@ CHtmlSysWinGroupQt::closeEvent( QCloseEvent* e )
     }
 }
 
-
-void
-CHtmlSysWinGroupQt::dragEnterEvent( QDragEnterEvent* e )
+void CHtmlSysWinGroupQt::dragEnterEvent(QDragEnterEvent* e)
 {
     // Only accept the event if there is exactly one URL which points to a
     // local file.
     if (e->mimeData()->hasUrls() and e->mimeData()->urls().size() == 1
-        and not e->mimeData()->urls().at(0).toLocalFile().isEmpty())
-    {
+        and not e->mimeData()->urls().at(0).toLocalFile().isEmpty()) {
         e->acceptProposedAction();
     }
 }
 
-
-void
-CHtmlSysWinGroupQt::dropEvent( QDropEvent* e )
+void CHtmlSysWinGroupQt::dropEvent(QDropEvent* e)
 {
     e->acceptProposedAction();
     fGameFileFromDropEvent = e->mimeData()->urls().at(0).toLocalFile();
     QTimer::singleShot(100, this, SLOT(fRunDropEventFile()));
 }
 
-
-void
-CHtmlSysWinGroupQt::copyToClipboard()
+void CHtmlSysWinGroupQt::copyToClipboard()
 {
     const QString& selectedText = DisplayWidget::selectedText();
     if (not selectedText.isEmpty()) {
@@ -690,33 +637,25 @@ CHtmlSysWinGroupQt::copyToClipboard()
     }
 }
 
-
-void
-CHtmlSysWinGroupQt::pasteFromClipboard()
+void CHtmlSysWinGroupQt::pasteFromClipboard()
 {
     qFrame->gameWindow()->insertText(QApplication::clipboard()->text());
 }
 
-
-void
-CHtmlSysWinGroupQt::fRunDropEventFile()
+void CHtmlSysWinGroupQt::fRunDropEventFile()
 {
     if (fAskQuitGameDialog()) {
         qFrame->setNextGame(fGameFileFromDropEvent);
     }
 }
 
-
-void
-CHtmlSysWinGroupQt::updatePasteAction()
+void CHtmlSysWinGroupQt::updatePasteAction()
 {
     fPasteAction->setDisabled(QApplication::clipboard()->text().isEmpty()
-                                    or not qFrame->gameWindow());
+                              or not qFrame->gameWindow());
 }
 
-
-CHtmlSysWinAboutBoxQt*
-CHtmlSysWinGroupQt::createAboutBox( class CHtmlFormatter* formatter )
+CHtmlSysWinAboutBoxQt* CHtmlSysWinGroupQt::createAboutBox(class CHtmlFormatter* formatter)
 {
     // If there's already an "about" box, destroy it first.
     if (fAboutBoxDialog != 0) {
@@ -733,9 +672,7 @@ CHtmlSysWinGroupQt::createAboutBox( class CHtmlFormatter* formatter )
     return fAboutBox;
 }
 
-
-void
-CHtmlSysWinGroupQt::deleteAboutBox()
+void CHtmlSysWinGroupQt::deleteAboutBox()
 {
     if (fAboutBox == 0) {
         return;
@@ -748,9 +685,7 @@ CHtmlSysWinGroupQt::deleteAboutBox()
     fAboutGameAction->setEnabled(false);
 }
 
-
-void
-CHtmlSysWinGroupQt::updateRecentGames()
+void CHtmlSysWinGroupQt::updateRecentGames()
 {
     // We simply clear the menu of all items and re-populate it.
     fRecentGamesMenu->clear();
@@ -781,24 +716,19 @@ CHtmlSysWinGroupQt::updateRecentGames()
     }
 }
 
-void
-CHtmlSysWinGroupQt::checkForUpdates()
+void CHtmlSysWinGroupQt::checkForUpdates()
 {
     fSilentIfNoUpdates = true;
     fCheckForUpdates();
 }
 
-
-void
-CHtmlSysWinGroupQt::enableCopyAction( bool f )
+void CHtmlSysWinGroupQt::enableCopyAction(bool f)
 {
     fCopyAction->setEnabled(f);
 }
 
-
 #ifdef Q_OS_MAC
-bool
-CHtmlSysWinGroupQt::handleFileOpenEvent( class QFileOpenEvent* e )
+bool CHtmlSysWinGroupQt::handleFileOpenEvent(class QFileOpenEvent* e)
 {
     if (e->file().isEmpty()) {
         e->ignore();
@@ -811,21 +741,18 @@ CHtmlSysWinGroupQt::handleFileOpenEvent( class QFileOpenEvent* e )
 }
 #endif
 
-
-oshtml_charset_id_t
-CHtmlSysWinGroupQt::get_default_win_charset() const
+oshtml_charset_id_t CHtmlSysWinGroupQt::get_default_win_charset() const
 {
-    //qDebug() << Q_FUNC_INFO << "called";
+    // qDebug() << Q_FUNC_INFO << "called";
 
     return 0;
 }
 
-
-size_t
-CHtmlSysWinGroupQt::xlat_html4_entity( textchar_t* result, size_t result_size, unsigned int charval,
-                                       oshtml_charset_id_t*, int* changed_charset )
+size_t CHtmlSysWinGroupQt::xlat_html4_entity(textchar_t* result, size_t result_size,
+                                             unsigned int charval, oshtml_charset_id_t*,
+                                             int* changed_charset)
 {
-    //qDebug() << Q_FUNC_INFO << "called";
+    // qDebug() << Q_FUNC_INFO << "called";
     Q_ASSERT(result != 0);
 
     // HTML4 entities are Unicode characters, which means the QChar(uint) ctor

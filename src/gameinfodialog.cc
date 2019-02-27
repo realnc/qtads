@@ -2,41 +2,40 @@
 #include "ui_gameinfodialog.h"
 
 #include <QDebug>
-#include <QMessageBox>
 #include <QFileInfo>
+#include <QMessageBox>
 
 #include "globals.h"
+#include "htmlfmt.h"
+#include "htmlrf.h"
 #include "settings.h"
 #include "sysframe.h"
 #include "syswininput.h"
-#include "htmlrf.h"
-#include "htmlfmt.h"
 
-
-void
-QTadsGameInfoEnum::tads_enum_game_info( const char* name, const char* val )
+void QTadsGameInfoEnum::tads_enum_game_info(const char* name, const char* val)
 {
     const QString& valStr = QString::fromUtf8(val);
     const QString& nameStr = QString::fromUtf8(name).toLower();
     const QString& htmlValStr =
-        #if QT_VERSION < 0x050000
-            Qt::escape(valStr);
-        #else
-            valStr.toHtmlEscaped();
-        #endif
+#if QT_VERSION < 0x050000
+        Qt::escape(valStr);
+#else
+        valStr.toHtmlEscaped();
+#endif
 
     if (nameStr == QString::fromLatin1("name")) {
         gameName = QString::fromLatin1("<b><center><font size=\"+1\">") + htmlValStr
-                         + QString::fromLatin1("</font></center></b><p>");
+                   + QString::fromLatin1("</font></center></b><p>");
         plainGameName = valStr;
     } else if (nameStr == QString::fromLatin1("headline")) {
-        headline = QString::fromLatin1("<center>") + htmlValStr
-                         + QString::fromLatin1("</center><p>");
+        headline =
+            QString::fromLatin1("<center>") + htmlValStr + QString::fromLatin1("</center><p>");
     } else if (nameStr == QString::fromLatin1("byline")) {
         byLine = QString::fromLatin1("<i><center>") + htmlValStr
-                       + QString::fromLatin1("</center></i><p>");
+                 + QString::fromLatin1("</center></i><p>");
     } else if (nameStr == QString::fromLatin1("htmlbyline")) {
-        htmlByLine = QString::fromLatin1("<i><center>") + valStr + QString::fromLatin1("</center></i><p>");
+        htmlByLine =
+            QString::fromLatin1("<i><center>") + valStr + QString::fromLatin1("</center></i><p>");
     } else if (nameStr == QString::fromLatin1("authoremail")) {
         email = valStr;
     } else if (nameStr == QString::fromLatin1("desc")) {
@@ -69,9 +68,7 @@ QTadsGameInfoEnum::tads_enum_game_info( const char* name, const char* val )
     }
 }
 
-
-static void
-insertTableRow( QTableWidget* table, const QString& text1, const QString& text2 )
+static void insertTableRow(QTableWidget* table, const QString& text1, const QString& text2)
 {
     table->insertRow(table->rowCount());
     QTableWidgetItem* item = new QTableWidgetItem(text1);
@@ -82,9 +79,7 @@ insertTableRow( QTableWidget* table, const QString& text1, const QString& text2 
     table->setItem(table->rowCount() - 1, 1, item);
 }
 
-
-static QImage
-loadCoverArtImage()
+static QImage loadCoverArtImage()
 {
     CHtmlResFinder* resFinder = qFrame->gameWindow()->get_formatter()->get_res_finder();
 
@@ -148,18 +143,18 @@ loadCoverArtImage()
     // If we got here, all went well.  Return the image scaled to a
     // 200 pixels width if it's too large.  Otherwise, return it as-is.
     if (image.width() > 200) {
-        Qt::TransformationMode mode = qFrame->settings()->useSmoothScaling ?
-                                      Qt::SmoothTransformation : Qt::FastTransformation;
+        Qt::TransformationMode mode = qFrame->settings()->useSmoothScaling
+                                          ? Qt::SmoothTransformation
+                                          : Qt::FastTransformation;
         return image.scaledToWidth(200, mode);
     } else {
         return image;
     }
 }
 
-
-GameInfoDialog::GameInfoDialog( const QByteArray& fname, QWidget* parent )
-    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint),
-      ui(new Ui::GameInfoDialog)
+GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* parent)
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
+    , ui(new Ui::GameInfoDialog)
 {
     ui->setupUi(this);
 
@@ -260,23 +255,18 @@ GameInfoDialog::GameInfoDialog( const QByteArray& fname, QWidget* parent )
     ui->table->setMaximumHeight(maxHeight);
 }
 
-
 GameInfoDialog::~GameInfoDialog()
 {
     delete ui;
 }
 
-
-bool
-GameInfoDialog::gameHasMetaInfo( const QByteArray& fname )
+bool GameInfoDialog::gameHasMetaInfo(const QByteArray& fname)
 {
     CTadsGameInfo info;
     return info.read_from_file(fname.constData());
 }
 
-
-QTadsGameInfoEnum
-GameInfoDialog::getMetaInfo( const QByteArray& fname )
+QTadsGameInfoEnum GameInfoDialog::getMetaInfo(const QByteArray& fname)
 {
     CTadsGameInfo info;
     QTadsGameInfoEnum cb;

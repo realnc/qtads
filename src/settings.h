@@ -18,17 +18,15 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include <QDate>
 #include "sysfont.h"
+#include <QDate>
 
+class Settings
+{
+public:
+    void loadFromDisk();
 
-class Settings {
-  public:
-    void
-    loadFromDisk();
-
-    void
-    saveToDisk();
+    void saveToDisk();
 
     bool enableGraphics;
     bool enableSoundEffects;
@@ -73,10 +71,13 @@ class Settings {
 
     QSize appSize;
     QDate lastUpdateDate;
-    enum UpdateFreq {
-        UpdateOnEveryStart, UpdateDaily, UpdateWeekly, UpdateNever
+    enum UpdateFreq
+    {
+        UpdateOnEveryStart,
+        UpdateDaily,
+        UpdateWeekly,
+        UpdateNever
     } updateFreq;
 };
-
 
 #endif

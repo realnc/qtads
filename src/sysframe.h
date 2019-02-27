@@ -20,9 +20,8 @@
 
 #include <QApplication>
 
-#include "htmlsys.h"
 #include "config.h"
-
+#include "htmlsys.h"
 
 /* Tads HTML layer class whose interface needs to be implemented by the
  * interpreter.
@@ -30,10 +29,11 @@
  * See htmltads/htmlsys.h and htmltads/notes/porting.htm for information
  * about this class.
  */
-class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
+class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame
+{
     Q_OBJECT
 
-  private:
+private:
     // Preferences (fonts, colors, etc.)
     class Settings* fSettings;
 
@@ -91,28 +91,23 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
     bool fNonStopMode;
 
     // Run the game file contained in fNextGame.
-    void
-    fRunGame();
+    void fRunGame();
 
-    void
-    fRunT2Game( const QString& fname );
+    void fRunT2Game(const QString& fname);
 
-    void
-    fRunT3Game( const QString& fname );
+    void fRunT3Game(const QString& fname);
 
 #ifdef Q_OS_MAC
-  protected:
+protected:
     // On the Mac, dropping a file on our application icon will generate a
     // FileOpen event, so we override this to be able to handle it.
-    bool
-    event( QEvent* ) override;
+    bool event(QEvent*) override;
 #endif
 
     // appctx callback for getting the current I/O safety level.
-    static void
-    fCtxGetIOSafetyLevel( void*, int* read, int* write );
+    static void fCtxGetIOSafetyLevel(void*, int* read, int* write);
 
-  signals:
+signals:
     // Emitted just prior to starting a game.  The game has not started yet
     // when this is emitted.
     void gameStarting();
@@ -125,50 +120,54 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
     // emitted.
     void gameHasQuit();
 
-  public slots:
+public slots:
     // Replacement for main().  We need this so that we can start the Tads VM
     // after the QApplication main event loop has started.
-    void
-    entryPoint( QString gameFileName );
+    void entryPoint(QString gameFileName);
 
-  public:
-    CHtmlSysFrameQt( int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
-                     const char* orgDomain );
+public:
+    CHtmlSysFrameQt(int& argc, char* argv[], const char* appName, const char* appVersion,
+                    const char* orgName, const char* orgDomain);
     ~CHtmlSysFrameQt() override;
 
-    class Settings*
-    settings()
-    { return fSettings; }
+    class Settings* settings()
+    {
+        return fSettings;
+    }
 
-    class CHtmlSysWinInputQt*
-    gameWindow()
-    { return fGameWin; }
+    class CHtmlSysWinInputQt* gameWindow()
+    {
+        return fGameWin;
+    }
 
-    const QList<class CHtmlSysWinQt*>&
-    bannerList()
-    { return fBannerList; }
+    const QList<class CHtmlSysWinQt*>& bannerList()
+    {
+        return fBannerList;
+    }
 
-    HTML_color_t
-    inputColor()
-    { return fInputColor; }
+    HTML_color_t inputColor()
+    {
+        return fInputColor;
+    }
 
-    void
-    inputColor( HTML_color_t color )
-    { fInputColor = color; }
+    void inputColor(HTML_color_t color)
+    {
+        fInputColor = color;
+    }
 
-    CHtmlSysFontQt*
-    createFont( const CHtmlFontDesc* font_desc );
+    CHtmlSysFontQt* createFont(const CHtmlFontDesc* font_desc);
 
-    bool
-    gameRunning()
-    { return fGameRunning; }
+    bool gameRunning()
+    {
+        return fGameRunning;
+    }
 
-    const QString&
-    gameFile()
-    { return fGameFile; }
+    const QString& gameFile()
+    {
+        return fGameFile;
+    }
 
-    void
-    setGameRunning( bool f )
+    void setGameRunning(bool f)
     {
         fGameRunning = f;
         if (f == false) {
@@ -176,8 +175,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
         }
     }
 
-    void
-    setNextGame( const QString& fname )
+    void setNextGame(const QString& fname)
     {
         fNextGame = fname;
         // If no game is currently executing, run it now. Otherwise, end the
@@ -189,42 +187,40 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
         }
     }
 
-    bool
-    tads3()
-    { return fTads3; }
+    bool tads3()
+    {
+        return fTads3;
+    }
 
-    bool
-    nonStopMode()
-    { return fNonStopMode; }
+    bool nonStopMode()
+    {
+        return fNonStopMode;
+    }
 
     // Recalculate and adjust the sizes of all HTML banners.
-    void
-    adjustBannerSizes();
+    void adjustBannerSizes();
 
     // Reformat all HTML banners.
-    void
-    reformatBanners( bool showStatus, bool freezeDisplay, bool resetSounds );
+    void reformatBanners(bool showStatus, bool freezeDisplay, bool resetSounds);
 
     // Schedule a reformat.
-    void
-    scheduleReformat()
-    { fReformatPending = true; }
+    void scheduleReformat()
+    {
+        fReformatPending = true;
+    }
 
     // Prune the main window's parse tree, if we're using too much memory.
     // This should be called before getting user input; we'll check to see how
     // much memory the parse tree is taking up, and cut it down a bit if it's
     // too big.
     // TODO: Implement configurable max memory size.
-    void
-    pruneParseTree();
+    void pruneParseTree();
 
     // Notify the application that preferences have changed.
-    void
-    notifyPreferencesChange( const class Settings* sett );
+    void notifyPreferencesChange(const class Settings* sett);
 
     // Advance the event loop.
-    void
-    advanceEventLoop( QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents )
+    void advanceEventLoop(QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents)
     {
         // Guard against re-entrancy.
         static bool working = false;
@@ -248,8 +244,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
     }
 
     // Advance the event loop with a timeout.
-    void
-    advanceEventLoop( QEventLoop::ProcessEventsFlags flags, int maxtime )
+    void advanceEventLoop(QEventLoop::ProcessEventsFlags flags, int maxtime)
     {
         // Guard against re-entrancy.
         static bool working = false;
@@ -270,67 +265,53 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame {
     //
     // CHtmlSysFrame interface implementation.
     //
-    void
-    flush_txtbuf( int fmt, int immediate_redraw ) override;
+    void flush_txtbuf(int fmt, int immediate_redraw) override;
 
-    class CHtmlParser*
-    get_parser() override
-    { return fParser; }
+    class CHtmlParser* get_parser() override
+    {
+        return fParser;
+    }
 
-    void
-    start_new_page() override;
+    void start_new_page() override;
 
-    void
-    set_nonstop_mode( int flag ) override;
+    void set_nonstop_mode(int flag) override;
 
-    void
-    display_output( const textchar_t* buf, size_t len ) override;
+    void display_output(const textchar_t* buf, size_t len) override;
 
-    int
-    check_break_key() override;
+    int check_break_key() override;
 
-    int
-    get_input( textchar_t* buf, size_t bufsiz ) override;
+    int get_input(textchar_t* buf, size_t bufsiz) override;
 
-    int
-    get_input_timeout( textchar_t* buf, size_t buflen, unsigned long timeout, int use_timeout ) override;
+    int get_input_timeout(textchar_t* buf, size_t buflen, unsigned long timeout,
+                          int use_timeout) override;
 
-    void
-    get_input_cancel( int reset ) override;
+    void get_input_cancel(int reset) override;
 
-    int
-    get_input_event( unsigned long ms, int use_timeout, os_event_info_t* info ) override;
+    int get_input_event(unsigned long ms, int use_timeout, os_event_info_t* info) override;
 
-    textchar_t
-    wait_for_keystroke( int pause_only ) override;
+    textchar_t wait_for_keystroke(int pause_only) override;
 
-    void
-    pause_for_exit() override;
+    void pause_for_exit() override;
 
-    void
-    pause_for_more() override;
+    void pause_for_more() override;
 
-    void
-    dbg_print( const char* msg ) override;
+    void dbg_print(const char* msg) override;
 
-    class CHtmlSysWin*
-    create_banner_window( class CHtmlSysWin* parent, HTML_BannerWin_Type_t window_type,
-                          class CHtmlFormatter* formatter, int where, class CHtmlSysWin* other,
-                          HTML_BannerWin_Pos_t pos, unsigned long style ) override;
+    class CHtmlSysWin* create_banner_window(class CHtmlSysWin* parent,
+                                            HTML_BannerWin_Type_t window_type,
+                                            class CHtmlFormatter* formatter, int where,
+                                            class CHtmlSysWin* other, HTML_BannerWin_Pos_t pos,
+                                            unsigned long style) override;
 
-    void
-    orphan_banner_window( class CHtmlFormatterBannerExt* banner ) override;
+    void orphan_banner_window(class CHtmlFormatterBannerExt* banner) override;
 
-    CHtmlSysWin*
-    create_aboutbox_window( class CHtmlFormatter* formatter ) override;
+    CHtmlSysWin* create_aboutbox_window(class CHtmlFormatter* formatter) override;
 
-    void
-    remove_banner_window( CHtmlSysWin* win ) override;
+    void remove_banner_window(CHtmlSysWin* win) override;
 
-    int
-    get_exe_resource( const textchar_t* resname, size_t resnamelen, textchar_t* fname_buf, size_t fname_buf_len,
-                      unsigned long* seek_pos, unsigned long* siz ) override;
+    int get_exe_resource(const textchar_t* resname, size_t resnamelen, textchar_t* fname_buf,
+                         size_t fname_buf_len, unsigned long* seek_pos,
+                         unsigned long* siz) override;
 };
-
 
 #endif

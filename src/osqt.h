@@ -32,13 +32,13 @@
 }
 #endif
 #include <QtGlobal>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdint.h>
 #include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,19 +46,19 @@ extern "C" {
 /* Define CPU_IS_BIGENDIAN to the appropriate value for this platform.
  * Needed by tads3/sha2.cpp. */
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
-    #define CPU_IS_BIGENDIAN 1
+#define CPU_IS_BIGENDIAN 1
 #else
-    #define CPU_IS_BIGENDIAN 0
+#define CPU_IS_BIGENDIAN 0
 #endif
 
 /* Most systems have typedefs for ushort, uint and ulong.  If not, the
  * qtads.pro project file should be modified to define OS_NO_TYPES_DEFINED. */
 #ifndef OS_NO_TYPES_DEFINED
-    #define OS_UINT_DEFINED
-    #ifndef Q_OS_ANDROID
-        #define OS_USHORT_DEFINED
-        #define OS_ULONG_DEFINED
-    #endif
+#define OS_UINT_DEFINED
+#ifndef Q_OS_ANDROID
+#define OS_USHORT_DEFINED
+#define OS_ULONG_DEFINED
+#endif
 #endif
 
 #define OSNOUI_OMIT_OS_FPRINTZ
@@ -101,7 +101,7 @@ extern "C" {
 
 /* Copies a struct into another.  ANSI C allows the assignment operator to be
  * used with structs. */
-#define OSCPYSTRUCT(x,y) ((x)=(y))
+#define OSCPYSTRUCT(x, y) ((x) = (y))
 
 /* For suppression of "unused variable" compiler warnings. */
 #define VARUSED(var) ((void)var)
@@ -150,7 +150,7 @@ extern "C" {
 
 #ifndef OS_NEWLINE_SEQ
 /* ASCII string giving the local newline sequence to write on output. */
-#define OS_NEWLINE_SEQ  "\n"
+#define OS_NEWLINE_SEQ "\n"
 #endif
 
 /* File handle structure for osfxxx functions. */
@@ -187,28 +187,28 @@ typedef struct QFile osfildef;
 /* File modes.  On Windows, we do the Microsoft thing.  Everywhere else, we
  * assume POSIX stat(2). */
 #ifdef Q_OS_WIN
-    #define OSFMODE_FILE     _S_IFREG
-    #define OSFMODE_DIR      _S_IFDIR
-    #define OSFMODE_BLK      0
-    #define OSFMODE_CHAR     _S_IFCHR
-    #define OSFMODE_PIPE     _S_IFIFO
-    #define OSFMODE_SOCKET   0
-    #define OSFMODE_LINK     0
+#define OSFMODE_FILE _S_IFREG
+#define OSFMODE_DIR _S_IFDIR
+#define OSFMODE_BLK 0
+#define OSFMODE_CHAR _S_IFCHR
+#define OSFMODE_PIPE _S_IFIFO
+#define OSFMODE_SOCKET 0
+#define OSFMODE_LINK 0
 #else
-    #define OSFMODE_FILE    S_IFREG
-    #define OSFMODE_DIR     S_IFDIR
-    #define OSFMODE_CHAR    S_IFCHR
-    #define OSFMODE_BLK     S_IFBLK
-    #define OSFMODE_PIPE    S_IFIFO
-    #define OSFMODE_LINK    S_IFLNK
-    #define OSFMODE_SOCKET  S_IFSOCK
+#define OSFMODE_FILE S_IFREG
+#define OSFMODE_DIR S_IFDIR
+#define OSFMODE_CHAR S_IFCHR
+#define OSFMODE_BLK S_IFBLK
+#define OSFMODE_PIPE S_IFIFO
+#define OSFMODE_LINK S_IFLNK
+#define OSFMODE_SOCKET S_IFSOCK
 #endif
 
 /* File attribute bits. */
-#define OSFATTR_HIDDEN  0x0001
-#define OSFATTR_SYSTEM  0x0002
-#define OSFATTR_READ    0x0004
-#define OSFATTR_WRITE   0x0008
+#define OSFATTR_HIDDEN 0x0001
+#define OSFATTR_SYSTEM 0x0002
+#define OSFATTR_READ 0x0004
+#define OSFATTR_WRITE 0x0008
 
 #ifdef __cplusplus
 typedef class QDirIterator* osdirhdl_t;
@@ -218,9 +218,8 @@ typedef struct QDirIterator* osdirhdl_t;
 
 /* 64-bit time_t.  Only Windows supports this. */
 #ifdef Q_OS_WIN
-    #define os_time_t __time64_t
+#define os_time_t __time64_t
 #endif
-
 
 /* ============= Functions follow ================ */
 
@@ -231,23 +230,21 @@ typedef struct QDirIterator* osdirhdl_t;
  * Tads 3, we use UTF-8 for everything. In Tads 2, we need to use the
  * local character set for filenames.
  */
-QString
-fnameToQStr( const char* fname );
+QString fnameToQStr(const char* fname);
 
 /* Helper routine. Translates a unicode QString filename to a local
  * filename.
  */
-QByteArray
-qStrToFname( const QString& fnameStr );
+QByteArray qStrToFname(const QString& fnameStr);
 
 extern "C" {
 #endif
 
 /* 64-bit replacements for <time.h> routines.  Only Windows supports this. */
 #ifdef Q_OS_WIN
-    #define os_gmtime    _gmtime64
-    #define os_localtime _localtime64
-    #define os_time      _time64
+#define os_gmtime _gmtime64
+#define os_localtime _localtime64
+#define os_time _time64
 #endif
 
 /* Allocate a block of memory of the given size in bytes. */
@@ -261,114 +258,89 @@ extern "C" {
 #define osrealloc realloc
 
 /* Open text file for reading. */
-osfildef*
-osfoprt( const char* fname, os_filetype_t );
+osfildef* osfoprt(const char* fname, os_filetype_t);
 
 /* Open text file for writing. */
-osfildef*
-osfopwt( const char* fname, os_filetype_t );
+osfildef* osfopwt(const char* fname, os_filetype_t);
 
 /* Open text file for reading and writing, keeping the file's existing
  * contents if the file already exists or creating a new file if no
  * such file exists. */
-osfildef*
-osfoprwt( const char* fname, os_filetype_t );
+osfildef* osfoprwt(const char* fname, os_filetype_t);
 
 /* Open text file for reading/writing.  If the file already exists,
  * truncate the existing contents.  Create a new file if it doesn't
  * already exist. */
-osfildef*
-osfoprwtt( const char* fname, os_filetype_t );
+osfildef* osfoprwtt(const char* fname, os_filetype_t);
 
 /* Open binary file for writing. */
-osfildef*
-osfopwb( const char* fname, os_filetype_t );
+osfildef* osfopwb(const char* fname, os_filetype_t);
 
 /* Open source file for reading - use the appropriate text or binary
  * mode. */
 #define osfoprs osfoprt
 
 /* Open binary file for reading. */
-osfildef*
-osfoprb( const char* fname, os_filetype_t );
+osfildef* osfoprb(const char* fname, os_filetype_t);
 
 /* Open binary file for reading/writing.  If the file already exists,
  * keep the existing contents.  Create a new file if it doesn't already
  * exist. */
-osfildef*
-osfoprwb( const char* fname, os_filetype_t );
+osfildef* osfoprwb(const char* fname, os_filetype_t);
 
 /* Open binary file for reading/writing.  If the file already exists,
  * truncate the existing contents.  Create a new file if it doesn't
  * already exist. */
-osfildef*
-osfoprwtb( const char* fname, os_filetype_t );
+osfildef* osfoprwtb(const char* fname, os_filetype_t);
 
 /* Get a line of text from a text file. */
-char*
-osfgets( char* buf, size_t len, osfildef* fp );
+char* osfgets(char* buf, size_t len, osfildef* fp);
 
 /* Write a line of text to a text file. */
-int
-osfputs( const char* buf, osfildef* fp );
+int osfputs(const char* buf, osfildef* fp);
 
 /* Write bytes to file. */
-int
-osfwb( osfildef* fp, const void* buf, int bufl );
+int osfwb(osfildef* fp, const void* buf, int bufl);
 
 /* Flush buffered writes to a file. */
-int
-osfflush( osfildef* fp );
+int osfflush(osfildef* fp);
 
 /* Get a character from a file. */
-int
-osfgetc( osfildef* fp );
+int osfgetc(osfildef* fp);
 
 /* Read bytes from file. */
-int
-osfrb( osfildef* fp, void* buf, int bufl );
+int osfrb(osfildef* fp, void* buf, int bufl);
 
 /* Read bytes from file and return the number of bytes read. */
-size_t
-osfrbc( osfildef* fp, void* buf, size_t bufl );
+size_t osfrbc(osfildef* fp, void* buf, size_t bufl);
 
 /* Get the current seek location in the file. */
 //#define osfpos ftell
-long
-osfpos( osfildef* fp );
+long osfpos(osfildef* fp);
 
 /* Seek to a location in the file. */
-int
-osfseek( osfildef* fp, long pos, int mode );
+int osfseek(osfildef* fp, long pos, int mode);
 
 /* Close a file. */
-void
-osfcls( osfildef* fp );
+void osfcls(osfildef* fp);
 
 /* Delete a file. */
-int
-osfdel( const char* fname );
+int osfdel(const char* fname);
 
 /* Rename a file. */
-int
-os_rename_file( const char* oldname, const char* newname );
+int os_rename_file(const char* oldname, const char* newname);
 
 /* Access a file - determine if the file exists. */
-int
-osfacc( const char* fname );
+int osfacc(const char* fname);
 
 /* Get a file's mode. */
-int
-osfmode( const char* fname, int follow_links, unsigned long* mode,
-         unsigned long* attr );
+int osfmode(const char* fname, int follow_links, unsigned long* mode, unsigned long* attr);
 
 /* Allocating sprintf and vsprintf. */
 // Currenty this is not used anywhere.
-//int
-//os_asprintf( char** bufptr, const char* fmt, ... );
+// int
+// os_asprintf( char** bufptr, const char* fmt, ... );
 
-int
-os_vasprintf( char** bufptr, const char* fmt, va_list ap );
-
+int os_vasprintf(char** bufptr, const char* fmt, va_list ap);
 
 #endif /* OSQT_H */

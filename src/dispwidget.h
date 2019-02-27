@@ -19,19 +19,19 @@
 #define DISPWIDGET_H
 
 #include <QDebug>
-#include <QWidget>
 #include <QTime>
+#include <QWidget>
 
 #include "config.h"
-
 
 /* The widget where CHtmlSysWin* performs actual paint operations.  It also
  * handles mouse events.
  */
-class DisplayWidget: public QWidget {
+class DisplayWidget: public QWidget
+{
     Q_OBJECT
 
-  private:
+private:
     // We track the current link the mouse is currently hovering over and the
     // link over which the mouse button has been pressed but not released yet.
     class CHtmlDispLink* fHoverLink;
@@ -50,20 +50,16 @@ class DisplayWidget: public QWidget {
     QTime fLastDoubleClick;
 
     // Stop tracking links.
-    void
-    fInvalidateLinkTracking();
+    void fInvalidateLinkTracking();
 
     // Returns the text currently selected in this window.
-    QString
-    fMySelectedText();
+    QString fMySelectedText();
 
-    void
-    fHandleDoubleOrTripleClick( QMouseEvent* e, bool tripleClick );
+    void fHandleDoubleOrTripleClick(QMouseEvent* e, bool tripleClick);
 
-    void
-    fSyncClipboard();
+    void fSyncClipboard();
 
-  protected:
+protected:
     // Are we in text selection mode?
     bool inSelectMode;
 
@@ -77,32 +73,25 @@ class DisplayWidget: public QWidget {
     // if there's no active selection.
     static DisplayWidget* curSelWidget;
 
-    void
-    paintEvent( QPaintEvent* e ) override;
+    void paintEvent(QPaintEvent* e) override;
 
-    void
-    mouseMoveEvent( QMouseEvent* e ) override;
+    void mouseMoveEvent(QMouseEvent* e) override;
 
-    void
-    leaveEvent( QEvent* e ) override;
+    void leaveEvent(QEvent* e) override;
 
-    void
-    mousePressEvent( QMouseEvent* e ) override;
+    void mousePressEvent(QMouseEvent* e) override;
 
-    void
-    mouseReleaseEvent( QMouseEvent* e ) override;
+    void mouseReleaseEvent(QMouseEvent* e) override;
 
-    void
-    mouseDoubleClickEvent( QMouseEvent* e ) override;
+    void mouseDoubleClickEvent(QMouseEvent* e) override;
 
-  public:
-    DisplayWidget( class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter );
+public:
+    DisplayWidget(class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter);
     ~DisplayWidget() override;
 
     // When our parent's notify_clear_contents() is called, we need to know
     // about it so we can perform link tracking invalidation.
-    void
-    notifyClearContents()
+    void notifyClearContents()
     {
         // When clearing contents, the display items are already gone. Set them
         // Null so we won't try to access them.
@@ -111,22 +100,18 @@ class DisplayWidget: public QWidget {
     }
 
     // Clear the selection range.
-    virtual void
-    clearSelection();
+    virtual void clearSelection();
 
     // Get the text contained in the currently active selection. Returns a
     // null string is there's currently no display widget with an active
     // selection.
-    static QString
-    selectedText();
+    static QString selectedText();
 
     // Update link tracking for specified mouse position.  If the specified
     // position isNull(), it will be autodetected.
     //
     // TODO: What happens with multi-pointer systems?
-    void
-    updateLinkTracking( const QPoint& pos );
+    void updateLinkTracking(const QPoint& pos);
 };
-
 
 #endif

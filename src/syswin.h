@@ -22,12 +22,11 @@
 #include <QDesktopWidget>
 #include <QScrollArea>
 
+#include "config.h"
 #include "globals.h"
 #include "sysfont.h"
 #include "sysframe.h"
 #include "syswingroup.h"
-#include "config.h"
-
 
 /* Tads HTML layer class whose interface needs to be implemented by the
  * interpreter.
@@ -35,10 +34,11 @@
  * See htmltads/htmlsys.h and htmltads/notes/porting.htm for information
  * about this class.
  */
-class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
+class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin
+{
     Q_OBJECT
 
-  private:
+private:
     // If we're a banner, what is our HTML_BannerWin_Pos_t, placement and
     // style flags.
     //
@@ -80,10 +80,9 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
     HTML_color_t fALinkColor = 0;
     HTML_color_t fHLinkColor = 0;
 
-    void
-    fSetupPainterForFont( QPainter& painter, bool hilite, CHtmlSysFont* font );
+    void fSetupPainterForFont(QPainter& painter, bool hilite, CHtmlSysFont* font);
 
-  protected:
+protected:
     // The content height at the time of the last user input.  When the
     // formatter is producing a long run of output, we pause between screens to
     // make sure the user has had a chance to see all of the text before we
@@ -103,133 +102,120 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
     // Our display widget.
     class DisplayWidget* dispWidget;
 
-    void
-    keyPressEvent( QKeyEvent* event ) override;
+    void keyPressEvent(QKeyEvent* event) override;
 
-    void
-    inputMethodEvent( QInputMethodEvent* e ) override;
+    void inputMethodEvent(QInputMethodEvent* e) override;
 
-    void
-    scrollContentsBy(int dx, int dy) override;
+    void scrollContentsBy(int dx, int dy) override;
 
-    void
-    wheelEvent( QWheelEvent* e ) override;
+    void wheelEvent(QWheelEvent* e) override;
 
-    void
-    resizeEvent( QResizeEvent* e ) override;
+    void resizeEvent(QResizeEvent* e) override;
 
-    void
-    mousePressEvent( QMouseEvent* e ) override;
+    void mousePressEvent(QMouseEvent* e) override;
 
-  public:
-    CHtmlSysWinQt( class CHtmlFormatter* formatter, QWidget* parent );
+public:
+    CHtmlSysWinQt(class CHtmlFormatter* formatter, QWidget* parent);
     ~CHtmlSysWinQt() override;
 
     // Returns our display widget.
-    class DisplayWidget*
-    displayWidget() const
-    { return dispWidget; }
+    class DisplayWidget* displayWidget() const
+    {
+        return dispWidget;
+    }
 
     // Calculate and adjust the sizes of our child banners.  On entry,
     // 'parentSize' contains the size of the full parent window area; on
     // return, it is updated to indicate the final size of the parent banner's
     // area after deducting the space carved out for children.
-    void
-    calcChildBannerSizes( QRect& parentSize );
+    void calcChildBannerSizes(QRect& parentSize);
 
     // Do a complete reformat.
-    void
-    doReformat( int showStatus, int freezeDisplay, int resetSounds );
+    void doReformat(int showStatus, int freezeDisplay, int resetSounds);
 
-    void
-    addBanner( CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int where, CHtmlSysWinQt* other,
-               HTML_BannerWin_Pos_t pos, unsigned long style );
+    void addBanner(CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int where,
+                   CHtmlSysWinQt* other, HTML_BannerWin_Pos_t pos, unsigned long style);
 
     // Our parent banner, if there is one.
-    CHtmlSysWinQt*
-    parentBanner() const
-    { return fParentBanner; }
+    CHtmlSysWinQt* parentBanner() const
+    {
+        return fParentBanner;
+    }
 
     // Scroll down by a page while keeping track of when to page-pause.  The
     // 'force' flag controls whether we should scroll even while waiting for
     // input in page-pause mode.
-    void
-    scrollDown( bool force, bool justOneLine );
+    void scrollDown(bool force, bool justOneLine);
 
     //
     // CHtmlSysWin interface implementation.
     //
-    CHtmlSysWinGroup*
-    get_win_group() override
-    { return qWinGroup; }
+    CHtmlSysWinGroup* get_win_group() override
+    {
+        return qWinGroup;
+    }
 
-    void
-    notify_clear_contents() override;
+    void notify_clear_contents() override;
 
-    int
-    close_window( int force ) override;
+    int close_window(int force) override;
 
-    long
-    get_disp_width() override
-    { return viewport()->width() - 3; }
+    long get_disp_width() override
+    {
+        return viewport()->width() - 3;
+    }
 
-    long
-    get_disp_height() override
-    { return viewport()->height(); }
+    long get_disp_height() override
+    {
+        return viewport()->height();
+    }
 
-    long
-    get_pix_per_inch() override
-    { return QApplication::desktop()->logicalDpiX(); }
+    long get_pix_per_inch() override
+    {
+        return QApplication::desktop()->logicalDpiX();
+    }
 
-    CHtmlPoint
-    measure_text( class CHtmlSysFont* font, const textchar_t* str, size_t len, int *ascent ) override;
+    CHtmlPoint measure_text(class CHtmlSysFont* font, const textchar_t* str, size_t len,
+                            int* ascent) override;
 
-    CHtmlPoint
-    measure_dbgsrc_icon() override
-    { return CHtmlPoint(); }
+    CHtmlPoint measure_dbgsrc_icon() override
+    {
+        return CHtmlPoint();
+    }
 
-    size_t
-    get_max_chars_in_width( CHtmlSysFont* font, const textchar_t* str, size_t len, long wid ) override;
+    size_t get_max_chars_in_width(CHtmlSysFont* font, const textchar_t* str, size_t len,
+                                  long wid) override;
 
-    void
-    draw_text( int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str, size_t len ) override;
+    void draw_text(int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str,
+                   size_t len) override;
 
-    void
-    draw_text_space( int hilite, long x, long y, CHtmlSysFont* font, long wid ) override;
+    void draw_text_space(int hilite, long x, long y, CHtmlSysFont* font, long wid) override;
 
-    void
-    draw_bullet( int hilite, long x, long y, CHtmlSysFont* font, HTML_SysWin_Bullet_t style ) override;
+    void draw_bullet(int hilite, long x, long y, CHtmlSysFont* font,
+                     HTML_SysWin_Bullet_t style) override;
 
-    void
-    draw_hrule( const CHtmlRect* pos, int shade ) override;
+    void draw_hrule(const CHtmlRect* pos, int shade) override;
 
-    void
-    draw_table_border( const CHtmlRect* pos, int width, int cell ) override;
+    void draw_table_border(const CHtmlRect* pos, int width, int cell) override;
 
-    void
-    draw_table_bkg( const CHtmlRect* pos, HTML_color_t bgcolor ) override;
+    void draw_table_bkg(const CHtmlRect* pos, HTML_color_t bgcolor) override;
 
-    void
-    draw_dbgsrc_icon( const CHtmlRect* pos, unsigned int stat ) override;
+    void draw_dbgsrc_icon(const CHtmlRect* pos, unsigned int stat) override;
 
-    int
-    do_formatting( int show_status, int update_win, int freeze_display ) override;
+    int do_formatting(int show_status, int update_win, int freeze_display) override;
 
     // We don't deal with palettes, so this is a no-op.
-    void
-    recalc_palette() override
-    { }
+    void recalc_palette() override
+    {}
 
     // We don't deal with palettes, so always return false.
-    int
-    get_use_palette() override
-    { return false; }
+    int get_use_palette() override
+    {
+        return false;
+    }
 
-    CHtmlSysFont*
-    get_default_font() override;
+    CHtmlSysFont* get_default_font() override;
 
-    CHtmlSysFont*
-    get_font( const CHtmlFontDesc* font_desc ) override
+    CHtmlSysFont* get_font(const CHtmlFontDesc* font_desc) override
     {
         if (fBannerStyleGrid) {
             // We're a text grid banner; use our internal font face,
@@ -243,105 +229,77 @@ class CHtmlSysWinQt: public QScrollArea, public CHtmlSysWin {
         return qFrame->createFont(font_desc);
     }
 
-    CHtmlSysFont*
-    get_bullet_font( CHtmlSysFont* current_font ) override
-    { return current_font; }
+    CHtmlSysFont* get_bullet_font(CHtmlSysFont* current_font) override
+    {
+        return current_font;
+    }
 
-    void
-    register_timer_func( void (*timer_func)( void* ), void* func_ctx ) override;
+    void register_timer_func(void (*timer_func)(void*), void* func_ctx) override;
 
-    void
-    unregister_timer_func( void (*timer_func)( void * ), void* func_ctx ) override;
+    void unregister_timer_func(void (*timer_func)(void*), void* func_ctx) override;
 
-    CHtmlSysTimer*
-    create_timer( void (*timer_func)( void* ), void *func_ctx ) override;
+    CHtmlSysTimer* create_timer(void (*timer_func)(void*), void* func_ctx) override;
 
-    void
-    set_timer( CHtmlSysTimer* timer, long interval_ms, int repeat ) override;
+    void set_timer(CHtmlSysTimer* timer, long interval_ms, int repeat) override;
 
-    void
-    cancel_timer( CHtmlSysTimer* timer ) override;
+    void cancel_timer(CHtmlSysTimer* timer) override;
 
-    void
-    delete_timer( CHtmlSysTimer* timer ) override;
+    void delete_timer(CHtmlSysTimer* timer) override;
 
-    void
-    fmt_adjust_hscroll() override;
+    void fmt_adjust_hscroll() override;
 
-    void
-    fmt_adjust_vscroll() override;
+    void fmt_adjust_vscroll() override;
 
-    void
-    inval_doc_coords( const CHtmlRect* area ) override;
+    void inval_doc_coords(const CHtmlRect* area) override;
 
-    void
-    advise_clearing_disp_list() override;
+    void advise_clearing_disp_list() override;
 
-    void
-    scroll_to_doc_coords( const CHtmlRect* pos ) override;
+    void scroll_to_doc_coords(const CHtmlRect* pos) override;
 
-    void
-    get_scroll_doc_coords( CHtmlRect* pos ) override;
+    void get_scroll_doc_coords(CHtmlRect* pos) override;
 
-    void
-    set_window_title( const textchar_t* title ) override;
+    void set_window_title(const textchar_t* title) override;
 
-    void
-    set_html_bg_color( HTML_color_t color, int use_default ) override;
+    void set_html_bg_color(HTML_color_t color, int use_default) override;
 
-    void
-    set_html_text_color( HTML_color_t color, int use_default ) override;
+    void set_html_text_color(HTML_color_t color, int use_default) override;
 
-    void
-    set_html_input_color( HTML_color_t, int ) override
+    void set_html_input_color(HTML_color_t, int) override
     // We don't provide input, so we don't deal with this.
-    { }
+    {}
 
-    void
-    set_html_link_colors( HTML_color_t link_color, int link_use_default, HTML_color_t vlink_color,
-                          int vlink_use_default, HTML_color_t alink_color, int alink_use_default,
-                          HTML_color_t hlink_color, int hlink_use_default ) override;
+    void set_html_link_colors(HTML_color_t link_color, int link_use_default,
+                              HTML_color_t vlink_color, int vlink_use_default,
+                              HTML_color_t alink_color, int alink_use_default,
+                              HTML_color_t hlink_color, int hlink_use_default) override;
 
-    HTML_color_t
-    map_system_color( HTML_color_t color ) override;
+    HTML_color_t map_system_color(HTML_color_t color) override;
 
-    HTML_color_t
-    get_html_link_color() const override;
+    HTML_color_t get_html_link_color() const override;
 
-    HTML_color_t
-    get_html_alink_color() const override;
+    HTML_color_t get_html_alink_color() const override;
 
-    HTML_color_t
-    get_html_vlink_color() const override;
+    HTML_color_t get_html_vlink_color() const override;
 
-    HTML_color_t
-    get_html_hlink_color() const override;
+    HTML_color_t get_html_hlink_color() const override;
 
-    int
-    get_html_link_underline() const override;
+    int get_html_link_underline() const override;
 
-    int
-    get_html_show_links() const override;
+    int get_html_show_links() const override;
 
-    int
-    get_html_show_graphics() const override;
+    int get_html_show_graphics() const override;
 
-    void
-    set_html_bg_image( class CHtmlResCacheObject* image ) override;
+    void set_html_bg_image(class CHtmlResCacheObject* image) override;
 
-    void
-    inval_html_bg_image( unsigned int x, unsigned int y, unsigned int wid, unsigned int ht ) override;
+    void inval_html_bg_image(unsigned int x, unsigned int y, unsigned int wid,
+                             unsigned int ht) override;
 
-    void
-    set_banner_size( long width, HTML_BannerWin_Units_t width_units, int use_width, long height,
-                     HTML_BannerWin_Units_t height_units, int use_height ) override;
+    void set_banner_size(long width, HTML_BannerWin_Units_t width_units, int use_width, long height,
+                         HTML_BannerWin_Units_t height_units, int use_height) override;
 
-    void
-    set_banner_info( HTML_BannerWin_Pos_t pos, unsigned long style ) override;
+    void set_banner_info(HTML_BannerWin_Pos_t pos, unsigned long style) override;
 
-    void
-    get_banner_info( HTML_BannerWin_Pos_t* pos, unsigned long* style ) override;
+    void get_banner_info(HTML_BannerWin_Pos_t* pos, unsigned long* style) override;
 };
-
 
 #endif

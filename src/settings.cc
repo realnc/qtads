@@ -16,17 +16,15 @@
  * USA.
  */
 
-#include <QSettings>
 #include <QDebug>
 #include <QFileInfo>
+#include <QSettings>
 
+#include "globals.h"
 #include "settings.h"
 #include "syswingroup.h"
-#include "globals.h"
 
-
-void
-Settings::loadFromDisk()
+void Settings::loadFromDisk()
 {
     QSettings sett;
 
@@ -46,14 +44,19 @@ Settings::loadFromDisk()
     sett.beginGroup(QString::fromLatin1("colors"));
     mainBgColor = sett.value(QString::fromLatin1("mainbg"), QColor(Qt::white)).value<QColor>();
     mainTextColor = sett.value(QString::fromLatin1("maintext"), QColor(Qt::black)).value<QColor>();
-    bannerBgColor = sett.value(QString::fromLatin1("bannerbg"), QColor(Qt::lightGray)).value<QColor>();
-    bannerTextColor = sett.value(QString::fromLatin1("bannertext"), QColor(Qt::black)).value<QColor>();
+    bannerBgColor =
+        sett.value(QString::fromLatin1("bannerbg"), QColor(Qt::lightGray)).value<QColor>();
+    bannerTextColor =
+        sett.value(QString::fromLatin1("bannertext"), QColor(Qt::black)).value<QColor>();
     inputColor = sett.value(QString::fromLatin1("input"), QColor(70, 70, 70)).value<QColor>();
     underlineLinks = sett.value(QString::fromLatin1("underlinelinks"), false).toBool();
     highlightLinks = sett.value(QString::fromLatin1("highlightlinks"), true).toBool();
-    unvisitedLinkColor = sett.value(QString::fromLatin1("unvisitedlinks"), QColor(Qt::blue)).value<QColor>();
-    hoveringLinkColor = sett.value(QString::fromLatin1("hoveringlinks"), QColor(Qt::red)).value<QColor>();
-    clickedLinkColor = sett.value(QString::fromLatin1("clickedlinks"), QColor(Qt::cyan)).value<QColor>();
+    unvisitedLinkColor =
+        sett.value(QString::fromLatin1("unvisitedlinks"), QColor(Qt::blue)).value<QColor>();
+    hoveringLinkColor =
+        sett.value(QString::fromLatin1("hoveringlinks"), QColor(Qt::red)).value<QColor>();
+    clickedLinkColor =
+        sett.value(QString::fromLatin1("clickedlinks"), QColor(Qt::cyan)).value<QColor>();
     sett.endGroup();
 
 #ifdef Q_OS_MAC
@@ -95,13 +98,15 @@ Settings::loadFromDisk()
     sett.beginGroup(QString::fromLatin1("misc"));
     ioSafetyLevelRead = sett.value(QString::fromLatin1("ioSafetyLevelRead"), 2).toInt();
     ioSafetyLevelWrite = sett.value(QString::fromLatin1("ioSafetyLevelWrite"), 2).toInt();
-    tads2Encoding = sett.value(QString::fromLatin1("tads2encoding"), QByteArray("windows-1252")).toByteArray();
+    tads2Encoding =
+        sett.value(QString::fromLatin1("tads2encoding"), QByteArray("windows-1252")).toByteArray();
     pasteOnDblClk = sett.value(QString::fromLatin1("pasteondoubleclick"), true).toBool();
     softScrolling = sett.value(QString::fromLatin1("softscrolling"), true).toBool();
     askForGameFile = sett.value(QString::fromLatin1("askforfileatstart"), false).toBool();
     confirmRestartGame = sett.value(QString::fromLatin1("confirmrestartgame"), true).toBool();
     confirmQuitGame = sett.value(QString::fromLatin1("confirmquitgame"), true).toBool();
-    lastFileOpenDir = sett.value(QString::fromLatin1("lastFileOpenDir"), QString::fromLatin1("")).toString();
+    lastFileOpenDir =
+        sett.value(QString::fromLatin1("lastFileOpenDir"), QString::fromLatin1("")).toString();
     sett.endGroup();
 
     sett.beginGroup(QString::fromLatin1("recent"));
@@ -110,7 +115,7 @@ Settings::loadFromDisk()
     // Remove any files that don't exist or aren't readable.
     for (int i = 0; i < recentGamesList.size(); ++i) {
         QFileInfo file(recentGamesList.at(i));
-        if (not file.exists() or not (file.isFile() or file.isSymLink()) or not file.isReadable()) {
+        if (not file.exists() or not(file.isFile() or file.isSymLink()) or not file.isReadable()) {
             recentGamesList.removeAt(i);
             --i;
         }
@@ -120,13 +125,10 @@ Settings::loadFromDisk()
     appSize = sett.value(QString::fromLatin1("geometry/size"), QSize(740, 540)).toSize();
     lastUpdateDate = sett.value(QString::fromLatin1("update/lastupdatedate"), QDate()).toDate();
     updateFreq = static_cast<UpdateFreq>(
-        sett.value(QString::fromLatin1("update/updatefreq"), UpdateDaily).toInt()
-    );
+        sett.value(QString::fromLatin1("update/updatefreq"), UpdateDaily).toInt());
 }
 
-
-void
-Settings::saveToDisk()
+void Settings::saveToDisk()
 {
     QSettings sett;
 

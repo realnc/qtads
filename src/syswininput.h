@@ -20,19 +20,20 @@
 
 #include <QQueue>
 
-#include "syswin.h"
 #include "config.h"
-
+#include "syswin.h"
 
 /* An input-capable CHtmlSysWinQt.
  */
-class CHtmlSysWinInputQt: public CHtmlSysWinQt {
+class CHtmlSysWinInputQt: public CHtmlSysWinQt
+{
     Q_OBJECT
     friend class CHtmlSysWinQt;
 
-  private:
+private:
     // These values specify the exact input-mode we are in.
-    enum InputMode {
+    enum InputMode
+    {
         // We aren't in input-mode.
         NoInput,
 
@@ -88,51 +89,40 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
     textchar_t* fInputBuffer;
     size_t fInputBufferSize;
 
-    void
-    fStartKeypressInput();
+    void fStartKeypressInput();
 
-    void
-    fProcessPagePauseQueue();
+    void fProcessPagePauseQueue();
 
-    void
-    fUpdateInputFormatter();
+    void fUpdateInputFormatter();
 
-  protected:
-    void
-    resizeEvent( QResizeEvent* event ) override;
+protected:
+    void resizeEvent(QResizeEvent* event) override;
 
-    void
-    keyPressEvent( QKeyEvent* e ) override;
+    void keyPressEvent(QKeyEvent* e) override;
 
-    void
-    inputMethodEvent( QInputMethodEvent* e ) override;
+    void inputMethodEvent(QInputMethodEvent* e) override;
 
-    void
-    singleKeyPressEvent( QKeyEvent* event );
+    void singleKeyPressEvent(QKeyEvent* event);
 
-  signals:
+signals:
     // Emitted when an input operation has finished successfully.
     void inputReady();
 
-  public:
-    CHtmlSysWinInputQt( class CHtmlFormatter* formatter, QWidget* parent );
+public:
+    CHtmlSysWinInputQt(class CHtmlFormatter* formatter, QWidget* parent);
     ~CHtmlSysWinInputQt() override;
 
     // Change the height of the text cursor.
-    void
-    setCursorHeight( unsigned height );
+    void setCursorHeight(unsigned height);
 
-    void
-    processCommand( const textchar_t* cmd, size_t len, int append, int enter, int os_cmd_id );
+    void processCommand(const textchar_t* cmd, size_t len, int append, int enter, int os_cmd_id);
 
     // Read a line of input.
-    void
-    getInput( textchar_t* buf, size_t buflen, unsigned long timeout = 0, bool useTimeout = false,
-              bool* timedOut = 0 );
+    void getInput(textchar_t* buf, size_t buflen, unsigned long timeout = 0,
+                  bool useTimeout = false, bool* timedOut = 0);
 
     // Cancel an interrupted input.  See CHtmlSysFrame::get_input_cancel().
-    void
-    cancelInput( bool reset );
+    void cancelInput(bool reset);
 
     // Uses os_getc_raw() semantics, but with a timeout.
     //
@@ -146,20 +136,16 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
     // If an HREF events happens while we're waiting for input, -1 is returned.
     // The caller should use the pendingHrefEvent() method to get the HREF
     // event in this case.
-    int
-    getKeypress( unsigned long timeout = 0, bool useTimeout = false, bool* timedOut = 0 );
+    int getKeypress(unsigned long timeout = 0, bool useTimeout = false, bool* timedOut = 0);
 
     // Add a banner to the queue of banners that are in page-pause mode.
-    void
-    addToPagePauseQueue( CHtmlSysWinQt* banner );
+    void addToPagePauseQueue(CHtmlSysWinQt* banner);
 
-    void
-    removeFromPagePauseQueue( CHtmlSysWinQt* banner );
+    void removeFromPagePauseQueue(CHtmlSysWinQt* banner);
 
     // Return the currently pending HREF event (is there is one.)  This method
     // will clear the event, so subsequent calls will return an empty string.
-    QString
-    pendingHrefEvent()
+    QString pendingHrefEvent()
     {
         QString ret(fHrefEvent);
         fHrefEvent.clear();
@@ -168,20 +154,18 @@ class CHtmlSysWinInputQt: public CHtmlSysWinQt {
 
     // Insert text into the current input editor position. Does nothing if line
     // input mode is not currently active.
-    void
-    insertText( QString str );
+    void insertText(QString str);
 
     // Do we currently accept text insertion?
-    bool
-    acceptsText()
-    { return fInputMode == NormalInput; }
+    bool acceptsText()
+    {
+        return fInputMode == NormalInput;
+    }
 
     //
     // CHtmlSysWin interface implementation.
     //
-    void
-    set_html_input_color( HTML_color_t clr, int use_default ) override;
+    void set_html_input_color(HTML_color_t clr, int use_default) override;
 };
-
 
 #endif

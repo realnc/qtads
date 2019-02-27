@@ -1,15 +1,16 @@
 #ifndef GAMEINFODIALOG_H
 #define GAMEINFODIALOG_H
 
-#include <QDialog>
-#include "gameinfo.h"
 #include "config.h"
+#include "gameinfo.h"
+#include <QDialog>
 
 /* Implementation of the game information enumerator callback interface.
  * See tads3/gameinfo.h for details.
  */
-class QTadsGameInfoEnum: public CTadsGameInfo_enum {
-  public:
+class QTadsGameInfoEnum: public CTadsGameInfo_enum
+{
+public:
     QString gameName;
     QString plainGameName; // Game name but without any HTML markup.
     QString headline;
@@ -30,32 +31,28 @@ class QTadsGameInfoEnum: public CTadsGameInfo_enum {
     QString copyRules;
     QString ifid;
 
-    void
-    tads_enum_game_info( const char* name, const char* val ) override;
+    void tads_enum_game_info(const char* name, const char* val) override;
 };
 
-
 namespace Ui {
-    class GameInfoDialog;
+class GameInfoDialog;
 }
 
-class GameInfoDialog: public QDialog {
+class GameInfoDialog: public QDialog
+{
     Q_OBJECT
 
-  public:
-    explicit GameInfoDialog( const QByteArray& fname, QWidget* parent = 0 );
+public:
+    explicit GameInfoDialog(const QByteArray& fname, QWidget* parent = 0);
     ~GameInfoDialog() override;
 
     // Checks whether a game file contains any embedded meta information.
-    static bool
-    gameHasMetaInfo( const QByteArray& fname );
+    static bool gameHasMetaInfo(const QByteArray& fname);
 
-    static QTadsGameInfoEnum
-    getMetaInfo( const QByteArray& fname );
+    static QTadsGameInfoEnum getMetaInfo(const QByteArray& fname);
 
-  private:
-    Ui::GameInfoDialog *ui;
+private:
+    Ui::GameInfoDialog* ui;
 };
-
 
 #endif // GAMEINFODIALOG_H

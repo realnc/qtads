@@ -21,29 +21,23 @@
 
 #include "vmuni.h"
 
-
 #ifdef TADSHTML_DEBUG
-void
-os_dbg_sys_msg( const textchar_t* msg )
+void os_dbg_sys_msg(const textchar_t* msg)
 {
     qDebug() << msg;
 }
 #endif
 
-
-oshtml_charset_id_t
-os_get_default_charset()
+oshtml_charset_id_t os_get_default_charset()
 {
     // We always assume UTF-8, so the value we return here doesn't actually
     // represent anything.
     return 0;
 }
 
-
 /* Get the next character in a string.
  */
-textchar_t*
-os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t len )
+textchar_t* os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t len)
 {
     if (p == 0) {
         return 0;
@@ -66,11 +60,9 @@ os_next_char( oshtml_charset_id_t /*id*/, const textchar_t* p, size_t len )
     return const_cast<textchar_t*>(p);
 }
 
-
 /* Get the previous character in a string.
  */
-textchar_t*
-os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart )
+textchar_t* os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart)
 {
     if (p == 0) {
         return 0;
@@ -86,12 +78,10 @@ os_prev_char( oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t*
     return const_cast<textchar_t*>(p);
 }
 
-
 /* Determine if the character at the given string position is a word
  * character - i.e., a character that's part of a written word.
  */
-int
-os_is_word_char( oshtml_charset_id_t id, const textchar_t* p, size_t len )
+int os_is_word_char(oshtml_charset_id_t id, const textchar_t* p, size_t len)
 {
     if (p == 0) {
         return false;
@@ -103,11 +93,9 @@ os_is_word_char( oshtml_charset_id_t id, const textchar_t* p, size_t len )
     return t3_is_alpha(c.at(0).unicode());
 }
 
-
 /* Get the current system time.
  */
-os_timer_t
-os_get_time()
+os_timer_t os_get_time()
 {
     return os_get_sys_clock_ms();
 }

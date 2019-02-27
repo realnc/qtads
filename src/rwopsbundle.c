@@ -25,11 +25,11 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
+#include <SDL_error.h>
+#include <SDL_rwops.h>
+#include <SDL_version.h>
 #include <errno.h>
 #include <string.h>
-#include <SDL_version.h>
-#include <SDL_rwops.h>
-#include <SDL_error.h>
 
 #include "rwopsbundle.h"
 
@@ -40,20 +40,19 @@
 /* Media resource information for our custom RWops implementation. Media
  * resources are embedded inside media bundle files. They begin at 'startPos'
  * and end at 'endPos' inside the 'file' bundle. */
-typedef struct {
+typedef struct
+{
     FILE* file;
     long startPos;
     long endPos;
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDL_VERSION_ATLEAST(1, 3, 0)
     Sint64 size;
 #endif
 } BundleFileInfo;
 
-
 /* Helper routine.  Checks whether the 'rwops' is of our own type.
  */
-static SDL_bool
-RWOpsCheck( SDL_RWops* rwops )
+static SDL_bool RWOpsCheck(SDL_RWops* rwops)
 {
     if (rwops->type != CUSTOM_RWOPS_TYPE) {
         SDL_SetError("Unrecognized RWops type %u", rwops->type);
@@ -62,13 +61,11 @@ RWOpsCheck( SDL_RWops* rwops )
     return SDL_TRUE;
 }
 
-
 /* RWops size callback. Only exists in SDL2 and reports the size of our data
  * in bytes.
  */
-#if SDL_VERSION_ATLEAST(1,3,0)
-static Sint64
-RWOpsSizeFunc( SDL_RWops* rwops )
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+static Sint64 RWOpsSizeFunc(SDL_RWops* rwops)
 {
     if (!RWOpsCheck(rwops))
         return -1;
@@ -76,19 +73,16 @@ RWOpsSizeFunc( SDL_RWops* rwops )
 }
 #endif
 
-
 /* RWops seek callback. We apply offsets to make all seek operations relative
  * to the start/end of the media resource embedded inside the media bundle
  * file.
  *
  * Must return the new current SEET_SET position.
  */
-#if SDL_VERSION_ATLEAST(1,3,0)
-static Sint64
-RWOpsSeekFunc( SDL_RWops* rwops, Sint64 offset, int whence )
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+static Sint64 RWOpsSeekFunc(SDL_RWops* rwops, Sint64 offset, int whence)
 #else
-static int
-RWOpsSeekFunc( SDL_RWops* rwops, int offset, int whence )
+static int RWOpsSeekFunc(SDL_RWops* rwops, int offset, int whence)
 #endif
 {
     BundleFileInfo* info;
@@ -112,18 +106,15 @@ RWOpsSeekFunc( SDL_RWops* rwops, int offset, int whence )
     return ftell(info->file) - info->startPos;
 }
 
-
 /* RWops read callback. We don't allow reading past the end of the media
  * resource embedded inside the media bundle file.
  *
  * Must return the number of elements (not bytes) that have been read.
  */
-#if SDL_VERSION_ATLEAST(1,3,0)
-static size_t
-RWOpsReadFunc( SDL_RWops* rwops, void* ptr, size_t size, size_t maxnum )
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+static size_t RWOpsReadFunc(SDL_RWops* rwops, void* ptr, size_t size, size_t maxnum)
 #else
-static int
-RWOpsReadFunc( SDL_RWops* rwops, void* ptr, int size, int maxnum )
+static int RWOpsReadFunc(SDL_RWops* rwops, void* ptr, int size, int maxnum)
 #endif
 {
     BundleFileInfo* info;
@@ -147,16 +138,13 @@ RWOpsReadFunc( SDL_RWops* rwops, void* ptr, int size, int maxnum )
     return itemsRead;
 }
 
-
 /* RWops write callback. This always fails, since we never write to media
  * bundle files.
  */
-#if SDL_VERSION_ATLEAST(1,3,0)
-static size_t
-RWOpsWriteFunc( SDL_RWops* rwops, const void* ptr, size_t size, size_t num )
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+static size_t RWOpsWriteFunc(SDL_RWops* rwops, const void* ptr, size_t size, size_t num)
 #else
-static int
-RWOpsWriteFunc( SDL_RWops* rwops, const void* ptr, int size, int num )
+static int RWOpsWriteFunc(SDL_RWops* rwops, const void* ptr, int size, int num)
 #endif
 {
     if (!RWOpsCheck(rwops))
@@ -165,11 +153,9 @@ RWOpsWriteFunc( SDL_RWops* rwops, const void* ptr, int size, int num )
     return -1;
 }
 
-
 /* RWops close callback. Frees the RWops as well as our custom data.
  */
-static int
-RWOpsCloseFunc( SDL_RWops* rwops )
+static int RWOpsCloseFunc(SDL_RWops* rwops)
 {
     BundleFileInfo* info;
     if (!RWOpsCheck(rwops))
@@ -181,9 +167,7 @@ RWOpsCloseFunc( SDL_RWops* rwops )
     return 0;
 }
 
-
-SDL_RWops*
-RWFromMediaBundle( FILE* mediaBundle, long resLength )
+SDL_RWops* RWFromMediaBundle(FILE* mediaBundle, long resLength)
 {
     BundleFileInfo* info;
     errno = 0;
@@ -213,7 +197,7 @@ RWFromMediaBundle( FILE* mediaBundle, long resLength )
     info->endPos = info->startPos + resLength;
 
     rwops->hidden.unknown.data1 = info;
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDL_VERSION_ATLEAST(1, 3, 0)
     rwops->size = RWOpsSizeFunc;
     info->size = resLength;
 #endif

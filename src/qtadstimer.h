@@ -22,20 +22,19 @@
 
 #include "htmlsys.h"
 
-
 /* Tads HTML layer class whose interface needs to be implemented by the
  * interpreter.
  *
  * See htmltads/htmlsys.h and htmltads/notes/porting.htm for information
  * about this class.
  */
-class QTadsTimer: public QTimer, public CHtmlSysTimer {
+class QTadsTimer: public QTimer, public CHtmlSysTimer
+{
     Q_OBJECT
 
-  public slots:
+public slots:
     // We connect the timeout() signal to this slot.
-    void
-    trigger()
+    void trigger()
     {
         // If we have a callback, call it.
         if (func_ != 0) {
@@ -43,9 +42,10 @@ class QTadsTimer: public QTimer, public CHtmlSysTimer {
         }
     }
 
-  public:
-    QTadsTimer( void (*func)(void*), void* ctx, QObject* parent = 0 )
-    : QTimer(parent), CHtmlSysTimer(func, ctx)
+public:
+    QTadsTimer(void (*func)(void*), void* ctx, QObject* parent = 0)
+        : QTimer(parent)
+        , CHtmlSysTimer(func, ctx)
     {
         connect(this, SIGNAL(timeout()), this, SLOT(trigger()));
     }
@@ -54,6 +54,5 @@ class QTadsTimer: public QTimer, public CHtmlSysTimer {
     // pointer in order to unregister the timer.
     using CHtmlSysTimer::func_;
 };
-
 
 #endif

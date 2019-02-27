@@ -18,13 +18,12 @@
 
 #include <QPainter>
 
-#include "syswin.h"
 #include "qtadsimage.h"
 #include "settings.h"
+#include "syswin.h"
 
-
-void
-QTadsImage::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, htmlimg_draw_mode_t mode )
+void QTadsImage::drawFromPaintEvent(class CHtmlSysWin* win, class CHtmlRect* pos,
+                                    htmlimg_draw_mode_t mode)
 {
     QPainter painter(static_cast<CHtmlSysWinQt*>(win)->widget());
     if (mode == HTMLIMG_DRAW_CLIP) {
@@ -50,12 +49,13 @@ QTadsImage::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, ht
         // If the image doesn't fit exactly, scale it. Use the "smooth"
         // transformation mode (which uses a bilinear filter) if enabled in
         // the settings.
-        Qt::TransformationMode mode = qFrame->settings()->useSmoothScaling ?
-                                      Qt::SmoothTransformation : Qt::FastTransformation;
+        Qt::TransformationMode mode = qFrame->settings()->useSmoothScaling
+                                          ? Qt::SmoothTransformation
+                                          : Qt::FastTransformation;
         if (width() != pos->right - pos->left or height() != pos->bottom - pos->top) {
             painter.drawImage(QPoint(pos->left, pos->top),
                               scaled(pos->right - pos->left, pos->bottom - pos->top,
-                                           Qt::IgnoreAspectRatio, mode));
+                                     Qt::IgnoreAspectRatio, mode));
         } else {
             painter.drawImage(QPoint(pos->left, pos->top), *this);
         }
@@ -65,5 +65,6 @@ QTadsImage::drawFromPaintEvent( class CHtmlSysWin* win, class CHtmlRect* pos, ht
     // If we get here, 'mode' must have been HTMLIMG_DRAW_TILE.
     Q_ASSERT(mode == HTMLIMG_DRAW_TILE);
     QPixmap pix(QPixmap::fromImage(*this));
-    painter.drawTiledPixmap(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top, pix);
+    painter.drawTiledPixmap(pos->left, pos->top, pos->right - pos->left, pos->bottom - pos->top,
+                            pix);
 }

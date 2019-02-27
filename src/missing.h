@@ -36,22 +36,19 @@ extern "C" {
  * This function is already available on MS Windows.
  */
 #ifndef _WIN32
-int
-memicmp( const char* s1, const char* s2, size_t len );
+int memicmp(const char* s1, const char* s2, size_t len);
 #endif
 
 /* Case-insensitive string comparison.
  */
-int
-stricmp( const char* s1, const char* s2 );
+int stricmp(const char* s1, const char* s2);
 
 /* Length-limited case-insensitive string comparison.
  *
  * This function compares at most 'n' characters, or until a '\0'
  * character has been detected.
  */
-int
-strnicmp( const char* s1, const char* s2, size_t n );
+int strnicmp(const char* s1, const char* s2, size_t n);
 
 #ifdef __cplusplus
 } /* extern "C" */

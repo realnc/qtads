@@ -44,8 +44,7 @@ extern "C" {
  * In case or errors, NULL is returned and 'mediaBundle' is not closed.
  * SDL_GetError() can be used to obtain an error string.
  */
-SDL_RWops*
-RWFromMediaBundle( FILE* mediaBundle, long resLength );
+SDL_RWops* RWFromMediaBundle(FILE* mediaBundle, long resLength);
 
 #ifdef __cplusplus
 }

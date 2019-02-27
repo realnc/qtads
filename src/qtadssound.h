@@ -21,29 +21,34 @@
 #include <QObject>
 #include <QTime>
 
-#include "tadshtml.h"
 #include "config.h"
+#include "tadshtml.h"
 #ifndef NO_AUDIO
 #include "Aulib/AudioStream.h"
 #endif
-
 
 bool initSound();
 
 void quitSound();
 
-
 /* Provides the common code for all three types of digitized sound (WAV,
  * Ogg Vorbis and MP3).
  */
-class QTadsSound: public QObject {
+class QTadsSound: public QObject
+{
     Q_OBJECT
 
-  public:
-    enum SoundType { WAV, OGG, MPEG, MIDI };
+public:
+    enum SoundType
+    {
+        WAV,
+        OGG,
+        MPEG,
+        MIDI
+    };
 
 #ifndef NO_AUDIO
-  private:
+private:
     Aulib::AudioStream* fAudStream;
     SoundType fType;
     bool fPlaying;
@@ -69,50 +74,42 @@ class QTadsSound: public QObject {
     std::chrono::milliseconds fLength{};
 
     // Aulib finish callback.
-    void
-    fFinishCallback( Aulib::Stream& strm );
+    void fFinishCallback(Aulib::Stream& strm);
 
     // Aulib loop callback.
-    void
-    fLoopCallback( Aulib::Stream& strm );
+    void fLoopCallback(Aulib::Stream& strm);
 
-    void
-    emitReadyToFadeOut()
-    { emit readyToFadeOut(); }
+    void emitReadyToFadeOut()
+    {
+        emit readyToFadeOut();
+    }
 
-  private slots:
-    void
-    fDoFadeOut();
+private slots:
+    void fDoFadeOut();
 
-    void
-    fPrepareFadeOut();
+    void fPrepareFadeOut();
 
-    void
-    fDeleteTimer();
+    void fDeleteTimer();
 
-  signals:
+signals:
     void readyToFadeOut();
 
-  public:
-    QTadsSound( QObject* parent, Aulib::AudioStream* stream, SoundType type );
+public:
+    QTadsSound(QObject* parent, Aulib::AudioStream* stream, SoundType type);
     ~QTadsSound() override;
 #endif
 
-  public:
-    int
-    startPlaying( void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
-                  int fadeIn, int fadeOut, bool crossFade );
+public:
+    int startPlaying(void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+                     int vol, int fadeIn, int fadeOut, bool crossFade);
 
-    void
-    cancelPlaying( bool sync, int fadeOut, bool fadeOutInBg );
+    void cancelPlaying(bool sync, int fadeOut, bool fadeOutInBg);
 
-    void
-    addCrossFade( int ms );
+    void addCrossFade(int ms);
 
-    static class CHtmlSysSound*
-    createSound( const class CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
-                 unsigned long filesize, class CHtmlSysWin* win, SoundType type );
+    static class CHtmlSysSound* createSound(const class CHtmlUrl* url, const textchar_t* filename,
+                                            unsigned long seekpos, unsigned long filesize,
+                                            class CHtmlSysWin* win, SoundType type);
 };
-
 
 #endif
