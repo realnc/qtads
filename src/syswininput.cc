@@ -213,11 +213,7 @@ void CHtmlSysWinInputQt::keyPressEvent(QKeyEvent* e)
         if (e->key() == Qt::Key_Space) {
             // Scroll down by a page.
             fPagePauseQueue.head()->scrollDown(true, false);
-#if QT_VERSION >= 0x040500
         } else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
-#else
-        } else if (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return) {
-#endif
             // Scroll down by a line.
             fPagePauseQueue.head()->scrollDown(true, true);
         }
@@ -232,11 +228,7 @@ void CHtmlSysWinInputQt::keyPressEvent(QKeyEvent* e)
                or e->matches(QKeySequence::MoveToEndOfBlock)) {
         fTadsBuffer->end_of_line(false);
         fCastDispWidget->clearSelection();
-#if QT_VERSION >= 0x040500
     } else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
-#else
-    } else if (e->key() == Qt::Key_Enter or e->key() == Qt::Key_Return) {
-#endif
         fInputReady = true;
         fInputMode = NoInput;
         fTadsBuffer->add_hist();

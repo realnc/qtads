@@ -80,34 +80,26 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     // "Game" menu.
     QMenu* menu = menuBar->addMenu(tr("&Game"));
     QAction* act = new QAction(tr("&Open") + QString::fromLatin1("..."), this);
-#if QT_VERSION >= 0x040600
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("document-open")));
-#endif
     act->setShortcuts(QKeySequence::Open);
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(fOpenNewGame()));
     act = new QAction(tr("Open &Recent"), this);
-#if QT_VERSION >= 0x040600
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("document-open-recent")));
-#endif
     fRecentGamesMenu = new QMenu(this);
     act->setMenu(fRecentGamesMenu);
     menu->addAction(act);
     connect(fRecentGamesMenu, SIGNAL(triggered(QAction*)), this,
             SLOT(fRecentGameTriggered(QAction*)));
     fRestartCurrentGameAction = new QAction(tr("Re&start"), this);
-#if QT_VERSION >= 0x040600
     fRestartCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("view-refresh")));
-#endif
     fRestartCurrentGameAction->setShortcut(QKeySequence(QString::fromLatin1("Ctrl+R")));
     menu->addAction(fRestartCurrentGameAction);
     fRestartCurrentGameAction->setEnabled(false);
     connect(fRestartCurrentGameAction, SIGNAL(triggered()), this, SLOT(fRestartCurrentGame()));
     fEndCurrentGameAction = new QAction(tr("Qui&t"), this);
     fEndCurrentGameAction->setMenuRole(QAction::NoRole);
-#if QT_VERSION >= 0x040600
     fEndCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("process-stop")));
-#endif
     fEndCurrentGameAction->setShortcuts(QKeySequence::Close);
     menu->addAction(fEndCurrentGameAction);
     fEndCurrentGameAction->setEnabled(false);
@@ -119,56 +111,44 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     menu->addAction(fAboutGameAction);
     connect(fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
     fGameInfoAction = new QAction(tr("View Metadata"), this);
-#if QT_VERSION >= 0x040600
     fGameInfoAction->setIcon(QIcon::fromTheme(QString::fromLatin1("document-properties")));
-#endif
     menu->addAction(fGameInfoAction);
     fGameInfoAction->setEnabled(false);
     connect(fGameInfoAction, SIGNAL(triggered()), this, SLOT(fShowGameInfoDialog()));
     menu->addSeparator();
     act = new QAction(tr("&Quit QTads"), this);
     act->setMenuRole(QAction::QuitRole);
-#if QT_VERSION >= 0x040600
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("application-exit")));
     act->setShortcuts(QKeySequence::Quit);
-#endif
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(close()));
 
     // "Edit" menu.
     menu = menuBar->addMenu(tr("&Edit"));
     fCopyAction = new QAction(tr("&Copy"), this);
-#if QT_VERSION >= 0x040600
     fCopyAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-copy")));
     fCopyAction->setShortcuts(QKeySequence::Copy);
-#endif
     fCopyAction->setEnabled(false);
     menu->addAction(fCopyAction);
     connect(fCopyAction, SIGNAL(triggered()), SLOT(copyToClipboard()));
     fPasteAction = new QAction(tr("&Paste"), this);
-#if QT_VERSION >= 0x040600
     fPasteAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-paste")));
     fPasteAction->setShortcuts(QKeySequence::Paste);
-#endif
     fPasteAction->setDisabled(true);
     menu->addAction(fPasteAction);
     connect(fPasteAction, SIGNAL(triggered()), SLOT(pasteFromClipboard()));
     connect(QApplication::clipboard(), SIGNAL(dataChanged()), SLOT(updatePasteAction()));
     menu->addSeparator();
     act = new QAction(tr("&Preferences..."), this);
-#if QT_VERSION >= 0x040600
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("configure")));
     act->setShortcuts(QKeySequence::Preferences);
-#endif
     menu->addAction(act);
     connect(act, SIGNAL(triggered()), this, SLOT(fShowConfDialog()));
 
     // "Help" menu.
     menu = menuBar->addMenu(tr("&Help"));
     fAboutQtadsAction = new QAction(tr("A&bout QTads"), this);
-#if QT_VERSION >= 0x040600
     fAboutQtadsAction->setIcon(QIcon::fromTheme(QString::fromLatin1("help-about")));
-#endif
     menu->addAction(fAboutQtadsAction);
     connect(fAboutQtadsAction, SIGNAL(triggered()), this, SLOT(fShowAboutQtads()));
     act = new QAction(tr("&Check for Updates"), this);

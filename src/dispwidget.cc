@@ -244,10 +244,6 @@ void DisplayWidget::mousePressEvent(QMouseEvent* e)
 
 void DisplayWidget::mouseReleaseEvent(QMouseEvent* e)
 {
-#if QT_VERSION < 0x040700
-#define MiddleButton MidButton
-#endif
-
     if (e->button() == Qt::MiddleButton and QApplication::clipboard()->supportsSelection()) {
         qFrame->gameWindow()->insertText(QApplication::clipboard()->text(QClipboard::Selection));
         return;

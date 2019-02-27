@@ -1,31 +1,15 @@
-QT += core gui network
+QT += core gui network widgets
 QT_CONFIG -= no-pkg-config
-contains(QT_MAJOR_VERSION, 5):QT += widgets
 TEMPLATE = app
 CONFIG += silent warn_off c++14
 VERSION = 2.1.7.99
 
-# qmake on Qt 5.3 and lower doesn't recognize c++14.
-contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 4) {
-    # First, tell qmake to use C++11 ...
-    CONFIG += c++11
-    # ... then, replace 11 with 14.
-    QMAKE_CXXFLAGS_CXX11 = $$replace(QMAKE_CXXFLAGS_CXX11, "std=c\+\+11", "std=c++1y")
-    QMAKE_CXXFLAGS_CXX11 = $$replace(QMAKE_CXXFLAGS_CXX11, "std=c\+\+0x", "std=c++1y")
+lessThan(QT_MAJOR_VERSION, 5) {
+    error(Qt 4 is not supported. You need at least Qt 5.9.)
 }
-
-# Qt 4 doesn't even know about C++11, let alone C++14.
-contains(QT_MAJOR_VERSION, 4) {
-    QMAKE_CXXFLAGS += -std=c++1y
+equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 9) {
+    error(Qt 5.9 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION".)
 }
-
-static:DEFINES += STATIC_QT
-
-android {
-    CONFIG += mobility
-    MOBILITY =
-}
-
 
 # Mac OS application and file icons.
 macx {
@@ -38,11 +22,6 @@ macx {
 # MS Windows executable resource.
 win32 {
     RC_FILE += qtads.rc
-}
-
-# Static OS X builds against Qt4 need to explicitly include the text codec plugins.
-macx:static:contains(QT_MAJOR_VERSION, 4) {
-    QTPLUGIN += qcncodecs qjpcodecs qtwcodecs qkrcodecs
 }
 
 macx {
@@ -454,72 +433,3 @@ SOURCES += \
     $$T3DIR/vmtzobj.cpp \
     $$T3DIR/vmundo.cpp \
     $$T3DIR/vmvec.cpp
-
-android:OTHER_FILES += \
-    android/AndroidManifest.xml \
-    android/res/values-et/strings.xml \
-    android/res/values-fa/strings.xml \
-    android/res/values-id/strings.xml \
-    android/res/drawable-ldpi/icon.png \
-    android/res/values-pt-rBR/strings.xml \
-    android/res/values-rs/strings.xml \
-    android/res/values-fr/strings.xml \
-    android/res/values-el/strings.xml \
-    android/res/values-it/strings.xml \
-    android/res/values-zh-rCN/strings.xml \
-    android/res/values-ro/strings.xml \
-    android/res/layout/splash.xml \
-    android/res/drawable/logo.png \
-    android/res/drawable/icon.png \
-    android/res/values-es/strings.xml \
-    android/res/values-ja/strings.xml \
-    android/res/values-de/strings.xml \
-    android/res/values-nb/strings.xml \
-    android/res/drawable-mdpi/icon.png \
-    android/res/values-ru/strings.xml \
-    android/res/values-ms/strings.xml \
-    android/res/values/strings.xml \
-    android/res/values/libs.xml \
-    android/res/values-pl/strings.xml \
-    android/res/drawable-hdpi/icon.png \
-    android/res/values-nl/strings.xml \
-    android/res/values-zh-rTW/strings.xml \
-    android/version.xml \
-    android/src/org/kde/necessitas/ministro/IMinistro.aidl \
-    android/src/org/kde/necessitas/ministro/IMinistroCallback.aidl \
-    android/src/org/kde/necessitas/origo/QtApplication.java \
-    android/src/org/kde/necessitas/origo/QtActivity.java \
-    android/AndroidManifest.xml \
-    android/res/values-et/strings.xml \
-    android/res/values-fa/strings.xml \
-    android/res/values-id/strings.xml \
-    android/res/drawable-ldpi/icon.png \
-    android/res/values-pt-rBR/strings.xml \
-    android/res/values-rs/strings.xml \
-    android/res/values-fr/strings.xml \
-    android/res/values-el/strings.xml \
-    android/res/values-it/strings.xml \
-    android/res/values-zh-rCN/strings.xml \
-    android/res/values-ro/strings.xml \
-    android/res/layout/splash.xml \
-    android/res/drawable/logo.png \
-    android/res/drawable/icon.png \
-    android/res/values-es/strings.xml \
-    android/res/values-ja/strings.xml \
-    android/res/values-de/strings.xml \
-    android/res/values-nb/strings.xml \
-    android/res/drawable-mdpi/icon.png \
-    android/res/values-ru/strings.xml \
-    android/res/values-ms/strings.xml \
-    android/res/values/strings.xml \
-    android/res/values/libs.xml \
-    android/res/values-pl/strings.xml \
-    android/res/drawable-hdpi/icon.png \
-    android/res/values-nl/strings.xml \
-    android/res/values-zh-rTW/strings.xml \
-    android/version.xml \
-    android/src/org/kde/necessitas/ministro/IMinistro.aidl \
-    android/src/org/kde/necessitas/ministro/IMinistroCallback.aidl \
-    android/src/org/kde/necessitas/origo/QtApplication.java \
-    android/src/org/kde/necessitas/origo/QtActivity.java \
-    android/AndroidManifest.xml

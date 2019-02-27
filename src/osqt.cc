@@ -39,11 +39,6 @@
 #endif
 
 #include <QApplication>
-#if QT_VERSION < 0x050000
-#include <QDesktopServices>
-#else
-#include <QStandardPaths>
-#endif
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
@@ -51,6 +46,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QStandardPaths>
 #include <QTemporaryFile>
 #include <QTextCodec>
 #include <QTimer>
@@ -613,12 +609,7 @@ void os_get_special_path(char* buf, size_t buflen, const char* /*argv0*/, int id
 
     case OS_GSP_T3_APP_DATA:
     case OS_GSP_LOGFILE: {
-        const QString& dirStr =
-#if QT_VERSION < 0x050000
-            QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-#else
-            QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-#endif
+        const QString& dirStr = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
         QDir dir(dirStr);
         // Create the directory if it doesn't exist.
         if (not dir.exists() and not dir.mkpath(dirStr)) {

@@ -16,12 +16,7 @@ void QTadsGameInfoEnum::tads_enum_game_info(const char* name, const char* val)
 {
     const QString& valStr = QString::fromUtf8(val);
     const QString& nameStr = QString::fromUtf8(name).toLower();
-    const QString& htmlValStr =
-#if QT_VERSION < 0x050000
-        Qt::escape(valStr);
-#else
-        valStr.toHtmlEscaped();
-#endif
+    const QString& htmlValStr = valStr.toHtmlEscaped();
 
     if (nameStr == QString::fromLatin1("name")) {
         gameName = QString::fromLatin1("<b><center><font size=\"+1\">") + htmlValStr
