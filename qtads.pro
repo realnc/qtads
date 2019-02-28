@@ -1,13 +1,13 @@
-QT += core gui network widgets
+QT += network widgets
 QT_CONFIG -= no-pkg-config
 TEMPLATE = app
-CONFIG += silent warn_off c++14
+CONFIG += silent warn_off strict_c strict_c++ c11 c++14 gc_binaries
 VERSION = 2.1.7.99
 
 lessThan(QT_MAJOR_VERSION, 5) {
     error(Qt 4 is not supported. You need at least Qt 5.9.)
 }
-equals(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 9) {
+equals(QT_MAJOR_VERSION, 5) : lessThan(QT_MINOR_VERSION, 9) {
     error(Qt 5.9 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION".)
 }
 
@@ -17,42 +17,24 @@ macx {
     OtherIcons.files = QTadsGameFile.icns
     OtherIcons.path = Contents/Resources
     QMAKE_BUNDLE_DATA += OtherIcons
+    QMAKE_INFO_PLIST = Info.plist
 }
 
 # MS Windows executable resource.
 win32 {
     RC_FILE += qtads.rc
-}
 
-macx {
-    QMAKE_INFO_PLIST = Info.plist
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
-    CONFIG += link_pkgconfig
-    QMAKE_CFLAGS += -std=gnu11 -fvisibility=hidden
-    QMAKE_CXXFLAGS += -fvisibility=hidden
-    QMAKE_LFLAGS += -dead_strip
-}
-
-win32 {
     *-g++* {
         QMAKE_CFLAGS += -march=i686 -mtune=generic
         QMAKE_CXXFLAGS += -march=i686 -mtune=generic
-        QMAKE_CFLAGS_RELEASE += -fomit-frame-pointer
-        QMAKE_CXXFLAGS_RELEASE += -fomit-frame-pointer
-
-        # Dead code stripping (requires patched binutils).
-        QMAKE_CFLAGS += -fdata-sections -ffunction-sections
-        QMAKE_CXXFLAGS += -fdata-sections -ffunction-sections
-        QMAKE_LFLAGS += -Wl,--gc-sections
-
-        # Don't dead-strip the resource section (it contains the icon,
-        # version strings, etc.)  We use a linker script to do that.
-        QMAKE_LFLAGS += $$PWD/w32_linkscript
     }
+}
 
-    # So that we can use _stat64().  This means the minimum version
-    # of Windows needed to run the application is Windows XP SP2.
-    DEFINES += __MSVCRT_VERSION__=0x0601
+macx | win32 {
+    DEFINES += OS_NO_TYPES_DEFINED
+    TARGET = QTads
+} else {
+    TARGET = qtads
 }
 
 RESOURCES += resources.qrc
@@ -61,10 +43,7 @@ RESOURCES += resources.qrc
 QMAKE_CXXFLAGS_WARN_OFF =
 QMAKE_CFLAGS_WARN_OFF =
 
-*-g++*|*-clang* {
-    # We require at least C11.
-    QMAKE_CFLAGS += -std=c11
-
+*-g++* | *-clang* {
     # For stat() and lstat().
     DEFINES += _SVID_SOURCE _DEFAULT_SOURCE
 
@@ -77,11 +56,6 @@ QMAKE_CFLAGS_WARN_OFF =
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter
     QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter
 }
-
-# Where to find the portable Tads sources.
-T2DIR = tads2
-T3DIR = tads3
-HTDIR = htmltads
 
 disable-audio {
     DEFINES += NO_AUDIO
@@ -129,6 +103,8 @@ disable-audio {
 DEFINES += \
     QT_NO_CAST_FROM_ASCII \
     QT_NO_CAST_TO_ASCII \
+    QT_DEPRECATED_WARNINGS \
+    QT_USE_QSTRINGBUILDER \
     QTADS \
     _M_LE_C11 \
     T3_COMPILING_FOR_HTML \
@@ -142,13 +118,6 @@ DEFINES += \
 #    DEFINES += VMGLOB_PARAM TADSHTML_DEBUG T3_DEBUG NEW_DELETE_NEED_THROW
 #}
 DEFINES += VMGLOB_VARS
-
-macx|win32 {
-    DEFINES += OS_NO_TYPES_DEFINED
-    TARGET = QTads
-} else {
-    TARGET = qtads
-}
 
 # These macros override some default buffer-sizes the T3VM uses for UNDO
 # operations.  QTads runs on systems with a lot of RAM (compared to DOS), so we
@@ -164,6 +133,11 @@ macx|win32 {
 #   VM_STACK_RESERVE=1024 \
 #   VM_UNDO_MAX_RECORDS=65536 \
 #   VM_UNDO_MAX_SAVEPTS=255
+
+# Where to find the portable Tads sources.
+T2DIR = tads2
+T3DIR = tads3
+HTDIR = htmltads
 
 INCLUDEPATH += \
     src \
