@@ -52,6 +52,9 @@ QMAKE_CFLAGS_WARN_OFF =
     QMAKE_CXXFLAGS += -fno-strict-aliasing
     QMAKE_CFLAGS += -fno-strict-aliasing
 
+    # TADS 3 doesn't build with C++14 sized delete.
+    QMAKE_CXXFLAGS += -fno-sized-deallocation
+
     # Avoid a flood of "unused parameter" warnings.
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter
     QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter
