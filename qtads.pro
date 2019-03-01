@@ -27,11 +27,10 @@ macx {
 
 # MS Windows executable resource.
 win32 {
-    RC_FILE += qtads.rc
-    RC_DEFINES += \
-        QTADS_VERSION=\""$$VERSION"\" \
-        W32_RC_FILEVERSION=\""$$VERSION_MAJOR","$$VERSION_MINOR","$$VERSION_PATCH",00\" \
-        W32_RC_PRODUCTVERSION=\""$$VERSION_MAJOR","$$VERSION_MINOR","$$VERSION_PATCH",00\"
+    RC_ICONS = qtads.ico
+    QMAKE_TARGET_COMPANY = "Nikos Chantziaras"
+    QMAKE_TARGET_DESCRIPTION = "QTads - A TADS Interpreter"
+    QMAKE_TARGET_COPYRIGHT = "Copyright 2013, Michael J. Roberts; 2013, Nikos Chantziaras"
 
     *-g++* {
         QMAKE_CFLAGS += -march=i686 -mtune=generic
