@@ -37,8 +37,10 @@
 int main(int argc, char** argv)
 {
     CHtmlResType::add_basic_types();
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", QTADS_VERSION,
                                                "Nikos Chantziaras", "qtads.sourceforge.net");
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     // Filename of the game to run.
     QString gameFileName;

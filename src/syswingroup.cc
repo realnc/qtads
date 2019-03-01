@@ -23,6 +23,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMimeData>
+#include <QScreen>
 #include <QTimer>
 #include <QUrl>
 #include <QVBoxLayout>
@@ -170,7 +171,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
     // Use a sane minimum size; by default Qt would allow us to be resized
     // to almost zero.
-    setMinimumSize(240, 180);
+    setMinimumSize(QApplication::primaryScreen()->availableSize() / 3);
 
     // Receive notification when a game is about to quit/start so we can
     // enable/disable related actions.

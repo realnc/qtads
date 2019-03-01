@@ -22,6 +22,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QMessageBox>
+#include <QScreen>
 #include <QStatusBar>
 #include <QTextCodec>
 #include <cstdlib>
@@ -355,7 +356,8 @@ void CHtmlSysFrameQt::entryPoint(QString gameFileName)
     if (not fSettings->appGeometry.isEmpty()) {
         fMainWin->restoreGeometry(fSettings->appGeometry);
     } else {
-        fMainWin->resize(1200, qApp->desktop()->availableGeometry().height() - 100);
+        auto h = QApplication::primaryScreen()->availableSize().height() / 1.1;
+        fMainWin->resize(h, h);
     }
     fMainWin->show();
 
