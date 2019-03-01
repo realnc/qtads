@@ -21,6 +21,7 @@
 #include <QPushButton>
 #include <QSignalMapper>
 #include <QTextCodec>
+#include <algorithm>
 
 #include "confdialog.h"
 #include "globals.h"
@@ -158,7 +159,7 @@ ConfDialog::ConfDialog(CHtmlSysWinGroupQt* parent)
             codecs.append(codecName);
         }
     }
-    qSort(codecs);
+    std::sort(codecs.begin(), codecs.end());
     for (int i = 0; i < codecs.size(); ++i) {
         if (ui->encodingComboBox->findText(QString::fromLatin1(codecs.at(i))) == -1) {
             ui->encodingComboBox->addItem(QString::fromLatin1(codecs.at(i)));
