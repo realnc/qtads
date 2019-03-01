@@ -30,7 +30,11 @@
 #include "ui_confdialog.h"
 
 ConfDialog::ConfDialog(CHtmlSysWinGroupQt* parent)
-    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint
+#ifdef Q_OS_MAC
+                          | Qt::Tool
+#endif
+              )
     , ui(new Ui::ConfDialog)
 {
     ui->setupUi(this);
