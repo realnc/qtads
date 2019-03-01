@@ -879,9 +879,9 @@ int trdmain(int argc, char *argv[], appctxdef *appctx, char *save_ext)
     /* close the error file if we opened it */
     if (errctx.errcxfp != 0)
         osfcls(errctx.errcxfp);
-	
-	/* close the command and log files, if open */
-	close_log_files();
+
+    /* close the command and log files, if open */
+    close_log_files();
 
     /* successful completion */
     return(OSEXSUCC);

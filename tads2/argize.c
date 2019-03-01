@@ -41,7 +41,7 @@ int countargs(const char *cmdline)
             while (isspace((unsigned char)*p)) p++;
             if (!*p) break;            /* If there's nothing left, get out. */
             state = 1;
-            /* fall through */;
+            /* fall through */
 
         case 1:                                                /* begin arg */
             argc++;
@@ -102,7 +102,7 @@ int argize(char *cmdline, int *const argc, char *argv[], const size_t argvlen)
             while (isspace((unsigned char)*p)) p++, q++;
             if (!*p) break;            /* If there's nothing left, get out. */
             state = 1;
-            /* fall through */;
+            /* fall through */
 
         case 1:                                                /* begin arg */
             if ((size_t)*argc < argvlen)

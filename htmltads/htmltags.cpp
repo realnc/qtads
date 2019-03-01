@@ -4361,6 +4361,7 @@ HTML_attrerr CHtmlTagBANNER::
         /* this is a REMOVEALL tag */
         remove_ = TRUE;
         removeall_ = TRUE;
+        break;
 
     case HTML_Attrib_height:
         /* note that the height has been explicitly set */

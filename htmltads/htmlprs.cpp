@@ -2247,7 +2247,6 @@ void CHtmlParser::parse_text()
     /* if it's a special unicode character, handle it specially */
     if (special != 0)
     {
-        size_t len;
         int spwid;
         
         /*
