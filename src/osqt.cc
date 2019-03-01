@@ -1109,7 +1109,7 @@ void os_rand(long* val)
 
     static bool initialized = false;
     if (not initialized) {
-        qsrand(QDateTime::currentDateTime().toTime_t());
+        qsrand(QDateTime::currentDateTimeUtc().toTime_t());
         initialized = true;
     }
     *val = qrand();
@@ -1138,7 +1138,7 @@ void os_gen_rand_bytes(unsigned char* buf, size_t len)
 
     static bool initialized = false;
     if (not initialized) {
-        qsrand(QDateTime::currentDateTime().toTime_t());
+        qsrand(QDateTime::currentDateTimeUtc().toTime_t());
         initialized = true;
     }
     for (size_t i = 0; i < len; ++i) {
