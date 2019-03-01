@@ -455,9 +455,10 @@ void CHtmlSysWinQt::addBanner(CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type,
 
 extern void os_sleep_ms(long ms);
 
-void CHtmlSysWinQt::scrollDown(bool force, bool justOneLine)
+void CHtmlSysWinQt::scrollDown(bool force, bool justOneLine, bool instant)
 {
     QScrollBar* bar = verticalScrollBar();
+    instant = not qFrame->settings()->softScrolling or instant;
 
     // If we're very small, or shouldn't scroll, or there's nothing to scroll,
     // ignore the call.
@@ -469,7 +470,7 @@ void CHtmlSysWinQt::scrollDown(bool force, bool justOneLine)
     // Simply scroll directly to the bottom if more-mode is disabled for this
     // banner or the game is in non-stop mode.
     if (not fBannerStyleModeMode or qFrame->nonStopMode()) {
-        if (qFrame->settings()->softScrolling) {
+        if (not instant) {
             while (bar->value() < bar->maximum()) {
                 bar->setValue(bar->value() + bar->singleStep());
                 os_sleep_ms(5);
@@ -487,7 +488,7 @@ void CHtmlSysWinQt::scrollDown(bool force, bool justOneLine)
     if (fInPagePauseMode) {
         if (justOneLine) {
             bar->triggerAction(QAbstractSlider::SliderSingleStepAdd);
-        } else if (qFrame->settings()->softScrolling) {
+        } else if (not instant) {
             int target = bar->value() + bar->pageStep() - bar->singleStep() * 2;
             while (bar->value() < target and bar->value() < bar->maximum()) {
                 bar->setValue(bar->value() + bar->singleStep());
@@ -496,7 +497,7 @@ void CHtmlSysWinQt::scrollDown(bool force, bool justOneLine)
         } else {
             bar->setValue(bar->value() + bar->pageStep() - bar->singleStep() * 2);
         }
-    } else if (qFrame->settings()->softScrolling) {
+    } else if (not instant) {
         while (bar->value() < lastInputHeight and bar->value() < bar->maximum()) {
             bar->setValue(bar->value() + bar->singleStep());
             os_sleep_ms(5);
@@ -908,7 +909,7 @@ void CHtmlSysWinQt::fmt_adjust_vscroll()
         dispWidget->resize(dispWidget->width(), viewport()->height());
     } else {
         dispWidget->resize(dispWidget->width(), targetHt);
-        scrollDown(false, false);
+        scrollDown(false, false, false);
     }
 }
 

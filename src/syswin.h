@@ -145,7 +145,7 @@ public:
     // Scroll down by a page while keeping track of when to page-pause.  The
     // 'force' flag controls whether we should scroll even while waiting for
     // input in page-pause mode.
-    void scrollDown(bool force, bool justOneLine);
+    void scrollDown(bool force, bool justOneLine, bool instant);
 
     //
     // CHtmlSysWin interface implementation.

@@ -212,10 +212,17 @@ void CHtmlSysWinInputQt::keyPressEvent(QKeyEvent* e)
     if (fInputMode == PagePauseInput) {
         if (e->key() == Qt::Key_Space) {
             // Scroll down by a page.
-            fPagePauseQueue.head()->scrollDown(true, false);
+            fPagePauseQueue.head()->scrollDown(true, false, false);
         } else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
             // Scroll down by a line.
-            fPagePauseQueue.head()->scrollDown(true, true);
+            fPagePauseQueue.head()->scrollDown(true, true, false);
+        } else if (e->matches(QKeySequence::MoveToEndOfLine)
+                   or e->matches(QKeySequence::MoveToEndOfDocument) or e->key() == Qt::Key_End) {
+            // Scroll down to the bottom instantly.
+            bool prevMode = qFrame->nonStopMode();
+            qFrame->set_nonstop_mode(true);
+            fPagePauseQueue.head()->scrollDown(true, false, true);
+            qFrame->set_nonstop_mode(prevMode);
         }
         return;
     }
