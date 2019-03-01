@@ -67,7 +67,7 @@ void DisplayWidgetInput::paintEvent(QPaintEvent* e)
 void DisplayWidgetInput::resizeEvent(QResizeEvent* e)
 {
     DisplayWidget::resizeEvent(e);
-    updateCursorPos(formatter, true, false);
+    QTimer::singleShot(0, this, [this] { updateCursorPos(formatter, true, false); });
 }
 
 void DisplayWidgetInput::mousePressEvent(QMouseEvent* e)
