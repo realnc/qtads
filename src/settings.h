@@ -69,7 +69,7 @@ public:
     QStringList recentGamesList;
     static const int recentGamesCapacity = 10;
 
-    QSize appSize;
+    QByteArray appGeometry;
     QDate lastUpdateDate;
     enum UpdateFreq
     {

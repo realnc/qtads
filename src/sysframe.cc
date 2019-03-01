@@ -351,8 +351,12 @@ bool CHtmlSysFrameQt::event(QEvent* e)
 
 void CHtmlSysFrameQt::entryPoint(QString gameFileName)
 {
-    // Restore the application's size.
-    fMainWin->resize(fSettings->appSize);
+    // Restore the application's size and position.
+    if (not fSettings->appGeometry.isEmpty()) {
+        fMainWin->restoreGeometry(fSettings->appGeometry);
+    } else {
+        fMainWin->resize(740, 540);
+    }
     fMainWin->show();
 
     // Do an online update check.

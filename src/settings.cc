@@ -122,7 +122,8 @@ void Settings::loadFromDisk()
     }
     sett.endGroup();
 
-    appSize = sett.value(QString::fromLatin1("geometry/size"), QSize(740, 540)).toSize();
+    appGeometry =
+        sett.value(QString::fromLatin1("geometry/appgeometry"), QByteArray()).toByteArray();
     lastUpdateDate = sett.value(QString::fromLatin1("update/lastupdatedate"), QDate()).toDate();
     updateFreq = static_cast<UpdateFreq>(
         sett.value(QString::fromLatin1("update/updatefreq"), UpdateDaily).toInt());
@@ -182,7 +183,7 @@ void Settings::saveToDisk()
     sett.setValue(QString::fromLatin1("games"), recentGamesList);
     sett.endGroup();
 
-    sett.setValue(QString::fromLatin1("geometry/size"), qWinGroup->size());
+    sett.setValue(QString::fromLatin1("geometry/appgeometry"), qWinGroup->saveGeometry());
     sett.setValue(QString::fromLatin1("update/lastupdatedate"), lastUpdateDate);
     sett.setValue(QString::fromLatin1("update/updatefreq"), updateFreq);
     sett.sync();
