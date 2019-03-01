@@ -3,7 +3,9 @@
 # else
 #  include <winver.h>
 # endif
-#include "src/globals.h"
+
+#define STRINGIFY(x) #x
+#define QTADS_VERSION_STR(x) STRINGIFY(x)
 
 IDI_ICON1 ICON DISCARDABLE "qtads.ico"
 
@@ -26,8 +28,8 @@ VS_VERSION_INFO VERSIONINFO
 			BEGIN
 				VALUE "CompanyName", "Nikos Chantziaras"
 				VALUE "FileDescription", "QTads - A TADS Interpreter"
-				VALUE "FileVersion", QTADS_VERSION
-				VALUE "ProductVersion", QTADS_VERSION
+				VALUE "FileVersion", QTADS_VERSION_STR(QTADS_VERSION)
+				VALUE "ProductVersion", QTADS_VERSION_STR(QTADS_VERSION)
 				VALUE "LegalCopyright", "Copyright 2013, Michael J. Roberts; 2013, Nikos Chantziaras"
 				VALUE "OriginalFilename", "QTads.exe"
 				VALUE "ProductName", "QTads"

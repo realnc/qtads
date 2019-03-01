@@ -37,8 +37,8 @@
 int main(int argc, char** argv)
 {
     CHtmlResType::add_basic_types();
-    CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", "2.0", "Nikos Chantziaras",
-                                               "qtads.sourceforge.net");
+    CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", QTADS_VERSION,
+                                               "Nikos Chantziaras", "qtads.sourceforge.net");
 
     // Filename of the game to run.
     QString gameFileName;

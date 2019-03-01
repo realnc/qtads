@@ -2,7 +2,12 @@ QT += network widgets
 QT_CONFIG -= no-pkg-config
 TEMPLATE = app
 CONFIG += silent warn_off strict_c strict_c++ c11 c++14 gc_binaries
-VERSION = 2.1.7.99
+
+VERSION_MAJOR = 2
+VERSION_MINOR = 1
+VERSION_PATCH = 7
+VERSION = "$$VERSION_MAJOR"."$$VERSION_MINOR"."$$VERSION_PATCH"
+DEFINES += QTADS_VERSION=\\\"$$VERSION\\\"
 
 lessThan(QT_MAJOR_VERSION, 5) {
     error(Qt 4 is not supported. You need at least Qt 5.9.)
@@ -23,6 +28,10 @@ macx {
 # MS Windows executable resource.
 win32 {
     RC_FILE += qtads.rc
+    RC_DEFINES += \
+        QTADS_VERSION=\""$$VERSION"\" \
+        W32_RC_FILEVERSION=\""$$VERSION_MAJOR","$$VERSION_MINOR","$$VERSION_PATCH",00\" \
+        W32_RC_PRODUCTVERSION=\""$$VERSION_MAJOR","$$VERSION_MINOR","$$VERSION_PATCH",00\"
 
     *-g++* {
         QMAKE_CFLAGS += -march=i686 -mtune=generic
