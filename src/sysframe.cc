@@ -355,7 +355,7 @@ void CHtmlSysFrameQt::entryPoint(QString gameFileName)
     if (not fSettings->appGeometry.isEmpty()) {
         fMainWin->restoreGeometry(fSettings->appGeometry);
     } else {
-        fMainWin->resize(740, 540);
+        fMainWin->resize(1200, qApp->desktop()->availableGeometry().height() - 100);
     }
     fMainWin->show();
 
