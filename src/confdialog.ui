@@ -226,9 +226,6 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="fontFilters">
-              <set>QFontComboBox::MonospacedFonts</set>
-             </property>
             </widget>
            </item>
            <item>
