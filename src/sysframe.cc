@@ -482,7 +482,7 @@ CHtmlSysFontQt* CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc)
                 matchFound = true;
             } else {
                 newFont.setFamily(s);
-                if (newFont.exactMatch()) {
+                if (s.compare(QFontInfo(newFont).family().trimmed(), Qt::CaseInsensitive) == 0) {
                     matchFound = true;
                     fontName = s;
                 }
