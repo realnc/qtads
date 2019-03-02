@@ -1,23 +1,64 @@
 Git
 ===
 
-  - Improved audio engine. Game audio data is now streamed directly from the
-    game and decoded on the fly rather than being decoded in advance,
-    eliminating the delay and memory use spike when playing large audio tracks.
+  - Improved audio engine:
 
-    Also, MIDI music is now rendered using an internal synthesizer (FluidSynth)
-    and thus it no longer matters whether or not the operating system supports
+    Game audio is now streamed directly from the game and decoded in real-time
+    rather than all of it being extracted and decoded in advance. This
+    eliminates the delay and memory use spike in games with long audio tracks.
+
+    Resampling quality is improved and the engine will now correctly apply
+    resampling (if needed) in all cases. Previously, certain sample rates could
+    cause resampling to be skipped, resulting in audio that plays at the wrong
+    speed.
+
+    MIDI music is now rendered using an internal synthesizer (FluidSynth) and
+    thus it no longer matters whether or not the operating system supports
     MIDI.
 
-  - Fixed an issue that prevented games from coloring links.
+  - The maximum text width of the game's main window is now configurable (set
+    to 70 characters by default. This only applies to the main window. Banner
+    windows created by the game are not affected.
 
-  - Building the interpreter now requires at least C11 and C++14.
+  - Fixed an issue that prevented games from applying custom colors to links.
+
+  - The interpreter now restores the old window position on startup, not just
+    the size.
+
+  - You can now press the END key (or whatever shortcut the system uses for
+    jumping to the end of a text line or document) during MORE prompts to jump
+    straight to the bottom of the text, bypassing further prompts.
+
+  - Fixed an issue where the interpreter sometimes failed to set custom fonts
+    requested by the game.
+
+  - The "Typewriter" font selector now allows selecting proportional fonts.
+    Many typewriter fonts don't seem to identify themselves as fixed-width.
+    Lift the restriction so that they can be selected in the font combo box.
+
+  - Fixed a possible crash when clicking on an in-game URL and the default
+    browser on Windows is set to Microsoft Edge.
+
+  - Improvements for high DPI displays.
 
   - TADS VM code fixes.
+
+  - Building the interpreter now requires at least C11, C++14 and Qt 5.9 or
+    newer.
 
   - It's now possible to build the interpreter without audio support:
 
       qmake -config disable-audio
+
+  - The project has moved from sourceforge to github. New homepage:
+
+      https://realnc.github.io/qtads
+
+    New project page:
+
+      https://github.com/realnc/qtads
+
+    The sourceforge project is still there, but only serves as a mirror.
 
 
 2.1.7 - 2016-01-21

@@ -31,11 +31,11 @@ the distribution include:
 
 The newest version of QTads can be downloaded from its homepage at:
 
-    http://qtads.sourceforge.net
+    https://realnc.github.io/qtads
 
-Previous versions can be found at the project page:
+Previous versions can be found at:
 
-    http://sourceforge.net/projects/qtads
+    https://github.com/realnc/qtads/releases
 
 
 About Tads and QTads
@@ -45,60 +45,38 @@ QTads is a so called "interpreter" for games created with the Text
 Adventure Development System, or "Tads" for short, a C-like object
 oriented programming language for authoring Interactive Fiction
 (similar to the Infocom or Legend Entertainment games, like "Zork").
-Yes, we are talking about text adventures here.
 
 The Tads compiler creates executables for the Tads Virtual Machine (the
 "Tads VM").  QTads is an implementation of this Virtual Machine; it
-runs Tads VM executables.  One can also say that QTads is a Tads VM
-emulator.  This is similar to Java; the Java compiler creates JavaVM
-programs which must be executed with a JavaVM implementation.
+runs Tads VM programs.
 
 Both Tads 2 as well as Tads 3 games are supported.
 
-QTads is not written from scratch; it uses Mike Roberts' portable
-reference implementations of the two Tads VMs; the T2 VM (written in C)
-and T3 VM (written in C++).
+QTads is not written from scratch; it uses Mike Roberts' reference
+implementations of the Tads VM.
 
 For more information about Tads, visit its home page:
 
-    http://www.tads.org
+    https://www.tads.org
 
 
 On what systems does it run?
 ============================
 
-Theoretically, it should run on *any* system for which a Qt-port exists
-(many Unices, including Linux and Mac OSX, Windows, Haiku, even embedded
-devices like cell phones and PDAs).  The systems it is known to run are
-Linux, Mac OS X 10.5 and newer, MS Windows XP/Vista/7 and Haiku.
+Theoretically, it should run on *any* system for which a version of Qt
+exists.  The main targets however are Linux, macOS and Windows.
 
 
-What's Interactive Fiction?
-===========================
+Where do I find games?
+======================
 
-Well, this is just a poor README file and therefore not the appropriate
-place for an introduction to Interactive Fiction.  For more information
-about Interactive Fiction (or "IF" for short), just go to the Tads page
-(see above) and follow some links.  Or search for "interactive fiction"
-in Google; you'll be amazed about how many results you'll get.  And
-you'll be even more amazed about how active the IF community is.
-
-At qtads.sourceforge.net you can find further information about online
-places where the community gathers and where to find games.
-
-
-I don't like QTads.  It sucks.
-==============================
-
-Then help me improve it.  Send me suggestions and bug reports, or even
-code if you know C++ and Qt.  Now!  Don't be afraid to do it.  Thank
-you.
+https://realnc.github.io/qtads/#games
 
 
 Copyright
 =========
 
-QTads is Copyright (C) 2013 by Nikos Chantziaras.
+Copyright (C) 2013, Nikos Chantziaras.
 
 QTads is free software; you can redistribute it and/or modify it either
 under the terms of the HTML TADS Freeware Source Code License as
