@@ -762,15 +762,15 @@ void CHtmlSysWinInputQt::insertText(QString str)
 void CHtmlSysWinInputQt::updateFormatterMargins()
 {
     const auto& sett = *qFrame->settings();
-    QFontMetricsF metrics(sett.mainFont);
     if (sett.textWidth < 1) {
-        formatter_->set_phys_margins(8, margins.top, 8, margins.bottom);
-        return;
+        margins.left = 8;
+        margins.right = 8;
+    } else {
+        int wantedWidth = QFontMetricsF(sett.mainFont).averageCharWidth() * sett.textWidth;
+        int sideMargin = std::max(8, ((int)get_disp_width() - wantedWidth) / 2);
+        margins.left = margins.right = sideMargin;
     }
-    int wantedWidth = metrics.averageCharWidth() * sett.textWidth;
-    int sideMargin = std::max(8, ((int)get_disp_width() - wantedWidth) / 2);
-    formatter_->set_phys_margins(sideMargin, margins.top, sideMargin, margins.bottom);
-    QTimer::singleShot(0, this, [this] { doReformat(false, true, false); });
+    formatter_->set_phys_margins(margins.left, margins.top, margins.right, margins.bottom);
 }
 
 void CHtmlSysWinInputQt::set_html_input_color(HTML_color_t clr, int use_default)
