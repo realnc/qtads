@@ -216,6 +216,8 @@ void CHtmlSysFrameQt::fRunGame()
             fGameWin = new CHtmlSysWinInputQt(fFormatter, qWinGroup->centralWidget());
             fGameWin->resize(qWinGroup->centralWidget()->size());
             fGameWin->show();
+            fGameWin->updateFormatterMargins();
+            fFormatter->start_at_top(false);
             fGameWin->setFocus();
 
             // Set the application's window title to contain the filename of
