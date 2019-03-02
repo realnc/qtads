@@ -266,7 +266,7 @@ void CHtmlSysWinGroupQt::fCheckForUpdates()
 
     fHttpRedirectCount = 0;
     fReply = sendNetRequest(
-        fNetManager, QUrl(QString::fromLatin1("http://qtads.sourceforge.net/currentversion")));
+        fNetManager, QUrl(QString::fromLatin1("https://realnc.github.io/qtads/currentversion")));
 }
 
 static void showUpdateErrorMsg(const QString& detailedText)
@@ -382,7 +382,7 @@ void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
         msgBox->setDefaultButton(QMessageBox::Yes);
         if (msgBox->exec() == QMessageBox::Yes) {
             QDesktopServices::openUrl(
-                QUrl(QString::fromLatin1("http://qtads.sourceforge.net/downloads.shtml")));
+                QUrl(QString::fromLatin1("https://realnc.github.io/qtads/#downloads")));
         }
     } else if (not fSilentIfNoUpdates) {
 #ifdef Q_OS_MAC

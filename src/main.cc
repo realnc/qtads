@@ -38,6 +38,8 @@ int main(int argc, char** argv)
 {
     CHtmlResType::add_basic_types();
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    // Keep our "qtads.sourceforge.net" organization domain, since it's used by QSettings and we
+    // want to be able to load settings from previous versions.
     CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", QTADS_VERSION,
                                                "Nikos Chantziaras", "qtads.sourceforge.net");
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);

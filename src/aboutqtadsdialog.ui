@@ -25,7 +25,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>&lt;h3&gt;&lt;a href=&quot;http://qtads.sourceforge.net&quot;&gt;&lt;img src=&quot;:/qtads-logo.png&quot; /&gt;&lt;/a&gt;
+          <string>&lt;h3&gt;&lt;a href=&quot;https://realnc.github.io/qtads&quot;&gt;&lt;img src=&quot;:/qtads-logo.png&quot; /&gt;&lt;/a&gt;
 &lt;br&gt;A Multimedia TADS Interpreter&lt;/h3&gt;
 
 &lt;p&gt;
@@ -153,7 +153,7 @@ And of course, Mike Roberts; if there would be no Mike, there would be no Tads!<
 
 &lt;p&gt;&amp;nbsp;&amp;nbsp;&lt;a href=&quot;mailto:Nikos Chantziaras &lt;realnc@gmail.com&gt;&quot;&gt;Nikos Chantziaras &amp;lt;realnc@gmail.com&amp;gt;&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;For up to date information about QTads, you can visit its &lt;a href=&quot;http://qtads.sourceforge.net&quot;&gt;homepage&lt;/a&gt;.&lt;/p&gt;</string>
+&lt;p&gt;For up to date information about QTads, you can visit its &lt;a href=&quot;https://realnc.github.io/qtads&quot;&gt;homepage&lt;/a&gt;.&lt;/p&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -205,7 +205,7 @@ And of course, Mike Roberts; if there would be no Mike, there would be no Tads!<
        <item>
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>&lt;p&gt;You can redistribute and/or modify QTads either under the terms of the &lt;a href=&quot;http://qtads.sourceforge.net/LICENSE.TXT&quot;&gt;HTML TADS Freeware Source Code License&lt;/a&gt;, or under the terms of the &lt;a href=&quot;http://qtads.sourceforge.net/COPYING&quot;&gt;GNU General Public License&lt;/a&gt; as published by the Free Software Foundation (either version 2 of the license, or, at your option, any later version).&lt;/p&gt;</string>
+          <string>&lt;p&gt;You can redistribute and/or modify QTads either under the terms of the &lt;a href=&quot;https://realnc.github.io/qtads/LICENSE.TXT&quot;&gt;HTML TADS Freeware Source Code License&lt;/a&gt;, or under the terms of the &lt;a href=&quot;https://realnc.github.io/qtads/gpl-3.0-standalone.html&quot;&gt;GNU General Public License&lt;/a&gt; as published by the Free Software Foundation (either version 2 of the license, or, at your option, any later version).&lt;/p&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
