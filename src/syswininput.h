@@ -162,6 +162,8 @@ public:
         return fInputMode == NormalInput;
     }
 
+    void updateFormatterMargins();
+
     //
     // CHtmlSysWin interface implementation.
     //

@@ -65,6 +65,7 @@ public:
     bool confirmRestartGame;
     bool confirmQuitGame;
     QString lastFileOpenDir;
+    int textWidth = 70;
 
     QStringList recentGamesList;
     static const int recentGamesCapacity = 10;

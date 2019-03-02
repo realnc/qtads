@@ -178,6 +178,15 @@ ConfDialog::ConfDialog(CHtmlSysWinGroupQt* parent)
     ui->askForGameFileCheckBox->setChecked(sett->askForGameFile);
     ui->confirmRestartCheckBox->setChecked(sett->confirmRestartGame);
     ui->confirmQuitCheckBox->setChecked(sett->confirmQuitGame);
+    if (sett->textWidth > 0) {
+        ui->limitWidthCheckBox->setChecked(true);
+        ui->limitWidthSpinBox->setValue(sett->textWidth);
+    } else {
+        ui->limitWidthCheckBox->setChecked(false);
+        ui->limitWidthSpinBox->setEnabled(false);
+    }
+    connect(ui->limitWidthCheckBox, &QCheckBox::toggled, ui->limitWidthSpinBox,
+            &QSpinBox::setEnabled);
 
     switch (sett->updateFreq) {
     case Settings::UpdateOnEveryStart:
@@ -299,6 +308,8 @@ void ConfDialog::fMakeInstantApply()
     connect(ui->askForGameFileCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->confirmRestartCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
     connect(ui->confirmQuitCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->limitWidthCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->limitWidthSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
 }
 
 void ConfDialog::fApplySettings()
@@ -369,6 +380,11 @@ void ConfDialog::fApplySettings()
     sett->askForGameFile = ui->askForGameFileCheckBox->isChecked();
     sett->confirmRestartGame = ui->confirmRestartCheckBox->isChecked();
     sett->confirmQuitGame = ui->confirmQuitCheckBox->isChecked();
+    if (ui->limitWidthCheckBox->isChecked()) {
+        sett->textWidth = ui->limitWidthSpinBox->value();
+    } else {
+        sett->textWidth = 0;
+    }
     if (ui->updateOnStartRadioButton->isChecked()) {
         sett->updateFreq = Settings::UpdateOnEveryStart;
     } else if (ui->updateDailyRadioButton->isChecked()) {

@@ -697,6 +697,8 @@ void CHtmlSysFrameQt::notifyPreferencesChange(const Settings* sett)
                            widgetRect.y() + widgetRect.height());
     fFormatter->inval_links_on_screen(&documentRect);
 
+    qFrame->gameWindow()->updateFormatterMargins();
+
     // Reformat everything so that changes in fonts/colors/etc become visible
     // immediately.
     qFrame->reformatBanners(true, true, false);

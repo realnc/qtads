@@ -193,6 +193,7 @@ void CHtmlSysWinInputQt::resizeEvent(QResizeEvent* event)
     if (fCastDispWidget->isCursorVisible()) {
         fCastDispWidget->updateCursorPos(formatter_, true, true);
     }
+    updateFormatterMargins();
 }
 
 void CHtmlSysWinInputQt::keyPressEvent(QKeyEvent* e)
@@ -756,6 +757,20 @@ void CHtmlSysWinInputQt::insertText(QString str)
     }
     fCastDispWidget->clearSelection();
     fUpdateInputFormatter();
+}
+
+void CHtmlSysWinInputQt::updateFormatterMargins()
+{
+    const auto& sett = *qFrame->settings();
+    QFontMetricsF metrics(sett.mainFont);
+    if (sett.textWidth < 1) {
+        formatter_->set_phys_margins(8, margins.top, 8, margins.bottom);
+        return;
+    }
+    int wantedWidth = metrics.averageCharWidth() * sett.textWidth;
+    int sideMargin = std::max(8, ((int)get_disp_width() - wantedWidth) / 2);
+    formatter_->set_phys_margins(sideMargin, margins.top, sideMargin, margins.bottom);
+    QTimer::singleShot(0, this, [this] { doReformat(false, true, false); });
 }
 
 void CHtmlSysWinInputQt::set_html_input_color(HTML_color_t clr, int use_default)

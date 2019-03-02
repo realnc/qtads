@@ -105,6 +105,7 @@ void Settings::loadFromDisk()
     askForGameFile = sett.value(QString::fromLatin1("askforfileatstart"), false).toBool();
     confirmRestartGame = sett.value(QString::fromLatin1("confirmrestartgame"), true).toBool();
     confirmQuitGame = sett.value(QString::fromLatin1("confirmquitgame"), true).toBool();
+    textWidth = sett.value(QString::fromLatin1("linewidth"), textWidth).toInt();
     lastFileOpenDir =
         sett.value(QString::fromLatin1("lastFileOpenDir"), QString::fromLatin1("")).toString();
     sett.endGroup();
@@ -176,6 +177,7 @@ void Settings::saveToDisk()
     sett.setValue(QString::fromLatin1("askforfileatstart"), askForGameFile);
     sett.setValue(QString::fromLatin1("confirmrestartgame"), confirmRestartGame);
     sett.setValue(QString::fromLatin1("confirmquitgame"), confirmQuitGame);
+    sett.setValue(QString::fromLatin1("linewidth"), textWidth);
     sett.setValue(QString::fromLatin1("lastFileOpenDir"), lastFileOpenDir);
     sett.endGroup();
 
