@@ -595,17 +595,6 @@ void CHtmlSysWinQt::draw_text(int hilite, long x, long y, CHtmlSysFont* font, co
         return;
     }
 
-    if (fBannerStyleGrid) {
-        // qDebug() << QString::fromUtf8(str, len);
-        const QString qStr(QString::fromUtf8(str, len));
-        // qDebug() << qStr;
-        if (qStr.startsWith(QString::fromUtf8("α"))) {
-            // qDebug() << len;
-            // abort();
-            // printf("%.*s\n", (int)len, str);
-        }
-    }
-
     QPainter painter(dispWidget);
     fSetupPainterForFont(painter, hilite, font);
     painter.drawText(x, y + painter.fontMetrics().ascent(), QString::fromUtf8(str, len));
