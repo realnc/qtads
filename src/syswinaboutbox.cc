@@ -12,6 +12,9 @@ CHtmlSysWinAboutBoxQt::CHtmlSysWinAboutBoxQt(class CHtmlFormatter* formatter, QW
     setMinimumSize(200, 140);
 }
 
+// Without this, building with LTO enabled on mingw doesn't work. No idea why.
+CHtmlSysWinAboutBoxQt::~CHtmlSysWinAboutBoxQt() = default;
+
 void CHtmlSysWinAboutBoxQt::resizeEvent(QResizeEvent* e)
 {
     formatter_->start_at_top(false);

@@ -23,6 +23,7 @@ protected:
 
 public:
     CHtmlSysWinAboutBoxQt(class CHtmlFormatter* formatter, QWidget* parent);
+    ~CHtmlSysWinAboutBoxQt() override;
 
     // We have scrollbars always disabled, so we can report our own
     // width/height rather than our viewport's.  We need to do that because
