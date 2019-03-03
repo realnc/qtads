@@ -1,5 +1,0 @@
-SECTIONS {
-    .rsrc : {
-        KEEP(*(.rsrc))
-    }
-}
