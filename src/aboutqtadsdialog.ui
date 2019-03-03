@@ -17,7 +17,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="aboutLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
            <horstretch>0</horstretch>
@@ -25,17 +25,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>&lt;h3&gt;&lt;a href=&quot;https://realnc.github.io/qtads&quot;&gt;&lt;img src=&quot;:/qtads-logo.png&quot; /&gt;&lt;/a&gt;
-&lt;br&gt;A Multimedia TADS Interpreter&lt;/h3&gt;
-
-&lt;p&gt;
-TADS Copyright © 2013 Michael J. Roberts&lt;br&gt;
-QTads Copyright © 2019 Nikos Chantziaras
-&lt;/p&gt;
-
-&lt;p&gt;
-QTads comes with NO WARRANTY, to the extent permitted by law. You may redistribute copies of QTads under certain terms and conditions. Click on the &amp;ldquo;License&amp;rdquo; tab for more information.
-&lt;/p&gt;</string>
+          <string/>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -55,7 +45,7 @@ QTads comes with NO WARRANTY, to the extent permitted by law. You may redistribu
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>Thanks To</string>
+       <string>Contributors</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -112,7 +102,7 @@ Thanks fly out to:
 
 for the ideas, source code and bug reports. Also thanks to everyone who donated to this project.
 
-And of course, Mike Roberts; if there would be no Mike, there would be no Tads!</string>
+Special thanks to Mike Roberts for creating TADS and for providing help and explaining the inner workings of TADS.</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::TextBrowserInteraction</set>
@@ -136,85 +126,6 @@ And of course, Mike Roberts; if there would be no Mike, there would be no Tads!<
          </property>
          <property name="textInteractionFlags">
           <set>Qt::TextBrowserInteraction</set>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_4">
-      <attribute name="title">
-       <string>Contact</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>&lt;p&gt;For suggestions, issues, queries, bug reports, or any form of feedback, please contact:&lt;/p&gt;
-
-&lt;p&gt;&amp;nbsp;&amp;nbsp;&lt;a href=&quot;mailto:Nikos Chantziaras &lt;realnc@gmail.com&gt;&quot;&gt;Nikos Chantziaras &amp;lt;realnc@gmail.com&amp;gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;For up to date information about QTads, you can visit its &lt;a href=&quot;https://realnc.github.io/qtads&quot;&gt;homepage&lt;/a&gt;.&lt;/p&gt;</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-         <property name="openExternalLinks">
-          <bool>true</bool>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_5">
-      <attribute name="title">
-       <string>Begware</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>&lt;p&gt;QTads is Free and Open Source Software and hence you are free to use, copy and even modify it. It is also &amp;ldquo;Begware&amp;rdquo;, meaning that you can get it at no cost, but we beg you to make a donation if you think the software is worth it.&lt;/p&gt;
-
-&lt;center&gt;&lt;p&gt;
-&lt;a href=&quot;https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2S3Y8SMHHHUQL&quot;&gt;Donate through PayPal&lt;/a&gt;
-&lt;/p&gt;
-
-&lt;p&gt;Thank you for supporting this project!&lt;/p&gt;&lt;/center&gt;</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-         <property name="openExternalLinks">
-          <bool>true</bool>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_6">
-      <attribute name="title">
-       <string>License</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_7">
-       <item>
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>&lt;p&gt;You can redistribute and/or modify QTads either under the terms of the &lt;a href=&quot;https://realnc.github.io/qtads/LICENSE.TXT&quot;&gt;HTML TADS Freeware Source Code License&lt;/a&gt;, or under the terms of the &lt;a href=&quot;https://realnc.github.io/qtads/gpl-3.0-standalone.html&quot;&gt;GNU General Public License&lt;/a&gt; as published by the Free Software Foundation (either version 2 of the license, or, at your option, any later version).&lt;/p&gt;</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-         <property name="openExternalLinks">
-          <bool>true</bool>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
          </property>
         </widget>
        </item>
