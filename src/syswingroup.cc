@@ -441,7 +441,8 @@ void CHtmlSysWinGroupQt::fShowAboutGame()
         return;
     }
     if (fAboutBoxDialog == 0) {
-        fAboutBoxDialog = new QDialog(this, Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        fAboutBoxDialog = new QDialog(this, Qt::WindowTitleHint | Qt::WindowSystemMenuHint
+                                                | Qt::WindowCloseButtonHint);
         fAboutBoxDialog->setWindowTitle(tr("About This Game"));
         fAboutBox->setParent(fAboutBoxDialog);
         QVBoxLayout* layout = new QVBoxLayout(fAboutBoxDialog);

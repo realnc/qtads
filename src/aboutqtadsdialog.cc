@@ -8,7 +8,7 @@
 #include "vmvsn.h"
 
 AboutQtadsDialog::AboutQtadsDialog(QWidget* parent)
-    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint)
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
     , ui(new Ui::AboutQtadsDialog)
 {
     ui->setupUi(this);
