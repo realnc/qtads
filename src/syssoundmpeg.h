@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef SYSSOUNDMPEG_H
-#define SYSSOUNDMPEG_H
-
+#pragma once
 #include "config.h"
 #include "htmlsys.h"
 #include "qtadssound.h"
@@ -46,8 +44,6 @@ public:
 
     void resume() override;
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

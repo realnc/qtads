@@ -1,6 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#pragma once
 
 #ifdef __cplusplus
 /* Works like qApp, but contains the global CHtmlSysFrameQt object instead.  If
@@ -16,8 +15,6 @@ extern class CHtmlSysFrameQt* qFrame;
  * this is a singleton object and it's handy to have a global pointer to it.
  */
 extern class CHtmlSysWinGroupQt* qWinGroup;
-#endif
-
 #endif
 
 /*

@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef DISPWIDGETINPUT_H
-#define DISPWIDGETINPUT_H
-
+#pragma once
 #include "config.h"
 #include "dispwidget.h"
 
@@ -88,8 +86,6 @@ public:
 
     void clearSelection() override;
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

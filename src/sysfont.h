@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef SYSFONT_H
-#define SYSFONT_H
-
+#pragma once
 #include <QColor>
 #include <QFontInfo>
 #include <QFontMetrics>
@@ -100,8 +98,6 @@ public:
         return QFontInfo(*this).pixelSize();
     }
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

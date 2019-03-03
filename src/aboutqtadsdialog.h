@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef ABOUTQTADSDIALOG_H
-#define ABOUTQTADSDIALOG_H
-
+#pragma once
 #include <QDialog>
 
 #include "config.h"
@@ -21,8 +19,6 @@ public:
 private:
     Ui::AboutQtadsDialog* ui;
 };
-
-#endif // ABOUTQTADSDIALOG_H
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

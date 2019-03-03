@@ -1,9 +1,4 @@
 // This is copyrighted software. More information is at the end of this file.
-
-/* ChangeLog:
- *     2002/12/17 Niko  - Creation
- */
-
 #include "globals.h"
 #include "std.h"
 

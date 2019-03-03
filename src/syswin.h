@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef SYSWIN_H
-#define SYSWIN_H
-
+#pragma once
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QScrollArea>
@@ -285,8 +283,6 @@ public:
 
     void get_banner_info(HTML_BannerWin_Pos_t* pos, unsigned long* style) override;
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

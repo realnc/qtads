@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef QTADSIMAGE_H
-#define QTADSIMAGE_H
-
+#pragma once
 #include <QImage>
 
 #include "htmlsys.h"
@@ -25,8 +23,6 @@ public:
     // using to repaint the window.
     void drawFromPaintEvent(CHtmlSysWin* win, class CHtmlRect* pos, htmlimg_draw_mode_t mode);
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

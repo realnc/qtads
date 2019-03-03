@@ -1,12 +1,11 @@
 // This is copyrighted software. More information is at the end of this file.
+#pragma once
 
 /* Qt-specific Tads OS functions.
  *
  * This file *must not* contain C++ code, since it gets included from
  * the portable Tads C code.
  */
-#ifndef OSQT_H
-#define OSQT_H
 
 /* The system headers should never be included from inside an extern "C" block.
  * However, we are included from tads2/os.h from inside such a block ourselves,
@@ -326,8 +325,6 @@ int osfmode(const char* fname, int follow_links, unsigned long* mode, unsigned l
 // os_asprintf( char** bufptr, const char* fmt, ... );
 
 int os_vasprintf(char** bufptr, const char* fmt, va_list ap);
-
-#endif /* OSQT_H */
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

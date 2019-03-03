@@ -1,5 +1,9 @@
 // This is copyrighted software. More information is at the end of this file.
 
+// Do not use "#pragma once" here, stuff might break. TADS does weird things in
+// its include order and sometimes includes the same header multiple times with
+// different preprocessor defitions.
+
 /* This file should be included ONLY by html_os.h, which serves as the
  * switchboard for OS header inclusion.  Do not include this file directly from
  * from any other file.

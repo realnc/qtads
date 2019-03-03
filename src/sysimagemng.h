@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef SYSIMAGEMNG_H
-#define SYSIMAGEMNG_H
-
+#pragma once
 #include <QDebug>
 #include <QMovie>
 
@@ -89,8 +87,6 @@ public:
         qDebug() << Q_FUNC_INFO;
     }
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

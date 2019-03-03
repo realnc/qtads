@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef DISPWIDGET_H
-#define DISPWIDGET_H
-
+#pragma once
 #include <QDebug>
 #include <QTime>
 #include <QWidget>
@@ -97,8 +95,6 @@ public:
     // TODO: What happens with multi-pointer systems?
     void updateLinkTracking(const QPoint& pos);
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

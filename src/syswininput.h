@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef SYSWININPUT_H
-#define SYSWININPUT_H
-
+#pragma once
 #include <QQueue>
 
 #include "config.h"
@@ -153,8 +151,6 @@ public:
     //
     void set_html_input_color(HTML_color_t clr, int use_default) override;
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

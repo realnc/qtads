@@ -1,10 +1,9 @@
 // This is copyrighted software. More information is at the end of this file.
+#pragma once
 
 /* This file provides some non-standard functions that are considered
  * standard by the portable Tads code and thus aren't in the OS-layer.
  */
-#ifndef MISSING_H
-#define MISSING_H
 
 #include <stddef.h> /* For size_t. */
 
@@ -37,8 +36,6 @@ int strnicmp(const char* s1, const char* s2, size_t n);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-
-#endif /* MISSING_H */
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

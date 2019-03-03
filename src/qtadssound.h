@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef QTADSSOUND_H
-#define QTADSSOUND_H
-
+#pragma once
 #include <QObject>
 #include <QTime>
 
@@ -95,8 +93,6 @@ public:
                                             unsigned long seekpos, unsigned long filesize,
                                             class CHtmlSysWin* win, SoundType type);
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

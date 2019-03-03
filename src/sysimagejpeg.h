@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef SYSIMAGEJPEG_H
-#define SYSIMAGEJPEG_H
-
+#pragma once
 #include "config.h"
 #include "qtadsimage.h"
 
@@ -37,8 +35,6 @@ public:
         return false;
     }
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

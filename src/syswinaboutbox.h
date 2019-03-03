@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef SYSWINABOUTBOX_H
-#define SYSWINABOUTBOX_H
-
+#pragma once
 #include "config.h"
 #include "syswin.h"
 
@@ -43,8 +41,6 @@ public:
     void set_banner_size(long width, HTML_BannerWin_Units_t width_units, int use_width, long height,
                          HTML_BannerWin_Units_t height_units, int use_height) override;
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos

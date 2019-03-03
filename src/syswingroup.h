@@ -1,7 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
-#ifndef SYSWINGROUP_H
-#define SYSWINGROUP_H
-
+#pragma once
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QScrollArea>
@@ -167,8 +165,6 @@ public:
     size_t xlat_html4_entity(textchar_t* result, size_t result_size, unsigned int charval,
                              oshtml_charset_id_t* charset, int* changed_charset) override;
 };
-
-#endif
 
 /*
     Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos
