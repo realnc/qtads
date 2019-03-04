@@ -93,7 +93,8 @@ disable-audio {
     HEADERS += \
         "$$PWD"/SDL_audiolib/include/Aulib/*.h \
         "$$PWD"/SDL_audiolib/src/*.h \
-        "$$PWD"/SDL_audiolib/*.h
+        "$$PWD"/SDL_audiolib/*.h \
+        src/rwopsbundle.h
 
     SOURCES += \
         SDL_audiolib/resampler/resample.c \
@@ -108,7 +109,8 @@ disable-audio {
         SDL_audiolib/src/Stream.cpp \
         SDL_audiolib/src/audiostream_p.cpp \
         SDL_audiolib/src/aulib.cpp \
-        SDL_audiolib/src/sampleconv.cpp
+        SDL_audiolib/src/sampleconv.cpp \
+        src/rwopsbundle.c
 }
 
 DEFINES += \
@@ -210,8 +212,7 @@ HEADERS += \
     src/gameinfodialog.h \
     src/kcolorbutton.h \
     src/aboutqtadsdialog.h \
-    src/config.h \
-    src/rwopsbundle.h
+    src/config.h
 
 # QTads sources.
 SOURCES += \
@@ -236,8 +237,7 @@ SOURCES += \
     src/settings.cc \
     src/gameinfodialog.cc \
     src/kcolorbutton.cc \
-    src/aboutqtadsdialog.cc \
-    src/rwopsbundle.c
+    src/aboutqtadsdialog.cc
 
 unix:SOURCES += \
     $$T2DIR/ostzposix.c

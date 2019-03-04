@@ -3,7 +3,7 @@
 #include "config.h"
 #include "htmlsys.h"
 #include "qtadssound.h"
-#ifndef Q_OS_ANDROID
+#ifndef NO_AUDIO
 #include "Aulib/AudioStream.h"
 #endif
 
