@@ -1,0 +1,61 @@
+dist: xenial
+sudo: required
+language: cpp
+
+addons:
+    apt:
+        sources:
+            - sourceline: 'ppa:beineri/opt-qt-5.12.1-xenial'
+
+        packages:
+            - libsdl2-dev
+            - libmpg123-dev
+            - libsndfile1-dev
+            - libvorbis-dev
+            - qt512base
+
+    homebrew:
+        packages:
+            - sdl2
+            - mpg123
+            - libsndfile
+            - libvorbis
+            - fluid-synth
+            - qt5
+        update: true
+
+matrix:
+    include:
+        - os: linux
+          compiler: clang
+
+          before_install:
+            - sudo ln -s /usr/local/lib /usr/local/lib64
+            - source /opt/qt512/bin/qt512-env.sh
+
+            #
+            # Install fluidsynth
+            #
+            - cd "$HOME"
+            - wget 'https://github.com/FluidSynth/fluidsynth/archive/v2.0.4.tar.gz'
+            - tar xf 'v2.0.4.tar.gz'
+            - cd fluidsynth-2.0.4
+            - mkdir build
+            - cd build
+            - cmake ..
+            - make -j2
+            - sudo make install
+
+        - os: osx
+          before_install:
+            - brew link qt5 --force
+
+before_script:
+    - qmake -version
+    - cd "$TRAVIS_BUILD_DIR"/..
+    - mkdir build
+    - cd build
+    - qmake "$TRAVIS_BUILD_DIR"
+
+script:
+    - make -j2
