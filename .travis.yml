@@ -8,54 +8,63 @@ addons:
             - sourceline: 'ppa:beineri/opt-qt-5.12.1-xenial'
 
         packages:
-            - libsdl2-dev
             - libmpg123-dev
+            - libsdl2-dev
             - libsndfile1-dev
             - libvorbis-dev
             - qt512base
 
     homebrew:
         packages:
-            - sdl2
-            - mpg123
+            - glib
             - libsndfile
             - libvorbis
-            - fluid-synth
+            - mpg123
             - qt5
-        update: true
+            - sdl2
 
 matrix:
     include:
         - os: linux
           compiler: clang
 
-          before_install:
-            - sudo ln -s /usr/local/lib /usr/local/lib64
-            - source /opt/qt512/bin/qt512-env.sh
-
-            #
-            # Install fluidsynth
-            #
-            - cd "$HOME"
-            - wget 'https://github.com/FluidSynth/fluidsynth/archive/v2.0.4.tar.gz'
-            - tar xf 'v2.0.4.tar.gz'
-            - cd fluidsynth-2.0.4
-            - mkdir build
-            - cd build
-            - cmake ..
-            - make -j2
-            - sudo make install
-
         - os: osx
-          before_install:
-            - brew link qt5 --force
+          compiler: clang
+
+before_install:
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        source /opt/qt512/bin/qt512-env.sh;
+      fi
+
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        brew link qt5 --force;
+      fi
+
+    - sudo ln -s /usr/local/lib /usr/local/lib64;
+
+    #
+    # Install fluidsynth
+    #
+    - cd "$HOME"
+    - wget 'https://github.com/FluidSynth/fluidsynth/archive/v2.0.4.tar.gz'
+    - tar xf 'v2.0.4.tar.gz'
+    - cd fluidsynth-2.0.4
+    - mkdir build
+    - cd build
+    - cmake -Denable-framework=off ..
+    - make -j2
+    - sudo make install
 
 before_script:
     - qmake -version
     - cd "$TRAVIS_BUILD_DIR"/..
     - mkdir build
     - cd build
-    - qmake "$TRAVIS_BUILD_DIR"
 
 script:
+    - qmake "$TRAVIS_BUILD_DIR"
+    - make -j2
+    - make distclean
+    - rm -rf *
+    - qmake -config disable-audio "$TRAVIS_BUILD_DIR"
     - make -j2
