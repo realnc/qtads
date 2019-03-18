@@ -1,4 +1,27 @@
-/* Copyright 2015 Nikos Chantziaras
+// This is copyrighted software. More information is at the end of this file.
+#pragma once
+#include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Create a custom RWops for the given file and media resource length. The file must have already
+ * been positioned to the beginning of the resource.
+ *
+ * The RWops takes ownership of the file; when the RWops is deleted or closed, fclose() will be
+ * called on 'mediaBundle'.
+ *
+ * In case or errors, NULL is returned and 'mediaBundle' is not closed. SDL_GetError() can be used
+ * to obtain an error string.
+ */
+struct SDL_RWops* RWFromMediaBundle(FILE* mediaBundle, long resLength);
+
+#ifdef __cplusplus
+}
+#endif
+
+/* Copyright (C) 2011-2019 Nikos Chantziaras
  *
  * This file is part of Hugor.
  *
@@ -25,29 +48,3 @@
  * include the source code for the parts of the Hugo Engine used as well as
  * that of the covered work.
  */
-#ifndef RWOPSBUNDLE_H
-#define RWOPSBUNDLE_H
-
-#include <stdio.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* Create a custom RWops for the given file and media resource length.
- * The file must have already been positioned to the beginning of the
- * resource.
- *
- * The RWops takes ownership of the file; when the RWops is deleted or
- * closed, fclose() will be called on 'mediaBundle'.
- *
- * In case or errors, NULL is returned and 'mediaBundle' is not closed.
- * SDL_GetError() can be used to obtain an error string.
- */
-SDL_RWops* RWFromMediaBundle(FILE* mediaBundle, long resLength);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif

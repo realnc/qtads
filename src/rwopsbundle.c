@@ -1,45 +1,19 @@
-/* Copyright 2015 Nikos Chantziaras
- *
- * This file is part of Hugor.
- *
- * Hugor is free software: you can redistribute it and/or modify it under the
- * terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- *
- * Hugor is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * Hugor.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Additional permission under GNU GPL version 3 section 7
- *
- * If you modify this Program, or any covered work, by linking or combining it
- * with the Hugo Engine (or a modified version of the Hugo Engine), containing
- * parts covered by the terms of the Hugo License, the licensors of this
- * Program grant you additional permission to convey the resulting work.
- * Corresponding Source for a non-source form of such a combination shall
- * include the source code for the parts of the Hugo Engine used as well as
- * that of the covered work.
- */
+// This is copyrighted software. More information is at the end of this file.
+#include "rwopsbundle.h"
+
 #include <SDL_error.h>
 #include <SDL_rwops.h>
 #include <SDL_version.h>
 #include <errno.h>
 #include <string.h>
 
-#include "rwopsbundle.h"
-
-/* Our custom RWops type id. Not strictly needed, but it helps catching bugs
- * if somehow we end up trying to delete a different type of RWops. */
+/* Our custom RWops type id. Not strictly needed, but it helps catching bugs if somehow we end up
+ * trying to delete a different type of RWops. */
 #define CUSTOM_RWOPS_TYPE 3819859
 
-/* Media resource information for our custom RWops implementation. Media
- * resources are embedded inside media bundle files. They begin at 'startPos'
- * and end at 'endPos' inside the 'file' bundle. */
+/* Media resource information for our custom RWops implementation. Media resources are embedded
+ * inside media bundle files. They begin at 'startPos' and end at 'endPos' inside the 'file' bundle.
+ */
 typedef struct
 {
     FILE* file;
@@ -61,21 +35,20 @@ static SDL_bool RWOpsCheck(SDL_RWops* rwops)
     return SDL_TRUE;
 }
 
-/* RWops size callback. Only exists in SDL2 and reports the size of our data
- * in bytes.
+/* RWops size callback. Only exists in SDL2 and reports the size of our data in bytes.
  */
 #if SDL_VERSION_ATLEAST(1, 3, 0)
 static Sint64 RWOpsSizeFunc(SDL_RWops* rwops)
 {
-    if (!RWOpsCheck(rwops))
+    if (!RWOpsCheck(rwops)) {
         return -1;
+    }
     return ((BundleFileInfo*)rwops->hidden.unknown.data1)->size;
 }
 #endif
 
-/* RWops seek callback. We apply offsets to make all seek operations relative
- * to the start/end of the media resource embedded inside the media bundle
- * file.
+/* RWops seek callback. We apply offsets to make all seek operations relative to the start/end of
+ * the media resource embedded inside the media bundle file.
  *
  * Must return the new current SEET_SET position.
  */
@@ -87,8 +60,9 @@ static int RWOpsSeekFunc(SDL_RWops* rwops, int offset, int whence)
 {
     BundleFileInfo* info;
     int seekRet;
-    if (!RWOpsCheck(rwops))
+    if (!RWOpsCheck(rwops)) {
         return -1;
+    }
     info = rwops->hidden.unknown.data1;
     errno = 0;
     if (whence == RW_SEEK_CUR) {
@@ -106,8 +80,8 @@ static int RWOpsSeekFunc(SDL_RWops* rwops, int offset, int whence)
     return ftell(info->file) - info->startPos;
 }
 
-/* RWops read callback. We don't allow reading past the end of the media
- * resource embedded inside the media bundle file.
+/* RWops read callback. We don't allow reading past the end of the media resource embedded inside
+ * the media bundle file.
  *
  * Must return the number of elements (not bytes) that have been read.
  */
@@ -121,8 +95,9 @@ static int RWOpsReadFunc(SDL_RWops* rwops, void* ptr, int size, int maxnum)
     long bytesToRead = size * maxnum;
     long curPos;
     size_t itemsRead;
-    if (!RWOpsCheck(rwops))
+    if (!RWOpsCheck(rwops)) {
         return -1;
+    }
     info = rwops->hidden.unknown.data1;
     curPos = ftell(info->file);
     /* Make sure we don't read past the end of the embedded media resource. */
@@ -138,8 +113,7 @@ static int RWOpsReadFunc(SDL_RWops* rwops, void* ptr, int size, int maxnum)
     return itemsRead;
 }
 
-/* RWops write callback. This always fails, since we never write to media
- * bundle files.
+/* RWops write callback. This always fails, since we never write to media bundle files.
  */
 #if SDL_VERSION_ATLEAST(1, 3, 0)
 static size_t RWOpsWriteFunc(SDL_RWops* rwops, const void* ptr, size_t size, size_t num)
@@ -147,8 +121,12 @@ static size_t RWOpsWriteFunc(SDL_RWops* rwops, const void* ptr, size_t size, siz
 static int RWOpsWriteFunc(SDL_RWops* rwops, const void* ptr, int size, int num)
 #endif
 {
-    if (!RWOpsCheck(rwops))
+    (void)ptr;
+    (void)size;
+    (void)num;
+    if (!RWOpsCheck(rwops)) {
         return -1;
+    }
     SDL_SetError("Media bundle files are not supposed to be written to");
     return -1;
 }
@@ -158,8 +136,9 @@ static int RWOpsWriteFunc(SDL_RWops* rwops, const void* ptr, int size, int num)
 static int RWOpsCloseFunc(SDL_RWops* rwops)
 {
     BundleFileInfo* info;
-    if (!RWOpsCheck(rwops))
+    if (!RWOpsCheck(rwops)) {
         return -1;
+    }
     info = rwops->hidden.unknown.data1;
     fclose(info->file);
     SDL_free(info);
@@ -208,3 +187,31 @@ SDL_RWops* RWFromMediaBundle(FILE* mediaBundle, long resLength)
     rwops->type = CUSTOM_RWOPS_TYPE;
     return rwops;
 }
+
+/* Copyright (C) 2011-2019 Nikos Chantziaras
+ *
+ * This file is part of Hugor.
+ *
+ * Hugor is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * Hugor is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * Hugor.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Additional permission under GNU GPL version 3 section 7
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with the Hugo Engine (or a modified version of the Hugo Engine), containing
+ * parts covered by the terms of the Hugo License, the licensors of this
+ * Program grant you additional permission to convey the resulting work.
+ * Corresponding Source for a non-source form of such a combination shall
+ * include the source code for the parts of the Hugo Engine used as well as
+ * that of the covered work.
+ */
