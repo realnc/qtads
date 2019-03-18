@@ -31,7 +31,6 @@ static long vorbisTellCb(void* rwops)
 
 namespace Aulib {
 
-/// \private
 struct AudioDecoderVorbis_priv final
 {
     std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> fVFHandle{nullptr, ov_clear};

@@ -6,8 +6,7 @@
 #include <cstring>
 #include <memory>
 
-/*! \private
- *
+/*
  * Simple RAII wrapper for buffers/arrays. More restrictive than std::vector.
  */
 template <typename T>

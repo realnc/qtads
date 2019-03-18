@@ -29,7 +29,6 @@ static void initModPlug(const SDL_AudioSpec& spec)
 
 namespace Aulib {
 
-/// \private
 struct AudioDecoderModPlug_priv final
 {
     AudioDecoderModPlug_priv();

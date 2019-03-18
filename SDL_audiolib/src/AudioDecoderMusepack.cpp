@@ -46,7 +46,6 @@ static mpc_bool_t mpcCanseekCb(mpc_reader* reader)
 
 namespace Aulib {
 
-/// \private
 struct AudioDecoderMusepack_priv final
 {
     mpc_reader reader{mpcReadCb, mpcSeekCb, mpcTellCb, mpcGetSizeCb, mpcCanseekCb, nullptr};

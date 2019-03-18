@@ -7,7 +7,6 @@
 
 namespace Aulib {
 
-/// \private
 struct AudioResamplerSox_priv final
 {
     explicit AudioResamplerSox_priv(AudioResamplerSox::Quality q)

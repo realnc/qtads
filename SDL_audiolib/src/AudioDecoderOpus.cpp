@@ -32,7 +32,6 @@ static opus_int64 opusTellCb(void* rwops)
 
 namespace Aulib {
 
-/// \private
 struct AudioDecoderOpus_priv final
 {
     std::unique_ptr<OggOpusFile, decltype(&op_free)> fOpusHandle{nullptr, &op_free};

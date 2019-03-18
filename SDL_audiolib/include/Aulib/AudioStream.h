@@ -10,6 +10,10 @@ struct SDL_AudioSpec;
 
 namespace Aulib {
 
+class AudioDecoder;
+class AudioResampler;
+class Processor;
+
 /*!
  * \brief Sample-based audio playback stream.
  *
@@ -31,8 +35,8 @@ public:
      *  Resampler to use for converting the sample rate of the audio we get from the decoder. If
      *  this is null, then no resampling will be performed.
      */
-    explicit AudioStream(const std::string& filename, std::unique_ptr<class AudioDecoder> decoder,
-                         std::unique_ptr<class AudioResampler> resampler);
+    explicit AudioStream(const std::string& filename, std::unique_ptr<AudioDecoder> decoder,
+                         std::unique_ptr<AudioResampler> resampler);
 
     /*!
      * \brief Constructs an audio stream from the given SDL_RWops, decoder and resampler.
@@ -57,6 +61,31 @@ public:
 
     AudioStream(const AudioStream&) = delete;
     AudioStream& operator=(const AudioStream&) = delete;
+
+    /*!
+     * \brief Add an audio processor to the bottom of the processor list.
+     *
+     * You can add multiple processors. They will be run in the order they were added, each one
+     * using the previous processor's output as input. If the processor instance already exists in
+     * the processor list, or is a nullptr, the function does nothing.
+     *
+     * \param processor The processor to add.
+     */
+    void addProcessor(std::shared_ptr<Processor> processor);
+
+    /*!
+     * \brief Remove a processor from the stream.
+     *
+     * If the processor instance is not found, the function does nothing.
+     *
+     * \param processor Processor to remove.
+     */
+    void removeProcessor(Processor* processor);
+
+    /*!
+     * \brief Remove all processors from the stream.
+     */
+    void clearProcessors();
 
     bool open() override;
     bool play(int iterations = 1, std::chrono::microseconds fadeTime = {}) override;

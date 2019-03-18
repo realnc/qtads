@@ -12,7 +12,6 @@ namespace chrono = std::chrono;
 
 namespace Aulib {
 
-/// \private
 struct AudioDecoderOpenmpt_priv final
 {
     std::unique_ptr<openmpt::module> fModule = nullptr;

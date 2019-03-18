@@ -1,39 +1,20 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
+#include "aulib_export.h"
+#include <stddef.h>
 
-#include <SDL_audio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/*
- * RAII wrapper for SDL_LockAudio().
- */
-class SdlAudioLocker final
-{
-public:
-    SdlAudioLocker()
-    {
-        SDL_LockAudio();
-        fIsLocked = true;
-    }
+typedef struct SDL_RWops SDL_RWops;
+#define SDL_LoadFile_RW SDL_LoadFile_RW_missing
 
-    ~SdlAudioLocker()
-    {
-        unlock();
-    }
+AULIB_NO_EXPORT void* SDL_LoadFile_RW_missing(SDL_RWops* src, size_t* datasize, int freesrc);
 
-    SdlAudioLocker(const SdlAudioLocker&) = delete;
-    SdlAudioLocker& operator=(const SdlAudioLocker&) = delete;
-
-    void unlock()
-    {
-        if (fIsLocked) {
-            SDL_UnlockAudio();
-            fIsLocked = false;
-        }
-    }
-
-private:
-    bool fIsLocked;
-};
+#ifdef __cplusplus
+}
+#endif
 
 /*
 

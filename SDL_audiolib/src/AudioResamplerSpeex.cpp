@@ -10,7 +10,6 @@
 
 namespace Aulib {
 
-/// \private
 struct AudioResamplerSpeex_priv final
 {
     explicit AudioResamplerSpeex_priv(int quality)
@@ -38,10 +37,12 @@ int Aulib::AudioResamplerSpeex::quality() const noexcept
 void Aulib::AudioResamplerSpeex::setQuality(int quality)
 {
     auto newQ = std::min(std::max(0, quality), 10);
-    SdlAudioLocker lock;
-    if (speex_resampler_set_quality(d->fResampler.get(), newQ) == RESAMPLER_ERR_SUCCESS) {
-        d->fQuality = newQ;
+    d->fQuality = newQ;
+    if (d->fResampler == nullptr) {
+        return;
     }
+    SdlAudioLocker lock;
+    speex_resampler_set_quality(d->fResampler.get(), newQ);
 }
 
 void Aulib::AudioResamplerSpeex::doResampling(float dst[], const float src[], int& dstLen,

@@ -50,7 +50,6 @@ static sf_count_t sfTellCb(void* rwops)
 
 namespace Aulib {
 
-/// \private
 struct AudioDecoderSndfile_priv final
 {
     std::unique_ptr<SNDFILE, decltype(&sf_close)> fSndfile{nullptr, &sf_close};

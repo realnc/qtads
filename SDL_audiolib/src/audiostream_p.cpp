@@ -15,6 +15,7 @@ SDL_AudioSpec Aulib::AudioStream_priv::fAudioSpec;
 std::vector<Aulib::AudioStream*> Aulib::AudioStream_priv::fStreamList;
 Buffer<float> Aulib::AudioStream_priv::fFinalMixBuf{0};
 Buffer<float> Aulib::AudioStream_priv::fStrmBuf{0};
+Buffer<float> Aulib::AudioStream_priv::fProcessorBuf{0};
 
 Aulib::AudioStream_priv::AudioStream_priv(AudioStream* pub, std::unique_ptr<AudioDecoder> decoder,
                                           std::unique_ptr<AudioResampler> resampler,
@@ -88,6 +89,7 @@ void Aulib::AudioStream_priv::fSdlCallbackImpl(void* /*unused*/, Uint8 out[], in
     if (fStrmBuf.size() != wantedSamples) {
         fFinalMixBuf.reset(wantedSamples);
         fStrmBuf.reset(wantedSamples);
+        fProcessorBuf.reset(wantedSamples);
     }
 
     // Fill with silence.
@@ -119,6 +121,10 @@ void Aulib::AudioStream_priv::fSdlCallbackImpl(void* /*unused*/, Uint8 out[], in
                     len += stream->d->fDecoder->decode(fStrmBuf.get() + len, wantedSamples - len,
                                                        callAgain);
                 }
+            }
+            for (const auto& proc : stream->d->processors) {
+                proc->process(fProcessorBuf.get(), fStrmBuf.get(), len);
+                std::memcpy(fStrmBuf.get(), fProcessorBuf.get(), len * sizeof(*fStrmBuf.get()));
             }
             if (len < wantedSamples) {
                 stream->d->fDecoder->rewind();

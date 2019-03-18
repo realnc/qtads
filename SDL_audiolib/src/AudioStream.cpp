@@ -3,6 +3,7 @@
 
 #include "Aulib/AudioDecoder.h"
 #include "Aulib/AudioResampler.h"
+#include "Aulib/Processor.h"
 #include "SdlAudioLocker.h"
 #include "audiostream_p.h"
 #include "aulib.h"
@@ -11,6 +12,7 @@
 #include "sampleconv.h"
 #include <SDL_audio.h>
 #include <SDL_timer.h>
+#include <algorithm>
 
 /* This is implemented here in order to avoid having the dtor call stop(),
  * which is a virtual.
@@ -47,6 +49,37 @@ Aulib::AudioStream::AudioStream(SDL_RWops* rwops, std::unique_ptr<AudioDecoder> 
 Aulib::AudioStream::~AudioStream()
 {
     stop_impl(d.get(), std::chrono::microseconds::zero());
+}
+
+void Aulib::AudioStream::addProcessor(std::shared_ptr<Processor> processor)
+{
+    if (processor == nullptr
+        or std::find_if(
+               d->processors.begin(), d->processors.end(),
+               [&processor](std::shared_ptr<Processor>& p) { return p.get() == processor.get(); })
+               != d->processors.end()) {
+        return;
+    }
+    SdlAudioLocker locker;
+    d->processors.push_back(std::move(processor));
+}
+
+void Aulib::AudioStream::removeProcessor(Processor* processor)
+{
+    auto it =
+        std::find_if(d->processors.begin(), d->processors.end(),
+                     [&processor](std::shared_ptr<Processor>& p) { return p.get() == processor; });
+    if (it == d->processors.end()) {
+        return;
+    }
+    SdlAudioLocker locker;
+    d->processors.erase(it);
+}
+
+void Aulib::AudioStream::clearProcessors()
+{
+    SdlAudioLocker locker;
+    d->processors.clear();
 }
 
 bool Aulib::AudioStream::open()

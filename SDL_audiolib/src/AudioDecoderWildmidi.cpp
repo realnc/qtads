@@ -10,7 +10,6 @@ namespace chrono = std::chrono;
 
 namespace Aulib {
 
-/// \private
 struct AudioDecoderWildmidi_priv final
 {
     std::unique_ptr<midi, decltype(&WildMidi_Close)> midiHandle{nullptr, &WildMidi_Close};
@@ -108,8 +107,14 @@ int Aulib::AudioDecoderWildmidi::doDecoding(float buf[], int len, bool& callAgai
     if (d->sampBuf.size() != len) {
         d->sampBuf.reset(len);
     }
-    int res = WildMidi_GetOutput(d->midiHandle.get(), reinterpret_cast<char*>(d->sampBuf.get()),
-                                 static_cast<unsigned long>(len) * 2);
+#ifdef LIBWILDMIDI_VERSION
+    using sample_type = int8_t*;
+#else
+    using sample_type = char*;
+#endif
+    int res =
+        WildMidi_GetOutput(d->midiHandle.get(), reinterpret_cast<sample_type>(d->sampBuf.get()),
+                           static_cast<unsigned long>(len) * 2);
     if (res < 0) {
         return 0;
     }

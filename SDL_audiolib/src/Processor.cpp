@@ -1,39 +1,8 @@
 // This is copyrighted software. More information is at the end of this file.
-#pragma once
+#include "Aulib/Processor.h"
 
-#include <SDL_audio.h>
-
-/*
- * RAII wrapper for SDL_LockAudio().
- */
-class SdlAudioLocker final
-{
-public:
-    SdlAudioLocker()
-    {
-        SDL_LockAudio();
-        fIsLocked = true;
-    }
-
-    ~SdlAudioLocker()
-    {
-        unlock();
-    }
-
-    SdlAudioLocker(const SdlAudioLocker&) = delete;
-    SdlAudioLocker& operator=(const SdlAudioLocker&) = delete;
-
-    void unlock()
-    {
-        if (fIsLocked) {
-            SDL_UnlockAudio();
-            fIsLocked = false;
-        }
-    }
-
-private:
-    bool fIsLocked;
-};
+Aulib::Processor::Processor() = default;
+Aulib::Processor::~Processor() = default;
 
 /*
 

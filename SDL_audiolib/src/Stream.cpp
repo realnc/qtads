@@ -6,7 +6,6 @@
 
 namespace Aulib {
 
-/// \private
 struct Stream_priv final
 {
     Stream::Callback fFinishCallback;

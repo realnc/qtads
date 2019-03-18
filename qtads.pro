@@ -88,16 +88,20 @@ disable-audio {
         SDL_audiolib \
         SDL_audiolib/include \
         SDL_audiolib/resampler \
-        SDL_audiolib/src
+        SDL_audiolib/src \
+        SDL_audiolib/missing
 
     HEADERS += \
+        $$files(SDL_audiolib/include/*.h) \
         $$files(SDL_audiolib/include/Aulib/*.h) \
         $$files(SDL_audiolib/src/*.h) \
+        $$files(SDL_audiolib/src/missing/*.h) \
         $$files(SDL_audiolib/*.h) \
         src/rwopsbundle.h
 
     SOURCES += \
         SDL_audiolib/resampler/resample.c \
+        SDL_audiolib/src/missing/sdl_load_file_rw.c \
         SDL_audiolib/src/AudioDecoder.cpp \
         SDL_audiolib/src/AudioDecoderFluidsynth.cpp \
         SDL_audiolib/src/AudioDecoderMpg123.cpp \
@@ -106,6 +110,7 @@ disable-audio {
         SDL_audiolib/src/AudioResampler.cpp \
         SDL_audiolib/src/AudioResamplerSpeex.cpp \
         SDL_audiolib/src/AudioStream.cpp \
+        SDL_audiolib/src/Processor.cpp \
         SDL_audiolib/src/Stream.cpp \
         SDL_audiolib/src/audiostream_p.cpp \
         SDL_audiolib/src/aulib.cpp \

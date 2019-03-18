@@ -1,39 +1,37 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
+#include "aulib_export.h"
 
-#include <SDL_audio.h>
+namespace Aulib {
 
-/*
- * RAII wrapper for SDL_LockAudio().
+/*!
+ * \brief Abstract base class for audio processors.
+ *
+ * A processor receives input samples, processes them and produces output samples. It can be used to
+ * alter the audio produced by a decoder. Processors run after resampling (if applicable.)
  */
-class SdlAudioLocker final
+class AULIB_EXPORT Processor
 {
 public:
-    SdlAudioLocker()
-    {
-        SDL_LockAudio();
-        fIsLocked = true;
-    }
+    Processor();
+    virtual ~Processor();
 
-    ~SdlAudioLocker()
-    {
-        unlock();
-    }
+    Processor(const Processor&) = delete;
+    Processor& operator=(const Processor&) = delete;
 
-    SdlAudioLocker(const SdlAudioLocker&) = delete;
-    SdlAudioLocker& operator=(const SdlAudioLocker&) = delete;
-
-    void unlock()
-    {
-        if (fIsLocked) {
-            SDL_UnlockAudio();
-            fIsLocked = false;
-        }
-    }
-
-private:
-    bool fIsLocked;
+    /*!
+     * \brief Process input samples and write output samples.
+     *
+     * This function will be called from the audio thread.
+     *
+     * \param[out] dest Output buffer.
+     * \param[in] source Input buffer.
+     * \param[in] len Input and output buffer size in samples.
+     */
+    virtual void process(float dest[], const float source[], int len) = 0;
 };
+
+} // namespace Aulib
 
 /*
 

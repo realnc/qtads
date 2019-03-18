@@ -60,7 +60,6 @@ static off_t mpgSeekCallback(void* rwops, off_t pos, int whence)
 
 namespace Aulib {
 
-/// \private
 struct AudioDecoderMpg123_priv final
 {
     AudioDecoderMpg123_priv();

@@ -98,7 +98,6 @@ static int initFluidSynth()
 
 namespace Aulib {
 
-/// \private
 struct AudioDecoderFluidSynth_priv final
 {
     AudioDecoderFluidSynth_priv();
@@ -141,14 +140,13 @@ Aulib::AudioDecoderFluidSynth::AudioDecoderFluidSynth()
 
 Aulib::AudioDecoderFluidSynth::~AudioDecoderFluidSynth() = default;
 
-int Aulib::AudioDecoderFluidSynth::loadSoundfont(const std::string& filename)
+bool Aulib::AudioDecoderFluidSynth::loadSoundfont(SDL_RWops* rwops)
 {
-    fluid_synth_sfload(d->fSynth.get(), filename.c_str(), 1);
-    return 0;
-}
+    if (rwops == nullptr) {
+        SDL_SetError("rwops is null.");
+        return false;
+    }
 
-int Aulib::AudioDecoderFluidSynth::loadSoundfont(SDL_RWops* rwops)
-{
     auto closeRwops = [rwops] {
         if (SDL_RWclose(rwops) != 0) {
             AM_warnLn("failed to close rwops: " << SDL_GetError());
@@ -158,16 +156,25 @@ int Aulib::AudioDecoderFluidSynth::loadSoundfont(SDL_RWops* rwops)
     std::array<char, 64> bogus_fname;
     auto ret = snprintf(bogus_fname.data(), bogus_fname.size(), "&%p", static_cast<void*>(rwops));
     if (ret < 0 or ret >= static_cast<int>(bogus_fname.size())) {
-        AM_warnLn("internal string representation of pointer is too long (please file a bug)");
+        SDL_SetError("internal string representation of pointer is too long (please file a bug)");
         closeRwops();
-        return -1;
+        return false;
     }
     if (fluid_synth_sfload(d->fSynth.get(), bogus_fname.data(), 1) == FLUID_FAILED) {
-        AM_warnLn("failed to load soundfont from rwops");
+        SDL_SetError("failed to load soundfont from rwops");
         closeRwops();
-        return -1;
+        return false;
     }
-    return 0;
+    return true;
+}
+
+bool Aulib::AudioDecoderFluidSynth::loadSoundfont(const std::string& filename)
+{
+    if (fluid_synth_sfload(d->fSynth.get(), filename.c_str(), 1) == FLUID_FAILED) {
+        SDL_SetError("FluidSynth failed to load soundfont.");
+        return false;
+    }
+    return true;
 }
 
 float Aulib::AudioDecoderFluidSynth::gain() const
@@ -186,23 +193,36 @@ bool Aulib::AudioDecoderFluidSynth::open(SDL_RWops* rwops)
         return true;
     }
     if (not d->fSynth) {
+        SDL_SetError("FluidSynth failed to initialize.");
+        return false;
+    }
+    if (rwops == nullptr) {
+        SDL_SetError("rwops is null.");
         return false;
     }
 
-    // FIXME: error reporting
     Sint64 midiDataLen = SDL_RWsize(rwops);
     if (midiDataLen <= 0) {
+        SDL_SetError("Invalid MIDI data.");
         return false;
     }
     Buffer<Uint8> newMidiData(midiDataLen);
     if (SDL_RWread(rwops, newMidiData.get(), newMidiData.size(), 1) != 1) {
+        SDL_SetError("Unable to read MIDI data. %s", SDL_GetError());
         return false;
     }
     d->fPlayer.reset(new_fluid_player(d->fSynth.get()));
-    if (not d->fPlayer
-        or fluid_player_add_mem(d->fPlayer.get(), newMidiData.get(), newMidiData.usize())
-               != FLUID_OK
-        or fluid_player_play(d->fPlayer.get()) != FLUID_OK) {
+    if (d->fPlayer == nullptr) {
+        SDL_SetError("Failed to create FluidSynth player.");
+        return false;
+    }
+    if (fluid_player_add_mem(d->fPlayer.get(), newMidiData.get(), newMidiData.usize())
+        != FLUID_OK) {
+        SDL_SetError("FluidSynth failed to load MIDI data.");
+        return false;
+    }
+    if (fluid_player_play(d->fPlayer.get()) != FLUID_OK) {
+        SDL_SetError("FluidSynth failed to start MIDI player.");
         return false;
     }
     d->fMidiData.swap(newMidiData);
@@ -212,6 +232,11 @@ bool Aulib::AudioDecoderFluidSynth::open(SDL_RWops* rwops)
 
 int Aulib::AudioDecoderFluidSynth::getChannels() const
 {
+    if (d->fSynth == nullptr) {
+        SDL_SetError("FluidSynth failed to initialize.");
+        return 0;
+    }
+
     int channels;
     fluid_settings_getint(settings, "synth.audio-channels", &channels);
     // This is the amount of stereo channel *pairs*, so each pair has *two* audio channels.
@@ -220,6 +245,11 @@ int Aulib::AudioDecoderFluidSynth::getChannels() const
 
 int Aulib::AudioDecoderFluidSynth::getRate() const
 {
+    if (d->fSynth == nullptr) {
+        SDL_SetError("FluidSynth failed to initialize.");
+        return 0;
+    }
+
     double rate;
     fluid_settings_getnum(settings, "synth.sample-rate", &rate);
     return rate;
@@ -245,9 +275,15 @@ int Aulib::AudioDecoderFluidSynth::doDecoding(float buf[], int len, bool& callAg
 
 bool Aulib::AudioDecoderFluidSynth::rewind()
 {
+    if (d->fSynth == nullptr) {
+        SDL_SetError("FluidSynth failed to initialize.");
+        return false;
+    }
+
     fluid_player_stop(d->fPlayer.get());
     d->fPlayer.reset(new_fluid_player(d->fSynth.get()));
     if (not d->fPlayer) {
+        SDL_SetError("FluidSynth failed to create new player.");
         return false;
     }
     fluid_player_add_mem(d->fPlayer.get(), d->fMidiData.get(), d->fMidiData.usize());
@@ -258,13 +294,13 @@ bool Aulib::AudioDecoderFluidSynth::rewind()
 
 chrono::microseconds Aulib::AudioDecoderFluidSynth::duration() const
 {
-    // We can't tell how long a MIDI file is.
+    SDL_SetError("Duration cannot be determined with this decoder.");
     return {};
 }
 
 bool Aulib::AudioDecoderFluidSynth::seekToTime(chrono::microseconds /*pos*/)
 {
-    // We don't support seeking.
+    SDL_SetError("Seeking is not supported with this decoder.");
     return false;
 }
 

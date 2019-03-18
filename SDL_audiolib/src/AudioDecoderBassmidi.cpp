@@ -76,7 +76,6 @@ private:
 
 namespace Aulib {
 
-/// \private
 struct AudioDecoderBassmidi_priv final
 {
     AudioDecoderBassmidi_priv();

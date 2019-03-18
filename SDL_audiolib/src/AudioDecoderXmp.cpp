@@ -12,7 +12,6 @@ namespace chrono = std::chrono;
 
 namespace Aulib {
 
-/// \private
 struct AudioDecoderXmp_priv final
 {
     std::unique_ptr<std::remove_pointer_t<xmp_context>, decltype(&xmp_free_context)> fContext{
