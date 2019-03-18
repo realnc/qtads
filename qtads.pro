@@ -91,9 +91,9 @@ disable-audio {
         SDL_audiolib/src
 
     HEADERS += \
-        "$$PWD"/SDL_audiolib/include/Aulib/*.h \
-        "$$PWD"/SDL_audiolib/src/*.h \
-        "$$PWD"/SDL_audiolib/*.h \
+        $$files(SDL_audiolib/include/Aulib/*.h) \
+        $$files(SDL_audiolib/src/*.h) \
+        $$files(SDL_audiolib/*.h) \
         src/rwopsbundle.h
 
     SOURCES += \
@@ -248,13 +248,13 @@ win32:SOURCES += \
 # Portable Tads headers.  We simply include every header from the Tads
 # directories.  It's sub-optimal, but the safest solution.
 # Tads 2 headers.
-HEADERS += $$PWD/$$T2DIR/*.h
+HEADERS += $$files($$T2DIR/*.h)
 
 # Tads 3 headers.
-HEADERS += $$PWD/$$T3DIR/*.h
+HEADERS += $$files($$T3DIR/*.h)
 
 # HTML TADS headers.
-HEADERS += $$PWD/$$HTDIR/*.h
+HEADERS += $$files($$HTDIR/*.h)
 
 # Portable Tads sources.  We always know which are needed.
 # HTML Tads sources.
