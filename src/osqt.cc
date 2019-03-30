@@ -30,13 +30,18 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+#include <QRandomGenerator>
+#endif
 #include <QStandardPaths>
 #include <QTemporaryFile>
 #include <QTextCodec>
 #include <QTimer>
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <random>
 
 #include "globals.h"
 #include "os.h"
@@ -1085,49 +1090,51 @@ int os_is_file_in_dir(const char* filename, const char* path, int include_subdir
 
 // --------------------------------------------------------------------
 
+/*
+ * We prefer QRandomGenerator if available, since it's guaranteed never to block. Also, it works on
+ * mingw without issues. std::random_device is used as a fallback, because it might block (it
+ * shouldn't, but might, according to the standard.) We disallow std::random_device with mingw,
+ * because it's broken altogether there (https://sourceforge.net/p/mingw-w64/bugs/338).
+ */
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0) and defined(__MINGW32__)
+#error MinGW (and MinGW-w64) has a broken std::random_device implementation.
+#endif
+
 /* Get a suitable seed for a random number generator.
  */
 void os_rand(long* val)
 {
-    Q_ASSERT(val != 0);
+    Q_ASSERT(val != nullptr);
 
-    static bool initialized = false;
-    if (not initialized) {
-        qsrand(QDateTime::currentDateTimeUtc().toTime_t());
-        initialized = true;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    if (sizeof(long) < 8) {
+        *val = static_cast<long>(QRandomGenerator::system()->generate());
+    } else {
+        *val = static_cast<long>(QRandomGenerator::system()->generate64());
     }
-    *val = qrand();
+#else
+    std::random_device rd;
+    std::uniform_int_distribution<long> dis;
+    *val = dis(rd);
+#endif
 }
 
-/* Generate random bytes for use in seeding a PRNG (pseudo-random number
- * generator).
+/* Generate random bytes for use in seeding a PRNG (pseudo-random number generator).
  */
 void os_gen_rand_bytes(unsigned char* buf, size_t len)
 {
-#ifdef Q_OS_UNIX
-    QFile rdev(QString::fromLatin1("/dev/urandom"));
-    if (rdev.open(QFile::ReadOnly)) {
-        qint64 bytesRead = rdev.read(reinterpret_cast<char*>(buf), len);
-        if (bytesRead >= static_cast<qint64>(len))
-            return;
-        if (bytesRead > 0) {
-            // For whatever reason, we couldn't read the requested amount of
-            // bytes from the device. We'll fill the rest with the generic
-            // generator below.
-            buf += bytesRead;
-            len -= bytesRead;
-        }
-    }
-#endif
+    Q_ASSERT(buf != nullptr);
 
-    static bool initialized = false;
-    if (not initialized) {
-        qsrand(QDateTime::currentDateTimeUtc().toTime_t());
-        initialized = true;
-    }
-    for (size_t i = 0; i < len; ++i) {
-        buf[i] = qrand() % 256;
-    }
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    Q_ASSERT(len % 4 == 0);
+    std::vector<quint32> tmp(len / 4);
+    QRandomGenerator::system()->fillRange(tmp.data(), tmp.size());
+    memcpy(buf, tmp.data(), tmp.size() * sizeof(*tmp.data()));
+#else
+    std::random_device dev;
+    std::uniform_int_distribution<unsigned char> dist;
+    std::generate_n(buf, len, [&dev, &dist] { return dist(dev); });
+#endif
 }
 
 /* --------------------------------------------------------------------
