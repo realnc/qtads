@@ -10,10 +10,10 @@ VERSION = "$$VERSION_MAJOR"."$$VERSION_MINOR"."$$VERSION_PATCH"
 DEFINES += QTADS_VERSION=\\\"$$VERSION\\\"
 
 lessThan(QT_MAJOR_VERSION, 5) {
-    error(Qt 4 is not supported. You need at least Qt 5.9.)
+    error(Qt 4 is not supported. You need at least Qt 5.5.)
 }
-equals(QT_MAJOR_VERSION, 5) : lessThan(QT_MINOR_VERSION, 9) {
-    error(Qt 5.9 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION".)
+contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
+    error(Qt 5.5 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION")
 }
 
 # Mac OS application and file icons.
