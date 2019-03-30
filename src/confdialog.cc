@@ -12,6 +12,7 @@
 #include "sysframe.h"
 #include "syswingroup.h"
 #include "ui_confdialog.h"
+#include "util.h"
 
 ConfDialog::ConfDialog(CHtmlSysWinGroupQt* parent)
     : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint
@@ -90,10 +91,10 @@ ConfDialog::ConfDialog(CHtmlSysWinGroupQt* parent)
         ui->inputFontBox->setCurrentFont(sett->inputFont);
     }
     ui->useMainFontCheckBox->setChecked(sett->useMainFontForInput);
-    connect(ui->useMainFontCheckBox, SIGNAL(toggled(bool)), ui->inputFontBox,
-            SLOT(setDisabled(bool)));
-    connect(ui->useMainFontCheckBox, SIGNAL(toggled(bool)), ui->inputFontSizeSpinBox,
-            SLOT(setDisabled(bool)));
+    connect(ui->useMainFontCheckBox, &QAbstractButton::toggled, ui->inputFontBox,
+            &QWidget::setDisabled);
+    connect(ui->useMainFontCheckBox, &QAbstractButton::toggled, ui->inputFontSizeSpinBox,
+            &QWidget::setDisabled);
     ui->inputFontItalicCheckBox->setChecked(sett->inputFont.italic());
     ui->inputFontBoldCheckBox->setChecked(sett->inputFont.bold());
 
@@ -205,9 +206,9 @@ ConfDialog::ConfDialog(CHtmlSysWinGroupQt* parent)
         // buttons.
         ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Apply
                                           | QDialogButtonBox::Cancel);
-        connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this,
-                SLOT(fApplySettings()));
-        connect(this, SIGNAL(accepted()), this, SLOT(fApplySettings()));
+        connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QAbstractButton::clicked, this,
+                &ConfDialog::fApplySettings);
+        connect(this, &QDialog::accepted, this, &ConfDialog::fApplySettings);
     }
 #endif
 }
@@ -231,68 +232,103 @@ void ConfDialog::changeEvent(QEvent* e)
 
 void ConfDialog::fMakeInstantApply()
 {
-    connect(ui->mainFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
-    connect(ui->fixedFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
-    connect(ui->serifFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
-    connect(ui->sansFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
-    connect(ui->scriptFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
-    connect(ui->writerFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
-    connect(ui->inputFontBox, SIGNAL(currentFontChanged(QFont)), this, SLOT(fApplySettings()));
-    connect(ui->useMainFontCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->mainFontBox, &QFontComboBox::currentFontChanged, this, &ConfDialog::fApplySettings);
+    connect(ui->fixedFontBox, &QFontComboBox::currentFontChanged, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->serifFontBox, &QFontComboBox::currentFontChanged, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->sansFontBox, &QFontComboBox::currentFontChanged, this, &ConfDialog::fApplySettings);
+    connect(ui->scriptFontBox, &QFontComboBox::currentFontChanged, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->writerFontBox, &QFontComboBox::currentFontChanged, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->inputFontBox, &QFontComboBox::currentFontChanged, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->useMainFontCheckBox, &QAbstractButton::toggled, this, &ConfDialog::fApplySettings);
 
-    connect(ui->mainFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
-    connect(ui->fixedFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
-    connect(ui->serifFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
-    connect(ui->sansFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
-    connect(ui->scriptFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
-    connect(ui->writerFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
-    connect(ui->inputFontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+    connect(ui->mainFontSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::fApplySettings);
+    connect(ui->fixedFontSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::fApplySettings);
+    connect(ui->serifFontSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::fApplySettings);
+    connect(ui->sansFontSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::fApplySettings);
+    connect(ui->scriptFontSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::fApplySettings);
+    connect(ui->writerFontSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::fApplySettings);
+    connect(ui->inputFontSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::fApplySettings);
 
-    connect(ui->inputFontItalicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->inputFontBoldCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->underlineLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->highlightLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->allowGraphicsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->inputFontItalicCheckBox, &QAbstractButton::toggled, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->inputFontBoldCheckBox, &QAbstractButton::toggled, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->underlineLinksCheckBox, &QAbstractButton::toggled, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->highlightLinksCheckBox, &QAbstractButton::toggled, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->allowGraphicsCheckBox, &QAbstractButton::toggled, this,
+            &ConfDialog::fApplySettings);
 #ifndef NO_AUDIO
-    connect(ui->allowSoundEffectsCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->allowMusicCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->allowSoundEffectsCheckBox, &QAbstractButton::toggled, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->allowMusicCheckBox, &QAbstractButton::toggled, this, &ConfDialog::fApplySettings);
 #endif
-    connect(ui->allowLinksCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->smoothScalingCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
+    connect(ui->allowLinksCheckBox, &QAbstractButton::toggled, this, &ConfDialog::fApplySettings);
+    connect(ui->smoothScalingCheckBox, &QAbstractButton::toggled, this,
+            &ConfDialog::fApplySettings);
 
-    connect(ui->mainTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
-    connect(ui->mainBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
-    connect(ui->bannerTextColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
-    connect(ui->bannerBgColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
-    connect(ui->inputColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
-    connect(ui->linkUnvisitedColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
-    connect(ui->linkHoveringColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
-    connect(ui->linkClickedColorButton, SIGNAL(changed(QColor)), this, SLOT(fApplySettings()));
+    connect(ui->mainTextColorButton, &KColorButton::changed, this, &ConfDialog::fApplySettings);
+    connect(ui->mainBgColorButton, &KColorButton::changed, this, &ConfDialog::fApplySettings);
+    connect(ui->bannerTextColorButton, &KColorButton::changed, this, &ConfDialog::fApplySettings);
+    connect(ui->bannerBgColorButton, &KColorButton::changed, this, &ConfDialog::fApplySettings);
+    connect(ui->inputColorButton, &KColorButton::changed, this, &ConfDialog::fApplySettings);
+    connect(ui->linkUnvisitedColorButton, &KColorButton::changed, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->linkHoveringColorButton, &KColorButton::changed, this, &ConfDialog::fApplySettings);
+    connect(ui->linkClickedColorButton, &KColorButton::changed, this, &ConfDialog::fApplySettings);
 
     // Because these are radio buttons, we connect the clicked() instead of
     // the toggled() signal.  The toggled() signal would result in the slot
     // getting called twice, once for the button that gets unchecked and once
     // for the button that gets checked.  The clicked() signal is only emitted
     // when a button gets checked.
-    connect(ui->safetyRead0RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->safetyRead2RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->safetyRead4RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->safetyWrite0RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->safetyWrite2RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->safetyWrite4RadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->updateOnStartRadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->updateDailyRadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->updateWeeklyRadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
-    connect(ui->updateNeverRadioButton, SIGNAL(clicked()), this, SLOT(fApplySettings()));
+    connect(ui->safetyRead0RadioButton, &QAbstractButton::clicked, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->safetyRead2RadioButton, &QAbstractButton::clicked, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->safetyRead4RadioButton, &QAbstractButton::clicked, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->safetyWrite0RadioButton, &QAbstractButton::clicked, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->safetyWrite2RadioButton, &QAbstractButton::clicked, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->safetyWrite4RadioButton, &QAbstractButton::clicked, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->updateOnStartRadioButton, &QAbstractButton::clicked, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->updateDailyRadioButton, &QAbstractButton::clicked, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->updateWeeklyRadioButton, &QAbstractButton::clicked, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->updateNeverRadioButton, &QAbstractButton::clicked, this,
+            &ConfDialog::fApplySettings);
 
-    connect(ui->encodingComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(fApplySettings()));
-    connect(ui->pasteOnDblClkCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->softScrollCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->askForGameFileCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->confirmRestartCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->confirmQuitCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->limitWidthCheckBox, SIGNAL(toggled(bool)), this, SLOT(fApplySettings()));
-    connect(ui->limitWidthSpinBox, SIGNAL(valueChanged(int)), this, SLOT(fApplySettings()));
+    connect(ui->encodingComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &ConfDialog::fApplySettings);
+    connect(ui->pasteOnDblClkCheckBox, &QAbstractButton::toggled, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->softScrollCheckBox, &QAbstractButton::toggled, this, &ConfDialog::fApplySettings);
+    connect(ui->askForGameFileCheckBox, &QAbstractButton::toggled, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->confirmRestartCheckBox, &QAbstractButton::toggled, this,
+            &ConfDialog::fApplySettings);
+    connect(ui->confirmQuitCheckBox, &QAbstractButton::toggled, this, &ConfDialog::fApplySettings);
+    connect(ui->limitWidthCheckBox, &QAbstractButton::toggled, this, &ConfDialog::fApplySettings);
+    connect(ui->limitWidthSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &ConfDialog::fApplySettings);
 }
 
 void ConfDialog::fApplySettings()

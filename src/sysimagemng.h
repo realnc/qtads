@@ -31,7 +31,7 @@ public:
     CHtmlSysImageMngQt()
         : fDispSite(0)
     {
-        connect(this, SIGNAL(updated(QRect)), this, SLOT(updateDisplay(QRect)));
+        connect(this, &QMovie::updated, this, &CHtmlSysImageMngQt::updateDisplay);
     }
 
     //

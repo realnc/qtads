@@ -68,45 +68,45 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("document-open")));
     act->setShortcuts(QKeySequence::Open);
     menu->addAction(act);
-    connect(act, SIGNAL(triggered()), this, SLOT(fOpenNewGame()));
+    connect(act, &QAction::triggered, this, &CHtmlSysWinGroupQt::fOpenNewGame);
     act = new QAction(tr("Open &Recent"), this);
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("document-open-recent")));
     fRecentGamesMenu = new QMenu(this);
     act->setMenu(fRecentGamesMenu);
     menu->addAction(act);
-    connect(fRecentGamesMenu, SIGNAL(triggered(QAction*)), this,
-            SLOT(fRecentGameTriggered(QAction*)));
+    connect(fRecentGamesMenu, &QMenu::triggered, this, &CHtmlSysWinGroupQt::fRecentGameTriggered);
     fRestartCurrentGameAction = new QAction(tr("Re&start"), this);
     fRestartCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("view-refresh")));
     fRestartCurrentGameAction->setShortcut(QKeySequence(QString::fromLatin1("Ctrl+R")));
     menu->addAction(fRestartCurrentGameAction);
     fRestartCurrentGameAction->setEnabled(false);
-    connect(fRestartCurrentGameAction, SIGNAL(triggered()), this, SLOT(fRestartCurrentGame()));
+    connect(fRestartCurrentGameAction, &QAction::triggered, this,
+            &CHtmlSysWinGroupQt::fRestartCurrentGame);
     fEndCurrentGameAction = new QAction(tr("Qui&t"), this);
     fEndCurrentGameAction->setMenuRole(QAction::NoRole);
     fEndCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("process-stop")));
     fEndCurrentGameAction->setShortcuts(QKeySequence::Close);
     menu->addAction(fEndCurrentGameAction);
     fEndCurrentGameAction->setEnabled(false);
-    connect(fEndCurrentGameAction, SIGNAL(triggered()), this, SLOT(fEndCurrentGame()));
+    connect(fEndCurrentGameAction, &QAction::triggered, this, &CHtmlSysWinGroupQt::fEndCurrentGame);
     menu->addSeparator();
     fAboutGameAction = new QAction(tr("&About This Game"), this);
     fAboutGameAction->setMenuRole(QAction::NoRole);
     fAboutGameAction->setEnabled(false);
     menu->addAction(fAboutGameAction);
-    connect(fAboutGameAction, SIGNAL(triggered()), this, SLOT(fShowAboutGame()));
+    connect(fAboutGameAction, &QAction::triggered, this, &CHtmlSysWinGroupQt::fShowAboutGame);
     fGameInfoAction = new QAction(tr("View Metadata"), this);
     fGameInfoAction->setIcon(QIcon::fromTheme(QString::fromLatin1("document-properties")));
     menu->addAction(fGameInfoAction);
     fGameInfoAction->setEnabled(false);
-    connect(fGameInfoAction, SIGNAL(triggered()), this, SLOT(fShowGameInfoDialog()));
+    connect(fGameInfoAction, &QAction::triggered, this, &CHtmlSysWinGroupQt::fShowGameInfoDialog);
     menu->addSeparator();
     act = new QAction(tr("&Quit QTads"), this);
     act->setMenuRole(QAction::QuitRole);
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("application-exit")));
     act->setShortcuts(QKeySequence::Quit);
     menu->addAction(act);
-    connect(act, SIGNAL(triggered()), this, SLOT(close()));
+    connect(act, &QAction::triggered, this, &QWidget::close);
 
     // "Edit" menu.
     menu = menuBar->addMenu(tr("&Edit"));
@@ -115,31 +115,32 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     fCopyAction->setShortcuts(QKeySequence::Copy);
     fCopyAction->setEnabled(false);
     menu->addAction(fCopyAction);
-    connect(fCopyAction, SIGNAL(triggered()), SLOT(copyToClipboard()));
+    connect(fCopyAction, &QAction::triggered, this, &CHtmlSysWinGroupQt::copyToClipboard);
     fPasteAction = new QAction(tr("&Paste"), this);
     fPasteAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-paste")));
     fPasteAction->setShortcuts(QKeySequence::Paste);
     fPasteAction->setDisabled(true);
     menu->addAction(fPasteAction);
-    connect(fPasteAction, SIGNAL(triggered()), SLOT(pasteFromClipboard()));
-    connect(QApplication::clipboard(), SIGNAL(dataChanged()), SLOT(updatePasteAction()));
+    connect(fPasteAction, &QAction::triggered, this, &CHtmlSysWinGroupQt::pasteFromClipboard);
+    connect(QApplication::clipboard(), &QClipboard::dataChanged, this,
+            &CHtmlSysWinGroupQt::updatePasteAction);
     menu->addSeparator();
     act = new QAction(tr("&Preferences..."), this);
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("configure")));
     act->setShortcuts(QKeySequence::Preferences);
     menu->addAction(act);
-    connect(act, SIGNAL(triggered()), this, SLOT(fShowConfDialog()));
+    connect(act, &QAction::triggered, this, &CHtmlSysWinGroupQt::fShowConfDialog);
 
     // "Help" menu.
     menu = menuBar->addMenu(tr("&Help"));
     fAboutQtadsAction = new QAction(tr("A&bout QTads"), this);
     fAboutQtadsAction->setIcon(QIcon::fromTheme(QString::fromLatin1("help-about")));
     menu->addAction(fAboutQtadsAction);
-    connect(fAboutQtadsAction, SIGNAL(triggered()), this, SLOT(fShowAboutQtads()));
+    connect(fAboutQtadsAction, &QAction::triggered, this, &CHtmlSysWinGroupQt::fShowAboutQtads);
     act = new QAction(tr("&Check for Updates"), this);
     act->setMenuRole(QAction::ApplicationSpecificRole);
     menu->addAction(act);
-    connect(act, SIGNAL(triggered()), this, SLOT(fCheckForUpdates()));
+    connect(act, &QAction::triggered, this, &CHtmlSysWinGroupQt::fCheckForUpdates);
 
     setMenuBar(menuBar);
 
@@ -159,9 +160,9 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
     // Receive notification when a game is about to quit/start so we can
     // enable/disable related actions.
-    connect(qFrame, SIGNAL(gameQuitting()), this, SLOT(fNotifyGameQuitting()));
-    connect(qFrame, SIGNAL(gameHasQuit()), this, SLOT(fNotifyGameQuitting()));
-    connect(qFrame, SIGNAL(gameStarting()), this, SLOT(fNotifyGameStarting()));
+    connect(qFrame, &CHtmlSysFrameQt::gameQuitting, this, &CHtmlSysWinGroupQt::fNotifyGameQuitting);
+    connect(qFrame, &CHtmlSysFrameQt::gameHasQuit, this, &CHtmlSysWinGroupQt::fNotifyGameQuitting);
+    connect(qFrame, &CHtmlSysFrameQt::gameStarting, this, &CHtmlSysWinGroupQt::fNotifyGameStarting);
 
     qWinGroup = this;
 }
@@ -246,7 +247,8 @@ void CHtmlSysWinGroupQt::fCheckForUpdates()
     }
 
     fNetManager = new QNetworkAccessManager(this);
-    connect(fNetManager, SIGNAL(finished(QNetworkReply*)), SLOT(fReplyFinished(QNetworkReply*)));
+    connect(fNetManager, &QNetworkAccessManager::finished, this,
+            &CHtmlSysWinGroupQt::fReplyFinished);
 
     fHttpRedirectCount = 0;
     fReply = sendNetRequest(
@@ -394,8 +396,8 @@ void CHtmlSysWinGroupQt::fShowGameInfoDialog()
     }
     fGameInfoDialog = new GameInfoDialog(qStrToFname(qFrame->gameFile()), this);
     fGameInfoDialog->setWindowTitle(tr("Game Information"));
-    connect(fGameInfoDialog, SIGNAL(finished(int)), SLOT(fHideGameInfoDialog()));
-    connect(fGameInfoDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
+    connect(fGameInfoDialog, &QDialog::finished, this, &CHtmlSysWinGroupQt::fHideGameInfoDialog);
+    connect(fGameInfoDialog, &QDialog::finished, this, &CHtmlSysWinGroupQt::fActivateWindow);
     fGameInfoDialog->show();
 }
 
@@ -417,8 +419,8 @@ void CHtmlSysWinGroupQt::fShowConfDialog()
     }
     fConfDialog = new ConfDialog(this);
     fConfDialog->setWindowTitle(tr("QTads Preferences"));
-    connect(fConfDialog, SIGNAL(finished(int)), this, SLOT(fHideConfDialog()));
-    connect(fConfDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
+    connect(fConfDialog, &QDialog::finished, this, &CHtmlSysWinGroupQt::fHideConfDialog);
+    connect(fConfDialog, &QDialog::finished, this, &CHtmlSysWinGroupQt::fActivateWindow);
     fConfDialog->show();
 }
 
@@ -448,10 +450,10 @@ void CHtmlSysWinGroupQt::fShowAboutGame()
         QVBoxLayout* layout = new QVBoxLayout(fAboutBoxDialog);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->addWidget(fAboutBox);
-        connect(fAboutBoxDialog, SIGNAL(finished(int)), SLOT(fHideAboutGame()));
+        connect(fAboutBoxDialog, &QDialog::finished, this, &CHtmlSysWinGroupQt::fHideAboutGame);
     }
     fAboutBoxDialog->resize(fAboutBox->size());
-    connect(fAboutBoxDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
+    connect(fAboutBoxDialog, &QDialog::finished, this, &CHtmlSysWinGroupQt::fActivateWindow);
     fAboutBoxDialog->show();
 }
 
@@ -475,13 +477,13 @@ void CHtmlSysWinGroupQt::fShowAboutQtads()
     }
 
     fAboutQtadsDialog = new AboutQtadsDialog(this);
-    connect(fAboutQtadsDialog, SIGNAL(finished(int)), this, SLOT(fHideAboutQtads()));
+    connect(fAboutQtadsDialog, &QDialog::finished, this, &CHtmlSysWinGroupQt::fHideAboutQtads);
 #ifdef Q_OS_MAC
     // Similar bug to the config dialog one.  Again, 4 pixels higher fixes it.
     fAboutQtadsDialog->layout()->activate();
     fAboutQtadsDialog->setMinimumHeight(fAboutQtadsDialog->minimumHeight() + 4);
 #endif
-    connect(fAboutQtadsDialog, SIGNAL(finished(int)), SLOT(fActivateWindow()));
+    connect(fAboutQtadsDialog, &QDialog::finished, this, &CHtmlSysWinGroupQt::fActivateWindow);
     fAboutQtadsDialog->show();
 }
 

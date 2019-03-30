@@ -458,9 +458,9 @@ void CHtmlSysWinInputQt::getInput(textchar_t* buf, size_t buflen, unsigned long 
         QEventLoop idleLoop;
         QTimer timer;
         timer.setSingleShot(true);
-        connect(&timer, SIGNAL(timeout()), &idleLoop, SLOT(quit()));
-        connect(qFrame, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
-        connect(this, SIGNAL(inputReady()), &idleLoop, SLOT(quit()));
+        connect(&timer, &QTimer::timeout, &idleLoop, &QEventLoop::quit);
+        connect(qFrame, &CHtmlSysFrameQt::gameQuitting, &idleLoop, &QEventLoop::quit);
+        connect(this, &CHtmlSysWinInputQt::inputReady, &idleLoop, &QEventLoop::quit);
         timer.start(timeout);
         idleLoop.exec();
         if (timedOut != 0 and not fInputReady and qFrame->gameRunning()) {
@@ -579,9 +579,9 @@ int CHtmlSysWinInputQt::getKeypress(unsigned long timeout, bool useTimeout, bool
         QEventLoop idleLoop;
         QTimer timer;
         timer.setSingleShot(true);
-        connect(&timer, SIGNAL(timeout()), &idleLoop, SLOT(quit()));
-        connect(qFrame, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
-        connect(this, SIGNAL(inputReady()), &idleLoop, SLOT(quit()));
+        connect(&timer, &QTimer::timeout, &idleLoop, &QEventLoop::quit);
+        connect(qFrame, &CHtmlSysFrameQt::gameQuitting, &idleLoop, &QEventLoop::quit);
+        connect(this, &CHtmlSysWinInputQt::inputReady, &idleLoop, &QEventLoop::quit);
         timer.start(timeout);
         idleLoop.exec();
     } else

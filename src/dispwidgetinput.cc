@@ -25,15 +25,14 @@ DisplayWidgetInput::DisplayWidgetInput(CHtmlSysWinQt* parent, CHtmlFormatter* fo
     , fInpTag(0)
     , fTadsBuffer(tadsBuffer)
 {
-    connect(fBlinkTimer, SIGNAL(timeout()), this, SLOT(fBlinkCursor()));
+    connect(fBlinkTimer, &QTimer::timeout, this, &DisplayWidgetInput::fBlinkCursor);
     resetCursorBlinking();
 
     // Our initial caret height is the height of the current input font.
     fHeight = QFontMetrics(qFrame->settings()->inputFont).height() - 1;
 
     // We need to check whether the application lost focus.
-    connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)),
-            SLOT(fHandleFocusChange(QWidget*, QWidget*)));
+    connect(qApp, &QApplication::focusChanged, this, &DisplayWidgetInput::fHandleFocusChange);
 }
 
 void DisplayWidgetInput::paintEvent(QPaintEvent* e)

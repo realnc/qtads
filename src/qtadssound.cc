@@ -81,9 +81,9 @@ QTadsSound::QTadsSound(QObject* parent, Aulib::AudioStream* stream, SoundType ty
         fLength = 0ms;
     }
     // qDebug() << "Sound length:" << fLength;
-    connect(this, SIGNAL(readyToFadeOut()), SLOT(fPrepareFadeOut()));
-    connect(fFadeOutTimer, SIGNAL(timeout()), this, SLOT(fDoFadeOut()));
-    connect(this, SIGNAL(destroyed()), SLOT(fDeleteTimer()));
+    connect(this, &QTadsSound::readyToFadeOut, this, &QTadsSound::fPrepareFadeOut);
+    connect(fFadeOutTimer, &QTimer::timeout, this, &QTadsSound::fDoFadeOut);
+    connect(this, &QObject::destroyed, this, &QTadsSound::fDeleteTimer);
 
     // Make sure the timer only calls our fade-out slot *once* and then stops.
     fFadeOutTimer->setSingleShot(true);

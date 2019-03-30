@@ -29,7 +29,7 @@ public:
         : QTimer(parent)
         , CHtmlSysTimer(func, ctx)
     {
-        connect(this, SIGNAL(timeout()), this, SLOT(trigger()));
+        connect(this, &QTimer::timeout, this, &QTadsTimer::trigger);
     }
 
     // We bring this into public scope since we need to evaluate the callback

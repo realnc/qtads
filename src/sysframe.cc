@@ -80,7 +80,7 @@ CHtmlSysFrameQt::CHtmlSysFrameQt(int& argc, char* argv[], const char* appName,
     fMainWin->updateRecentGames();
 
     // Automatically quit the application when the last window has closed.
-    connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
+    connect(this, &QGuiApplication::lastWindowClosed, this, &QCoreApplication::quit);
 
     // We're the main HTML TADS frame object.
     CHtmlSysFrame::set_frame_obj(this);

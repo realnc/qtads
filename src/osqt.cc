@@ -1381,8 +1381,8 @@ void os_sleep_ms(long ms)
     QEventLoop idleLoop;
     QTimer timer;
     timer.setSingleShot(true);
-    QObject::connect(&timer, SIGNAL(timeout()), &idleLoop, SLOT(quit()));
-    QObject::connect(qFrame, SIGNAL(gameQuitting()), &idleLoop, SLOT(quit()));
+    QObject::connect(&timer, &QTimer::timeout, &idleLoop, &QEventLoop::quit);
+    QObject::connect(qFrame, &CHtmlSysFrameQt::gameQuitting, &idleLoop, &QEventLoop::quit);
     timer.start(ms);
     idleLoop.exec();
 }
