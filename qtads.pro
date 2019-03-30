@@ -217,7 +217,8 @@ HEADERS += \
     src/gameinfodialog.h \
     src/kcolorbutton.h \
     src/aboutqtadsdialog.h \
-    src/config.h
+    src/config.h \
+    src/qtimerchrono.h
 
 # QTads sources.
 SOURCES += \
@@ -242,7 +243,8 @@ SOURCES += \
     src/settings.cc \
     src/gameinfodialog.cc \
     src/kcolorbutton.cc \
-    src/aboutqtadsdialog.cc
+    src/aboutqtadsdialog.cc \
+    src/qtimerchrono.cc
 
 unix:SOURCES += \
     $$T2DIR/ostzposix.c

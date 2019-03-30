@@ -36,7 +36,7 @@ private:
     bool fPlaying;
     std::chrono::milliseconds fFadeOut{};
     bool fCrossFade;
-    class QTimer* fFadeOutTimer;
+    class QTimerChrono* fFadeOutTimer;
     QTime fTimePos;
 
     // TADS callback to invoke on stop.

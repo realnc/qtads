@@ -2,7 +2,6 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QResource>
-#include <QTimer>
 
 #ifndef NO_AUDIO
 #include "Aulib/AudioDecoderFluidsynth.h"
@@ -23,6 +22,7 @@
 
 #include "globals.h"
 #include "qtadssound.h"
+#include "qtimerchrono.h"
 #include "settings.h"
 #include "sysframe.h"
 #include "syssoundmidi.h"
@@ -66,7 +66,7 @@ QTadsSound::QTadsSound(QObject* parent, Aulib::AudioStream* stream, SoundType ty
     , fType(type)
     , fPlaying(false)
     , fCrossFade(false)
-    , fFadeOutTimer(new QTimer(0))
+    , fFadeOutTimer(new QTimerChrono(nullptr))
     , fDone_func(0)
     , fDone_func_ctx(0)
     , fRepeats(0)
