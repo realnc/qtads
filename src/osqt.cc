@@ -1347,9 +1347,10 @@ int os_input_dialog(int icon_id, const char* prompt, int standard_button_set, co
  */
 void os_time_ns(os_time_t* seconds, long* nanoseconds)
 {
-    const QDateTime& curTime = QDateTime::currentDateTime();
-    *seconds = curTime.toTime_t();
-    *nanoseconds = curTime.time().msec() * 1000000;
+    auto ms = QDateTime::currentMSecsSinceEpoch();
+    *seconds = ms / 1000;
+    ms -= *seconds * 1000;
+    *nanoseconds = ms * 1000000;
 }
 
 /* Get the current system high-precision timer.
