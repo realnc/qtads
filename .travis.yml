@@ -68,3 +68,4 @@ script:
     - rm -rf *
     - qmake -config disable-audio "$TRAVIS_BUILD_DIR"
     - make -j2
+    - make install
