@@ -170,17 +170,6 @@ OBJECTS_DIR = obj
 MOC_DIR = tmp
 UI_DIR = tmp
 
-# DISTFILES += AUTHORS COPYING ChangeLog INSTALL NEWS README SOURCE_README TODO
-# Extra files to include in the distribution tar.gz archive (by doing a
-# "make dist").
-# DISTFILES += \
-# $$T2DIR/LICENSE.TXT \
-# $$T2DIR/tadsver.htm \
-# $$T2DIR/portnote.txt \
-# $$T3DIR/portnote.htm \
-# $$HTDIR/LICENSE.TXT \
-# $$HTDIR/notes/porting.htm
-
 FORMS += \
     src/confdialog.ui \
     src/gameinfodialog.ui \
@@ -428,3 +417,30 @@ SOURCES += \
     $$T3DIR/vmtzobj.cpp \
     $$T3DIR/vmundo.cpp \
     $$T3DIR/vmvec.cpp
+
+docs.files = AUTHORS NEWS README
+desktop.files = $$files(desktop/*)
+
+OTHER_FILES *= \
+    $$desktop.files \
+    $$docs.files \
+    INSTALL \
+    LICENSE.TXT
+
+isEmpty(PREFIX) {
+    PREFIX = /usr/local
+}
+isEmpty(BINDIR) {
+    BINDIR = "$$PREFIX/bin"
+}
+isEmpty(DATADIR) {
+    DATADIR = "$$PREFIX/share"
+}
+isEmpty(DOCDIR) {
+    DOCDIR = "$$DATADIR/doc/$$TARGET-$$VERSION"
+}
+
+target.path = "$$BINDIR"
+docs.path = "$$DOCDIR"
+desktop.path = "$$DATADIR"
+INSTALLS += desktop docs target
