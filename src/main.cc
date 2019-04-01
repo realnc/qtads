@@ -29,6 +29,9 @@ int main(int argc, char** argv)
     CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", QTADS_VERSION,
                                                "Nikos Chantziaras", "qtads.sourceforge.net");
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+    QApplication::setDesktopFileName(QStringLiteral("nikos.chantziaras.qtads"));
+#endif
 
     // Filename of the game to run.
     QString gameFileName;
