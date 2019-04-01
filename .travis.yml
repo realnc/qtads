@@ -68,4 +68,6 @@ script:
     - rm -rf *
     - qmake -config disable-audio "$TRAVIS_BUILD_DIR"
     - make -j2
-    - make install
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        sudo make install;
+      fi
