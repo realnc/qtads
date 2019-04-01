@@ -1,10 +1,11 @@
 [Desktop Entry]
+Version=1.0
 Name=QTads
 GenericName=TADS interpreter
 Comment=Multimedia interpreter for TADS games
 Exec=qtads %f
+TryExec=qtads
 Icon=qtads
-Terminal=false
 Type=Application
 MimeType=application/x-tads;application/x-t3vm-image;
 Categories=Game;
