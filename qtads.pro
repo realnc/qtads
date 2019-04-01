@@ -424,6 +424,9 @@ desktop.files = $$files(desktop/*)
 OTHER_FILES *= \
     $$desktop.files \
     $$docs.files \
+    .clang-format \
+    .gitignore \
+    .travis.yml \
     INSTALL \
     LICENSE.TXT
 
