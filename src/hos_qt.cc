@@ -81,7 +81,13 @@ int os_is_word_char(oshtml_charset_id_t id, const textchar_t* p, size_t len)
  */
 os_timer_t os_get_time()
 {
-    return os_get_sys_clock_ms();
+    using namespace std::chrono;
+    // Use an initial zero point instead of just returning now().time_since_epoch(), so that we
+    // start counting from 0. This keeps the numbers small, which is important since we implement
+    // os_get_sys_clock_ms() in terms of this function. On systems where long int is 32 bits it
+    // would overflow.
+    static auto zero_point = steady_clock::now();
+    return duration_cast<milliseconds>(steady_clock::now() - zero_point).count();
 }
 
 /*

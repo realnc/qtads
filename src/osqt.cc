@@ -1357,25 +1357,7 @@ void os_time_ns(os_time_t* seconds, long* nanoseconds)
  */
 long os_get_sys_clock_ms(void)
 {
-    static QTime zeroPoint(QTime::currentTime());
-    static long lastRet = -1;
-    static unsigned long wraps = 0;
-
-    long ret = zeroPoint.elapsed();
-
-    if (ret < lastRet) {
-        // Timer has wrapped to zero.  This only happens when 24 hours have
-        // passed since this function has been called for the first time.  It's
-        // unlikely that someone will run the interpreter for 24 hours, but
-        // still...
-        //
-        // Note that the code *will* break if we're running for more than
-        // 11.767.033 years, 251 days, 20 hours and 24 minutes.  :P
-        ++wraps;
-    }
-
-    lastRet = ret;
-    return ret + (wraps * 86400000L);
+    return os_get_time();
 }
 
 /* Sleep for a while.

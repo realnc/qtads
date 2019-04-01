@@ -15,6 +15,8 @@
 #ifndef HOS_QT_H
 #define HOS_QT_H
 
+#include <chrono>
+
 /* ------------------------------------------------------------------------ */
 /*
  *   System debugging console messages
@@ -121,7 +123,7 @@ int os_is_word_char(oshtml_charset_id_t id, const textchar_t* p, size_t len);
  */
 
 /* system timer datatype */
-typedef long os_timer_t;
+using os_timer_t = std::chrono::milliseconds::rep;
 
 /* get the current system time value */
 os_timer_t os_get_time();
@@ -130,7 +132,7 @@ os_timer_t os_get_time();
  *   Get the number of timer units per second.  For Windows and Unix, the
  *   timer indicates milliseconds, so there are 1000 units per second.
  */
-// Qt emulates a resolution of 1 ms even on systems with a lower resolution.
+// We use chrono::milliseconds on all platforms.
 #define OS_TIMER_UNITS_PER_SECOND 1000
 
 /* ------------------------------------------------------------------------ */
