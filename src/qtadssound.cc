@@ -36,11 +36,6 @@ using namespace std::chrono_literals;
 bool initSound()
 {
 #ifndef NO_AUDIO
-    if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-        qWarning("Unable to initialize SDL audio engine: %s", SDL_GetError());
-        return false;
-    }
-
     if (not Aulib::init(44100, AUDIO_S16SYS, 2, 2048)) {
         qWarning("Unable to initialize SDL_audiolib: %s", SDL_GetError());
         return false;
