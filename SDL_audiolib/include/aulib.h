@@ -12,27 +12,35 @@ namespace Aulib {
  * \brief Initializes the audio system.
  *
  * \param freq
- *  Sample rate that the audio device should be opened in.
+ *  Sample rate that the audio device should be opened in. The sample rate that gets actually used
+ *  might change though if the device does not support the requested rate. Use \ref sampleRate() to
+ *  find out the actual sample rate.
  *
  * \param format
- *  Audio format. The most common format is AUDIO_S16LSB. The formats are defined by SDL
- *  (SDL_audio.h).
+ *  Audio sample format. The most common format is AUDIO_S16SYS. The formats are defined by SDL
+ *  (SDL_audio.h). The actual format we end up using might be different than the one we request if
+ *  the audio device does not support it. Use \ref sampleFormat() to find out the actual sample
+ *  format.
  *
  * \param channels
  *  Amount of output channels to use. Can either be 1 (mono) or 2 (stereo.) Lower or higher values
- *  will be adjusted.
+ *  will be adjusted. Unlike the other parameters, the channel count is enforced and will not
+ *  change.
  *
- * \param bufferSize
- *  Size in bytes of the internal buffer that is used to feed audio samples to SDL. Lower values
- *  provide lower latency on audio operations, at the cost of increased CPU usage and risk of audio
- *  drop-outs. A good value for 44.1kHz output for music players is 8192 bytes (8kB), while a game
- *  that needs to play sound effects without much latency would use something like 2048 instead.
+ * \param frameSize
+ *  Size in frames (samples per channel) of the internal buffer that is used to feed audio samples
+ *  to SDL. Lower values provide lower latency on audio operations, at the cost of increased CPU
+ *  usage and risk of audio drop-outs. A good value for 44.1kHz output for music players is 8192
+ *  bytes (8kB), while a game that needs to play sound effects without much latency would use
+ *  something like 2048 instead. The actual frame size we end up using might be different. This
+ *  depends on the audio device and output driver used by SDL. Use \ref frameSize() to find out the
+ *  actual frame size.
  *
  * \return
- *  \retval 0 The audio system was initialized successfully.
- *  \retval !=0 The audio system could not be initialized.
+ *  \retval true The audio system was initialized successfully.
+ *  \retval false The audio system could not be initialized.
  */
-AULIB_EXPORT int init(int freq, SDL_AudioFormat format, int channels, int bufferSize);
+AULIB_EXPORT bool init(int freq, SDL_AudioFormat format, int channels, int frameSize);
 
 /*!
  *  \brief Shuts down the SDL_audiolib library.
@@ -42,9 +50,33 @@ AULIB_EXPORT int init(int freq, SDL_AudioFormat format, int channels, int buffer
  */
 AULIB_EXPORT void quit();
 
-//! \private
-// Don't use this. It will be removed soon.
-AULIB_EXPORT const SDL_AudioSpec& spec();
+/*!
+ * \brief Sample format the audio device is actually using.
+ *
+ * This can be different than the format that was requested.
+ */
+AULIB_EXPORT SDL_AudioFormat sampleFormat() noexcept;
+
+/*!
+ * \brief Sample rate the audio device is actually using.
+ *
+ * This can be different than the sample rate that was requested.
+ */
+AULIB_EXPORT int sampleRate() noexcept;
+
+/*!
+ * \brief Number of output channels.
+ *
+ * This always matches the amount of channels that was requested.
+ */
+AULIB_EXPORT int channelCount() noexcept;
+
+/*!
+ * \brief Number of frames (samples per channel) the audio device is actually using.
+ *
+ * This can be different than the frame size that was requested.
+ */
+AULIB_EXPORT int frameSize() noexcept;
 
 } // namespace Aulib
 

@@ -1,40 +1,39 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
 
-#include "stream_p.h"
-#include <SDL_audio.h>
+#include <Aulib/Resampler.h>
 
-/*
- * RAII wrapper for SDL_LockAudio().
+namespace Aulib {
+
+struct ResamplerSpeex_priv;
+
+/*!
+ * \brief Speex resampler.
  */
-class SdlAudioLocker final
+class AULIB_EXPORT ResamplerSpeex: public Resampler
 {
 public:
-    SdlAudioLocker()
-    {
-        SDL_LockAudioDevice(Aulib::Stream_priv::fDeviceId);
-        fIsLocked = true;
-    }
+    /*!
+     * \param quality
+     *      Speex resampler quality level, from 0 to 10. The value is clamped
+     *      if it lies outside this range. Note that the quality can be changed
+     *      later on if required.
+     */
+    explicit ResamplerSpeex(int quality = 5);
+    ~ResamplerSpeex() override;
 
-    ~SdlAudioLocker()
-    {
-        unlock();
-    }
+    int quality() const noexcept;
+    void setQuality(int quality);
 
-    SdlAudioLocker(const SdlAudioLocker&) = delete;
-    SdlAudioLocker& operator=(const SdlAudioLocker&) = delete;
-
-    void unlock()
-    {
-        if (fIsLocked) {
-            SDL_UnlockAudioDevice(Aulib::Stream_priv::fDeviceId);
-            fIsLocked = false;
-        }
-    }
+protected:
+    void doResampling(float dst[], const float src[], int& dstLen, int& srcLen) override;
+    int adjustForOutputSpec(int dstRate, int srcRate, int channels) override;
 
 private:
-    bool fIsLocked;
+    const std::unique_ptr<ResamplerSpeex_priv> d;
 };
+
+} // namespace Aulib
 
 /*
 

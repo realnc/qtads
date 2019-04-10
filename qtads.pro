@@ -102,19 +102,18 @@ disable-audio {
     SOURCES += \
         SDL_audiolib/resampler/resample.c \
         SDL_audiolib/src/missing/sdl_load_file_rw.c \
-        SDL_audiolib/src/AudioDecoder.cpp \
-        SDL_audiolib/src/AudioDecoderFluidsynth.cpp \
-        SDL_audiolib/src/AudioDecoderMpg123.cpp \
-        SDL_audiolib/src/AudioDecoderSndfile.cpp \
-        SDL_audiolib/src/AudioDecoderVorbis.cpp \
-        SDL_audiolib/src/AudioResampler.cpp \
-        SDL_audiolib/src/AudioResamplerSpeex.cpp \
-        SDL_audiolib/src/AudioStream.cpp \
+        SDL_audiolib/src/Decoder.cpp \
+        SDL_audiolib/src/DecoderFluidsynth.cpp \
+        SDL_audiolib/src/DecoderMpg123.cpp \
+        SDL_audiolib/src/DecoderSndfile.cpp \
+        SDL_audiolib/src/DecoderVorbis.cpp \
         SDL_audiolib/src/Processor.cpp \
+        SDL_audiolib/src/Resampler.cpp \
+        SDL_audiolib/src/ResamplerSpeex.cpp \
         SDL_audiolib/src/Stream.cpp \
-        SDL_audiolib/src/audiostream_p.cpp \
         SDL_audiolib/src/aulib.cpp \
         SDL_audiolib/src/sampleconv.cpp \
+        SDL_audiolib/src/stream_p.cpp \
         src/rwopsbundle.c
 }
 

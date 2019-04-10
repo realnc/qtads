@@ -4,11 +4,11 @@
 #include <QResource>
 
 #ifndef NO_AUDIO
-#include "Aulib/AudioDecoderFluidsynth.h"
-#include "Aulib/AudioDecoderMpg123.h"
-#include "Aulib/AudioDecoderSndfile.h"
-#include "Aulib/AudioDecoderVorbis.h"
-#include "Aulib/AudioResamplerSpeex.h"
+#include "Aulib/DecoderFluidsynth.h"
+#include "Aulib/DecoderMpg123.h"
+#include "Aulib/DecoderSndfile.h"
+#include "Aulib/DecoderVorbis.h"
+#include "Aulib/ResamplerSpeex.h"
 #include "aulib.h"
 #include "rwopsbundle.h"
 #include <SDL.h>
@@ -41,7 +41,7 @@ bool initSound()
         return false;
     }
 
-    if (Aulib::init(44100, AUDIO_S16SYS, 2, 2048) != 0) {
+    if (not Aulib::init(44100, AUDIO_S16SYS, 2, 2048)) {
         qWarning("Unable to initialize SDL_audiolib: %s", SDL_GetError());
         return false;
     }
@@ -60,7 +60,7 @@ void quitSound()
 }
 
 #ifndef NO_AUDIO
-QTadsSound::QTadsSound(QObject* parent, Aulib::AudioStream* stream, SoundType type)
+QTadsSound::QTadsSound(QObject* parent, Aulib::Stream* stream, SoundType type)
     : QObject(parent)
     , fAudStream(stream)
     , fType(type)
@@ -130,8 +130,7 @@ void QTadsSound::fDoFadeOut()
     // If we need to do a crossfade, call the TADS callback now.
     if (fCrossFade and fDone_func) {
         fDone_func(fDone_func_ctx, fRepeats);
-        // Make sure our AudioStream callback won't call the TADS callback a second
-        // time.
+        // Make sure our Stream callback won't call the TADS callback a second time.
         fDone_func = 0;
         fDone_func_ctx = 0;
     }
@@ -293,30 +292,30 @@ CHtmlSysSound* QTadsSound::createSound(const CHtmlUrl* /*url*/, const textchar_t
         return 0;
     }
 
-    std::unique_ptr<Aulib::AudioDecoder> decoder = nullptr;
+    std::unique_ptr<Aulib::Decoder> decoder = nullptr;
     switch (type) {
     case MPEG:
-        decoder = std::make_unique<Aulib::AudioDecoderMpg123>();
+        decoder = std::make_unique<Aulib::DecoderMpg123>();
         break;
     case OGG:
-        decoder = std::make_unique<Aulib::AudioDecoderVorbis>();
+        decoder = std::make_unique<Aulib::DecoderVorbis>();
         break;
     case WAV:
-        decoder = std::make_unique<Aulib::AudioDecoderSndfile>();
+        decoder = std::make_unique<Aulib::DecoderSndfile>();
         break;
     case MIDI: {
-        decoder = std::make_unique<Aulib::AudioDecoderFluidSynth>();
+        decoder = std::make_unique<Aulib::DecoderFluidsynth>();
         QResource sf2Res(QStringLiteral(":/soundfont.sf2"));
         auto* sf2_rwops = SDL_RWFromConstMem(sf2Res.data(), sf2Res.size());
-        auto fsynth = static_cast<Aulib::AudioDecoderFluidSynth*>(decoder.get());
+        auto fsynth = static_cast<Aulib::DecoderFluidsynth*>(decoder.get());
         fsynth->loadSoundfont(sf2_rwops);
         fsynth->setGain(0.6f);
         break;
     }
     }
 
-    Aulib::AudioStream* stream = new Aulib::AudioStream(
-        rw, std::move(decoder), std::make_unique<Aulib::AudioResamplerSpeex>(), true);
+    Aulib::Stream* stream =
+        new Aulib::Stream(rw, std::move(decoder), std::make_unique<Aulib::ResamplerSpeex>(), true);
     if (not stream->open()) {
         qWarning() << "ERROR:" << SDL_GetError();
         SDL_ClearError();

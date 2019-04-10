@@ -1,18 +1,18 @@
 // This is copyrighted software. More information is at the end of this file.
-#include "Aulib/AudioDecoderFluidsynth.h"
-#include "Aulib/AudioDecoderModplug.h"
-#include "Aulib/AudioDecoderMpg123.h"
-#include "Aulib/AudioDecoderSndfile.h"
-#include "Aulib/AudioDecoderVorbis.h"
-#include "Aulib/AudioResamplerSpeex.h"
-#include "Aulib/AudioStream.h"
+#include "Aulib/DecoderFluidsynth.h"
+#include "Aulib/DecoderModplug.h"
+#include "Aulib/DecoderMpg123.h"
+#include "Aulib/DecoderSndfile.h"
+#include "Aulib/DecoderVorbis.h"
+#include "Aulib/ResamplerSpeex.h"
+#include "Aulib/Stream.h"
 #include "aulib_config.h"
 #include "aulib_debug.h"
 #include "aulib_global.h"
 #include "sdl_mixer_emu.h"
 
 // Currently active global music stream (SDL_mixer only supports one.)
-static Aulib::AudioStream* gMusic = nullptr;
+static Aulib::Stream* gMusic = nullptr;
 static float gMusicVolume = 1.0f;
 
 extern "C" {
@@ -30,8 +30,8 @@ Mix_Music* Mix_LoadMUS(const char* file)
 {
     AM_debugPrintLn(__func__);
 
-    auto strm = new Aulib::AudioStream(file, Aulib::AudioDecoder::decoderFor(file),
-                                       std::make_unique<Aulib::AudioResamplerSpeex>());
+    auto strm = new Aulib::Stream(file, Aulib::Decoder::decoderFor(file),
+                                  std::make_unique<Aulib::ResamplerSpeex>());
     strm->open();
     return (Mix_Music*)strm;
 }
@@ -40,8 +40,8 @@ Mix_Music* Mix_LoadMUS_RW(SDL_RWops* rw)
 {
     AM_debugPrintLn(__func__);
 
-    auto strm = new Aulib::AudioStream(rw, Aulib::AudioDecoder::decoderFor(rw),
-                                       std::make_unique<Aulib::AudioResamplerSpeex>(), false);
+    auto strm = new Aulib::Stream(rw, Aulib::Decoder::decoderFor(rw),
+                                  std::make_unique<Aulib::ResamplerSpeex>(), false);
     strm->open();
     return (Mix_Music*)strm;
 }
@@ -50,29 +50,29 @@ Mix_Music* Mix_LoadMUSType_RW(SDL_RWops* rw, Mix_MusicType type, int freesrc)
 {
     AM_debugPrintLn(__func__ << " type: " << type);
 
-    auto decoder = std::unique_ptr<Aulib::AudioDecoder>(nullptr);
+    auto decoder = std::unique_ptr<Aulib::Decoder>(nullptr);
     switch (type) {
     case MUS_WAV:
     case MUS_FLAC:
-        decoder = std::make_unique<Aulib::AudioDecoderSndfile>();
+        decoder = std::make_unique<Aulib::DecoderSndfile>();
         break;
 
     case MUS_MOD:
     case MUS_MODPLUG:
-        decoder = std::make_unique<Aulib::AudioDecoderModPlug>();
+        decoder = std::make_unique<Aulib::DecoderModplug>();
         break;
 
     case MUS_MID:
-        decoder = std::make_unique<Aulib::AudioDecoderFluidSynth>();
+        decoder = std::make_unique<Aulib::DecoderFluidsynth>();
         break;
 
     case MUS_OGG:
-        decoder = std::make_unique<Aulib::AudioDecoderVorbis>();
+        decoder = std::make_unique<Aulib::DecoderVorbis>();
         break;
 
     case MUS_MP3:
     case MUS_MP3_MAD:
-        decoder = std::make_unique<Aulib::AudioDecoderMpg123>();
+        decoder = std::make_unique<Aulib::DecoderMpg123>();
         break;
 
     default:
@@ -80,8 +80,8 @@ Mix_Music* Mix_LoadMUSType_RW(SDL_RWops* rw, Mix_MusicType type, int freesrc)
         return nullptr;
     }
 
-    auto strm = new Aulib::AudioStream(
-        rw, std::move(decoder), std::make_unique<Aulib::AudioResamplerSpeex>(), freesrc != 0);
+    auto strm = new Aulib::Stream(rw, std::move(decoder), std::make_unique<Aulib::ResamplerSpeex>(),
+                                  freesrc != 0);
     strm->open();
     return (Mix_Music*)strm;
 }
@@ -90,7 +90,7 @@ void Mix_FreeMusic(Mix_Music* music)
 {
     AM_debugPrintLn(__func__);
 
-    auto* strm = (Aulib::AudioStream*)music;
+    auto* strm = (Aulib::Stream*)music;
     if (gMusic == strm) {
         gMusic = nullptr;
     }
@@ -158,7 +158,7 @@ int Mix_PlayMusic(Mix_Music* music, int loops)
     if (loops == 0) {
         return 0;
     }
-    gMusic = (Aulib::AudioStream*)music;
+    gMusic = (Aulib::Stream*)music;
     gMusic->setVolume(gMusicVolume);
     return static_cast<int>(gMusic->play(loops == -1 ? 0 : loops));
 }

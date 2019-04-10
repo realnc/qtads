@@ -6,7 +6,7 @@
 #include "config.h"
 #include "tadshtml.h"
 #ifndef NO_AUDIO
-#include "Aulib/AudioStream.h"
+#include "Aulib/Stream.h"
 #endif
 
 bool initSound();
@@ -31,7 +31,7 @@ public:
 
 #ifndef NO_AUDIO
 private:
-    Aulib::AudioStream* fAudStream;
+    Aulib::Stream* fAudStream;
     SoundType fType;
     bool fPlaying;
     std::chrono::milliseconds fFadeOut{};
@@ -77,7 +77,7 @@ signals:
     void readyToFadeOut();
 
 public:
-    QTadsSound(QObject* parent, Aulib::AudioStream* stream, SoundType type);
+    QTadsSound(QObject* parent, Aulib::Stream* stream, SoundType type);
     ~QTadsSound() override;
 #endif
 

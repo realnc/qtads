@@ -1,24 +1,75 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
 
-#include "aulib_global.h"
+#include "aulib_export.h"
 #include <SDL_stdinc.h>
+#include <aulib.h>
 #include <chrono>
 #include <functional>
 #include <memory>
 
+struct SDL_RWops;
+struct SDL_AudioSpec;
+
 namespace Aulib {
 
+class Decoder;
+class Resampler;
+class Processor;
+
 /*!
- * \brief Abstract base class for playback streams.
+ * \brief A \ref Stream handles playback for audio produced by a Decoder.
  */
 class AULIB_EXPORT Stream
 {
 public:
     using Callback = std::function<void(Stream&)>;
 
-    Stream();
+    /*!
+     * \brief Constructs an audio stream from the given file name, decoder and resampler.
+     *
+     * \param filename
+     *  File name from which to feed data to the decoder. Must not be null.
+     *
+     * \param decoder
+     *  Decoder to use for decoding the contents of the file. Must not be null.
+     *
+     * \param resampler
+     *  Resampler to use for converting the sample rate of the audio we get from the decoder. If
+     *  this is null, then no resampling will be performed.
+     */
+    explicit Stream(const std::string& filename, std::unique_ptr<Decoder> decoder,
+                    std::unique_ptr<Resampler> resampler);
+
+    //! \overload
+    explicit Stream(const std::string& filename, std::unique_ptr<Decoder> decoder);
+
+    /*!
+     * \brief Constructs an audio stream from the given SDL_RWops, decoder and resampler.
+     *
+     * \param rwops
+     *  SDL_RWops from which to feed data to the decoder. Must not be null.
+     *
+     * \param decoder
+     *  Decoder to use for decoding the contents of the SDL_RWops. Must not be null.
+     *
+     * \param resampler
+     *  Resampler to use for converting the sample rate of the audio we get from the decoder. If
+     *  this is null, then no resampling will be performed.
+     *
+     * \param closeRw
+     *  Specifies whether 'rwops' should be automatically closed when the stream is destroyed.
+     */
+    explicit Stream(SDL_RWops* rwops, std::unique_ptr<Decoder> decoder,
+                    std::unique_ptr<Resampler> resampler, bool closeRw);
+
+    //! \overload
+    explicit Stream(SDL_RWops* rwops, std::unique_ptr<Decoder> decoder, bool closeRw);
+
     virtual ~Stream();
+
+    Stream(const Stream&) = delete;
+    Stream& operator=(const Stream&) = delete;
 
     /*!
      * \brief Open the stream and prepare it for playback.
@@ -30,7 +81,7 @@ public:
      *  \retval true Stream was opened successfully.
      *  \retval false The stream could not be opened.
      */
-    virtual bool open() = 0;
+    virtual bool open();
 
     /*!
      * \brief Start playback.
@@ -45,7 +96,7 @@ public:
      *  \retval true Playback was started successfully, or it was already started.
      *  \retval false Playback could not be started.
      */
-    virtual bool play(int iterations = 1, std::chrono::microseconds fadeTime = {}) = 0;
+    virtual bool play(int iterations = 1, std::chrono::microseconds fadeTime = {});
 
     /*!
      * \brief Stop playback.
@@ -55,7 +106,7 @@ public:
      * \param fadeTime
      *  Fade-out over the specified amount of time.
      */
-    virtual void stop(std::chrono::microseconds fadeTime = {}) = 0;
+    virtual void stop(std::chrono::microseconds fadeTime = {});
 
     /*!
      * \brief Pause playback.
@@ -63,7 +114,7 @@ public:
      * \param fadeTime
      *  Fade-out over the specified amount of time.
      */
-    virtual void pause(std::chrono::microseconds fadeTime = {}) = 0;
+    virtual void pause(std::chrono::microseconds fadeTime = {});
 
     /*!
      * \brief Resume playback.
@@ -71,7 +122,7 @@ public:
      * \param fadeTime
      *  Fade-in over the specified amount of time.
      */
-    virtual void resume(std::chrono::microseconds fadeTime = {}) = 0;
+    virtual void resume(std::chrono::microseconds fadeTime = {});
 
     /*!
      * \brief Rewind stream to the beginning.
@@ -80,7 +131,7 @@ public:
      *  \retval true Stream was rewound successfully.
      *  \retval false Stream could not be rewound.
      */
-    virtual bool rewind() = 0;
+    virtual bool rewind();
 
     /*!
      * \brief Change playback volume.
@@ -90,7 +141,7 @@ public:
      *  are possible and will result in gain being applied (which might result in distortion.) For
      *  example, 3.5 would result in 350% percent volume. There is no upper limit.
      */
-    virtual void setVolume(float volume) = 0;
+    virtual void setVolume(float volume);
 
     /*!
      * \brief Get current playback volume.
@@ -98,24 +149,24 @@ public:
      * \return
      *  Current playback volume.
      */
-    virtual float volume() const = 0;
+    virtual float volume() const;
 
     /*!
      * \brief Mute the stream.
      *
      * A muted stream still accepts volume changes, but it will stay inaudible until it is unmuted.
      */
-    virtual void mute() = 0;
+    virtual void mute();
 
     /*!
      * \brief Unmute the stream.
      */
-    virtual void unmute() = 0;
+    virtual void unmute();
 
     /*!
      * \brief Returns true if the stream is muted, false otherwise.
      */
-    virtual bool isMuted() const = 0;
+    virtual bool isMuted() const;
 
     /*!
      * \brief Get current playback state.
@@ -126,7 +177,7 @@ public:
      *  \retval true Playback has been started.
      *  \retval false Playback has not been started yet, or was stopped.
      */
-    virtual bool isPlaying() const = 0;
+    virtual bool isPlaying() const;
 
     /*!
      * \brief Get current pause state.
@@ -138,7 +189,7 @@ public:
      *  \retval true The stream is currently paused.
      *  \retval false The stream is currently not paused.
      */
-    virtual bool isPaused() const = 0;
+    virtual bool isPaused() const;
 
     /*!
      * \brief Get stream duration.
@@ -151,7 +202,7 @@ public:
      * Stream duration. If the stream does not provide duration information, a zero duration is
      * returned.
      */
-    virtual std::chrono::microseconds duration() const = 0;
+    virtual std::chrono::microseconds duration() const;
 
     /*!
      * \brief Seek to a time position in the stream.
@@ -169,7 +220,7 @@ public:
      *  \retval true The playback position was changed successfully.
      *  \retval false This stream does not support seeking.
      */
-    virtual bool seekToTime(std::chrono::microseconds pos) = 0;
+    virtual bool seekToTime(std::chrono::microseconds pos);
 
     /*!
      * \brief Set a callback for when the stream finishes playback.
@@ -204,6 +255,31 @@ public:
      */
     void unsetLoopCallback();
 
+    /*!
+     * \brief Add an audio processor to the bottom of the processor list.
+     *
+     * You can add multiple processors. They will be run in the order they were added, each one
+     * using the previous processor's output as input. If the processor instance already exists in
+     * the processor list, or is a nullptr, the function does nothing.
+     *
+     * \param processor The processor to add.
+     */
+    void addProcessor(std::shared_ptr<Processor> processor);
+
+    /*!
+     * \brief Remove a processor from the stream.
+     *
+     * If the processor instance is not found, the function does nothing.
+     *
+     * \param processor Processor to remove.
+     */
+    void removeProcessor(Processor* processor);
+
+    /*!
+     * \brief Remove all processors from the stream.
+     */
+    void clearProcessors();
+
 protected:
     /*!
      * \brief Invokes the finish-playback callback, if there is one.
@@ -220,6 +296,9 @@ protected:
     void invokeLoopCallback();
 
 private:
+    friend struct Stream_priv;
+    friend bool Aulib::init(int, SDL_AudioFormat, int, int);
+
     const std::unique_ptr<struct Stream_priv> d;
 };
 

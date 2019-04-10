@@ -1,40 +1,34 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
 
-#include "stream_p.h"
-#include <SDL_audio.h>
+#include <Aulib/Decoder.h>
 
-/*
- * RAII wrapper for SDL_LockAudio().
+namespace Aulib {
+
+/*!
+ * \brief libvorbisfile decoder.
  */
-class SdlAudioLocker final
+class AULIB_EXPORT DecoderVorbis: public Decoder
 {
 public:
-    SdlAudioLocker()
-    {
-        SDL_LockAudioDevice(Aulib::Stream_priv::fDeviceId);
-        fIsLocked = true;
-    }
+    DecoderVorbis();
+    ~DecoderVorbis() override;
 
-    ~SdlAudioLocker()
-    {
-        unlock();
-    }
+    bool open(SDL_RWops* rwops) override;
+    int getChannels() const override;
+    int getRate() const override;
+    bool rewind() override;
+    std::chrono::microseconds duration() const override;
+    bool seekToTime(std::chrono::microseconds pos) override;
 
-    SdlAudioLocker(const SdlAudioLocker&) = delete;
-    SdlAudioLocker& operator=(const SdlAudioLocker&) = delete;
-
-    void unlock()
-    {
-        if (fIsLocked) {
-            SDL_UnlockAudioDevice(Aulib::Stream_priv::fDeviceId);
-            fIsLocked = false;
-        }
-    }
+protected:
+    int doDecoding(float buf[], int len, bool& callAgain) override;
 
 private:
-    bool fIsLocked;
+    const std::unique_ptr<struct DecoderVorbis_priv> d;
 };
+
+} // namespace Aulib
 
 /*
 

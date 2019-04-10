@@ -4,7 +4,7 @@
 #include "htmlsys.h"
 #include "qtadssound.h"
 #ifndef NO_AUDIO
-#include "Aulib/AudioStream.h"
+#include "Aulib/Stream.h"
 #endif
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -19,7 +19,7 @@ class CHtmlSysSoundMidiQt: public QTadsSound, public CHtmlSysSoundMidi
 
 public:
 #ifndef NO_AUDIO
-    CHtmlSysSoundMidiQt(QObject* parent, Aulib::AudioStream* stream, SoundType type)
+    CHtmlSysSoundMidiQt(QObject* parent, Aulib::Stream* stream, SoundType type)
         : QTadsSound(parent, stream, type)
     {}
 #endif

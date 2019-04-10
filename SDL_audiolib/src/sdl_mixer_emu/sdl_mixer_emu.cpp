@@ -4,7 +4,7 @@
 #include "aulib_config.h"
 #include "aulib_debug.h"
 #include "aulib_global.h"
-//#include "audiostream.h"
+//#include "stream.h"
 
 const SDL_version* Mix_Linked_Version()
 {
@@ -46,15 +46,14 @@ int Mix_QuerySpec(int* frequency, Uint16* format, int* channels)
 {
     AM_debugPrintLn(__func__);
 
-    const SDL_AudioSpec& spec = Aulib::spec();
     if (frequency != nullptr) {
-        *frequency = spec.freq;
+        *frequency = Aulib::sampleRate();
     }
     if (format != nullptr) {
-        *format = spec.format;
+        *format = Aulib::sampleFormat();
     }
     if (channels != nullptr) {
-        *channels = spec.channels;
+        *channels = Aulib::channelCount();
     }
     return 1; // TODO
 }
