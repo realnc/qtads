@@ -1,7 +1,7 @@
 // This is copyrighted software. More information is at the end of this file.
 #include <QDebug>
 #include <QFileDialog>
-#include <QMetaType>
+#include <QTimer>
 
 #include "qtadssound.h"
 #include "settings.h"
@@ -62,9 +62,8 @@ int main(int argc, char** argv)
     }
 #endif
 
-    QMetaObject::invokeMethod(app, "entryPoint", Qt::QueuedConnection,
-                              Q_ARG(QString, gameFileName));
-    int ret = app->exec();
+    QTimer::singleShot(0, app, [app, gameFileName] { app->entryPoint(gameFileName); });
+    int ret = CHtmlSysFrameQt::exec();
 
     delete app;
     quitSound();
