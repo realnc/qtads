@@ -34,10 +34,12 @@ bool Aulib::init(int freq, SDL_AudioFormat format, int channels, int frameSize)
     requestedSpec.samples = frameSize;
     requestedSpec.callback = ::sdlCallback;
     Stream_priv::fAudioSpec = requestedSpec;
+    auto flags = SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_FORMAT_CHANGE;
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+    flags |= SDL_AUDIO_ALLOW_SAMPLES_CHANGE;
+#endif
     Stream_priv::fDeviceId =
-        SDL_OpenAudioDevice(nullptr, false, &requestedSpec, &Stream_priv::fAudioSpec,
-                            SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_FORMAT_CHANGE
-                                | SDL_AUDIO_ALLOW_SAMPLES_CHANGE);
+        SDL_OpenAudioDevice(nullptr, false, &requestedSpec, &Stream_priv::fAudioSpec, flags);
     if (Stream_priv::fDeviceId == 0) {
         Aulib::quit();
         return false;
@@ -134,7 +136,7 @@ int Aulib::frameSize() noexcept
 
 /*
 
-Copyright (C) 2014, 2015, 2016, 2017, 2018 Nikos Chantziaras.
+Copyright (C) 2014, 2015, 2016, 2017, 2018, 2019 Nikos Chantziaras.
 
 This file is part of SDL_audiolib.
 
