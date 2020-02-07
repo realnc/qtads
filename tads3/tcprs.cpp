@@ -1049,12 +1049,14 @@ CTcPrsNode *CTcParser::create_sym_node(const textchar_t *sym, size_t sym_len)
      *   requires that local scope items be declared before their first
      *   use. 
      */
-    CTcPrsSymtab *symtab;
-    CTcSymbol *entry = local_symtab_->find(sym, sym_len, &symtab);
+    if (local_symtab_ != 0) {
+        CTcPrsSymtab *symtab;
+        CTcSymbol *entry = local_symtab_->find(sym, sym_len, &symtab);
 
-    /* if we found it in local scope, return a resolved symbol node */
-    if (entry != 0 && symtab != global_symtab_)
-        return new CTPNSymResolved(entry);
+        /* if we found it in local scope, return a resolved symbol node */
+        if (entry != 0 && symtab != global_symtab_)
+            return new CTPNSymResolved(entry);
+    }
 
     /* if there's a debugger local scope, look it up there */
     if (debug_symtab_ != 0)
