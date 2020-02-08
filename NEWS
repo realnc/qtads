@@ -1,5 +1,5 @@
-Git
-===
+3.0 - 2020-02-08
+================
 
   - Improved audio engine:
 
@@ -32,18 +32,29 @@ Git
   - Fixed an issue where the interpreter sometimes failed to set custom fonts
     requested by the game.
 
-  - The "Typewriter" font selector now allows selecting proportional fonts.
-    Many typewriter fonts don't seem to identify themselves as fixed-width.
-    Lift the restriction so that they can be selected in the font combo box.
+  - The "Typewriter" font setting now allows selecting proportional fonts. Many
+    typewriter fonts don't identify themselves as fixed-width. Lift the
+    restriction so that they can be selected.
 
   - Fixed a possible crash when clicking on an in-game URL and the default
     browser on Windows is set to Microsoft Edge.
 
   - Improvements for high DPI displays.
 
-  - TADS VM code fixes.
+  - Fixed not being able to close some dialog windows on Windows.
 
-  - Building the interpreter now requires at least C11, C++14 and Qt 5.9 or
+  - Improved random number generator.
+
+  - "OS time" is now properly reported with nanosecond precision instead of
+    milliseconds.
+
+  - The choice for which fonts to use by default (if no font settings exist
+    yet) is now deferred to the OS. Previously, common font names for each OS
+    were hardcoded for each font type.
+
+  - TADS VM code fixes and a workaround for dynamic compilation crashes.
+
+  - Building the interpreter now requires at least C11, C++14 and Qt 5.5 or
     newer.
 
   - It's now possible to build the interpreter without audio support:
@@ -59,6 +70,8 @@ Git
       https://github.com/realnc/qtads
 
     The sourceforge project is still there, but only serves as a mirror.
+
+  - QTads is now licensed under the GPL version 3 or later.
 
 
 2.1.7 - 2016-01-21

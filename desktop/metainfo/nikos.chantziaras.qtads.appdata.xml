@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2020 Nikos Chantziaras <realnc@gmail.com> -->
+<component type="desktop-application">
+    <id>nikos.chantziaras.qtads</id>
+    <metadata_license>FSFAP</metadata_license>
+    <project_license>GPL-3.0+</project_license>
+    <name>QTads</name>
+    <summary>Multimedia interpreter for TADS games</summary>
+    <developer_name>Nikos Chantziaras</developer_name>
+    <update_contact>realnc@gmail.com</update_contact>
+    <launchable type="desktop-id">nikos.chantziaras.qtads.desktop</launchable>
+    <provides>
+        <binary>qtads</binary>
+    </provides>
+    <categories>
+        <category>Game</category>
+        <category>AdventureGame</category>
+    ​</categories>
+
+    <description>
+        <p>QTads is a cross-platform, multimedia interpreter for TADS games. It is fully compatible
+        with HTML TADS (aka "Multimedia TADS.") Both TADS versions in use today (v2 and v3) are
+        supported.</p>
+
+        <p>Most TADS games are free and can be downloaded from places like the Interactive Fiction
+        Database (https://ifdb.tads.org) and the Interactive Fiction Archive
+        (https://ifarchive.org).</p>
+    </description>
+
+    <screenshots>
+        <screenshot type="default">
+            <caption>Playing Scott Starkey's "The Beetmonger's Journal"</caption>
+            <image type="source" width="1354" height="762">https://realnc.github.io/qtads/appstream_screenshot.png</image>
+        </screenshot>
+    </screenshots>
+
+    <url type="homepage">https://realnc.github.io/qtads</url>
+    <url type="bugtracker">https://github.com/realnc/qtads/issues</url>
+    <url type="contact">mailto:realnc@gmail.com</url>
+
+    <releases>
+    <release version="3.0" date="2020-02-08">
+        <description>
+            <p>Too many changes and bug fixes to list them all. Some important ones:</p>            
+            <ul>
+                <li>Improved audio engine with better sound quality.</li>
+                <li>Audio is now streamed in real-time where in the past it had to be decoded in
+                    whole prior to playback, causing a big delay.</li>
+                <li>MIDI music is now played using an internal MIDI synthesizer (FluidSynth).</li>
+                <li>The maximum text width of the main window is now configurable.</li>
+            </ul>
+        </description>
+        <url>https://github.com/realnc/qtads/releases/tag/3.0.0</url>
+    </release>
+    </releases>
+</component>
