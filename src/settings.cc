@@ -7,6 +7,14 @@
 #include "settings.h"
 #include "syswingroup.h"
 
+static QFont fontForStyleHint(const QFont::StyleHint hint)
+{
+    QFont f;
+    f.setStyleHint(hint);
+    f.setFamily(f.defaultFamily());
+    return f;
+}
+
 void Settings::loadFromDisk()
 {
     QSettings sett;
@@ -42,39 +50,20 @@ void Settings::loadFromDisk()
         sett.value(QString::fromLatin1("clickedlinks"), QColor(Qt::cyan)).value<QColor>();
     sett.endGroup();
 
-#ifdef Q_OS_MAC
-    const QString& DEFAULT_SERIF = QString::fromLatin1("Georgia,15");
-    const QString& DEFAULT_SANS = QString::fromLatin1("Helvetica,15");
-    const QString& DEFAULT_MONO = QString::fromLatin1("Andale Mono,15");
-    const QString& DEFAULT_SCRIPT = QString::fromLatin1("Apple Chancery,17");
-#else
-#ifdef Q_OS_WIN
-    const QString& DEFAULT_SERIF = QString::fromLatin1("Times New Roman,12");
-    const QString& DEFAULT_SANS = QString::fromLatin1("Verdana,12");
-    const QString& DEFAULT_MONO = QString::fromLatin1("Courier New,12");
-    const QString& DEFAULT_SCRIPT = QString::fromLatin1("Comic Sans MS,12");
-#else
-#ifdef Q_OS_ANDROID
-    const QString& DEFAULT_SERIF = QString::fromLatin1("Droid Serif");
-    const QString& DEFAULT_SANS = QString::fromLatin1("Droid Sans");
-    const QString& DEFAULT_MONO = QString::fromLatin1("Droid Sans Mono");
-    const QString& DEFAULT_SCRIPT = QString::fromLatin1("Droid Serif");
-#else
-    const QString& DEFAULT_SERIF = QString::fromLatin1("serif");
-    const QString& DEFAULT_SANS = QString::fromLatin1("sans-serif");
-    const QString& DEFAULT_MONO = QString::fromLatin1("monospace");
-    const QString& DEFAULT_SCRIPT = QString::fromLatin1("cursive");
-#endif
-#endif
-#endif
+    const auto def_serif = fontForStyleHint(QFont::Serif);
+    const auto def_sans = fontForStyleHint(QFont::SansSerif);
+    const auto def_fixed = fontForStyleHint(QFont::Monospace);
+    const auto def_writer = fontForStyleHint(QFont::TypeWriter);
+    const auto def_script = fontForStyleHint(QFont::Cursive);
+
     sett.beginGroup(QString::fromLatin1("fonts"));
-    mainFont.fromString(sett.value(QString::fromLatin1("main"), DEFAULT_SERIF).toString());
-    fixedFont.fromString(sett.value(QString::fromLatin1("fixed"), DEFAULT_MONO).toString());
-    serifFont.fromString(sett.value(QString::fromLatin1("serif"), DEFAULT_SERIF).toString());
-    sansFont.fromString(sett.value(QString::fromLatin1("sans"), DEFAULT_SANS).toString());
-    scriptFont.fromString(sett.value(QString::fromLatin1("script"), DEFAULT_SCRIPT).toString());
-    writerFont.fromString(sett.value(QString::fromLatin1("typewriter"), DEFAULT_MONO).toString());
-    inputFont.fromString(sett.value(QString::fromLatin1("input"), DEFAULT_SERIF).toString());
+    mainFont.fromString(sett.value(QString::fromLatin1("main"), def_serif).toString());
+    fixedFont.fromString(sett.value(QString::fromLatin1("fixed"), def_fixed).toString());
+    serifFont.fromString(sett.value(QString::fromLatin1("serif"), def_serif).toString());
+    sansFont.fromString(sett.value(QString::fromLatin1("sans"), def_sans).toString());
+    scriptFont.fromString(sett.value(QString::fromLatin1("script"), def_script).toString());
+    writerFont.fromString(sett.value(QString::fromLatin1("typewriter"), def_writer).toString());
+    inputFont.fromString(sett.value(QString::fromLatin1("input"), def_serif).toString());
     useMainFontForInput = sett.value(QString::fromLatin1("useMainFontForInput"), true).toBool();
     sett.endGroup();
 
