@@ -446,3 +446,35 @@ target.path = "$$BINDIR"
 docs.path = "$$DOCDIR"
 desktop.path = "$$DATADIR"
 INSTALLS += desktop docs target
+
+linux {
+    appimage.target = appimage
+    appimage.commands = \
+        rm -f QTads.AppImage \
+        && rm -rf AppDir \
+        && "$$QMAKE_QMAKE" PREFIX="$$OUT_PWD/AppDir/usr" -config release "$$_PRO_FILE_" \
+        && make -j$$QMAKE_HOST.cpu_count install \
+        && linuxdeployqt \
+            AppDir/usr/share/applications/nikos.chantziaras.qtads.desktop \
+            -appimage \
+            -no-copy-copyright-files \
+            -no-translations \
+            -qmake="$$QMAKE_QMAKE" \
+            -extra-plugins=iconengines,platformthemes \
+        && mv *.AppImage QTads.AppImage
+
+    QMAKE_EXTRA_TARGETS += appimage
+}
+
+macx {
+    macdist.target = macdist
+    macdist.commands = \
+        rm -rf "$${TARGET}.app" \
+        && rm -f "$${TARGET}.zip" \
+        && "$$QMAKE_QMAKE" -config release "$$_PRO_FILE_" \
+        && make -j$$QMAKE_HOST.cpu_count \
+        && "$$dirname(QMAKE_QMAKE)/macdeployqt" "$${TARGET}.app" \
+        && ditto -v -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 "$${TARGET}.app" "$${TARGET}.zip"
+
+    QMAKE_EXTRA_TARGETS += macdist
+}
