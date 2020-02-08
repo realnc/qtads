@@ -38,8 +38,7 @@ int strnicmp(const char* s1, const char* s2, size_t n);
 #endif
 
 /*
-    Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos
-    Chantziaras.
+    Copyright 2003-2020 Nikos Chantziaras <realnc@gmail.com>
 
     This file is part of QTads.
 

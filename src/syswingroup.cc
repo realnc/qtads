@@ -725,8 +725,7 @@ size_t CHtmlSysWinGroupQt::xlat_html4_entity(textchar_t* result, size_t result_s
 }
 
 /*
-    Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos
-    Chantziaras.
+    Copyright 2003-2020 Nikos Chantziaras <realnc@gmail.com>
 
     This file is part of QTads.
 

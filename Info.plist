@@ -7,7 +7,7 @@
     <key>CFBundleShortVersionString</key>
     <string>@FULL_VERSION@</string>
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright © 2013 Mike Roberts; © 2019 Nikos Chantziaras.</string>
+    <string>Copyright © 2016 Mike Roberts; © 2020 Nikos Chantziaras.</string>
     <key>CFBundleIconFile</key>
     <string>@ICON@</string>
     <key>CFBundlePackageType</key>

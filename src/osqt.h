@@ -327,8 +327,7 @@ int osfmode(const char* fname, int follow_links, unsigned long* mode, unsigned l
 int os_vasprintf(char** bufptr, const char* fmt, va_list ap);
 
 /*
-    Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos
-    Chantziaras.
+    Copyright 2003-2020 Nikos Chantziaras <realnc@gmail.com>
 
     This file is part of QTads.
 

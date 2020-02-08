@@ -27,8 +27,8 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget* parent)
         <p><a href="https://realnc.github.io/qtads">https://realnc.github.io/qtads</a></p>
 
         <p>
-        TADS Copyright © 2013 Michael J. Roberts<br>
-        QTads Copyright © 2019 Nikos Chantziaras
+        TADS Copyright © 2016 Michael J. Roberts<br>
+        QTads Copyright © 2020 Nikos Chantziaras
         </p>
 
         <p>
@@ -65,8 +65,7 @@ AboutQtadsDialog::~AboutQtadsDialog()
 }
 
 /*
-    Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos
-    Chantziaras.
+    Copyright 2003-2020 Nikos Chantziaras <realnc@gmail.com>
 
     This file is part of QTads.
 

@@ -5,12 +5,11 @@
 char G_tads_oem_app_name[] = "QTads " QTADS_VERSION;
 char G_tads_oem_dbg_name[] = ""; /* No debugger for Qt (yet). */
 char G_tads_oem_display_mode[] = "multimedia";
-char G_tads_oem_author[] = "QTads copyright (C) 2013 by Nikos Chantziaras <realnc@gmail.com>\n";
+char G_tads_oem_author[] = "QTads copyright (C) 2020 by Nikos Chantziaras <realnc@gmail.com>\n";
 int G_tads_oem_copyright_prefix = TRUE;
 
 /*
-    Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos
-    Chantziaras.
+    Copyright 2003-2020 Nikos Chantziaras <realnc@gmail.com>
 
     This file is part of QTads.
 

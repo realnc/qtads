@@ -769,8 +769,7 @@ void CHtmlSysWinInputQt::set_html_input_color(HTML_color_t clr, int use_default)
 }
 
 /*
-    Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Nikos
-    Chantziaras.
+    Copyright 2003-2020 Nikos Chantziaras <realnc@gmail.com>
 
     This file is part of QTads.
 
