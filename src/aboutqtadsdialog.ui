@@ -60,24 +60,28 @@ Thanks fly out to:
 
   Adam Thornton
   Adrien Beau
-  Andrew Plotkin
   Alan Mead
+  Andrew Plotkin
   Beni Serfaty
   C.E.J. Pacian
   Chris Odhner
   Christophe Antoine
   Curt Siffert
   Daniel Schepler
+  Delta477
   Denis Pokataev
+  Dominik 'disconnect3d' Czarnota
   Emily Boegheim
   Eric Eve
   Eric Forgeot
   Erik Temple
+  František Dvořák
   Greg Boettcher
   Guilherme De Sousa
   Hugo Landau
   Jim Aikin
   Joe Mason
+  John Ziegler
   Kevin Boone
   Kodath duMatri
   Kris Kennaway
@@ -85,22 +89,22 @@ Thanks fly out to:
   Leif Huhn
   Marc Simpson
   Ming Hua
-  Nicolas Lécureuil
   NR Turner
+  Nicolas Lécureuil
   Ornithopter
   Petter Sjölund
   Poster
-  Rémi Verschelde
   Rune Berg
+  Rémi Verschelde
   Samuel Verschelde
   Stefan Müller
-  tetzank
   Thom Brown
   Tomas Blaha
   Tony Houlbrooke
   Xenius
+  tetzank
 
-for the ideas, source code and bug reports. Also thanks to everyone who donated to this project.
+for the ideas, patches and bug reports. Also thanks to everyone who donated to this project.
 
 Special thanks to Mike Roberts for creating TADS and for providing help and explaining the inner workings of TADS.</string>
          </property>
