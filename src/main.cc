@@ -24,10 +24,8 @@ int main(int argc, char** argv)
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-    // Keep our "qtads.sourceforge.net" organization domain, since it's used by QSettings and we
-    // want to be able to load settings from previous versions.
     CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", QTADS_VERSION,
-                                               "Nikos Chantziaras", "qtads.sourceforge.net");
+                                               "Nikos Chantziaras", "nikos.chantziaras.qtads");
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     QApplication::setDesktopFileName(QStringLiteral("nikos.chantziaras.qtads"));
