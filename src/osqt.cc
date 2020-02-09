@@ -935,9 +935,9 @@ static void canonicalize_path(char* path)
     if (not info.isDir()) {
         QString cleanFilename(fnameToQStr(path));
         int i = cleanFilename.length();
-        while (cleanFilename[i] != QChar::fromLatin1('/') and i > 0) {
+        do {
             --i;
-        }
+        } while (i > 0 and cleanFilename[i] != QChar::fromLatin1('/'));
         canonPath.append(qStrToFname(cleanFilename.mid(i)));
     }
     qstrncpy(path, canonPath.constData(), OSFNMAX);
