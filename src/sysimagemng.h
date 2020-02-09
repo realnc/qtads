@@ -22,14 +22,14 @@ private:
 private slots:
     void updateDisplay(const QRect& rect)
     {
-        if (fDispSite != 0) {
+        if (fDispSite != nullptr) {
             fDispSite->dispsite_inval(rect.x(), rect.y(), rect.width(), rect.height());
         }
     }
 
 public:
     CHtmlSysImageMngQt()
-        : fDispSite(0)
+        : fDispSite(nullptr)
     {
         connect(this, &QMovie::updated, this, &CHtmlSysImageMngQt::updateDisplay);
     }
@@ -62,17 +62,17 @@ public:
         QTadsImage(currentImage()).drawFromPaintEvent(win, pos, mode);
     }
 
-    unsigned long get_width() const override
+    auto get_width() const -> unsigned long override
     {
         return frameRect().width();
     }
 
-    unsigned long get_height() const override
+    auto get_height() const -> unsigned long override
     {
         return frameRect().height();
     }
 
-    int map_palette(CHtmlSysWin*, int) override
+    auto map_palette(CHtmlSysWin*, int) -> int override
     {
         return false;
     }

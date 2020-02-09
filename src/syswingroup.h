@@ -63,9 +63,9 @@ private:
     // update checker finds no available updates.
     bool fSilentIfNoUpdates;
 
-    bool fAskQuitGameDialog();
+    auto fAskQuitGameDialog() -> bool;
 
-    bool fAskRestartGameDialog();
+    auto fAskRestartGameDialog() -> bool;
 
 private slots:
     void fCheckForUpdates();
@@ -132,11 +132,11 @@ public:
     CHtmlSysWinGroupQt();
     ~CHtmlSysWinGroupQt() override;
 
-    CHtmlSysWinAboutBoxQt* createAboutBox(class CHtmlFormatter* formatter);
+    auto createAboutBox(class CHtmlFormatter* formatter) -> CHtmlSysWinAboutBoxQt*;
 
     void deleteAboutBox();
 
-    CHtmlSysWinAboutBoxQt* aboutBox()
+    auto aboutBox() -> CHtmlSysWinAboutBoxQt*
     {
         return fAboutBox;
     }
@@ -145,7 +145,7 @@ public:
 
     void checkForUpdates();
 
-    bool wantsToQuit() const
+    auto wantsToQuit() const -> bool
     {
         return fWantsToQuit;
     }
@@ -160,10 +160,10 @@ public:
     //
     // CHtmlSysWinGroup interface implementation.
     //
-    oshtml_charset_id_t get_default_win_charset() const override;
+    auto get_default_win_charset() const -> oshtml_charset_id_t override;
 
-    size_t xlat_html4_entity(textchar_t* result, size_t result_size, unsigned int charval,
-                             oshtml_charset_id_t* charset, int* changed_charset) override;
+    auto xlat_html4_entity(textchar_t* result, size_t result_size, unsigned int charval,
+                             oshtml_charset_id_t* charset, int* changed_charset) -> size_t override;
 };
 
 /*

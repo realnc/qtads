@@ -35,7 +35,7 @@ private:
     void fInvalidateLinkTracking();
 
     // Returns the text currently selected in this window.
-    QString fMySelectedText();
+    auto fMySelectedText() -> QString;
 
     void fHandleDoubleOrTripleClick(QMouseEvent* e, bool tripleClick);
 
@@ -77,7 +77,7 @@ public:
     {
         // When clearing contents, the display items are already gone. Set them
         // Null so we won't try to access them.
-        fClickedLink = fHoverLink = 0;
+        fClickedLink = fHoverLink = nullptr;
         fInvalidateLinkTracking();
     }
 
@@ -87,7 +87,7 @@ public:
     // Get the text contained in the currently active selection. Returns a
     // null string is there's currently no display widget with an active
     // selection.
-    static QString selectedText();
+    static auto selectedText() -> QString;
 
     // Update link tracking for specified mouse position.  If the specified
     // position isNull(), it will be autodetected.

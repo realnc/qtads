@@ -13,7 +13,7 @@ class ConfDialog: public QDialog
     Q_OBJECT
 
 public:
-    ConfDialog(class CHtmlSysWinGroupQt* parent = 0);
+    ConfDialog(class CHtmlSysWinGroupQt* parent = nullptr);
     ~ConfDialog() override;
 
 protected:

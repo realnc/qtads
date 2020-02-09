@@ -101,7 +101,7 @@ public:
     ~CHtmlSysWinQt() override;
 
     // Returns our display widget.
-    class DisplayWidget* displayWidget() const
+    auto displayWidget() const -> class DisplayWidget*
     {
         return dispWidget;
     }
@@ -119,7 +119,7 @@ public:
                    CHtmlSysWinQt* other, HTML_BannerWin_Pos_t pos, unsigned long style);
 
     // Our parent banner, if there is one.
-    CHtmlSysWinQt* parentBanner() const
+    auto parentBanner() const -> CHtmlSysWinQt*
     {
         return fParentBanner;
     }
@@ -132,40 +132,40 @@ public:
     //
     // CHtmlSysWin interface implementation.
     //
-    CHtmlSysWinGroup* get_win_group() override
+    auto get_win_group() -> CHtmlSysWinGroup* override
     {
         return qWinGroup;
     }
 
     void notify_clear_contents() override;
 
-    int close_window(int force) override;
+    auto close_window(int force) -> int override;
 
-    long get_disp_width() override
+    auto get_disp_width() -> long override
     {
         return viewport()->width() - 3;
     }
 
-    long get_disp_height() override
+    auto get_disp_height() -> long override
     {
         return viewport()->height();
     }
 
-    long get_pix_per_inch() override
+    auto get_pix_per_inch() -> long override
     {
         return QApplication::desktop()->logicalDpiX();
     }
 
-    CHtmlPoint measure_text(class CHtmlSysFont* font, const textchar_t* str, size_t len,
-                            int* ascent) override;
+    auto measure_text(class CHtmlSysFont* font, const textchar_t* str, size_t len,
+                            int* ascent) -> CHtmlPoint override;
 
-    CHtmlPoint measure_dbgsrc_icon() override
+    auto measure_dbgsrc_icon() -> CHtmlPoint override
     {
-        return CHtmlPoint();
+        return {};
     }
 
-    size_t get_max_chars_in_width(CHtmlSysFont* font, const textchar_t* str, size_t len,
-                                  long wid) override;
+    auto get_max_chars_in_width(CHtmlSysFont* font, const textchar_t* str, size_t len,
+                                  long wid) -> size_t override;
 
     void draw_text(int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str,
                    size_t len) override;
@@ -183,21 +183,21 @@ public:
 
     void draw_dbgsrc_icon(const CHtmlRect* pos, unsigned int stat) override;
 
-    int do_formatting(int show_status, int update_win, int freeze_display) override;
+    auto do_formatting(int show_status, int update_win, int freeze_display) -> int override;
 
     // We don't deal with palettes, so this is a no-op.
     void recalc_palette() override
     {}
 
     // We don't deal with palettes, so always return false.
-    int get_use_palette() override
+    auto get_use_palette() -> int override
     {
         return false;
     }
 
-    CHtmlSysFont* get_default_font() override;
+    auto get_default_font() -> CHtmlSysFont* override;
 
-    CHtmlSysFont* get_font(const CHtmlFontDesc* font_desc) override
+    auto get_font(const CHtmlFontDesc* font_desc) -> CHtmlSysFont* override
     {
         if (fBannerStyleGrid) {
             // We're a text grid banner; use our internal font face,
@@ -211,7 +211,7 @@ public:
         return qFrame->createFont(font_desc);
     }
 
-    CHtmlSysFont* get_bullet_font(CHtmlSysFont* current_font) override
+    auto get_bullet_font(CHtmlSysFont* current_font) -> CHtmlSysFont* override
     {
         return current_font;
     }
@@ -220,7 +220,7 @@ public:
 
     void unregister_timer_func(void (*timer_func)(void*), void* func_ctx) override;
 
-    CHtmlSysTimer* create_timer(void (*timer_func)(void*), void* func_ctx) override;
+    auto create_timer(void (*timer_func)(void*), void* func_ctx) -> CHtmlSysTimer* override;
 
     void set_timer(CHtmlSysTimer* timer, long interval_ms, int repeat) override;
 
@@ -255,21 +255,21 @@ public:
                               HTML_color_t alink_color, int alink_use_default,
                               HTML_color_t hlink_color, int hlink_use_default) override;
 
-    HTML_color_t map_system_color(HTML_color_t color) override;
+    auto map_system_color(HTML_color_t color) -> HTML_color_t override;
 
-    HTML_color_t get_html_link_color() const override;
+    auto get_html_link_color() const -> HTML_color_t override;
 
-    HTML_color_t get_html_alink_color() const override;
+    auto get_html_alink_color() const -> HTML_color_t override;
 
-    HTML_color_t get_html_vlink_color() const override;
+    auto get_html_vlink_color() const -> HTML_color_t override;
 
-    HTML_color_t get_html_hlink_color() const override;
+    auto get_html_hlink_color() const -> HTML_color_t override;
 
-    int get_html_link_underline() const override;
+    auto get_html_link_underline() const -> int override;
 
-    int get_html_show_links() const override;
+    auto get_html_show_links() const -> int override;
 
-    int get_html_show_graphics() const override;
+    auto get_html_show_graphics() const -> int override;
 
     void set_html_bg_image(class CHtmlResCacheObject* image) override;
 

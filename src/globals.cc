@@ -1,7 +1,7 @@
 // This is copyrighted software. More information is at the end of this file.
 
-class CHtmlSysFrameQt* qFrame = 0;
-class CHtmlSysWinGroupQt* qWinGroup = 0;
+class CHtmlSysFrameQt* qFrame = nullptr;
+class CHtmlSysWinGroupQt* qWinGroup = nullptr;
 
 /*
     Copyright 2003-2020 Nikos Chantziaras <realnc@gmail.com>

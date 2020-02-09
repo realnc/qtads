@@ -25,7 +25,7 @@ CHtmlSysWinInputQt::CHtmlSysWinInputQt(CHtmlFormatter* formatter, QWidget* paren
     , fInputReady(false)
     , fRestoreFromCancel(false)
     , fLastKeyEvent(Qt::Key_Any)
-    , fTag(0)
+    , fTag(nullptr)
 {
     fInputBuffer = new textchar_t[1024];
     fInputBufferSize = 1024;
@@ -86,7 +86,7 @@ void CHtmlSysWinInputQt::fProcessPagePauseQueue()
 
 void CHtmlSysWinInputQt::fUpdateInputFormatter()
 {
-    if (fTag == 0) {
+    if (fTag == nullptr) {
         return;
     }
     fTag->setlen(static_cast<CHtmlFormatterInput*>(formatter_), fTadsBuffer->getlen());
@@ -404,11 +404,11 @@ void CHtmlSysWinInputQt::getInput(textchar_t* buf, size_t buflen, unsigned long 
                                   bool useTimeout, bool* timedOut)
 {
     // qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(buf != 0);
+    Q_ASSERT(buf != nullptr);
 
     CHtmlFormatterInput* formatter = static_cast<CHtmlFormatterInput*>(formatter_);
 
-    bool resuming = fTag != 0;
+    bool resuming = fTag != nullptr;
 
     // Correct any ill-formed HTML prior to input.
     formatter->prepare_for_input();
@@ -463,7 +463,7 @@ void CHtmlSysWinInputQt::getInput(textchar_t* buf, size_t buflen, unsigned long 
         connect(this, &CHtmlSysWinInputQt::inputReady, &idleLoop, &QEventLoop::quit);
         timer.start(timeout);
         idleLoop.exec();
-        if (timedOut != 0 and not fInputReady and qFrame->gameRunning()) {
+        if (timedOut != nullptr and not fInputReady and qFrame->gameRunning()) {
             *timedOut = true;
             fInputMode = NoInput;
             return;
@@ -495,7 +495,7 @@ void CHtmlSysWinInputQt::getInput(textchar_t* buf, size_t buflen, unsigned long 
 
 void CHtmlSysWinInputQt::cancelInput(bool reset)
 {
-    if (fTag == 0) {
+    if (fTag == nullptr) {
         // There's nothing to cancel.
         return;
     }
@@ -531,15 +531,15 @@ void CHtmlSysWinInputQt::cancelInput(bool reset)
 
     // Done with the tag.
     if (reset) {
-        fTag = 0;
-        fCastDispWidget->setInputTag(0);
+        fTag = nullptr;
+        fCastDispWidget->setInputTag(nullptr);
         fRestoreFromCancel = false;
     } else {
         fRestoreFromCancel = true;
     }
 }
 
-int CHtmlSysWinInputQt::getKeypress(unsigned long timeout, bool useTimeout, bool* timedOut)
+auto CHtmlSysWinInputQt::getKeypress(unsigned long timeout, bool useTimeout, bool* timedOut) -> int
 {
     // qDebug() << Q_FUNC_INFO;
     // If 'done' is false, it means that we have been previously called and
@@ -601,7 +601,7 @@ int CHtmlSysWinInputQt::getKeypress(unsigned long timeout, bool useTimeout, bool
 
     // If we're using a timeout and it expired, tell the caller.
     if (useTimeout and qFrame->gameRunning() and not fInputReady) {
-        Q_ASSERT(timedOut != 0);
+        Q_ASSERT(timedOut != nullptr);
         *timedOut = true;
         return -1;
     }

@@ -38,12 +38,12 @@ public:
     // CVmHostIfc interface implementation.
     //
 
-    int get_io_safety_read() override
+    auto get_io_safety_read() -> int override
     {
-        if (fAppctx != 0 and fAppctx->get_io_safety_level != 0) {
+        if (fAppctx != nullptr and fAppctx->get_io_safety_level != nullptr) {
             // Ask the app context to handle it.
             int readLvl;
-            (*fAppctx->get_io_safety_level)(fAppctx->io_safety_level_ctx, &readLvl, 0);
+            (*fAppctx->get_io_safety_level)(fAppctx->io_safety_level_ctx, &readLvl, nullptr);
             return readLvl;
         } else {
             // The app context doesn't care - use our own level memory */
@@ -51,12 +51,12 @@ public:
         }
     }
 
-    int get_io_safety_write() override
+    auto get_io_safety_write() -> int override
     {
-        if (fAppctx != 0 and fAppctx->get_io_safety_level != 0) {
+        if (fAppctx != nullptr and fAppctx->get_io_safety_level != nullptr) {
             // Ask the app context to handle it.
             int writeLvl;
-            (*fAppctx->get_io_safety_level)(fAppctx->io_safety_level_ctx, 0, &writeLvl);
+            (*fAppctx->get_io_safety_level)(fAppctx->io_safety_level_ctx, nullptr, &writeLvl);
             return writeLvl;
         } else {
             // The app context doesn't care - use our own level memory */
@@ -66,7 +66,7 @@ public:
 
     void set_io_safety(int readLvl, int writeLvl) override
     {
-        if (fAppctx != 0 and fAppctx->set_io_safety_level != 0) {
+        if (fAppctx != nullptr and fAppctx->set_io_safety_level != nullptr) {
             // Let the app context handle it.
             (*fAppctx->set_io_safety_level)(fAppctx->io_safety_level_ctx, readLvl, writeLvl);
         } else {
@@ -79,9 +79,9 @@ public:
     // FIXME: Implement
     void get_net_safety(int* client_level, int* server_level) override
     {
-        if (client_level != 0)
+        if (client_level != nullptr)
             *client_level = 0;
-        if (server_level != 0)
+        if (server_level != nullptr)
             *server_level = 0;
     }
 
@@ -89,7 +89,7 @@ public:
     void set_net_safety(int /*client_level*/, int /*server_level*/) override
     {}
 
-    class CResLoader* get_sys_res_loader() override
+    auto get_sys_res_loader() -> class CResLoader* override
     {
         return fCmapResLoader;
     }
@@ -97,7 +97,7 @@ public:
     void set_image_name(const char* fname) override
     {
         // Pass it through the app context if possible.
-        if (fAppctx != 0 and fAppctx->set_game_name != 0) {
+        if (fAppctx != nullptr and fAppctx->set_game_name != nullptr) {
             (*fAppctx->set_game_name)(fAppctx->set_game_name_ctx, fname);
         }
     }
@@ -105,15 +105,15 @@ public:
     void set_res_dir(const char* fname) override
     {
         // Pass it through the app context if possible.
-        if (fAppctx != 0 and fAppctx->set_res_dir != 0) {
+        if (fAppctx != nullptr and fAppctx->set_res_dir != nullptr) {
             (*fAppctx->set_res_dir)(fAppctx->set_res_dir_ctx, fname);
         }
     }
 
-    int add_resfile(const char* fname) override
+    auto add_resfile(const char* fname) -> int override
     {
         // Pass it through the app context if possible.
-        if (fAppctx != 0 and fAppctx->add_resfile != 0) {
+        if (fAppctx != nullptr and fAppctx->add_resfile != nullptr) {
             return (*fAppctx->add_resfile)(fAppctx->add_resfile_ctx, fname);
         } else {
             return 0;
@@ -121,18 +121,18 @@ public:
     }
 
     // We suport add_resfile() if the application context does.
-    int can_add_resfiles() override
+    auto can_add_resfiles() -> int override
     {
         // If the add_resfile function is defined in the application context,
         // we support adding resource files.
-        return (fAppctx != 0 and fAppctx->add_resfile != 0);
+        return (fAppctx != nullptr and fAppctx->add_resfile != nullptr);
     }
 
     void add_resource(unsigned long ofs, unsigned long siz, const char* res_name,
                       size_t res_name_len, int fileno) override
     {
         // Pass it through the app context if possible.
-        if (fAppctx != 0 and fAppctx->add_resource != 0) {
+        if (fAppctx != nullptr and fAppctx->add_resource != nullptr) {
             (*fAppctx->add_resource)(fAppctx->add_resource_ctx, ofs, siz, res_name, res_name_len,
                                      fileno);
         }
@@ -142,49 +142,49 @@ public:
                       size_t res_name_len) override
     {
         // Pass it through the app context if possible.
-        if (fAppctx != 0 and fAppctx->add_resource_link != 0) {
+        if (fAppctx != nullptr and fAppctx->add_resource_link != nullptr) {
             (*fAppctx->add_resource_link)(fAppctx->add_resource_link_ctx, fname, fname_len,
                                           res_name, res_name_len);
         }
     }
 
-    const char* get_res_path() override
+    auto get_res_path() -> const char* override
     {
         // Get the path from the app context if possible.
-        return (fAppctx != 0 ? fAppctx->ext_res_path : 0);
+        return (fAppctx != nullptr ? fAppctx->ext_res_path : nullptr);
     }
 
     // Determine if a resource exists.
-    int resfile_exists(const char* res_name, size_t res_name_len) override
+    auto resfile_exists(const char* res_name, size_t res_name_len) -> int override
     {
         // Let the application context handle it if possible; if not, just
         // return false, since we can't otherwise provide resource operations.
-        if (fAppctx != 0 and fAppctx->resfile_exists != 0) {
+        if (fAppctx != nullptr and fAppctx->resfile_exists != nullptr) {
             return (*fAppctx->resfile_exists)(fAppctx->resfile_exists_ctx, res_name, res_name_len);
         } else {
             return false;
         }
     }
 
-    osfildef* find_resource(const char* res_name, size_t res_name_len,
-                            unsigned long* res_size) override
+    auto find_resource(const char* res_name, size_t res_name_len,
+                            unsigned long* res_size) -> osfildef* override
     {
         // Let the application context handle it; if we don't have an
         // application context, we don't provide resource operation, so simply
         // return failure.
-        if (fAppctx != 0 and fAppctx->find_resource != 0) {
+        if (fAppctx != nullptr and fAppctx->find_resource != nullptr) {
             return (*fAppctx->find_resource)(fAppctx->find_resource_ctx, res_name, res_name_len,
                                              res_size);
         } else {
-            return 0;
+            return nullptr;
         }
     }
 
-    vmhost_gin_t get_image_name(char* buf, size_t buflen) override
+    auto get_image_name(char* buf, size_t buflen) -> vmhost_gin_t override
     {
         // Let the application context handle it if possible; otherwise, return
         // false, since we can't otherwise ask for an image name.
-        if (fAppctx != 0 and fAppctx->get_game_name != 0) {
+        if (fAppctx != nullptr and fAppctx->get_game_name != nullptr) {
             // Ask the host system to get a name.
             int ret = (*fAppctx->get_game_name)(fAppctx->get_game_name_ctx, buf, buflen);
 
@@ -200,7 +200,7 @@ public:
     // Get a special file system path.
     void get_special_file_path(char* buf, size_t buflen, int id) override
     {
-        return os_get_special_path(buf, buflen, 0, id);
+        return os_get_special_path(buf, buflen, nullptr, id);
     }
 };
 

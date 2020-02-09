@@ -19,13 +19,13 @@ public slots:
     void trigger()
     {
         // If we have a callback, call it.
-        if (func_ != 0) {
+        if (func_ != nullptr) {
             invoke_callback();
         }
     }
 
 public:
-    QTadsTimer(void (*func)(void*), void* ctx, QObject* parent = 0)
+    QTadsTimer(void (*func)(void*), void* ctx, QObject* parent = nullptr)
         : QTimer(parent)
         , CHtmlSysTimer(func, ctx)
     {

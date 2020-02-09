@@ -112,22 +112,22 @@ public:
                     const char* orgName, const char* orgDomain);
     ~CHtmlSysFrameQt() override;
 
-    class Settings* settings()
+    auto settings() -> class Settings*
     {
         return fSettings;
     }
 
-    class CHtmlSysWinInputQt* gameWindow()
+    auto gameWindow() -> class CHtmlSysWinInputQt*
     {
         return fGameWin;
     }
 
-    const QList<class CHtmlSysWinQt*>& bannerList()
+    auto bannerList() -> const QList<class CHtmlSysWinQt*>&
     {
         return fBannerList;
     }
 
-    HTML_color_t inputColor()
+    auto inputColor() -> HTML_color_t
     {
         return fInputColor;
     }
@@ -137,14 +137,14 @@ public:
         fInputColor = color;
     }
 
-    CHtmlSysFontQt* createFont(const CHtmlFontDesc* font_desc);
+    auto createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFontQt*;
 
-    bool gameRunning()
+    auto gameRunning() -> bool
     {
         return fGameRunning;
     }
 
-    const QString& gameFile()
+    auto gameFile() -> const QString&
     {
         return fGameFile;
     }
@@ -157,9 +157,9 @@ public:
         }
     }
 
-    void setNextGame(const QString& fname)
+    void setNextGame(QString fname)
     {
-        fNextGame = fname;
+        fNextGame = std::move(fname);
         // If no game is currently executing, run it now. Otherwise, end the
         // current game.
         if (not fGameRunning) {
@@ -169,12 +169,12 @@ public:
         }
     }
 
-    bool tads3()
+    auto tads3() -> bool
     {
         return fTads3;
     }
 
-    bool nonStopMode()
+    auto nonStopMode() -> bool
     {
         return fNonStopMode;
     }
@@ -217,7 +217,7 @@ public:
         // On OS X, this causes CPU utilization to go through the roof.  Not
         // sure why.  Disable this for now on OS X until further information
         // is available on this.
-        sendPostedEvents(0, QEvent::DeferredDelete);
+        sendPostedEvents(nullptr, QEvent::DeferredDelete);
 #endif
         sendPostedEvents();
         processEvents(flags);
@@ -236,7 +236,7 @@ public:
         working = true;
 
 #ifndef Q_OS_MAC
-        sendPostedEvents(0, QEvent::DeferredDelete);
+        sendPostedEvents(nullptr, QEvent::DeferredDelete);
 #endif
         sendPostedEvents();
         processEvents(flags, maxtime);
@@ -249,7 +249,7 @@ public:
     //
     void flush_txtbuf(int fmt, int immediate_redraw) override;
 
-    class CHtmlParser* get_parser() override
+    auto get_parser() -> class CHtmlParser* override
     {
         return fParser;
     }
@@ -260,18 +260,18 @@ public:
 
     void display_output(const textchar_t* buf, size_t len) override;
 
-    int check_break_key() override;
+    auto check_break_key() -> int override;
 
-    int get_input(textchar_t* buf, size_t bufsiz) override;
+    auto get_input(textchar_t* buf, size_t bufsiz) -> int override;
 
-    int get_input_timeout(textchar_t* buf, size_t buflen, unsigned long timeout,
-                          int use_timeout) override;
+    auto get_input_timeout(textchar_t* buf, size_t buflen, unsigned long timeout,
+                          int use_timeout) -> int override;
 
     void get_input_cancel(int reset) override;
 
-    int get_input_event(unsigned long ms, int use_timeout, os_event_info_t* info) override;
+    auto get_input_event(unsigned long ms, int use_timeout, os_event_info_t* info) -> int override;
 
-    textchar_t wait_for_keystroke(int pause_only) override;
+    auto wait_for_keystroke(int pause_only) -> textchar_t override;
 
     void pause_for_exit() override;
 
@@ -279,21 +279,21 @@ public:
 
     void dbg_print(const char* msg) override;
 
-    class CHtmlSysWin* create_banner_window(class CHtmlSysWin* parent,
+    auto create_banner_window(class CHtmlSysWin* parent,
                                             HTML_BannerWin_Type_t window_type,
                                             class CHtmlFormatter* formatter, int where,
                                             class CHtmlSysWin* other, HTML_BannerWin_Pos_t pos,
-                                            unsigned long style) override;
+                                            unsigned long style) -> class CHtmlSysWin* override;
 
     void orphan_banner_window(class CHtmlFormatterBannerExt* banner) override;
 
-    CHtmlSysWin* create_aboutbox_window(class CHtmlFormatter* formatter) override;
+    auto create_aboutbox_window(class CHtmlFormatter* formatter) -> CHtmlSysWin* override;
 
     void remove_banner_window(CHtmlSysWin* win) override;
 
-    int get_exe_resource(const textchar_t* resname, size_t resnamelen, textchar_t* fname_buf,
+    auto get_exe_resource(const textchar_t* resname, size_t resnamelen, textchar_t* fname_buf,
                          size_t fname_buf_len, unsigned long* seek_pos,
-                         unsigned long* siz) override;
+                         unsigned long* siz) -> int override;
 };
 
 /*

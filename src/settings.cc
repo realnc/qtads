@@ -7,7 +7,7 @@
 #include "settings.h"
 #include "syswingroup.h"
 
-static QFont fontForStyleHint(const QFont::StyleHint hint)
+static auto fontForStyleHint(const QFont::StyleHint hint) -> QFont
 {
     QFont f;
     f.setStyleHint(hint);

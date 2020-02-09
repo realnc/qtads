@@ -22,12 +22,12 @@ private:
 public:
     // When color() is a valid color (QColor::isValid()) it should be used as
     // the foreground color when drawing text in this font.
-    const QColor& color() const
+    auto color() const -> const QColor&
     {
         return fColor;
     }
 
-    HTML_color_t htmlColor() const
+    auto htmlColor() const -> HTML_color_t
     {
         return HTML_make_color(fColor.red(), fColor.green(), fColor.blue());
     }
@@ -39,12 +39,12 @@ public:
 
     // When bgColor() is a valid color (QColor::isValid()) it should be used as
     // the background color when drawing text in this font.
-    const QColor& bgColor() const
+    auto bgColor() const -> const QColor&
     {
         return fBgColor;
     }
 
-    HTML_color_t htmlBgColor() const
+    auto htmlBgColor() const -> HTML_color_t
     {
         return HTML_make_color(fBgColor.red(), fBgColor.green(), fBgColor.blue());
     }
@@ -54,12 +54,12 @@ public:
         fBgColor = QColor(HTML_color_red(color), HTML_color_green(color), HTML_color_blue(color));
     }
 
-    bool operator==(const CHtmlSysFontQt& f) const
+    auto operator==(const CHtmlSysFontQt& f) const -> bool
     {
         return QFont::operator==(f) and fColor == f.fColor and fBgColor == f.fBgColor;
     }
 
-    CHtmlSysFontQt& operator=(const QFont& f)
+    auto operator=(const QFont& f) -> CHtmlSysFontQt&
     {
         QFont::operator=(f);
         return *this;
@@ -88,12 +88,12 @@ public:
         m->total_height = tmp.height();
     }
 
-    int is_fixed_pitch() override
+    auto is_fixed_pitch() -> int override
     {
         return QFontInfo(*this).fixedPitch();
     }
 
-    int get_em_size() override
+    auto get_em_size() -> int override
     {
         return QFontInfo(*this).pixelSize();
     }

@@ -22,7 +22,7 @@ DisplayWidgetInput::DisplayWidgetInput(CHtmlSysWinQt* parent, CHtmlFormatter* fo
     , fCursorVisible(false)
     , fBlinkVisible(false)
     , fBlinkTimer(new QTimer(this))
-    , fInpTag(0)
+    , fInpTag(nullptr)
     , fTadsBuffer(tadsBuffer)
 {
     connect(fBlinkTimer, &QTimer::timeout, this, &DisplayWidgetInput::fBlinkCursor);
@@ -118,7 +118,7 @@ void DisplayWidgetInput::fBlinkCursor()
 
 void DisplayWidgetInput::fHandleFocusChange(QWidget* old, QWidget* now)
 {
-    if (now == 0) {
+    if (now == nullptr) {
         // The application window lost focus.  Disable cursor blinking.
         fBlinkTimer->stop();
 #ifdef Q_OS_MAC
@@ -132,7 +132,7 @@ void DisplayWidgetInput::fHandleFocusChange(QWidget* old, QWidget* now)
             fBlinkCursor();
         }
 #endif
-    } else if (old == 0 and now != 0) {
+    } else if (old == nullptr and now != nullptr) {
         // The application window gained focus.  Reset cursor blinking.
         resetCursorBlinking();
     }
@@ -142,7 +142,7 @@ void DisplayWidgetInput::updateCursorPos(CHtmlFormatter* formatter, bool keepSel
                                          bool updateFormatterSelection)
 {
     // Ignore the call if there's currently no active tag.
-    if (fInpTag == 0) {
+    if (fInpTag == nullptr) {
         return;
     }
 

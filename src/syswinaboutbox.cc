@@ -22,7 +22,7 @@ void CHtmlSysWinAboutBoxQt::resizeEvent(QResizeEvent* e)
     QScrollArea::resizeEvent(e);
 }
 
-QSize CHtmlSysWinAboutBoxQt::sizeHint() const
+auto CHtmlSysWinAboutBoxQt::sizeHint() const -> QSize
 {
     // Ensure that we're always large enough to show the whole contents of the
     // "about" content.

@@ -12,7 +12,7 @@
 #include "sysframe.h"
 
 #ifndef _WIN32
-int memicmp(const char* s1, const char* s2, size_t len)
+auto memicmp(const char* s1, const char* s2, size_t len) -> int
 {
     char* x1 = new char[len];
     char* x2 = new char[len];
@@ -28,7 +28,7 @@ int memicmp(const char* s1, const char* s2, size_t len)
 }
 #endif
 
-int stricmp(const char* s1, const char* s2)
+auto stricmp(const char* s1, const char* s2) -> int
 {
     if (qFrame->tads3()) {
         return QString::localeAwareCompare(QString::fromUtf8(s1).toLower(),
@@ -40,7 +40,7 @@ int stricmp(const char* s1, const char* s2)
                                        codec->toUnicode(s2).toLower());
 }
 
-int strnicmp(const char* s1, const char* s2, size_t n)
+auto strnicmp(const char* s1, const char* s2, size_t n) -> int
 {
     QString qs1;
     QString qs2;

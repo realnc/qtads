@@ -51,7 +51,7 @@ void os_dbg_sys_msg(const textchar_t* msg);
 typedef unsigned int oshtml_charset_id_t;
 
 /* get the system default character set */
-oshtml_charset_id_t os_get_default_charset();
+auto os_get_default_charset() -> oshtml_charset_id_t;
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -76,7 +76,7 @@ oshtml_charset_id_t os_get_default_charset();
  *   like this is a security breach or anything; the caller can always use
  *   an ordinary type-cast if they really want to remove the const-ness.)
  */
-textchar_t* os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/);
+auto os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/) -> textchar_t*;
 
 /*
  *   Decrement a character string pointer to point to the previous character
@@ -93,7 +93,7 @@ textchar_t* os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t
  *   multi-byte character but should always be at a byte that starts a
  *   character OR at the byte just after the end of the string...
  */
-textchar_t* os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart);
+auto os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart) -> textchar_t*;
 
 /*
  *   Determine if the character at the given string position is a word
@@ -109,7 +109,7 @@ textchar_t* os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const 
  *   additional characters following the character of interest, so 'len'
  *   isn't necessary the number of bytes in the single character at 'p').
  */
-int os_is_word_char(oshtml_charset_id_t id, const textchar_t* p, size_t len);
+auto os_is_word_char(oshtml_charset_id_t id, const textchar_t* p, size_t len) -> int;
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -126,7 +126,7 @@ int os_is_word_char(oshtml_charset_id_t id, const textchar_t* p, size_t len);
 using os_timer_t = std::chrono::milliseconds::rep;
 
 /* get the current system time value */
-os_timer_t os_get_time();
+auto os_get_time() -> os_timer_t;
 
 /*
  *   Get the number of timer units per second.  For Windows and Unix, the

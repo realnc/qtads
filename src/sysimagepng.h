@@ -20,17 +20,17 @@ public:
         QTadsImage::drawFromPaintEvent(win, pos, mode);
     }
 
-    unsigned long get_width() const override
+    auto get_width() const -> unsigned long override
     {
         return QTadsImage::width();
     }
 
-    unsigned long get_height() const override
+    auto get_height() const -> unsigned long override
     {
         return QTadsImage::height();
     }
 
-    int map_palette(CHtmlSysWin*, int) override
+    auto map_palette(CHtmlSysWin*, int) -> int override
     {
         return false;
     }

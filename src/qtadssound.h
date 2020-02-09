@@ -9,7 +9,7 @@
 #include "Aulib/Stream.h"
 #endif
 
-bool initSound();
+auto initSound() -> bool;
 
 void quitSound();
 
@@ -82,16 +82,16 @@ public:
 #endif
 
 public:
-    int startPlaying(void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
-                     int vol, int fadeIn, int fadeOut, bool crossFade);
+    auto startPlaying(void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+                     int vol, int fadeIn, int fadeOut, bool crossFade) -> int;
 
     void cancelPlaying(bool sync, int fadeOut, bool fadeOutInBg);
 
     void addCrossFade(int ms);
 
-    static class CHtmlSysSound* createSound(const class CHtmlUrl* url, const textchar_t* filename,
+    static auto createSound(const class CHtmlUrl* url, const textchar_t* filename,
                                             unsigned long seekpos, unsigned long filesize,
-                                            class CHtmlSysWin* win, SoundType type);
+                                            class CHtmlSysWin* win, SoundType type) -> class CHtmlSysSound*;
 };
 
 /*

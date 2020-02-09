@@ -11,7 +11,7 @@ class QTadsImage: public QImage
 {
 public:
     QTadsImage()
-    {}
+    = default;
 
     QTadsImage(const QImage& qImg)
         : QImage(qImg)

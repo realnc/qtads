@@ -66,7 +66,7 @@ public:
         fCursorVisible = visible;
     }
 
-    bool isCursorVisible()
+    auto isCursorVisible() -> bool
     {
         return fCursorVisible;
     }

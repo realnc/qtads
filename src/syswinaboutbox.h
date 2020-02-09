@@ -19,7 +19,7 @@ protected:
 
     void resizeEvent(QResizeEvent* e) override;
 
-    QSize sizeHint() const override;
+    auto sizeHint() const -> QSize override;
 
 public:
     CHtmlSysWinAboutBoxQt(class CHtmlFormatter* formatter, QWidget* parent);
@@ -29,12 +29,12 @@ public:
     // width/height rather than our viewport's.  We need to do that because
     // the formatter needs to know our size before we become visible, and our
     // viewport only reports a valid size after show() is called.
-    long get_disp_width() override
+    auto get_disp_width() -> long override
     {
         return width();
     }
 
-    long get_disp_height() override
+    auto get_disp_height() -> long override
     {
         return height();
     }

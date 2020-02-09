@@ -42,25 +42,25 @@ void QTadsFrame::dropEvent(QDropEvent* e)
 }
 
 CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
-    : fConfDialog(0)
-    , fGameInfoDialog(0)
-    , fAboutBoxDialog(0)
-    , fAboutBox(0)
-    , fAboutQtadsDialog(0)
-    , fNetManager(0)
+    : fConfDialog(nullptr)
+    , fGameInfoDialog(nullptr)
+    , fAboutBoxDialog(nullptr)
+    , fAboutBox(nullptr)
+    , fAboutQtadsDialog(nullptr)
+    , fNetManager(nullptr)
     , fHttpRedirectCount(0)
     , fWantsToQuit(false)
     , fSilentIfNoUpdates(false)
 {
     // qDebug() << Q_FUNC_INFO << "called";
-    Q_ASSERT(qWinGroup == 0);
+    Q_ASSERT(qWinGroup == nullptr);
 
     // Make sure we can drag&drop (files in our case) into the main window.
     setAcceptDrops(true);
 
     // We make our menu bar parentless so it will be shared by all our windows
     // in Mac OS X.
-    QMenuBar* menuBar = new QMenuBar(0);
+    QMenuBar* menuBar = new QMenuBar(nullptr);
 
     // "Game" menu.
     QMenu* menu = menuBar->addMenu(tr("&Game"));
@@ -169,11 +169,11 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
 CHtmlSysWinGroupQt::~CHtmlSysWinGroupQt()
 {
-    Q_ASSERT(qWinGroup != 0);
-    qWinGroup = 0;
+    Q_ASSERT(qWinGroup != nullptr);
+    qWinGroup = nullptr;
 }
 
-bool CHtmlSysWinGroupQt::fAskQuitGameDialog()
+auto CHtmlSysWinGroupQt::fAskQuitGameDialog() -> bool
 {
     if (not qFrame->settings()->confirmQuitGame or not qFrame->gameRunning()) {
         return true;
@@ -199,7 +199,7 @@ bool CHtmlSysWinGroupQt::fAskQuitGameDialog()
     return false;
 }
 
-bool CHtmlSysWinGroupQt::fAskRestartGameDialog()
+auto CHtmlSysWinGroupQt::fAskRestartGameDialog() -> bool
 {
     if (not qFrame->settings()->confirmRestartGame or not qFrame->gameRunning()) {
         return true;
@@ -225,7 +225,7 @@ bool CHtmlSysWinGroupQt::fAskRestartGameDialog()
     return false;
 }
 
-static QNetworkReply* sendNetRequest(QNetworkAccessManager* nam, const QUrl& url)
+static auto sendNetRequest(QNetworkAccessManager* nam, const QUrl& url) -> QNetworkReply*
 {
     QByteArray userAgent = "QTads/";
     userAgent += QByteArray(QTADS_VERSION).replace(' ', '_');
@@ -242,7 +242,7 @@ static QNetworkReply* sendNetRequest(QNetworkAccessManager* nam, const QUrl& url
 void CHtmlSysWinGroupQt::fCheckForUpdates()
 {
     // If there's already an update check in progress, don't do anything.
-    if (fNetManager != 0) {
+    if (fNetManager != nullptr) {
         return;
     }
 
@@ -273,7 +273,7 @@ void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
         showUpdateErrorMsg(fReply->errorString());
         fNetManager->deleteLater();
         fReply->deleteLater();
-        fNetManager = 0;
+        fNetManager = nullptr;
         return;
     }
 
@@ -285,7 +285,7 @@ void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
             showUpdateErrorMsg(tr("Too many HTTP redirects"));
             fNetManager->deleteLater();
             fReply->deleteLater();
-            fNetManager = 0;
+            fNetManager = nullptr;
             return;
         }
         QUrl newUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
@@ -309,7 +309,7 @@ void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
         showUpdateErrorMsg(errMsg);
         fNetManager->deleteLater();
         fReply->deleteLater();
-        fNetManager = 0;
+        fNetManager = nullptr;
         return;
     }
 
@@ -382,14 +382,14 @@ void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
     fSilentIfNoUpdates = false;
     fNetManager->deleteLater();
     fReply->deleteLater();
-    fNetManager = 0;
+    fNetManager = nullptr;
     qFrame->settings()->lastUpdateDate = QDate::currentDate();
 }
 
 void CHtmlSysWinGroupQt::fShowGameInfoDialog()
 {
     // If the dialog is already open, simply activate and raise it.
-    if (fGameInfoDialog != 0) {
+    if (fGameInfoDialog != nullptr) {
         fGameInfoDialog->activateWindow();
         fGameInfoDialog->raise();
         return;
@@ -403,16 +403,16 @@ void CHtmlSysWinGroupQt::fShowGameInfoDialog()
 
 void CHtmlSysWinGroupQt::fHideGameInfoDialog()
 {
-    if (fGameInfoDialog != 0) {
+    if (fGameInfoDialog != nullptr) {
         fGameInfoDialog->deleteLater();
-        fGameInfoDialog = 0;
+        fGameInfoDialog = nullptr;
     }
 }
 
 void CHtmlSysWinGroupQt::fShowConfDialog()
 {
     // If the dialog is already open, simply activate and raise it.
-    if (fConfDialog != 0) {
+    if (fConfDialog != nullptr) {
         fConfDialog->activateWindow();
         fConfDialog->raise();
         return;
@@ -426,23 +426,23 @@ void CHtmlSysWinGroupQt::fShowConfDialog()
 
 void CHtmlSysWinGroupQt::fHideConfDialog()
 {
-    if (fConfDialog != 0) {
+    if (fConfDialog != nullptr) {
         fConfDialog->deleteLater();
-        fConfDialog = 0;
+        fConfDialog = nullptr;
     }
 }
 
 void CHtmlSysWinGroupQt::fShowAboutGame()
 {
-    if (fAboutBox == 0) {
+    if (fAboutBox == nullptr) {
         return;
     }
-    if (fAboutBoxDialog != 0 and fAboutBoxDialog->isVisible()) {
+    if (fAboutBoxDialog != nullptr and fAboutBoxDialog->isVisible()) {
         fAboutBoxDialog->activateWindow();
         fAboutBoxDialog->raise();
         return;
     }
-    if (fAboutBoxDialog == 0) {
+    if (fAboutBoxDialog == nullptr) {
         fAboutBoxDialog = new QDialog(this, Qt::WindowTitleHint | Qt::WindowSystemMenuHint
                                                 | Qt::WindowCloseButtonHint);
         fAboutBoxDialog->setWindowTitle(tr("About This Game"));
@@ -461,16 +461,16 @@ void CHtmlSysWinGroupQt::fHideAboutGame()
 {
     // Destroy the dialog, but not the about box HTML banner.  We reparent
     // the banner so it won't be automatically deleted by its parent.
-    fAboutBox->setParent(0);
+    fAboutBox->setParent(nullptr);
     fAboutBoxDialog->hide();
     fAboutBoxDialog->deleteLater();
-    fAboutBoxDialog = 0;
+    fAboutBoxDialog = nullptr;
 }
 
 void CHtmlSysWinGroupQt::fShowAboutQtads()
 {
     // If the dialog is already open, simply activate and raise it.
-    if (fAboutQtadsDialog != 0) {
+    if (fAboutQtadsDialog != nullptr) {
         fAboutQtadsDialog->activateWindow();
         fAboutQtadsDialog->raise();
         return;
@@ -489,21 +489,21 @@ void CHtmlSysWinGroupQt::fShowAboutQtads()
 
 void CHtmlSysWinGroupQt::fHideAboutQtads()
 {
-    if (fAboutQtadsDialog != 0) {
+    if (fAboutQtadsDialog != nullptr) {
         fAboutQtadsDialog->deleteLater();
-        fAboutQtadsDialog = 0;
+        fAboutQtadsDialog = nullptr;
     }
 }
 
 void CHtmlSysWinGroupQt::fOpenNewGame()
 {
-    const QString& fname = QFileDialog::getOpenFileName(
-        0, tr("Choose the TADS game you wish to run"), qFrame->settings()->lastFileOpenDir,
+    QString fname = QFileDialog::getOpenFileName(
+        nullptr, tr("Choose the TADS game you wish to run"), qFrame->settings()->lastFileOpenDir,
         tr("TADS Games") + QString::fromLatin1(" (*.gam *.Gam *.GAM *.t3 *.T3)"));
     activateWindow();
     if (not fname.isEmpty()) {
         qFrame->settings()->lastFileOpenDir = QFileInfo(fname).absolutePath();
-        qFrame->setNextGame(fname);
+        qFrame->setNextGame(std::move(fname));
     }
 }
 
@@ -614,17 +614,17 @@ void CHtmlSysWinGroupQt::updatePasteAction()
                               or not qFrame->gameWindow());
 }
 
-CHtmlSysWinAboutBoxQt* CHtmlSysWinGroupQt::createAboutBox(class CHtmlFormatter* formatter)
+auto CHtmlSysWinGroupQt::createAboutBox(class CHtmlFormatter* formatter) -> CHtmlSysWinAboutBoxQt*
 {
     // If there's already an "about" box, destroy it first.
-    if (fAboutBoxDialog != 0) {
+    if (fAboutBoxDialog != nullptr) {
         fHideAboutGame();
     } else {
         fAboutGameAction->setEnabled(true);
     }
 
     // We will reparent the banner when we show the actual dialog.
-    fAboutBox = new CHtmlSysWinAboutBoxQt(formatter, 0);
+    fAboutBox = new CHtmlSysWinAboutBoxQt(formatter, nullptr);
     // Only set the width to something comfortable.  The height will be
     // calculated later when set_banner_size() is called on the about box.
     fAboutBox->resize(500, 0);
@@ -633,14 +633,14 @@ CHtmlSysWinAboutBoxQt* CHtmlSysWinGroupQt::createAboutBox(class CHtmlFormatter* 
 
 void CHtmlSysWinGroupQt::deleteAboutBox()
 {
-    if (fAboutBox == 0) {
+    if (fAboutBox == nullptr) {
         return;
     }
-    if (fAboutBoxDialog != 0) {
+    if (fAboutBoxDialog != nullptr) {
         fHideAboutGame();
     }
     delete fAboutBox;
-    fAboutBox = 0;
+    fAboutBox = nullptr;
     fAboutGameAction->setEnabled(false);
 }
 
@@ -700,25 +700,25 @@ bool CHtmlSysWinGroupQt::handleFileOpenEvent(class QFileOpenEvent* e)
 }
 #endif
 
-oshtml_charset_id_t CHtmlSysWinGroupQt::get_default_win_charset() const
+auto CHtmlSysWinGroupQt::get_default_win_charset() const -> oshtml_charset_id_t
 {
     // qDebug() << Q_FUNC_INFO << "called";
 
     return 0;
 }
 
-size_t CHtmlSysWinGroupQt::xlat_html4_entity(textchar_t* result, size_t result_size,
+auto CHtmlSysWinGroupQt::xlat_html4_entity(textchar_t* result, size_t result_size,
                                              unsigned int charval, oshtml_charset_id_t*,
-                                             int* changed_charset)
+                                             int* changed_charset) -> size_t
 {
     // qDebug() << Q_FUNC_INFO << "called";
-    Q_ASSERT(result != 0);
+    Q_ASSERT(result != nullptr);
 
     // HTML4 entities are Unicode characters, which means the QChar(uint) ctor
     // will do the right thing.
     QString s = QString(QChar(charval));
     strcpy(result, s.toUtf8());
-    if (changed_charset != 0) {
+    if (changed_charset != nullptr) {
         *changed_charset = false;
     }
     return s.toUtf8().length();

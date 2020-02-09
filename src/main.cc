@@ -18,7 +18,7 @@
 #undef main
 #endif
 
-int main(int argc, char** argv)
+auto main(int argc, char** argv) -> int
 {
     CHtmlResType::add_basic_types();
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 
     if (gameFileName.isEmpty() and app->settings()->askForGameFile) {
         gameFileName = QFileDialog::getOpenFileName(
-            0, QObject::tr("Choose the TADS game you wish to run"), QString::fromLatin1(""),
+            nullptr, QObject::tr("Choose the TADS game you wish to run"), QString::fromLatin1(""),
             QObject::tr("TADS Games") + QString::fromLatin1("(*.gam *.Gam *.GAM *.t3 *.T3)"));
     }
 

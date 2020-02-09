@@ -14,12 +14,12 @@
 #include "settings.h"
 #include "syswininput.h"
 
-DisplayWidget* DisplayWidget::curSelWidget = 0;
+DisplayWidget* DisplayWidget::curSelWidget = nullptr;
 
 DisplayWidget::DisplayWidget(CHtmlSysWinQt* parent, CHtmlFormatter* formatter)
     : QWidget(parent)
-    , fHoverLink(0)
-    , fClickedLink(0)
+    , fHoverLink(nullptr)
+    , fClickedLink(nullptr)
     , fHasSelection(false)
     , inSelectMode(false)
     , parentSysWin(parent)
@@ -39,20 +39,20 @@ DisplayWidget::~DisplayWidget()
     // access it anymore.
     if (DisplayWidget::curSelWidget == this) {
         qWinGroup->enableCopyAction(false);
-        DisplayWidget::curSelWidget = 0;
+        DisplayWidget::curSelWidget = nullptr;
     }
 }
 
 void DisplayWidget::fInvalidateLinkTracking()
 {
     // If we're tracking links (hover/click), forget about them.
-    if (fClickedLink != 0) {
+    if (fClickedLink != nullptr) {
         fClickedLink->set_clicked(parentSysWin, CHtmlDispLink_none);
-        fClickedLink = 0;
+        fClickedLink = nullptr;
     }
-    if (fHoverLink != 0) {
+    if (fHoverLink != nullptr) {
         fHoverLink->set_clicked(parentSysWin, CHtmlDispLink_none);
-        fHoverLink = 0;
+        fHoverLink = nullptr;
     }
     unsetCursor();
     qWinGroup->statusBar()->setUpdatesEnabled(false);
@@ -60,7 +60,7 @@ void DisplayWidget::fInvalidateLinkTracking()
     qWinGroup->statusBar()->setUpdatesEnabled(true);
 }
 
-QString DisplayWidget::fMySelectedText()
+auto DisplayWidget::fMySelectedText() -> QString
 {
     unsigned long startOfs, endOfs;
     formatter->get_sel_range(&startOfs, &endOfs);
@@ -129,7 +129,7 @@ void DisplayWidget::paintEvent(QPaintEvent* e)
     const QRect& qRect = e->region().boundingRect();
     CHtmlRect cRect(qRect.left(), qRect.top(), qRect.left() + qRect.width(),
                     qRect.top() + qRect.height());
-    formatter->draw(&cRect, false, 0);
+    formatter->draw(&cRect, false, nullptr);
 }
 
 void DisplayWidget::mouseMoveEvent(QMouseEvent* e)
@@ -141,7 +141,7 @@ void DisplayWidget::mouseMoveEvent(QMouseEvent* e)
         // If we're tracking a selection, update the selection range.
         if (inSelectMode) {
             formatter->set_sel_range(CHtmlPoint(fSelectOrigin.x(), fSelectOrigin.y()),
-                                     CHtmlPoint(e->pos().x(), e->pos().y()), 0, 0);
+                                     CHtmlPoint(e->pos().x(), e->pos().y()), nullptr, nullptr);
             fSyncClipboard();
             return;
         }
@@ -176,7 +176,7 @@ void DisplayWidget::mousePressEvent(QMouseEvent* e)
         return;
     }
 
-    if (fHoverLink == 0) {
+    if (fHoverLink == nullptr) {
         // We're not hover-tracking a link. Start selection mode if we're not
         // already in that mode.
         if (inSelectMode) {
@@ -208,7 +208,7 @@ void DisplayWidget::mousePressEvent(QMouseEvent* e)
         // Just in case we had a selection previously, clear it.
         clearSelection();
         // If another widget also has an active selection, clear it.
-        if (curSelWidget != 0 and curSelWidget != this) {
+        if (curSelWidget != nullptr and curSelWidget != this) {
             curSelWidget->clearSelection();
         }
         // Remember that we're the widget with an active selection.
@@ -255,7 +255,7 @@ void DisplayWidget::mouseReleaseEvent(QMouseEvent* e)
         clearSelection();
     }
 
-    if (fClickedLink == 0) {
+    if (fClickedLink == nullptr) {
         // We're not click-tracking a link; there's nothing else to do here.
         return;
     }
@@ -270,11 +270,11 @@ void DisplayWidget::mouseReleaseEvent(QMouseEvent* e)
             fClickedLink->set_clicked(parentSysWin, CHtmlDispLink_hover);
         }
         // Otherwise, if we're hovering over another link, put that one in hover mode.
-    } else if (fHoverLink != 0) {
+    } else if (fHoverLink != nullptr) {
         fHoverLink->set_clicked(parentSysWin, CHtmlDispLink_hover);
     }
     // Stop click-tracking it.
-    fClickedLink = 0;
+    fClickedLink = nullptr;
 }
 
 void DisplayWidget::mouseDoubleClickEvent(QMouseEvent* e)
@@ -303,9 +303,9 @@ void DisplayWidget::clearSelection()
     }
 }
 
-QString DisplayWidget::selectedText()
+auto DisplayWidget::selectedText() -> QString
 {
-    if (DisplayWidget::curSelWidget == 0) {
+    if (DisplayWidget::curSelWidget == nullptr) {
         // There's no active selection.
         return QString();
     }
@@ -327,11 +327,11 @@ void DisplayWidget::updateLinkTracking(const QPoint& mousePos)
     CHtmlDisp* disp = formatter->find_by_pos(docPos, true);
 
     // If there's nothing, no need to continue.
-    if (disp == 0) {
+    if (disp == nullptr) {
         // If we were tracking anything, forget about it.
-        if (fHoverLink != 0) {
+        if (fHoverLink != nullptr) {
             fHoverLink->set_clicked(parentSysWin, CHtmlDispLink_none);
-            fHoverLink = 0;
+            fHoverLink = nullptr;
             unsetCursor();
             qWinGroup->statusBar()->setUpdatesEnabled(false);
             qWinGroup->statusBar()->clearMessage();
@@ -353,7 +353,7 @@ void DisplayWidget::updateLinkTracking(const QPoint& mousePos)
         // If we're tracking a hover and it's a new link, track this one and
         // forget about the previous one.
         if (link != fHoverLink) {
-            if (fHoverLink != 0) {
+            if (fHoverLink != nullptr) {
                 fHoverLink->set_clicked(parentSysWin, CHtmlDispLink_none);
             }
             fHoverLink = link;
@@ -361,16 +361,16 @@ void DisplayWidget::updateLinkTracking(const QPoint& mousePos)
 
         // If it's a clickable link, also change the mouse cursor shape and
         // hovering color.
-        if (link != 0 and link->is_clickable_link()) {
+        if (link != nullptr and link->is_clickable_link()) {
             setCursor(Qt::PointingHandCursor);
             // Only change its color if we're not click-tracking another link.
-            if (qFrame->settings()->highlightLinks and fClickedLink == 0) {
+            if (qFrame->settings()->highlightLinks and fClickedLink == nullptr) {
                 link->set_clicked(parentSysWin, CHtmlDispLink_hover);
             }
         }
 
         // If we found something that has ALT text, show it in the status bar.
-        if (disp->get_alt_text() != 0 and strlen(disp->get_alt_text()) > 0) {
+        if (disp->get_alt_text() != nullptr and strlen(disp->get_alt_text()) > 0) {
             qWinGroup->statusBar()->setUpdatesEnabled(false);
             qWinGroup->statusBar()->showMessage(QString::fromUtf8(disp->get_alt_text()));
             qWinGroup->statusBar()->setUpdatesEnabled(true);
@@ -379,7 +379,7 @@ void DisplayWidget::updateLinkTracking(const QPoint& mousePos)
 
         // It could be a clickable link without any ALT text.  In that case, show
         // its contents.
-        if (link != 0 and link->is_clickable_link()) {
+        if (link != nullptr and link->is_clickable_link()) {
             qWinGroup->statusBar()->setUpdatesEnabled(false);
             qWinGroup->statusBar()->showMessage(QString::fromUtf8(link->href_.get_url()));
             qWinGroup->statusBar()->setUpdatesEnabled(true);
@@ -393,9 +393,9 @@ void DisplayWidget::updateLinkTracking(const QPoint& mousePos)
     qWinGroup->statusBar()->clearMessage();
     qWinGroup->statusBar()->setUpdatesEnabled(true);
     unsetCursor();
-    if (fHoverLink != 0) {
+    if (fHoverLink != nullptr) {
         fHoverLink->set_clicked(parentSysWin, CHtmlDispLink_none);
-        fHoverLink = 0;
+        fHoverLink = nullptr;
     }
 }
 

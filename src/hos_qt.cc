@@ -12,7 +12,7 @@ void os_dbg_sys_msg(const textchar_t* msg)
 }
 #endif
 
-oshtml_charset_id_t os_get_default_charset()
+auto os_get_default_charset() -> oshtml_charset_id_t
 {
     // We always assume UTF-8, so the value we return here doesn't actually
     // represent anything.
@@ -21,10 +21,10 @@ oshtml_charset_id_t os_get_default_charset()
 
 /* Get the next character in a string.
  */
-textchar_t* os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t len)
+auto os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t len) -> textchar_t*
 {
-    if (p == 0) {
-        return 0;
+    if (p == nullptr) {
+        return nullptr;
     }
     // We always use UTF-8, so we only need to figure out how many bytes to
     // skip by looking at the first byte. We don't need to actually iterate
@@ -46,10 +46,10 @@ textchar_t* os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t
 
 /* Get the previous character in a string.
  */
-textchar_t* os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart)
+auto os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart) -> textchar_t*
 {
-    if (p == 0) {
-        return 0;
+    if (p == nullptr) {
+        return nullptr;
     }
     // Move back one byte.
     --p;
@@ -65,9 +65,9 @@ textchar_t* os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const 
 /* Determine if the character at the given string position is a word
  * character - i.e., a character that's part of a written word.
  */
-int os_is_word_char(oshtml_charset_id_t id, const textchar_t* p, size_t len)
+auto os_is_word_char(oshtml_charset_id_t id, const textchar_t* p, size_t len) -> int
 {
-    if (p == 0) {
+    if (p == nullptr) {
         return false;
     }
     const QString& c = QString::fromUtf8(p, os_next_char(id, p, len) - p);
@@ -79,7 +79,7 @@ int os_is_word_char(oshtml_charset_id_t id, const textchar_t* p, size_t len)
 
 /* Get the current system time.
  */
-os_timer_t os_get_time()
+auto os_get_time() -> os_timer_t
 {
     using namespace std::chrono;
     // Use an initial zero point instead of just returning now().time_since_epoch(), so that we

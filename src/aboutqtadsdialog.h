@@ -13,7 +13,7 @@ class AboutQtadsDialog: public QDialog
     Q_OBJECT
 
 public:
-    explicit AboutQtadsDialog(QWidget* parent = 0);
+    explicit AboutQtadsDialog(QWidget* parent = nullptr);
     ~AboutQtadsDialog() override;
 
 private:

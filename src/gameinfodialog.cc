@@ -75,7 +75,7 @@ static void insertTableRow(QTableWidget* table, const QString& text1, const QStr
     table->setItem(table->rowCount() - 1, 1, item);
 }
 
-static QImage loadCoverArtImage()
+static auto loadCoverArtImage() -> QImage
 {
     CHtmlResFinder* resFinder = qFrame->gameWindow()->get_formatter()->get_res_finder();
 
@@ -236,7 +236,7 @@ GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* parent)
     // at all in case we have zero rows.
     int topMargin;
     int bottomMargin;
-    ui->table->getContentsMargins(0, &topMargin, 0, &bottomMargin);
+    ui->table->getContentsMargins(nullptr, &topMargin, nullptr, &bottomMargin);
     int maxHeight = ui->table->rowCount() * ui->table->rowHeight(0);
     if (maxHeight > 0) {
         // Only add the margins to the maximum height if we're going to show
@@ -256,13 +256,13 @@ GameInfoDialog::~GameInfoDialog()
     delete ui;
 }
 
-bool GameInfoDialog::gameHasMetaInfo(const QByteArray& fname)
+auto GameInfoDialog::gameHasMetaInfo(const QByteArray& fname) -> bool
 {
     CTadsGameInfo info;
     return info.read_from_file(fname.constData());
 }
 
-QTadsGameInfoEnum GameInfoDialog::getMetaInfo(const QByteArray& fname)
+auto GameInfoDialog::getMetaInfo(const QByteArray& fname) -> QTadsGameInfoEnum
 {
     CTadsGameInfo info;
     QTadsGameInfoEnum cb;

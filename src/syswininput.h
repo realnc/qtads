@@ -101,7 +101,7 @@ public:
 
     // Read a line of input.
     void getInput(textchar_t* buf, size_t buflen, unsigned long timeout = 0,
-                  bool useTimeout = false, bool* timedOut = 0);
+                  bool useTimeout = false, bool* timedOut = nullptr);
 
     // Cancel an interrupted input.  See CHtmlSysFrame::get_input_cancel().
     void cancelInput(bool reset);
@@ -118,7 +118,7 @@ public:
     // If an HREF events happens while we're waiting for input, -1 is returned.
     // The caller should use the pendingHrefEvent() method to get the HREF
     // event in this case.
-    int getKeypress(unsigned long timeout = 0, bool useTimeout = false, bool* timedOut = 0);
+    auto getKeypress(unsigned long timeout = 0, bool useTimeout = false, bool* timedOut = nullptr) -> int;
 
     // Add a banner to the queue of banners that are in page-pause mode.
     void addToPagePauseQueue(CHtmlSysWinQt* banner);
@@ -127,7 +127,7 @@ public:
 
     // Return the currently pending HREF event (is there is one.)  This method
     // will clear the event, so subsequent calls will return an empty string.
-    QString pendingHrefEvent()
+    auto pendingHrefEvent() -> QString
     {
         QString ret(fHrefEvent);
         fHrefEvent.clear();
@@ -139,7 +139,7 @@ public:
     void insertText(QString str);
 
     // Do we currently accept text insertion?
-    bool acceptsText()
+    auto acceptsText() -> bool
     {
         return fInputMode == NormalInput;
     }

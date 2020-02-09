@@ -42,13 +42,13 @@ class GameInfoDialog: public QDialog
     Q_OBJECT
 
 public:
-    explicit GameInfoDialog(const QByteArray& fname, QWidget* parent = 0);
+    explicit GameInfoDialog(const QByteArray& fname, QWidget* parent = nullptr);
     ~GameInfoDialog() override;
 
     // Checks whether a game file contains any embedded meta information.
-    static bool gameHasMetaInfo(const QByteArray& fname);
+    static auto gameHasMetaInfo(const QByteArray& fname) -> bool;
 
-    static QTadsGameInfoEnum getMetaInfo(const QByteArray& fname);
+    static auto getMetaInfo(const QByteArray& fname) -> QTadsGameInfoEnum;
 
 private:
     Ui::GameInfoDialog* ui;

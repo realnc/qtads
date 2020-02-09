@@ -25,11 +25,11 @@
 
 void CHtmlSysFrameQt::fCtxGetIOSafetyLevel(void*, int* read, int* write)
 {
-    Q_ASSERT(qFrame != 0);
-    if (read != 0) {
+    Q_ASSERT(qFrame != nullptr);
+    if (read != nullptr) {
         *read = qFrame->fSettings->ioSafetyLevelRead;
     }
-    if (write != 0) {
+    if (write != nullptr) {
         *write = qFrame->fSettings->ioSafetyLevelWrite;
     }
 }
@@ -37,14 +37,14 @@ void CHtmlSysFrameQt::fCtxGetIOSafetyLevel(void*, int* read, int* write)
 CHtmlSysFrameQt::CHtmlSysFrameQt(int& argc, char* argv[], const char* appName,
                                  const char* appVersion, const char* orgName, const char* orgDomain)
     : QApplication(argc, argv)
-    , fGameWin(0)
+    , fGameWin(nullptr)
     , fGameRunning(false)
     , fTads3(true)
     , fReformatPending(false)
     , fNonStopMode(false)
 {
     // qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(qFrame == 0);
+    Q_ASSERT(qFrame == nullptr);
 
     setApplicationName(QString::fromLatin1(appName));
     setApplicationVersion(QString::fromLatin1(appVersion));
@@ -60,8 +60,8 @@ CHtmlSysFrameQt::CHtmlSysFrameQt(int& argc, char* argv[], const char* appName,
     const QColor& tmpCol = fSettings->inputColor;
     fInputColor = HTML_make_color(tmpCol.red(), tmpCol.green(), tmpCol.blue());
 
-    fParser = 0;
-    fFormatter = 0;
+    fParser = nullptr;
+    fFormatter = nullptr;
 
     // Clear the TADS appctx; all unused fields must be 0.
     memset(&fAppctx, 0, sizeof(fAppctx));
@@ -95,19 +95,19 @@ CHtmlSysFrameQt::CHtmlSysFrameQt(int& argc, char* argv[], const char* appName,
 CHtmlSysFrameQt::~CHtmlSysFrameQt()
 {
     // qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(qFrame != 0);
+    Q_ASSERT(qFrame != nullptr);
 
     // Delete the "about this game" box.
     fMainWin->deleteAboutBox();
 
     // We're no longer the main frame object.
-    CHtmlSysFrame::set_frame_obj(0);
+    CHtmlSysFrame::set_frame_obj(nullptr);
 
     // Save our persistent settings.
     fSettings->saveToDisk();
 
     // We're being destroyed, so our global pointer is no longer valid.
-    qFrame = 0;
+    qFrame = nullptr;
 
     // Delete HTML banners, orphaned banners and main game window.
     while (not fBannerList.isEmpty()) {
@@ -116,18 +116,18 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
     while (not fOrhpanBannerList.isEmpty()) {
         os_banner_delete(fOrhpanBannerList.takeLast());
     }
-    if (fGameWin != 0) {
+    if (fGameWin != nullptr) {
         delete fGameWin;
     }
 
     // Release the parser and delete our parser and formatter.
-    if (fFormatter != 0) {
+    if (fFormatter != nullptr) {
         fFormatter->release_parser();
     }
-    if (fParser != 0) {
+    if (fParser != nullptr) {
         delete fParser;
     }
-    if (fFormatter != 0) {
+    if (fFormatter != nullptr) {
         delete fFormatter;
     }
 
@@ -160,7 +160,7 @@ void CHtmlSysFrameQt::fRunGame()
 
         // Run the appropriate TADS VM.
         int vmType =
-            vm_get_game_type(qStrToFname(finfo.absoluteFilePath()).constData(), 0, 0, 0, 0);
+            vm_get_game_type(qStrToFname(finfo.absoluteFilePath()).constData(), nullptr, 0, nullptr, 0);
         if (vmType == VM_GGT_TADS2 or vmType == VM_GGT_TADS3) {
             // Delete all HTML and orphaned banners.
             while (not fOrhpanBannerList.isEmpty()) {
@@ -171,18 +171,18 @@ void CHtmlSysFrameQt::fRunGame()
             }
 
             // Delete the current main HTML game window.
-            if (fGameWin != 0) {
+            if (fGameWin != nullptr) {
                 delete fGameWin;
             }
 
             // Delete current HTML parser and main game window formatter.
-            if (fFormatter != 0) {
+            if (fFormatter != nullptr) {
                 fFormatter->release_parser();
             }
-            if (fParser != 0) {
+            if (fParser != nullptr) {
                 delete fParser;
             }
-            if (fFormatter != 0) {
+            if (fFormatter != nullptr) {
                 delete fFormatter;
             }
 
@@ -372,14 +372,14 @@ void CHtmlSysFrameQt::entryPoint(QString gameFileName)
 
     // If a game file was specified, try to run it.
     if (not gameFileName.isEmpty()) {
-        setNextGame(gameFileName);
+        setNextGame(std::move(gameFileName));
     }
 }
 
-CHtmlSysFontQt* CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc)
+auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFontQt*
 {
     // qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(font_desc != 0);
+    Q_ASSERT(font_desc != nullptr);
 
     CHtmlFontDesc newFontDesc = *font_desc;
     CHtmlSysFontQt newFont;
@@ -597,7 +597,7 @@ CHtmlSysFontQt* CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc)
 
 void CHtmlSysFrameQt::adjustBannerSizes()
 {
-    if (fGameWin == 0) {
+    if (fGameWin == nullptr) {
         return;
     }
 
@@ -609,7 +609,7 @@ void CHtmlSysFrameQt::adjustBannerSizes()
 
 void CHtmlSysFrameQt::reformatBanners(bool showStatus, bool freezeDisplay, bool resetSounds)
 {
-    if (fGameWin == 0) {
+    if (fGameWin == nullptr) {
         return;
     }
 
@@ -658,7 +658,7 @@ void CHtmlSysFrameQt::pruneParseTree()
 void CHtmlSysFrameQt::notifyPreferencesChange(const Settings* sett)
 {
     // Bail out if we currently don't have an active formatter.
-    if (fFormatter == 0) {
+    if (fFormatter == nullptr) {
         return;
     }
 
@@ -699,7 +699,7 @@ void CHtmlSysFrame::kill_process()
     ::exit(0);
 }
 
-int CHtmlSysFrame::eof_on_console()
+auto CHtmlSysFrame::eof_on_console() -> int
 {
     return qWinGroup->wantsToQuit();
 }
@@ -778,7 +778,7 @@ void CHtmlSysFrameQt::display_output(const textchar_t* buf, size_t len)
     }
 }
 
-int CHtmlSysFrameQt::check_break_key()
+auto CHtmlSysFrameQt::check_break_key() -> int
 {
     // qDebug() << Q_FUNC_INFO;
 
@@ -786,7 +786,7 @@ int CHtmlSysFrameQt::check_break_key()
     return false;
 }
 
-int CHtmlSysFrameQt::get_input(textchar_t* buf, size_t bufsiz)
+auto CHtmlSysFrameQt::get_input(textchar_t* buf, size_t bufsiz) -> int
 {
     // qDebug() << Q_FUNC_INFO;
 
@@ -796,8 +796,8 @@ int CHtmlSysFrameQt::get_input(textchar_t* buf, size_t bufsiz)
     return true;
 }
 
-int CHtmlSysFrameQt::get_input_timeout(textchar_t* buf, size_t buflen, unsigned long timeout,
-                                       int use_timeout)
+auto CHtmlSysFrameQt::get_input_timeout(textchar_t* buf, size_t buflen, unsigned long timeout,
+                                       int use_timeout) -> int
 {
     // qDebug() << Q_FUNC_INFO;
 
@@ -828,7 +828,7 @@ void CHtmlSysFrameQt::get_input_cancel(int reset)
     fGameWin->cancelInput(reset);
 }
 
-int CHtmlSysFrameQt::get_input_event(unsigned long timeout, int use_timeout, os_event_info_t* info)
+auto CHtmlSysFrameQt::get_input_event(unsigned long timeout, int use_timeout, os_event_info_t* info) -> int
 {
     // qDebug() << Q_FUNC_INFO << "use_timeout:" << use_timeout;
 
@@ -880,7 +880,7 @@ int CHtmlSysFrameQt::get_input_event(unsigned long timeout, int use_timeout, os_
 }
 
 // FIXME: OS_EVT_HREF isn't handled and shouldn't be allowed here.
-textchar_t CHtmlSysFrameQt::wait_for_keystroke(int pause_only)
+auto CHtmlSysFrameQt::wait_for_keystroke(int pause_only) -> textchar_t
 {
     // qDebug() << Q_FUNC_INFO;
 
@@ -951,11 +951,11 @@ void CHtmlSysFrameQt::dbg_print(const char* /*msg*/)
     // qDebug() << "HTML TADS Debug message:" << msg;
 }
 
-CHtmlSysWin* CHtmlSysFrameQt::create_banner_window(CHtmlSysWin* parent,
+auto CHtmlSysFrameQt::create_banner_window(CHtmlSysWin* parent,
                                                    HTML_BannerWin_Type_t window_type,
                                                    CHtmlFormatter* formatter, int where,
                                                    CHtmlSysWin* other, HTML_BannerWin_Pos_t pos,
-                                                   unsigned long style)
+                                                   unsigned long style) -> CHtmlSysWin*
 {
     // qDebug() << Q_FUNC_INFO;
     // return 0;
@@ -981,14 +981,14 @@ CHtmlSysWin* CHtmlSysFrameQt::create_banner_window(CHtmlSysWin* parent,
 
     // If no parent was specified, it means that it's a child of the main
     // game window.
-    if (parent == 0) {
+    if (parent == nullptr) {
         parent = castParent = fGameWin;
     }
 
     // If BEFORE or AFTER is requested but 'other' isn't a child of the
     // parent, we must behave as if OS_BANNER_LAST were specified.
     if (where == OS_BANNER_BEFORE or where == OS_BANNER_AFTER) {
-        Q_ASSERT(other != 0);
+        Q_ASSERT(other != nullptr);
         if (castOther->parentBanner() != parent) {
             where = OS_BANNER_LAST;
         }
@@ -1007,7 +1007,7 @@ void CHtmlSysFrameQt::orphan_banner_window(CHtmlFormatterBannerExt* banner)
     fOrhpanBannerList.append(banner);
 }
 
-CHtmlSysWin* CHtmlSysFrameQt::create_aboutbox_window(CHtmlFormatter* formatter)
+auto CHtmlSysFrameQt::create_aboutbox_window(CHtmlFormatter* formatter) -> CHtmlSysWin*
 {
     // qDebug() << Q_FUNC_INFO;
 
@@ -1029,7 +1029,7 @@ void CHtmlSysFrameQt::remove_banner_window(CHtmlSysWin* win)
     // Before deleting it, remove it from our list and give keyboard focus to
     // its parent, if it has one.
     fBannerList.removeAll(castWin);
-    if (castWin->parentBanner() != 0) {
+    if (castWin->parentBanner() != nullptr) {
         castWin->parentBanner()->setFocus();
     }
 
@@ -1038,9 +1038,9 @@ void CHtmlSysFrameQt::remove_banner_window(CHtmlSysWin* win)
     adjustBannerSizes();
 }
 
-int CHtmlSysFrameQt::get_exe_resource(const textchar_t* /*resname*/, size_t /*resnamelen*/,
+auto CHtmlSysFrameQt::get_exe_resource(const textchar_t* /*resname*/, size_t /*resnamelen*/,
                                       textchar_t* /*fname_buf*/, size_t /*fname_buf_len*/,
-                                      unsigned long* /*seek_pos*/, unsigned long* /*siz*/)
+                                      unsigned long* /*seek_pos*/, unsigned long* /*siz*/) -> int
 {
     // qDebug() << Q_FUNC_INFO;
     // qDebug() << "resname:" << resname << "fname_buf:" << fname_buf << "seek_pos:" << seek_pos;
