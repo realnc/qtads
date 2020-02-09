@@ -87,7 +87,7 @@ public:
 
     // FIXME: Implement
     void set_net_safety(int /*client_level*/, int /*server_level*/) override
-    {}
+    { }
 
     auto get_sys_res_loader() -> class CResLoader* override
     {
@@ -128,23 +128,24 @@ public:
         return (fAppctx != nullptr and fAppctx->add_resfile != nullptr);
     }
 
-    void add_resource(unsigned long ofs, unsigned long siz, const char* res_name,
-                      size_t res_name_len, int fileno) override
+    void add_resource(
+        unsigned long ofs, unsigned long siz, const char* res_name, size_t res_name_len,
+        int fileno) override
     {
         // Pass it through the app context if possible.
         if (fAppctx != nullptr and fAppctx->add_resource != nullptr) {
-            (*fAppctx->add_resource)(fAppctx->add_resource_ctx, ofs, siz, res_name, res_name_len,
-                                     fileno);
+            (*fAppctx->add_resource)(
+                fAppctx->add_resource_ctx, ofs, siz, res_name, res_name_len, fileno);
         }
     }
 
-    void add_resource(const char* fname, size_t fname_len, const char* res_name,
-                      size_t res_name_len) override
+    void add_resource(
+        const char* fname, size_t fname_len, const char* res_name, size_t res_name_len) override
     {
         // Pass it through the app context if possible.
         if (fAppctx != nullptr and fAppctx->add_resource_link != nullptr) {
-            (*fAppctx->add_resource_link)(fAppctx->add_resource_link_ctx, fname, fname_len,
-                                          res_name, res_name_len);
+            (*fAppctx->add_resource_link)(
+                fAppctx->add_resource_link_ctx, fname, fname_len, res_name, res_name_len);
         }
     }
 
@@ -166,15 +167,15 @@ public:
         }
     }
 
-    auto find_resource(const char* res_name, size_t res_name_len,
-                            unsigned long* res_size) -> osfildef* override
+    auto find_resource(const char* res_name, size_t res_name_len, unsigned long* res_size)
+        -> osfildef* override
     {
         // Let the application context handle it; if we don't have an
         // application context, we don't provide resource operation, so simply
         // return failure.
         if (fAppctx != nullptr and fAppctx->find_resource != nullptr) {
-            return (*fAppctx->find_resource)(fAppctx->find_resource_ctx, res_name, res_name_len,
-                                             res_size);
+            return (*fAppctx->find_resource)(
+                fAppctx->find_resource_ctx, res_name, res_name_len, res_size);
         } else {
             return nullptr;
         }

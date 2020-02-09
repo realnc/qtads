@@ -21,14 +21,14 @@ void QTadsGameInfoEnum::tads_enum_game_info(const char* name, const char* val)
 
     if (nameStr == QString::fromLatin1("name")) {
         gameName = QString::fromLatin1("<b><center><font size=\"+1\">") + htmlValStr
-                   + QString::fromLatin1("</font></center></b><p>");
+            + QString::fromLatin1("</font></center></b><p>");
         plainGameName = valStr;
     } else if (nameStr == QString::fromLatin1("headline")) {
         headline =
             QString::fromLatin1("<center>") + htmlValStr + QString::fromLatin1("</center><p>");
     } else if (nameStr == QString::fromLatin1("byline")) {
         byLine = QString::fromLatin1("<i><center>") + htmlValStr
-                 + QString::fromLatin1("</center></i><p>");
+            + QString::fromLatin1("</center></i><p>");
     } else if (nameStr == QString::fromLatin1("htmlbyline")) {
         htmlByLine =
             QString::fromLatin1("<i><center>") + valStr + QString::fromLatin1("</center></i><p>");
@@ -85,8 +85,8 @@ static auto loadCoverArtImage() -> QImage
     // standard which did not use a prefix.
     QByteArray coverArtResName;
     bool coverArtFound = false;
-    const char coverArtPaths[][21] = {".system/CoverArt.png", ".system/CoverArt.jpg",
-                                      "CoverArt.png", "CoverArt.jpg"};
+    const char coverArtPaths[][21] = {
+        ".system/CoverArt.png", ".system/CoverArt.jpg", "CoverArt.png", "CoverArt.jpg"};
     for (int i = 0; i < 4 and not coverArtFound; ++i) {
         coverArtResName = coverArtPaths[i];
         if (resFinder->resfile_exists(coverArtResName.constData(), coverArtResName.length())) {
@@ -101,8 +101,8 @@ static auto loadCoverArtImage() -> QImage
     CStringBuf strBuf;
     unsigned long offset;
     unsigned long size;
-    resFinder->get_file_info(&strBuf, coverArtResName.constData(), coverArtResName.length(),
-                             &offset, &size);
+    resFinder->get_file_info(
+        &strBuf, coverArtResName.constData(), coverArtResName.length(), &offset, &size);
 
     // Check if the file exists and is readable.
     QFileInfo inf(fnameToQStr(strBuf.get()));
@@ -140,8 +140,8 @@ static auto loadCoverArtImage() -> QImage
     // 200 pixels width if it's too large.  Otherwise, return it as-is.
     if (image.width() > 200) {
         Qt::TransformationMode mode = qFrame->settings()->useSmoothScaling
-                                          ? Qt::SmoothTransformation
-                                          : Qt::FastTransformation;
+            ? Qt::SmoothTransformation
+            : Qt::FastTransformation;
         return image.scaledToWidth(200, mode);
     } else {
         return image;
@@ -161,8 +161,8 @@ GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* parent)
     // browser as the "CoverArt" resource.
     const QImage& image = loadCoverArtImage();
     if (not image.isNull()) {
-        ui->description->document()->addResource(QTextDocument::ImageResource,
-                                                 QUrl(QString::fromLatin1("CoverArt")), image);
+        ui->description->document()->addResource(
+            QTextDocument::ImageResource, QUrl(QString::fromLatin1("CoverArt")), image);
         resize(width(), height() + image.height());
     }
 
@@ -175,7 +175,7 @@ GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* parent)
         tmp += QString::fromLatin1("<center><img src=\"CoverArt\"></center><p>");
     }
     tmp += cb.gameName + cb.headline + (cb.htmlByLine.isEmpty() ? cb.byLine : cb.htmlByLine)
-           + (cb.htmlDesc.isEmpty() ? cb.desc : cb.htmlDesc);
+        + (cb.htmlDesc.isEmpty() ? cb.desc : cb.htmlDesc);
     ui->description->setHtml(tmp);
 
     // Fill out the table.

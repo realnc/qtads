@@ -10,12 +10,11 @@
 class QTadsImage: public QImage
 {
 public:
-    QTadsImage()
-    = default;
+    QTadsImage() = default;
 
     QTadsImage(const QImage& qImg)
         : QImage(qImg)
-    {}
+    { }
 
     // A call to this method is only allowed to happen from inside
     // QTadsDisplayWidget::paintEvent().  This always happens indirectly

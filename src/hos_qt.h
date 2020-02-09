@@ -4,6 +4,8 @@
 // its include order and sometimes includes the same header multiple times with
 // different preprocessor defitions.
 
+// clang-format off
+
 /* This file should be included ONLY by html_os.h, which serves as the
  * switchboard for OS header inclusion.  Do not include this file directly from
  * from any other file.
@@ -190,6 +192,8 @@ auto os_get_time() -> os_timer_t;
 #define os_align_size(siz) (((siz) + 7) & ~7)
 
 #endif /* HOS_QT_H */
+
+// clang-format on
 
 /*
     Copyright 2003-2020 Nikos Chantziaras <realnc@gmail.com>

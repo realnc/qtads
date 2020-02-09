@@ -13,9 +13,9 @@
  * 'imageType'.  It has the same format as the list returned by
  * QImageReader::supportedImageFormats() (like "JPG", "PNG", etc.)
  */
-static auto createImageFromFile(const CHtmlUrl* /*url*/, const textchar_t* filename,
-                                             unsigned long seekpos, unsigned long filesize,
-                                             CHtmlSysWin* /*win*/, const QString& imageType) -> CHtmlSysResource*
+static auto createImageFromFile(
+    const CHtmlUrl* /*url*/, const textchar_t* filename, unsigned long seekpos,
+    unsigned long filesize, CHtmlSysWin* /*win*/, const QString& imageType) -> CHtmlSysResource*
 {
     // qDebug() << "Loading" << imageType << "image from" << filename << "at offset" << seekpos
     //      << "with size" << filesize << "url:" << url->get_url();
@@ -86,23 +86,23 @@ static auto createImageFromFile(const CHtmlUrl* /*url*/, const textchar_t* filen
     return image;
 }
 
-auto CHtmlSysImageJpeg::create_jpeg(const CHtmlUrl* url, const textchar_t* filename,
-                                                 unsigned long seekpos, unsigned long filesize,
-                                                 CHtmlSysWin* win) -> CHtmlSysResource*
+auto CHtmlSysImageJpeg::create_jpeg(
+    const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos, unsigned long filesize,
+    CHtmlSysWin* win) -> CHtmlSysResource*
 {
     return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromLatin1("JPG"));
 }
 
-auto CHtmlSysImagePng::create_png(const CHtmlUrl* url, const textchar_t* filename,
-                                               unsigned long seekpos, unsigned long filesize,
-                                               CHtmlSysWin* win) -> CHtmlSysResource*
+auto CHtmlSysImagePng::create_png(
+    const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos, unsigned long filesize,
+    CHtmlSysWin* win) -> CHtmlSysResource*
 {
     return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromLatin1("PNG"));
 }
 
-auto CHtmlSysImageMng::create_mng(const CHtmlUrl* url, const textchar_t* filename,
-                                               unsigned long seekpos, unsigned long filesize,
-                                               CHtmlSysWin* win) -> CHtmlSysResource*
+auto CHtmlSysImageMng::create_mng(
+    const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos, unsigned long filesize,
+    CHtmlSysWin* win) -> CHtmlSysResource*
 {
     return ::createImageFromFile(url, filename, seekpos, filesize, win, QString::fromLatin1("MNG"));
 }

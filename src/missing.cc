@@ -31,13 +31,13 @@ auto memicmp(const char* s1, const char* s2, size_t len) -> int
 auto stricmp(const char* s1, const char* s2) -> int
 {
     if (qFrame->tads3()) {
-        return QString::localeAwareCompare(QString::fromUtf8(s1).toLower(),
-                                           QString::fromUtf8(s2).toLower());
+        return QString::localeAwareCompare(
+            QString::fromUtf8(s1).toLower(), QString::fromUtf8(s2).toLower());
     }
     // TADS 2 does not use UTF-8; use the encoding from our settings.
     QTextCodec* codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
-    return QString::localeAwareCompare(codec->toUnicode(s1).toLower(),
-                                       codec->toUnicode(s2).toLower());
+    return QString::localeAwareCompare(
+        codec->toUnicode(s1).toLower(), codec->toUnicode(s2).toLower());
 }
 
 auto strnicmp(const char* s1, const char* s2, size_t n) -> int

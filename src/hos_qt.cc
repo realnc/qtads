@@ -46,7 +46,8 @@ auto os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t len) -
 
 /* Get the previous character in a string.
  */
-auto os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart) -> textchar_t*
+auto os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart)
+    -> textchar_t*
 {
     if (p == nullptr) {
         return nullptr;

@@ -34,8 +34,9 @@ void CHtmlSysFrameQt::fCtxGetIOSafetyLevel(void*, int* read, int* write)
     }
 }
 
-CHtmlSysFrameQt::CHtmlSysFrameQt(int& argc, char* argv[], const char* appName,
-                                 const char* appVersion, const char* orgName, const char* orgDomain)
+CHtmlSysFrameQt::CHtmlSysFrameQt(
+    int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
+    const char* orgDomain)
     : QApplication(argc, argv)
     , fGameWin(nullptr)
     , fGameRunning(false)
@@ -159,8 +160,8 @@ void CHtmlSysFrameQt::fRunGame()
         QDir::setCurrent(finfo.absolutePath());
 
         // Run the appropriate TADS VM.
-        int vmType =
-            vm_get_game_type(qStrToFname(finfo.absoluteFilePath()).constData(), nullptr, 0, nullptr, 0);
+        int vmType = vm_get_game_type(
+            qStrToFname(finfo.absoluteFilePath()).constData(), nullptr, 0, nullptr, 0);
         if (vmType == VM_GGT_TADS2 or vmType == VM_GGT_TADS3) {
             // Delete all HTML and orphaned banners.
             while (not fOrhpanBannerList.isEmpty()) {
@@ -215,8 +216,8 @@ void CHtmlSysFrameQt::fRunGame()
                 qWinGroup->setWindowTitle(finfo.fileName());
 #else
                 // On all other systems, also append the application name.
-                qWinGroup->setWindowTitle(finfo.fileName() + QString::fromLatin1(" - ")
-                                          + qFrame->applicationName());
+                qWinGroup->setWindowTitle(
+                    finfo.fileName() + QString::fromLatin1(" - ") + qFrame->applicationName());
 #endif
             } else {
                 qWinGroup->setWindowTitle(titleStr.trimmed());
@@ -283,8 +284,8 @@ void CHtmlSysFrameQt::fRunGame()
             display_output(endMsg.toUtf8().constData(), endMsg.length());
             flush_txtbuf(true, false);
         } else {
-            QMessageBox::critical(fMainWin, tr("Open Game"),
-                                  finfo.fileName() + tr(" is not a TADS game file."));
+            QMessageBox::critical(
+                fMainWin, tr("Open Game"), finfo.fileName() + tr(" is not a TADS game file."));
         }
     }
 
@@ -324,7 +325,7 @@ void CHtmlSysFrameQt::fRunT3Game(const QString& fname)
 }
 
 #ifdef Q_OS_MAC
-#include <QFileOpenEvent>
+    #include <QFileOpenEvent>
 bool CHtmlSysFrameQt::event(QEvent* e)
 {
     // We only handle the FileOpen event.
@@ -385,8 +386,8 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
     CHtmlSysFontQt newFont;
     QFont::StyleStrategy strat;
     // We're building with a recent enough Qt; use ForceIntegerMetrics directly.
-    strat = QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality
-                                 | QFont::ForceIntegerMetrics);
+    strat = QFont::StyleStrategy(
+        QFont::PreferOutline | QFont::PreferQuality | QFont::ForceIntegerMetrics);
     newFont.setStyleStrategy(strat);
 
     // Use the weight they provided (we may change this if a weight modifier is
@@ -678,8 +679,9 @@ void CHtmlSysFrameQt::notifyPreferencesChange(const Settings* sett)
     // Links in the main game window are not invalidated for some reason, so we
     // invalidate them manually here.
     const QRect& widgetRect = fGameWin->widget()->visibleRegion().boundingRect();
-    CHtmlRect documentRect(widgetRect.x(), widgetRect.y(), widgetRect.x() + widgetRect.width(),
-                           widgetRect.y() + widgetRect.height());
+    CHtmlRect documentRect(
+        widgetRect.x(), widgetRect.y(), widgetRect.x() + widgetRect.width(),
+        widgetRect.y() + widgetRect.height());
     fFormatter->inval_links_on_screen(&documentRect);
 
     qFrame->gameWindow()->updateFormatterMargins();
@@ -796,8 +798,8 @@ auto CHtmlSysFrameQt::get_input(textchar_t* buf, size_t bufsiz) -> int
     return true;
 }
 
-auto CHtmlSysFrameQt::get_input_timeout(textchar_t* buf, size_t buflen, unsigned long timeout,
-                                       int use_timeout) -> int
+auto CHtmlSysFrameQt::get_input_timeout(
+    textchar_t* buf, size_t buflen, unsigned long timeout, int use_timeout) -> int
 {
     // qDebug() << Q_FUNC_INFO;
 
@@ -828,7 +830,8 @@ void CHtmlSysFrameQt::get_input_cancel(int reset)
     fGameWin->cancelInput(reset);
 }
 
-auto CHtmlSysFrameQt::get_input_event(unsigned long timeout, int use_timeout, os_event_info_t* info) -> int
+auto CHtmlSysFrameQt::get_input_event(unsigned long timeout, int use_timeout, os_event_info_t* info)
+    -> int
 {
     // qDebug() << Q_FUNC_INFO << "use_timeout:" << use_timeout;
 
@@ -856,12 +859,14 @@ auto CHtmlSysFrameQt::get_input_event(unsigned long timeout, int use_timeout, os
         // For TADS 3, we use the result as-is; it's already in UTF-8.  For TADS 2,
         // we will need to use the prefered encoding.
         if (fTads3) {
-            strncpy(info->href, fGameWin->pendingHrefEvent().toUtf8().constData(),
-                    sizeof(info->href) - 1);
+            strncpy(
+                info->href, fGameWin->pendingHrefEvent().toUtf8().constData(),
+                sizeof(info->href) - 1);
         } else {
             QTextCodec* codec = QTextCodec::codecForName(fSettings->tads2Encoding);
-            strncpy(info->href, codec->fromUnicode(fGameWin->pendingHrefEvent()).constData(),
-                    sizeof(info->href) - 1);
+            strncpy(
+                info->href, codec->fromUnicode(fGameWin->pendingHrefEvent()).constData(),
+                sizeof(info->href) - 1);
         }
         info->href[sizeof(info->href) - 1] = '\0';
         return OS_EVT_HREF;
@@ -896,8 +901,8 @@ auto CHtmlSysFrameQt::wait_for_keystroke(int pause_only) -> textchar_t
         return ret;
     }
 
-    QLabel moreText(pause_only ? tr("*** MORE ***  [press a key to continue]")
-                               : tr("Please press a key"));
+    QLabel moreText(
+        pause_only ? tr("*** MORE ***  [press a key to continue]") : tr("Please press a key"));
     // Display a permanent QLabel instead of a temporary message.  This allows
     // other status bar messages (like when hovering over hyperlinks) to
     // temporary remove the MORE text instead of replacing it.
@@ -951,11 +956,9 @@ void CHtmlSysFrameQt::dbg_print(const char* /*msg*/)
     // qDebug() << "HTML TADS Debug message:" << msg;
 }
 
-auto CHtmlSysFrameQt::create_banner_window(CHtmlSysWin* parent,
-                                                   HTML_BannerWin_Type_t window_type,
-                                                   CHtmlFormatter* formatter, int where,
-                                                   CHtmlSysWin* other, HTML_BannerWin_Pos_t pos,
-                                                   unsigned long style) -> CHtmlSysWin*
+auto CHtmlSysFrameQt::create_banner_window(
+    CHtmlSysWin* parent, HTML_BannerWin_Type_t window_type, CHtmlFormatter* formatter, int where,
+    CHtmlSysWin* other, HTML_BannerWin_Pos_t pos, unsigned long style) -> CHtmlSysWin*
 {
     // qDebug() << Q_FUNC_INFO;
     // return 0;
@@ -1038,9 +1041,9 @@ void CHtmlSysFrameQt::remove_banner_window(CHtmlSysWin* win)
     adjustBannerSizes();
 }
 
-auto CHtmlSysFrameQt::get_exe_resource(const textchar_t* /*resname*/, size_t /*resnamelen*/,
-                                      textchar_t* /*fname_buf*/, size_t /*fname_buf_len*/,
-                                      unsigned long* /*seek_pos*/, unsigned long* /*siz*/) -> int
+auto CHtmlSysFrameQt::get_exe_resource(
+    const textchar_t* /*resname*/, size_t /*resnamelen*/, textchar_t* /*fname_buf*/,
+    size_t /*fname_buf_len*/, unsigned long* /*seek_pos*/, unsigned long * /*siz*/) -> int
 {
     // qDebug() << Q_FUNC_INFO;
     // qDebug() << "resname:" << resname << "fname_buf:" << fname_buf << "seek_pos:" << seek_pos;

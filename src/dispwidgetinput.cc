@@ -14,8 +14,8 @@
 #include "syswin.h"
 #include "syswingroup.h"
 
-DisplayWidgetInput::DisplayWidgetInput(CHtmlSysWinQt* parent, CHtmlFormatter* formatter,
-                                       CHtmlInputBuf* tadsBuffer)
+DisplayWidgetInput::DisplayWidgetInput(
+    CHtmlSysWinQt* parent, CHtmlFormatter* formatter, CHtmlInputBuf* tadsBuffer)
     : DisplayWidget(parent, formatter)
     , fCursorPos(0, 0)
     , fLastCursorPos(0, 0)
@@ -112,8 +112,8 @@ void DisplayWidgetInput::mouseMoveEvent(QMouseEvent* e)
 void DisplayWidgetInput::fBlinkCursor()
 {
     fBlinkVisible = not fBlinkVisible;
-    update(fCursorPos.x() - 5, fCursorPos.y() - 5, fCursorPos.x() + 5,
-           fCursorPos.y() + fHeight + 5);
+    update(
+        fCursorPos.x() - 5, fCursorPos.y() - 5, fCursorPos.x() + 5, fCursorPos.y() + fHeight + 5);
 }
 
 void DisplayWidgetInput::fHandleFocusChange(QWidget* old, QWidget* now)
@@ -138,8 +138,8 @@ void DisplayWidgetInput::fHandleFocusChange(QWidget* old, QWidget* now)
     }
 }
 
-void DisplayWidgetInput::updateCursorPos(CHtmlFormatter* formatter, bool keepSelection,
-                                         bool updateFormatterSelection)
+void DisplayWidgetInput::updateCursorPos(
+    CHtmlFormatter* formatter, bool keepSelection, bool updateFormatterSelection)
 {
     // Ignore the call if there's currently no active tag.
     if (fInpTag == nullptr) {

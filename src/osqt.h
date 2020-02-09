@@ -29,19 +29,19 @@ extern "C" {
 /* Define CPU_IS_BIGENDIAN to the appropriate value for this platform.
  * Needed by tads3/sha2.cpp. */
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
-#define CPU_IS_BIGENDIAN 1
+    #define CPU_IS_BIGENDIAN 1
 #else
-#define CPU_IS_BIGENDIAN 0
+    #define CPU_IS_BIGENDIAN 0
 #endif
 
 /* Most systems have typedefs for ushort, uint and ulong.  If not, the
  * qtads.pro project file should be modified to define OS_NO_TYPES_DEFINED. */
 #ifndef OS_NO_TYPES_DEFINED
-#define OS_UINT_DEFINED
-#ifndef Q_OS_ANDROID
-#define OS_USHORT_DEFINED
-#define OS_ULONG_DEFINED
-#endif
+    #define OS_UINT_DEFINED
+    #ifndef Q_OS_ANDROID
+        #define OS_USHORT_DEFINED
+        #define OS_ULONG_DEFINED
+    #endif
 #endif
 
 #define OSNOUI_OMIT_OS_FPRINTZ
@@ -110,18 +110,18 @@ extern "C" {
 #define OSFNMAX 255
 
 #ifndef OSPATHALT
-/* Other path separator characters. */
-#define OSPATHALT ""
+    /* Other path separator characters. */
+    #define OSPATHALT ""
 #endif
 
 #ifndef OSPATHURL
-/* Path separator characters for URL conversions. */
-#define OSPATHURL "/"
+    /* Path separator characters for URL conversions. */
+    #define OSPATHURL "/"
 #endif
 
 #ifndef OSPATHCHAR
-/* Normal path separator character. */
-#define OSPATHCHAR '/'
+    /* Normal path separator character. */
+    #define OSPATHCHAR '/'
 #endif
 
 /* Directory separator for PATH-style environment variables. */
@@ -132,8 +132,8 @@ extern "C" {
 #define OSPATHPWD "."
 
 #ifndef OS_NEWLINE_SEQ
-/* ASCII string giving the local newline sequence to write on output. */
-#define OS_NEWLINE_SEQ "\n"
+    /* ASCII string giving the local newline sequence to write on output. */
+    #define OS_NEWLINE_SEQ "\n"
 #endif
 
 /* File handle structure for osfxxx functions. */
@@ -170,21 +170,21 @@ typedef struct QFile osfildef;
 /* File modes.  On Windows, we do the Microsoft thing.  Everywhere else, we
  * assume POSIX stat(2). */
 #ifdef Q_OS_WIN
-#define OSFMODE_FILE _S_IFREG
-#define OSFMODE_DIR _S_IFDIR
-#define OSFMODE_BLK 0
-#define OSFMODE_CHAR _S_IFCHR
-#define OSFMODE_PIPE _S_IFIFO
-#define OSFMODE_SOCKET 0
-#define OSFMODE_LINK 0
+    #define OSFMODE_FILE _S_IFREG
+    #define OSFMODE_DIR _S_IFDIR
+    #define OSFMODE_BLK 0
+    #define OSFMODE_CHAR _S_IFCHR
+    #define OSFMODE_PIPE _S_IFIFO
+    #define OSFMODE_SOCKET 0
+    #define OSFMODE_LINK 0
 #else
-#define OSFMODE_FILE S_IFREG
-#define OSFMODE_DIR S_IFDIR
-#define OSFMODE_CHAR S_IFCHR
-#define OSFMODE_BLK S_IFBLK
-#define OSFMODE_PIPE S_IFIFO
-#define OSFMODE_LINK S_IFLNK
-#define OSFMODE_SOCKET S_IFSOCK
+    #define OSFMODE_FILE S_IFREG
+    #define OSFMODE_DIR S_IFDIR
+    #define OSFMODE_CHAR S_IFCHR
+    #define OSFMODE_BLK S_IFBLK
+    #define OSFMODE_PIPE S_IFIFO
+    #define OSFMODE_LINK S_IFLNK
+    #define OSFMODE_SOCKET S_IFSOCK
 #endif
 
 /* File attribute bits. */
@@ -201,7 +201,7 @@ typedef struct QDirIterator* osdirhdl_t;
 
 /* 64-bit time_t.  Only Windows supports this. */
 #ifdef Q_OS_WIN
-#define os_time_t __time64_t
+    #define os_time_t __time64_t
 #endif
 
 /* ============= Functions follow ================ */
@@ -225,9 +225,9 @@ extern "C" {
 
 /* 64-bit replacements for <time.h> routines.  Only Windows supports this. */
 #ifdef Q_OS_WIN
-#define os_gmtime _gmtime64
-#define os_localtime _localtime64
-#define os_time _time64
+    #define os_gmtime _gmtime64
+    #define os_localtime _localtime64
+    #define os_time _time64
 #endif
 
 /* Allocate a block of memory of the given size in bytes. */

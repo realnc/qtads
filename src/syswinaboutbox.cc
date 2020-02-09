@@ -29,8 +29,8 @@ auto CHtmlSysWinAboutBoxQt::sizeHint() const -> QSize
     return dispWidget->size();
 }
 
-void CHtmlSysWinAboutBoxQt::set_banner_size(long width, HTML_BannerWin_Units_t, int, long height,
-                                            HTML_BannerWin_Units_t height_units, int)
+void CHtmlSysWinAboutBoxQt::set_banner_size(
+    long width, HTML_BannerWin_Units_t, int, long height, HTML_BannerWin_Units_t height_units, int)
 {
     bannerSize = height;
     bannerSizeUnits = height_units;

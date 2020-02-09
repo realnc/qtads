@@ -96,7 +96,8 @@ void DisplayWidget::fHandleDoubleOrTripleClick(QMouseEvent* e, bool tripleClick)
     // paste the word into the current line input. Otherwise, just select the
     // word.
     if (qFrame->settings()->pasteOnDblClk and not tripleClick
-        and (QApplication::keyboardModifiers() & Qt::ControlModifier)) {
+        and (QApplication::keyboardModifiers() & Qt::ControlModifier))
+    {
         CStringBuf strBuf;
         formatter->extract_text(&strBuf, start, end);
         QString txt(QString::fromUtf8(strBuf.get()).trimmed());
@@ -127,8 +128,8 @@ void DisplayWidget::paintEvent(QPaintEvent* e)
 
     // qDebug() << "repainting" << e->rect();
     const QRect& qRect = e->region().boundingRect();
-    CHtmlRect cRect(qRect.left(), qRect.top(), qRect.left() + qRect.width(),
-                    qRect.top() + qRect.height());
+    CHtmlRect cRect(
+        qRect.left(), qRect.top(), qRect.left() + qRect.width(), qRect.top() + qRect.height());
     formatter->draw(&cRect, false, nullptr);
 }
 
@@ -140,8 +141,9 @@ void DisplayWidget::mouseMoveEvent(QMouseEvent* e)
     if (e->buttons() & Qt::LeftButton) {
         // If we're tracking a selection, update the selection range.
         if (inSelectMode) {
-            formatter->set_sel_range(CHtmlPoint(fSelectOrigin.x(), fSelectOrigin.y()),
-                                     CHtmlPoint(e->pos().x(), e->pos().y()), nullptr, nullptr);
+            formatter->set_sel_range(
+                CHtmlPoint(fSelectOrigin.x(), fSelectOrigin.y()),
+                CHtmlPoint(e->pos().x(), e->pos().y()), nullptr, nullptr);
             fSyncClipboard();
             return;
         }
@@ -149,7 +151,8 @@ void DisplayWidget::mouseMoveEvent(QMouseEvent* e)
         // If there's enough distance since the start of the drag, start a
         // drag event containing the selected text.
         if (fHasSelection
-            and (e->pos() - fDragStartPos).manhattanLength() > QApplication::startDragDistance()) {
+            and (e->pos() - fDragStartPos).manhattanLength() > QApplication::startDragDistance())
+        {
             QDrag* drag = new QDrag(this);
             QMimeData* mime = new QMimeData;
             mime->setText(fMySelectedText());
@@ -187,7 +190,8 @@ void DisplayWidget::mousePressEvent(QMouseEvent* e)
         // passed, then this is a triple-click.
         if (fLastDoubleClick.isValid()
             and fLastDoubleClick.msecsTo(QTime::currentTime())
-                    <= QApplication::doubleClickInterval()) {
+                <= QApplication::doubleClickInterval())
+        {
             fHandleDoubleOrTripleClick(e, true);
             return;
         }
@@ -263,8 +267,9 @@ void DisplayWidget::mouseReleaseEvent(QMouseEvent* e)
     // If we're still hovering over the clicked link, process it.
     if (fClickedLink == fHoverLink) {
         const textchar_t* cmd = fClickedLink->href_.get_url();
-        qFrame->gameWindow()->processCommand(cmd, strlen(cmd), fClickedLink->get_append(),
-                                             not fClickedLink->get_noenter(), OS_CMD_NONE);
+        qFrame->gameWindow()->processCommand(
+            cmd, strlen(cmd), fClickedLink->get_append(), not fClickedLink->get_noenter(),
+            OS_CMD_NONE);
         // Put it back in hovering mode.
         if (qFrame->settings()->highlightLinks) {
             fClickedLink->set_clicked(parentSysWin, CHtmlDispLink_hover);

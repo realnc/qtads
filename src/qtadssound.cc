@@ -4,20 +4,20 @@
 #include <QResource>
 
 #ifndef NO_AUDIO
-#include "Aulib/DecoderFluidsynth.h"
-#include "Aulib/DecoderMpg123.h"
-#include "Aulib/DecoderSndfile.h"
-#include "Aulib/DecoderVorbis.h"
-#include "Aulib/ResamplerSpeex.h"
-#include "aulib.h"
-#include "rwopsbundle.h"
-#include <SDL.h>
-#include <SDL_error.h>
-#include <SDL_rwops.h>
-#include <cerrno>
-#include <cstdio>
-#include <cstring>
-#include <functional>
+    #include "Aulib/DecoderFluidsynth.h"
+    #include "Aulib/DecoderMpg123.h"
+    #include "Aulib/DecoderSndfile.h"
+    #include "Aulib/DecoderVorbis.h"
+    #include "Aulib/ResamplerSpeex.h"
+    #include "aulib.h"
+    #include "rwopsbundle.h"
+    #include <SDL.h>
+    #include <SDL_error.h>
+    #include <SDL_rwops.h>
+    #include <cerrno>
+    #include <cstdio>
+    #include <cstring>
+    #include <functional>
 #endif
 
 #include "globals.h"
@@ -142,8 +142,9 @@ void QTadsSound::fDeleteTimer()
     delete fFadeOutTimer;
 }
 
-auto QTadsSound::startPlaying(void (*done_func)(void*, int repeat_count), void* done_func_ctx,
-                             int repeat, int vol, int fadeIn, int fadeOut, bool crossFade) -> int
+auto QTadsSound::startPlaying(
+    void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
+    int fadeIn, int fadeOut, bool crossFade) -> int
 {
     // qDebug() << Q_FUNC_INFO;
 
@@ -247,9 +248,9 @@ void QTadsSound::addCrossFade(int ms)
 }
 #endif
 
-auto QTadsSound::createSound(const CHtmlUrl* /*url*/, const textchar_t* filename,
-                                       unsigned long seekpos, unsigned long filesize, CHtmlSysWin*,
-                                       SoundType type) -> CHtmlSysSound*
+auto QTadsSound::createSound(
+    const CHtmlUrl* /*url*/, const textchar_t* filename, unsigned long seekpos,
+    unsigned long filesize, CHtmlSysWin*, SoundType type) -> CHtmlSysSound*
 #ifndef NO_AUDIO
 {
     // qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize

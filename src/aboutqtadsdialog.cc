@@ -44,18 +44,18 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget* parent)
     QString str;
     str += QString::fromLatin1("<p><table border=\"0\" width=\"100%\"><tr><td>");
     str += tr("QTads:") + QString::fromLatin1("</td><td>") + QString::fromLatin1(QTADS_VERSION)
-           + QString::fromLatin1("<br></td></tr><tr><td>") + tr("HTML TADS:")
-           + QString::fromLatin1("</td><td>\t") + QString::fromLatin1(HTMLTADS_VERSION)
-           + QString::fromLatin1("</td></tr><tr><td>") + tr("TADS 2 virtual machine:")
-           + QString::fromLatin1("</td><td>\t") + QString::fromLatin1(TADS_RUNTIME_VERSION)
-           + QString::fromLatin1("</td></tr><tr><td>") + tr("TADS 3 virtual machine:")
-           + QString::fromLatin1("</td><td>\t") + QString::fromLatin1(T3VM_VSN_STRING)
-           + QString::fromLatin1(" (") + QString::fromLatin1(T3VM_IDENTIFICATION)
-           + QString::fromLatin1(")<br></td></tr><tr><td>") + tr("Qt build version:")
-           + QString::fromLatin1("</td><td>") + QString::fromLatin1(QT_VERSION_STR)
-           + QString::fromLatin1("</td></tr><tr><td>") + tr("Qt runtime version:")
-           + QString::fromLatin1("</td><td>") + QString::fromLatin1(qVersion())
-           + QString::fromLatin1("</td></tr></table></p>");
+        + QString::fromLatin1("<br></td></tr><tr><td>") + tr("HTML TADS:")
+        + QString::fromLatin1("</td><td>\t") + QString::fromLatin1(HTMLTADS_VERSION)
+        + QString::fromLatin1("</td></tr><tr><td>") + tr("TADS 2 virtual machine:")
+        + QString::fromLatin1("</td><td>\t") + QString::fromLatin1(TADS_RUNTIME_VERSION)
+        + QString::fromLatin1("</td></tr><tr><td>") + tr("TADS 3 virtual machine:")
+        + QString::fromLatin1("</td><td>\t") + QString::fromLatin1(T3VM_VSN_STRING)
+        + QString::fromLatin1(" (") + QString::fromLatin1(T3VM_IDENTIFICATION)
+        + QString::fromLatin1(")<br></td></tr><tr><td>") + tr("Qt build version:")
+        + QString::fromLatin1("</td><td>") + QString::fromLatin1(QT_VERSION_STR)
+        + QString::fromLatin1("</td></tr><tr><td>") + tr("Qt runtime version:")
+        + QString::fromLatin1("</td><td>") + QString::fromLatin1(qVersion())
+        + QString::fromLatin1("</td></tr></table></p>");
     ui->versionInfoLabel->setText(str);
 }
 

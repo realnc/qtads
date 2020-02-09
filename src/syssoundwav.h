@@ -4,7 +4,7 @@
 #include "htmlsys.h"
 #include "qtadssound.h"
 #ifndef NO_AUDIO
-#include "Aulib/Stream.h"
+    #include "Aulib/Stream.h"
 #endif
 
 /* Tads HTML layer class whose interface needs to be implemented by the
@@ -21,15 +21,16 @@ public:
 #ifndef NO_AUDIO
     CHtmlSysSoundWavQt(QObject* parent, Aulib::Stream* stream, SoundType type)
         : QTadsSound(parent, stream, type)
-    {}
+    { }
 #endif
 
     //
     // CHtmlSysSoundWav interface implementation.
     //
-    auto play_sound(CHtmlSysWin* win, void (*done_func)(void*, int repeat_count),
-                   void* done_func_ctx, int repeat, const textchar_t* url, int vol, long fade_in,
-                   long fade_out, int crossfade) -> int override;
+    auto play_sound(
+        CHtmlSysWin* win, void (*done_func)(void*, int repeat_count), void* done_func_ctx,
+        int repeat, const textchar_t* url, int vol, long fade_in, long fade_out, int crossfade)
+        -> int override;
 
     void add_crossfade(CHtmlSysWin* win, long ms) override;
 

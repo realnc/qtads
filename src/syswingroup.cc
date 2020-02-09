@@ -31,7 +31,8 @@ void QTadsFrame::dragEnterEvent(QDragEnterEvent* e)
     CHtmlSysWinInputQt* gameWindow = qFrame->gameWindow();
     // Only accept text. URLs are handled by the main window instead.
     if (e->mimeData()->hasText() and not e->mimeData()->hasUrls()
-        and (gameWindow and gameWindow->acceptsText())) {
+        and (gameWindow and gameWindow->acceptsText()))
+    {
         e->acceptProposedAction();
     }
 }
@@ -80,8 +81,9 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     fRestartCurrentGameAction->setShortcut(QKeySequence(QString::fromLatin1("Ctrl+R")));
     menu->addAction(fRestartCurrentGameAction);
     fRestartCurrentGameAction->setEnabled(false);
-    connect(fRestartCurrentGameAction, &QAction::triggered, this,
-            &CHtmlSysWinGroupQt::fRestartCurrentGame);
+    connect(
+        fRestartCurrentGameAction, &QAction::triggered, this,
+        &CHtmlSysWinGroupQt::fRestartCurrentGame);
     fEndCurrentGameAction = new QAction(tr("Qui&t"), this);
     fEndCurrentGameAction->setMenuRole(QAction::NoRole);
     fEndCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("process-stop")));
@@ -122,8 +124,9 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     fPasteAction->setDisabled(true);
     menu->addAction(fPasteAction);
     connect(fPasteAction, &QAction::triggered, this, &CHtmlSysWinGroupQt::pasteFromClipboard);
-    connect(QApplication::clipboard(), &QClipboard::dataChanged, this,
-            &CHtmlSysWinGroupQt::updatePasteAction);
+    connect(
+        QApplication::clipboard(), &QClipboard::dataChanged, this,
+        &CHtmlSysWinGroupQt::updatePasteAction);
     menu->addSeparator();
     act = new QAction(tr("&Preferences..."), this);
     act->setIcon(QIcon::fromTheme(QString::fromLatin1("configure")));
@@ -247,8 +250,8 @@ void CHtmlSysWinGroupQt::fCheckForUpdates()
     }
 
     fNetManager = new QNetworkAccessManager(this);
-    connect(fNetManager, &QNetworkAccessManager::finished, this,
-            &CHtmlSysWinGroupQt::fReplyFinished);
+    connect(
+        fNetManager, &QNetworkAccessManager::finished, this, &CHtmlSysWinGroupQt::fReplyFinished);
 
     fHttpRedirectCount = 0;
     fReply = sendNetRequest(
@@ -443,8 +446,8 @@ void CHtmlSysWinGroupQt::fShowAboutGame()
         return;
     }
     if (fAboutBoxDialog == nullptr) {
-        fAboutBoxDialog = new QDialog(this, Qt::WindowTitleHint | Qt::WindowSystemMenuHint
-                                                | Qt::WindowCloseButtonHint);
+        fAboutBoxDialog = new QDialog(
+            this, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint);
         fAboutBoxDialog->setWindowTitle(tr("About This Game"));
         fAboutBox->setParent(fAboutBoxDialog);
         QVBoxLayout* layout = new QVBoxLayout(fAboutBoxDialog);
@@ -576,7 +579,8 @@ void CHtmlSysWinGroupQt::dragEnterEvent(QDragEnterEvent* e)
     // Only accept the event if there is exactly one URL which points to a
     // local file.
     if (e->mimeData()->hasUrls() and e->mimeData()->urls().size() == 1
-        and not e->mimeData()->urls().at(0).toLocalFile().isEmpty()) {
+        and not e->mimeData()->urls().at(0).toLocalFile().isEmpty())
+    {
         e->acceptProposedAction();
     }
 }
@@ -610,8 +614,8 @@ void CHtmlSysWinGroupQt::fRunDropEventFile()
 
 void CHtmlSysWinGroupQt::updatePasteAction()
 {
-    fPasteAction->setDisabled(QApplication::clipboard()->text().isEmpty()
-                              or not qFrame->gameWindow());
+    fPasteAction->setDisabled(
+        QApplication::clipboard()->text().isEmpty() or not qFrame->gameWindow());
 }
 
 auto CHtmlSysWinGroupQt::createAboutBox(class CHtmlFormatter* formatter) -> CHtmlSysWinAboutBoxQt*
@@ -707,9 +711,9 @@ auto CHtmlSysWinGroupQt::get_default_win_charset() const -> oshtml_charset_id_t
     return 0;
 }
 
-auto CHtmlSysWinGroupQt::xlat_html4_entity(textchar_t* result, size_t result_size,
-                                             unsigned int charval, oshtml_charset_id_t*,
-                                             int* changed_charset) -> size_t
+auto CHtmlSysWinGroupQt::xlat_html4_entity(
+    textchar_t* result, size_t result_size, unsigned int charval, oshtml_charset_id_t*,
+    int* changed_charset) -> size_t
 {
     // qDebug() << Q_FUNC_INFO << "called";
     Q_ASSERT(result != nullptr);

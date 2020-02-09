@@ -162,8 +162,9 @@ public:
     //
     auto get_default_win_charset() const -> oshtml_charset_id_t override;
 
-    auto xlat_html4_entity(textchar_t* result, size_t result_size, unsigned int charval,
-                             oshtml_charset_id_t* charset, int* changed_charset) -> size_t override;
+    auto xlat_html4_entity(
+        textchar_t* result, size_t result_size, unsigned int charval, oshtml_charset_id_t* charset,
+        int* changed_charset) -> size_t override;
 };
 
 /*

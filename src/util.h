@@ -14,48 +14,48 @@
  * approved by the KDE Free Qt Foundation.
  */
 #if QT_VERSION < QT_VERSION_CHECK(5, 7, 0)
-template<typename T>
+template <typename T>
 constexpr typename std::add_const<T>::type& qAsConst(T& t) noexcept
 {
     return t;
 }
 
-template<typename T>
+template <typename T>
 void qAsConst(const T&&) = delete;
 
-template<typename... Args>
+template <typename... Args>
 struct QNonConstOverload
 {
-    template<typename R, typename T>
+    template <typename R, typename T>
     constexpr auto operator()(R (T::*ptr)(Args...)) const noexcept -> decltype(ptr)
     {
         return ptr;
     }
 
-    template<typename R, typename T>
+    template <typename R, typename T>
     static constexpr auto of(R (T::*ptr)(Args...)) noexcept -> decltype(ptr)
     {
         return ptr;
     }
 };
 
-template<typename... Args>
+template <typename... Args>
 struct QConstOverload
 {
-    template<typename R, typename T>
+    template <typename R, typename T>
     constexpr auto operator()(R (T::*ptr)(Args...) const) const noexcept -> decltype(ptr)
     {
         return ptr;
     }
 
-    template<typename R, typename T>
+    template <typename R, typename T>
     static constexpr auto of(R (T::*ptr)(Args...) const) noexcept -> decltype(ptr)
     {
         return ptr;
     }
 };
 
-template<typename... Args>
+template <typename... Args>
 struct QOverload: QConstOverload<Args...>, QNonConstOverload<Args...>
 {
     using QConstOverload<Args...>::of;
@@ -63,24 +63,24 @@ struct QOverload: QConstOverload<Args...>, QNonConstOverload<Args...>
     using QNonConstOverload<Args...>::of;
     using QNonConstOverload<Args...>::operator();
 
-    template<typename R>
+    template <typename R>
     constexpr auto operator()(R (*ptr)(Args...)) const noexcept -> decltype(ptr)
     {
         return ptr;
     }
 
-    template<typename R>
+    template <typename R>
     static constexpr auto of(R (*ptr)(Args...)) noexcept -> decltype(ptr)
     {
         return ptr;
     }
 };
 
-template<typename... Args>
+template <typename... Args>
 constexpr Q_DECL_UNUSED QOverload<Args...> qOverload = {};
-template<typename... Args>
+template <typename... Args>
 constexpr Q_DECL_UNUSED QConstOverload<Args...> qConstOverload = {};
-template<typename... Args>
+template <typename... Args>
 constexpr Q_DECL_UNUSED QNonConstOverload<Args...> qNonConstOverload = {};
 #endif
 /* End of code copyrighted by The Qt Company Ltd and Intel Corporation. */

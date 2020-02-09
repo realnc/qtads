@@ -6,7 +6,7 @@
 #include "config.h"
 #include "tadshtml.h"
 #ifndef NO_AUDIO
-#include "Aulib/Stream.h"
+    #include "Aulib/Stream.h"
 #endif
 
 auto initSound() -> bool;
@@ -82,16 +82,17 @@ public:
 #endif
 
 public:
-    auto startPlaying(void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
-                     int vol, int fadeIn, int fadeOut, bool crossFade) -> int;
+    auto startPlaying(
+        void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat, int vol,
+        int fadeIn, int fadeOut, bool crossFade) -> int;
 
     void cancelPlaying(bool sync, int fadeOut, bool fadeOutInBg);
 
     void addCrossFade(int ms);
 
-    static auto createSound(const class CHtmlUrl* url, const textchar_t* filename,
-                                            unsigned long seekpos, unsigned long filesize,
-                                            class CHtmlSysWin* win, SoundType type) -> class CHtmlSysSound*;
+    static auto createSound(
+        const class CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos,
+        unsigned long filesize, class CHtmlSysWin* win, SoundType type) -> class CHtmlSysSound*;
 };
 
 /*

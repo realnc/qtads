@@ -11,15 +11,15 @@
 
 // Make sure we get vasprintf() from cstdio, which in mingw is a GNU extension.
 #if defined(__MINGW32__) and not defined(_GNU_SOURCE)
-#define _GNU_SOURCE
-#define GNU_SOURCE_DEFINED
+    #define _GNU_SOURCE
+    #define GNU_SOURCE_DEFINED
 #endif
 
 #include <cstdio>
 
 #ifdef GNU_SOURCE_DEFINED
-#undef _GNU_SOURCE
-#undef GNU_SOURCE_DEFINED
+    #undef _GNU_SOURCE
+    #undef GNU_SOURCE_DEFINED
 #endif
 
 #include <QApplication>
@@ -31,7 +31,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-#include <QRandomGenerator>
+    #include <QRandomGenerator>
 #endif
 #include <QStandardPaths>
 #include <QTemporaryFile>
@@ -401,8 +401,8 @@ auto os_file_stat(const char* fname, int follow_links, os_file_stat_t* s) -> int
     bool isLink = inf.isSymLink();
 #ifdef Q_OS_WIN
     // Don't treat shortcut files as symlinks.
-    if (isLink
-        and (QString::compare(inf.suffix(), QLatin1String("lnk"), Qt::CaseInsensitive) == 0)) {
+    if (isLink and (QString::compare(inf.suffix(), QLatin1String("lnk"), Qt::CaseInsensitive) == 0))
+    {
         isLink = false;
     }
 #endif
@@ -474,8 +474,8 @@ auto os_get_root_dirs(char* buf, size_t buflen) -> size_t
 
 auto os_open_dir(const char* dirname, osdirhdl_t* handle) -> int
 {
-    QDirIterator* d = new QDirIterator(fnameToQStr(dirname),
-                                       QDir::Dirs | QDir::Files | QDir::Hidden | QDir::System);
+    QDirIterator* d = new QDirIterator(
+        fnameToQStr(dirname), QDir::Dirs | QDir::Files | QDir::Hidden | QDir::System);
     if (d->next().isEmpty()) {
         // We can't read anything.  Don't know why, don't care.
         return false;
@@ -808,20 +808,21 @@ auto os_get_root_name(const char* buf) -> char*
 
 /* Build a full path name, given a path and a filename.
  */
-void os_build_full_path(char* fullpathbuf, size_t fullpathbuflen, const char* path,
-                        const char* filename)
+void os_build_full_path(
+    char* fullpathbuf, size_t fullpathbuflen, const char* path, const char* filename)
 {
     Q_ASSERT(fullpathbuf != nullptr);
     Q_ASSERT(path != nullptr);
     Q_ASSERT(filename != nullptr);
 
-    qstrncpy(fullpathbuf,
-             qStrToFname(QFileInfo(QDir(fnameToQStr(path)), fnameToQStr(filename)).filePath()),
-             fullpathbuflen);
+    qstrncpy(
+        fullpathbuf,
+        qStrToFname(QFileInfo(QDir(fnameToQStr(path)), fnameToQStr(filename)).filePath()),
+        fullpathbuflen);
 }
 
-void os_combine_paths(char* fullpathbuf, size_t fullpathbuflen, const char* path,
-                      const char* filename)
+void os_combine_paths(
+    char* fullpathbuf, size_t fullpathbuflen, const char* path, const char* filename)
 {
     Q_ASSERT(fullpathbuf != nullptr);
     Q_ASSERT(path != nullptr);
@@ -942,7 +943,8 @@ static void canonicalize_path(char* path)
     qstrncpy(path, canonPath.constData(), OSFNMAX);
 }
 
-auto os_is_file_in_dir(const char* filename, const char* path, int include_subdirs, int match_self) -> int
+auto os_is_file_in_dir(const char* filename, const char* path, int include_subdirs, int match_self)
+    -> int
 {
     char filename_buf[OSFNMAX], path_buf[OSFNMAX];
     size_t flen, plen;
@@ -1077,8 +1079,9 @@ int os_is_file_in_dir(const char* filename, const char* path, int include_subdir
     // only need to iterate directories, not regular files, and we omit the
     // "." and ".." directory entries. We do follow symbolic links; it's OK
     // to do so, since QDirIterator will detect loops.
-    QDirIterator it(pathStr, QDir::Dirs | QDir::NoDotAndDotDot,
-                    QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+    QDirIterator it(
+        pathStr, QDir::Dirs | QDir::NoDotAndDotDot,
+        QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
     while (it.hasNext() and not found) {
         if (fnameStr.startsWith(QDir(it.next()).canonicalPath()) and fileInf.exists()) {
             found = true;
@@ -1097,7 +1100,7 @@ int os_is_file_in_dir(const char* filename, const char* path, int include_subdir
  * because it's broken altogether there (https://sourceforge.net/p/mingw-w64/bugs/338).
  */
 #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0) and defined(__MINGW32__)
-#error MinGW (and MinGW-w64) has a broken std::random_device implementation.
+    #error MinGW (and MinGW-w64) has a broken std::random_device implementation.
 #endif
 
 /* Get a suitable seed for a random number generator.
@@ -1177,8 +1180,9 @@ void os_csr_busy(int /*flag*/)
 /* Ask the user for a filename, using a system-dependent dialog or
  * other mechanism.
  */
-auto os_askfile(const char* prompt, char* fname_buf, int fname_buf_len, int prompt_type,
-               os_filetype_t file_type) -> int
+auto os_askfile(
+    const char* prompt, char* fname_buf, int fname_buf_len, int prompt_type,
+    os_filetype_t file_type) -> int
 {
     Q_ASSERT(prompt_type == OS_AFP_SAVE or prompt_type == OS_AFP_OPEN);
     Q_ASSERT(prompt != nullptr);
@@ -1226,11 +1230,11 @@ auto os_askfile(const char* prompt, char* fname_buf, int fname_buf_len, int prom
 
     QString filename;
     if (prompt_type == OS_AFP_OPEN) {
-        filename = QFileDialog::getOpenFileName(qFrame->gameWindow(), promptStr,
-                                                QDir::currentPath(), filter);
+        filename = QFileDialog::getOpenFileName(
+            qFrame->gameWindow(), promptStr, QDir::currentPath(), filter);
     } else {
-        filename = QFileDialog::getSaveFileName(qFrame->gameWindow(), promptStr,
-                                                QDir::currentPath(), filter);
+        filename = QFileDialog::getSaveFileName(
+            qFrame->gameWindow(), promptStr, QDir::currentPath(), filter);
     }
 
     if (filename.isEmpty()) {
@@ -1256,16 +1260,19 @@ auto os_askfile(const char* prompt, char* fname_buf, int fname_buf_len, int prom
 
 /* Ask for input through a dialog.
  */
-auto os_input_dialog(int icon_id, const char* prompt, int standard_button_set, const char** buttons,
-                    int button_count, int default_index, int cancel_index) -> int
+auto os_input_dialog(
+    int icon_id, const char* prompt, int standard_button_set, const char** buttons,
+    int button_count, int default_index, int cancel_index) -> int
 {
     Q_ASSERT(prompt != nullptr);
-    Q_ASSERT(icon_id == OS_INDLG_ICON_NONE or icon_id == OS_INDLG_ICON_WARNING
-             or icon_id == OS_INDLG_ICON_INFO or icon_id == OS_INDLG_ICON_QUESTION
-             or icon_id == OS_INDLG_ICON_ERROR);
-    Q_ASSERT(standard_button_set == 0 or standard_button_set == OS_INDLG_OK
-             or standard_button_set == OS_INDLG_OKCANCEL or standard_button_set == OS_INDLG_YESNO
-             or standard_button_set == OS_INDLG_YESNOCANCEL);
+    Q_ASSERT(
+        icon_id == OS_INDLG_ICON_NONE or icon_id == OS_INDLG_ICON_WARNING
+        or icon_id == OS_INDLG_ICON_INFO or icon_id == OS_INDLG_ICON_QUESTION
+        or icon_id == OS_INDLG_ICON_ERROR);
+    Q_ASSERT(
+        standard_button_set == 0 or standard_button_set == OS_INDLG_OK
+        or standard_button_set == OS_INDLG_OKCANCEL or standard_button_set == OS_INDLG_YESNO
+        or standard_button_set == OS_INDLG_YESNOCANCEL);
 
     QMessageBox dialog(qWinGroup);
 
@@ -1382,7 +1389,7 @@ void os_sleep_ms(long ms)
  * TODO: Find out if this can be empty on all systems Qt supports.
  */
 void os_settype(const char*, os_filetype_t)
-{}
+{ }
 
 /* --------------------------------------------------------------------
  */
@@ -1391,7 +1398,7 @@ void os_settype(const char*, os_filetype_t)
  *
  * TODO: Find out what this is supposed to do.
  */
-auto os_paramfile(char* /*buf*/) -> int
+auto os_paramfile(char * /*buf*/) -> int
 {
     return false;
 }
@@ -1408,7 +1415,7 @@ void os_term(int /*status*/)
  * TODO: Find out if this can be empty on all systems Qt supports.
  */
 void os_tzset(void)
-{}
+{ }
 
 /* Set the default saved-game extension.
  *
@@ -1417,7 +1424,7 @@ void os_tzset(void)
  * and this isn't possible in QTads.
  */
 void os_set_save_ext(const char*)
-{}
+{ }
 
 /* --------------------------------------------------------------------
  */
@@ -1452,9 +1459,10 @@ void os_gen_charmap_filename(char* filename, char* internal_id, char* /*argv0*/)
     qDebug() << Q_FUNC_INFO;
     Q_ASSERT(filename != nullptr);
 
-    strncpy(filename,
-            qStrToFname(QString::fromLatin1(internal_id) + QString::fromLatin1(".tcp")).constData(),
-            OSFNMAX);
+    strncpy(
+        filename,
+        qStrToFname(QString::fromLatin1(internal_id) + QString::fromLatin1(".tcp")).constData(),
+        OSFNMAX);
     filename[OSFNMAX - 1] = '\0';
 }
 
@@ -1575,8 +1583,9 @@ auto os_get_sysinfo(int code, void* /*param*/, long* result) -> int
 /* Open a popup menu window.
  */
 // FIXME: Just a dummy implementation for now.
-auto os_show_popup_menu(int /*default_pos*/, int /*x*/, int /*y*/, const char* /*txt*/,
-                       size_t /*txtlen*/, union os_event_info_t* /*evt*/) -> int
+auto os_show_popup_menu(
+    int /*default_pos*/, int /*x*/, int /*y*/, const char* /*txt*/, size_t /*txtlen*/,
+    union os_event_info_t * /*evt*/) -> int
 {
     if (qFrame->gameRunning()) {
         return OSPOP_FAIL;
@@ -1588,10 +1597,10 @@ auto os_show_popup_menu(int /*default_pos*/, int /*x*/, int /*y*/, const char* /
  */
 // FIXME: Just a dummy implementation for now.
 void os_enable_cmd_event(int /*id*/, unsigned int /*status*/)
-{}
+{ }
 
 void os_init_ui_after_load(class CVmBifTable* /*bif_table*/, class CVmMetaTable* /*meta_table*/)
-{}
+{ }
 
 /*
     Copyright 2003-2020 Nikos Chantziaras <realnc@gmail.com>

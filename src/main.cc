@@ -15,7 +15,7 @@
 // or setting up the application menu on OS X, or redirecting stdout and stderr
 // to text files on Windows), which would break things.
 #if !defined(NO_AUDIO) && defined(main)
-#undef main
+    #undef main
 #endif
 
 auto main(int argc, char** argv) -> int
@@ -24,8 +24,8 @@ auto main(int argc, char** argv) -> int
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-    CHtmlSysFrameQt* app = new CHtmlSysFrameQt(argc, argv, "QTads", QTADS_VERSION,
-                                               "Nikos Chantziaras", "nikos.chantziaras.qtads");
+    CHtmlSysFrameQt* app = new CHtmlSysFrameQt(
+        argc, argv, "QTads", QTADS_VERSION, "Nikos Chantziaras", "nikos.chantziaras.qtads");
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     QApplication::setDesktopFileName(QStringLiteral("nikos.chantziaras.qtads"));

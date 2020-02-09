@@ -12,7 +12,7 @@ class QTimerChrono final: public QTimer
 public:
     explicit QTimerChrono(QObject* parent = nullptr)
         : QTimer(parent)
-    {}
+    { }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 8, 0)
     using QTimer::start;

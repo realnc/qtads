@@ -103,8 +103,8 @@ void CHtmlSysWinInputQt::setCursorHeight(unsigned height)
     fCastDispWidget->updateCursorPos(formatter_, true, true);
 }
 
-void CHtmlSysWinInputQt::processCommand(const textchar_t* cmd, size_t len, int append, int enter,
-                                        int os_cmd_id)
+void CHtmlSysWinInputQt::processCommand(
+    const textchar_t* cmd, size_t len, int append, int enter, int os_cmd_id)
 {
     if (not qFrame->gameRunning()) {
         return;
@@ -119,7 +119,8 @@ void CHtmlSysWinInputQt::processCommand(const textchar_t* cmd, size_t len, int a
         return;
     }
     if (strnicmp(cmd, "news:", 5) == 0 || strnicmp(cmd, "mailto:", 7) == 0
-        || strnicmp(cmd, "telnet:", 7) == 0) {
+        || strnicmp(cmd, "telnet:", 7) == 0)
+    {
         // Parse news, mailto and telnet URLs in tolerant mode.
         auto url = QUrl::fromEncoded(cmd, QUrl::TolerantMode);
         QTimer::singleShot(0, [url] { QDesktopServices::openUrl(url); });
@@ -202,8 +203,10 @@ void CHtmlSysWinInputQt::keyPressEvent(QKeyEvent* e)
         } else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
             // Scroll down by a line.
             fPagePauseQueue.head()->scrollDown(true, true, false);
-        } else if (e->matches(QKeySequence::MoveToEndOfLine)
-                   or e->matches(QKeySequence::MoveToEndOfDocument) or e->key() == Qt::Key_End) {
+        } else if (
+            e->matches(QKeySequence::MoveToEndOfLine)
+            or e->matches(QKeySequence::MoveToEndOfDocument) or e->key() == Qt::Key_End)
+        {
             // Scroll down to the bottom instantly.
             bool prevMode = qFrame->nonStopMode();
             qFrame->set_nonstop_mode(true);
@@ -213,12 +216,12 @@ void CHtmlSysWinInputQt::keyPressEvent(QKeyEvent* e)
         return;
     }
 
-    if (e->matches(QKeySequence::MoveToStartOfLine)
-        or e->matches(QKeySequence::MoveToStartOfBlock)) {
+    if (e->matches(QKeySequence::MoveToStartOfLine) or e->matches(QKeySequence::MoveToStartOfBlock))
+    {
         fTadsBuffer->start_of_line(false);
         fCastDispWidget->clearSelection();
-    } else if (e->matches(QKeySequence::MoveToEndOfLine)
-               or e->matches(QKeySequence::MoveToEndOfBlock)) {
+    } else if (
+        e->matches(QKeySequence::MoveToEndOfLine) or e->matches(QKeySequence::MoveToEndOfBlock)) {
         fTadsBuffer->end_of_line(false);
         fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
@@ -280,14 +283,15 @@ void CHtmlSysWinInputQt::keyPressEvent(QKeyEvent* e)
             fCastDispWidget->clearSelection();
         }
         fTadsBuffer->move_right(true, true);
-    } else if (e->matches(QKeySequence::SelectStartOfLine)
-               or e->matches(QKeySequence::SelectStartOfBlock)) {
+    } else if (
+        e->matches(QKeySequence::SelectStartOfLine) or e->matches(QKeySequence::SelectStartOfBlock))
+    {
         if (not fTadsBuffer->has_sel_range()) {
             fCastDispWidget->clearSelection();
         }
         fTadsBuffer->start_of_line(true);
-    } else if (e->matches(QKeySequence::SelectEndOfLine)
-               or e->matches(QKeySequence::SelectEndOfBlock)) {
+    } else if (
+        e->matches(QKeySequence::SelectEndOfLine) or e->matches(QKeySequence::SelectEndOfBlock)) {
         if (not fTadsBuffer->has_sel_range()) {
             fCastDispWidget->clearSelection();
         }
@@ -320,7 +324,8 @@ void CHtmlSysWinInputQt::keyPressEvent(QKeyEvent* e)
 void CHtmlSysWinInputQt::inputMethodEvent(QInputMethodEvent* e)
 {
     if (fInputMode == NoInput or not qFrame->gameRunning() or fInputMode == PagePauseInput
-        or e->commitString().isEmpty()) {
+        or e->commitString().isEmpty())
+    {
         QScrollArea::inputMethodEvent(e);
         return;
     }
@@ -400,8 +405,8 @@ void CHtmlSysWinInputQt::singleKeyPressEvent(QKeyEvent* event)
     emit inputReady();
 }
 
-void CHtmlSysWinInputQt::getInput(textchar_t* buf, size_t buflen, unsigned long timeout,
-                                  bool useTimeout, bool* timedOut)
+void CHtmlSysWinInputQt::getInput(
+    textchar_t* buf, size_t buflen, unsigned long timeout, bool useTimeout, bool* timedOut)
 {
     // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(buf != nullptr);
@@ -430,8 +435,8 @@ void CHtmlSysWinInputQt::getInput(textchar_t* buf, size_t buflen, unsigned long 
         while (formatter->more_to_do()) {
             formatter->do_formatting();
         }
-        fTadsBuffer->setbuf(fInputBuffer,
-                            buflen > fInputBufferSize ? fInputBufferSize - 1 : buflen - 1, 0);
+        fTadsBuffer->setbuf(
+            fInputBuffer, buflen > fInputBufferSize ? fInputBufferSize - 1 : buflen - 1, 0);
         CHtmlTagTextInput* tag = formatter->begin_input(fTadsBuffer->getbuf(), 0);
         fTag = tag;
         fCastDispWidget->setInputTag(tag);
@@ -485,10 +490,11 @@ void CHtmlSysWinInputQt::getInput(textchar_t* buf, size_t buflen, unsigned long 
         strncpy(buf, fTadsBuffer->getbuf(), len);
     } else {
         QTextCodec* codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
-        strncpy(buf,
-                codec->fromUnicode(QString::fromUtf8(fTadsBuffer->getbuf(), fTadsBuffer->getlen()))
-                    .constData(),
-                len);
+        strncpy(
+            buf,
+            codec->fromUnicode(QString::fromUtf8(fTadsBuffer->getbuf(), fTadsBuffer->getlen()))
+                .constData(),
+            len);
     }
     buf[len] = '\0';
 }

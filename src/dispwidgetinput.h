@@ -51,8 +51,8 @@ protected:
     void mouseMoveEvent(QMouseEvent* e) override;
 
 public:
-    DisplayWidgetInput(class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter,
-                       CHtmlInputBuf* tadsBuffer);
+    DisplayWidgetInput(
+        class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter, CHtmlInputBuf* tadsBuffer);
 
     // Set the height of the text cursor in pixels.
     void setCursorHeight(unsigned height)
@@ -71,8 +71,8 @@ public:
         return fCursorVisible;
     }
 
-    void updateCursorPos(class CHtmlFormatter* formatter, bool keepSelection,
-                         bool updateFormatterSelection);
+    void updateCursorPos(
+        class CHtmlFormatter* formatter, bool keepSelection, bool updateFormatterSelection);
 
     // Reset cursor blink timer.  This will read the blinking rate from the
     // desktop environment and ajust the blink timer as needed.

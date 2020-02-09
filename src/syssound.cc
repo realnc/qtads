@@ -12,9 +12,9 @@
 /* --------------------------------------------------------------------
  * CHtmlSysSoundMidiQt
  */
-auto CHtmlSysSoundMidiQt::play_sound(CHtmlSysWin*, void (*done_func)(void*, int repeat_count),
-                                    void* done_func_ctx, int repeat, const textchar_t* /*url*/,
-                                    int vol, long fade_in, long fade_out, int crossfade) -> int
+auto CHtmlSysSoundMidiQt::play_sound(
+    CHtmlSysWin*, void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+    const textchar_t* /*url*/, int vol, long fade_in, long fade_out, int crossfade) -> int
 #ifndef NO_AUDIO
 {
     // qDebug() << "play_sound url:" << url << "repeat:" << repeat;
@@ -32,7 +32,7 @@ void CHtmlSysSoundMidiQt::add_crossfade(CHtmlSysWin*, long ms)
     addCrossFade(ms);
 }
 #else
-{}
+{ }
 #endif
 
 void CHtmlSysSoundMidiQt::cancel_sound(CHtmlSysWin*, int sync, long fade_out_ms, int fade_in_bg)
@@ -43,7 +43,7 @@ void CHtmlSysSoundMidiQt::cancel_sound(CHtmlSysWin*, int sync, long fade_out_ms,
     cancelPlaying(sync, fade_out_ms, fade_in_bg);
 }
 #else
-{}
+{ }
 #endif
 
 void CHtmlSysSoundMidiQt::resume()
@@ -54,9 +54,9 @@ void CHtmlSysSoundMidiQt::resume()
 /* --------------------------------------------------------------------
  * CHtmlSysSoundWavQt
  */
-auto CHtmlSysSoundWavQt::play_sound(CHtmlSysWin*, void (*done_func)(void*, int repeat_count),
-                                   void* done_func_ctx, int repeat, const textchar_t* /*url*/,
-                                   int vol, long fade_in, long fade_out, int crossfade) -> int
+auto CHtmlSysSoundWavQt::play_sound(
+    CHtmlSysWin*, void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+    const textchar_t* /*url*/, int vol, long fade_in, long fade_out, int crossfade) -> int
 #ifndef NO_AUDIO
 {
     // qDebug() << "play_sound url:" << url << "repeat:" << repeat;
@@ -74,7 +74,7 @@ void CHtmlSysSoundWavQt::add_crossfade(CHtmlSysWin*, long ms)
     addCrossFade(ms);
 }
 #else
-{}
+{ }
 #endif
 
 void CHtmlSysSoundWavQt::cancel_sound(CHtmlSysWin*, int sync, long fade_out_ms, int fade_in_bg)
@@ -85,7 +85,7 @@ void CHtmlSysSoundWavQt::cancel_sound(CHtmlSysWin*, int sync, long fade_out_ms, 
     cancelPlaying(sync, fade_out_ms, fade_in_bg);
 }
 #else
-{}
+{ }
 #endif
 
 void CHtmlSysSoundWavQt::resume()
@@ -96,9 +96,9 @@ void CHtmlSysSoundWavQt::resume()
 /* --------------------------------------------------------------------
  * CHtmlSysSoundOggQt
  */
-auto CHtmlSysSoundOggQt::play_sound(CHtmlSysWin*, void (*done_func)(void*, int repeat_count),
-                                   void* done_func_ctx, int repeat, const textchar_t*, int vol,
-                                   long fade_in, long fade_out, int crossfade) -> int
+auto CHtmlSysSoundOggQt::play_sound(
+    CHtmlSysWin*, void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+    const textchar_t*, int vol, long fade_in, long fade_out, int crossfade) -> int
 {
     // qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 #ifndef NO_AUDIO
@@ -132,9 +132,9 @@ void CHtmlSysSoundOggQt::resume()
 /* --------------------------------------------------------------------
  * CHtmlSysSoundMpegQt
  */
-auto CHtmlSysSoundMpegQt::play_sound(CHtmlSysWin*, void (*done_func)(void*, int repeat_count),
-                                    void* done_func_ctx, int repeat, const textchar_t* /*url*/,
-                                    int vol, long fade_in, long fade_out, int crossfade) -> int
+auto CHtmlSysSoundMpegQt::play_sound(
+    CHtmlSysWin*, void (*done_func)(void*, int repeat_count), void* done_func_ctx, int repeat,
+    const textchar_t* /*url*/, int vol, long fade_in, long fade_out, int crossfade) -> int
 {
     // qDebug() << "play_sound url:" << url << "repeat:" << repeat;
 #ifndef NO_AUDIO
@@ -168,9 +168,9 @@ void CHtmlSysSoundMpegQt::resume()
 /* --------------------------------------------------------------------
  * Base code static function implementations.
  */
-auto CHtmlSysSoundMidi::create_midi(const CHtmlUrl* url, const textchar_t* filename,
-                                                 unsigned long seekpos, unsigned long filesize,
-                                                 CHtmlSysWin* win) -> CHtmlSysResource*
+auto CHtmlSysSoundMidi::create_midi(
+    const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos, unsigned long filesize,
+    CHtmlSysWin* win) -> CHtmlSysResource*
 #ifndef Q_OS_ANDROID
 {
     return QTadsSound::createSound(url, filename, seekpos, filesize, win, QTadsSound::MIDI);
@@ -181,9 +181,9 @@ auto CHtmlSysSoundMidi::create_midi(const CHtmlUrl* url, const textchar_t* filen
 }
 #endif
 
-auto CHtmlSysSoundWav::create_wav(const CHtmlUrl* url, const textchar_t* filename,
-                                               unsigned long seekpos, unsigned long filesize,
-                                               CHtmlSysWin* win) -> CHtmlSysResource*
+auto CHtmlSysSoundWav::create_wav(
+    const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos, unsigned long filesize,
+    CHtmlSysWin* win) -> CHtmlSysResource*
 {
 #ifndef NO_AUDIO
     return QTadsSound::createSound(url, filename, seekpos, filesize, win, QTadsSound::WAV);
@@ -192,9 +192,9 @@ auto CHtmlSysSoundWav::create_wav(const CHtmlUrl* url, const textchar_t* filenam
 #endif
 }
 
-auto CHtmlSysSoundMpeg::create_mpeg(const CHtmlUrl* url, const textchar_t* filename,
-                                                 unsigned long seekpos, unsigned long filesize,
-                                                 CHtmlSysWin* win) -> CHtmlSysResource*
+auto CHtmlSysSoundMpeg::create_mpeg(
+    const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos, unsigned long filesize,
+    CHtmlSysWin* win) -> CHtmlSysResource*
 {
 #ifndef NO_AUDIO
     return QTadsSound::createSound(url, filename, seekpos, filesize, win, QTadsSound::MPEG);
@@ -203,9 +203,9 @@ auto CHtmlSysSoundMpeg::create_mpeg(const CHtmlUrl* url, const textchar_t* filen
 #endif
 }
 
-auto CHtmlSysSoundOgg::create_ogg(const CHtmlUrl* url, const textchar_t* filename,
-                                               unsigned long seekpos, unsigned long filesize,
-                                               CHtmlSysWin* win) -> CHtmlSysResource*
+auto CHtmlSysSoundOgg::create_ogg(
+    const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos, unsigned long filesize,
+    CHtmlSysWin* win) -> CHtmlSysResource*
 {
 #ifndef NO_AUDIO
     return QTadsSound::createSound(url, filename, seekpos, filesize, win, QTadsSound::OGG);

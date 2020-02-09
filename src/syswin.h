@@ -115,8 +115,9 @@ public:
     // Do a complete reformat.
     void doReformat(int showStatus, int freezeDisplay, int resetSounds);
 
-    void addBanner(CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int where,
-                   CHtmlSysWinQt* other, HTML_BannerWin_Pos_t pos, unsigned long style);
+    void addBanner(
+        CHtmlSysWinQt* banner, HTML_BannerWin_Type_t type, int where, CHtmlSysWinQt* other,
+        HTML_BannerWin_Pos_t pos, unsigned long style);
 
     // Our parent banner, if there is one.
     auto parentBanner() const -> CHtmlSysWinQt*
@@ -156,24 +157,24 @@ public:
         return QApplication::desktop()->logicalDpiX();
     }
 
-    auto measure_text(class CHtmlSysFont* font, const textchar_t* str, size_t len,
-                            int* ascent) -> CHtmlPoint override;
+    auto measure_text(class CHtmlSysFont* font, const textchar_t* str, size_t len, int* ascent)
+        -> CHtmlPoint override;
 
     auto measure_dbgsrc_icon() -> CHtmlPoint override
     {
         return {};
     }
 
-    auto get_max_chars_in_width(CHtmlSysFont* font, const textchar_t* str, size_t len,
-                                  long wid) -> size_t override;
+    auto get_max_chars_in_width(CHtmlSysFont* font, const textchar_t* str, size_t len, long wid)
+        -> size_t override;
 
-    void draw_text(int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str,
-                   size_t len) override;
+    void draw_text(
+        int hilite, long x, long y, CHtmlSysFont* font, const textchar_t* str, size_t len) override;
 
     void draw_text_space(int hilite, long x, long y, CHtmlSysFont* font, long wid) override;
 
-    void draw_bullet(int hilite, long x, long y, CHtmlSysFont* font,
-                     HTML_SysWin_Bullet_t style) override;
+    void draw_bullet(
+        int hilite, long x, long y, CHtmlSysFont* font, HTML_SysWin_Bullet_t style) override;
 
     void draw_hrule(const CHtmlRect* pos, int shade) override;
 
@@ -187,7 +188,7 @@ public:
 
     // We don't deal with palettes, so this is a no-op.
     void recalc_palette() override
-    {}
+    { }
 
     // We don't deal with palettes, so always return false.
     auto get_use_palette() -> int override
@@ -248,12 +249,12 @@ public:
 
     void set_html_input_color(HTML_color_t, int) override
     // We don't provide input, so we don't deal with this.
-    {}
+    { }
 
-    void set_html_link_colors(HTML_color_t link_color, int link_use_default,
-                              HTML_color_t vlink_color, int vlink_use_default,
-                              HTML_color_t alink_color, int alink_use_default,
-                              HTML_color_t hlink_color, int hlink_use_default) override;
+    void set_html_link_colors(
+        HTML_color_t link_color, int link_use_default, HTML_color_t vlink_color,
+        int vlink_use_default, HTML_color_t alink_color, int alink_use_default,
+        HTML_color_t hlink_color, int hlink_use_default) override;
 
     auto map_system_color(HTML_color_t color) -> HTML_color_t override;
 
@@ -273,11 +274,12 @@ public:
 
     void set_html_bg_image(class CHtmlResCacheObject* image) override;
 
-    void inval_html_bg_image(unsigned int x, unsigned int y, unsigned int wid,
-                             unsigned int ht) override;
+    void
+    inval_html_bg_image(unsigned int x, unsigned int y, unsigned int wid, unsigned int ht) override;
 
-    void set_banner_size(long width, HTML_BannerWin_Units_t width_units, int use_width, long height,
-                         HTML_BannerWin_Units_t height_units, int use_height) override;
+    void set_banner_size(
+        long width, HTML_BannerWin_Units_t width_units, int use_width, long height,
+        HTML_BannerWin_Units_t height_units, int use_height) override;
 
     void set_banner_info(HTML_BannerWin_Pos_t pos, unsigned long style) override;
 

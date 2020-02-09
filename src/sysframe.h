@@ -108,8 +108,9 @@ public slots:
     void entryPoint(QString gameFileName);
 
 public:
-    CHtmlSysFrameQt(int& argc, char* argv[], const char* appName, const char* appVersion,
-                    const char* orgName, const char* orgDomain);
+    CHtmlSysFrameQt(
+        int& argc, char* argv[], const char* appName, const char* appVersion, const char* orgName,
+        const char* orgDomain);
     ~CHtmlSysFrameQt() override;
 
     auto settings() -> class Settings*
@@ -264,8 +265,8 @@ public:
 
     auto get_input(textchar_t* buf, size_t bufsiz) -> int override;
 
-    auto get_input_timeout(textchar_t* buf, size_t buflen, unsigned long timeout,
-                          int use_timeout) -> int override;
+    auto get_input_timeout(textchar_t* buf, size_t buflen, unsigned long timeout, int use_timeout)
+        -> int override;
 
     void get_input_cancel(int reset) override;
 
@@ -279,11 +280,10 @@ public:
 
     void dbg_print(const char* msg) override;
 
-    auto create_banner_window(class CHtmlSysWin* parent,
-                                            HTML_BannerWin_Type_t window_type,
-                                            class CHtmlFormatter* formatter, int where,
-                                            class CHtmlSysWin* other, HTML_BannerWin_Pos_t pos,
-                                            unsigned long style) -> class CHtmlSysWin* override;
+    auto create_banner_window(
+        class CHtmlSysWin* parent, HTML_BannerWin_Type_t window_type,
+        class CHtmlFormatter* formatter, int where, class CHtmlSysWin* other,
+        HTML_BannerWin_Pos_t pos, unsigned long style) -> class CHtmlSysWin* override;
 
     void orphan_banner_window(class CHtmlFormatterBannerExt* banner) override;
 
@@ -291,9 +291,9 @@ public:
 
     void remove_banner_window(CHtmlSysWin* win) override;
 
-    auto get_exe_resource(const textchar_t* resname, size_t resnamelen, textchar_t* fname_buf,
-                         size_t fname_buf_len, unsigned long* seek_pos,
-                         unsigned long* siz) -> int override;
+    auto get_exe_resource(
+        const textchar_t* resname, size_t resnamelen, textchar_t* fname_buf, size_t fname_buf_len,
+        unsigned long* seek_pos, unsigned long* siz) -> int override;
 };
 
 /*

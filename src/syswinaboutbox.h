@@ -39,8 +39,9 @@ public:
         return height();
     }
 
-    void set_banner_size(long width, HTML_BannerWin_Units_t width_units, int use_width, long height,
-                         HTML_BannerWin_Units_t height_units, int use_height) override;
+    void set_banner_size(
+        long width, HTML_BannerWin_Units_t width_units, int use_width, long height,
+        HTML_BannerWin_Units_t height_units, int use_height) override;
 };
 
 /*
