@@ -61,7 +61,6 @@ QTadsSound::QTadsSound(QObject* parent, Aulib::Stream* stream, SoundType type)
     , fType(type)
     , fPlaying(false)
     , fCrossFade(false)
-    , fFadeOutTimer(new QTimerChrono(nullptr))
     , fDone_func(nullptr)
     , fDone_func_ctx(nullptr)
     , fRepeats(0)
@@ -77,11 +76,10 @@ QTadsSound::QTadsSound(QObject* parent, Aulib::Stream* stream, SoundType type)
     }
     // qDebug() << "Sound length:" << fLength;
     connect(this, &QTadsSound::readyToFadeOut, this, &QTadsSound::fPrepareFadeOut);
-    connect(fFadeOutTimer, &QTimer::timeout, this, &QTadsSound::fDoFadeOut);
-    connect(this, &QObject::destroyed, this, &QTadsSound::fDeleteTimer);
+    connect(&fFadeOutTimer, &QTimer::timeout, this, &QTadsSound::fDoFadeOut);
 
     // Make sure the timer only calls our fade-out slot *once* and then stops.
-    fFadeOutTimer->setSingleShot(true);
+    fFadeOutTimer.setSingleShot(true);
 }
 
 QTadsSound::~QTadsSound()
@@ -114,7 +112,7 @@ void QTadsSound::fLoopCallback(Aulib::Stream& strm)
     if (fFadeOut.count() > 0 and (fRepeatsWanted == -1 or fRepeats == fRepeatsWanted)) {
         // Clamp the interval to 0 (= now), in case the fade out time is larger than the sound
         // length.
-        fFadeOutTimer->start(std::max(0ms, fLength - fFadeOut));
+        fFadeOutTimer.start(std::max(0ms, fLength - fFadeOut));
     }
 }
 
@@ -134,12 +132,7 @@ void QTadsSound::fDoFadeOut()
 
 void QTadsSound::fPrepareFadeOut()
 {
-    fFadeOutTimer->start(fLength - fFadeOut);
-}
-
-void QTadsSound::fDeleteTimer()
-{
-    delete fFadeOutTimer;
+    fFadeOutTimer.start(fLength - fFadeOut);
 }
 
 auto QTadsSound::startPlaying(
@@ -243,7 +236,7 @@ void QTadsSound::addCrossFade(int ms)
             timeFromNow = 1ms;
             fFadeOut = fLength - chrono::milliseconds(fTimePos.elapsed());
         }
-        fFadeOutTimer->start(timeFromNow);
+        fFadeOutTimer.start(timeFromNow);
     }
 }
 #endif

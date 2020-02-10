@@ -4,6 +4,7 @@
 #include <QTime>
 
 #include "config.h"
+#include "qtimerchrono.h"
 #include "tadshtml.h"
 #ifndef NO_AUDIO
     #include "Aulib/Stream.h"
@@ -36,7 +37,7 @@ private:
     bool fPlaying;
     std::chrono::milliseconds fFadeOut{};
     bool fCrossFade;
-    class QTimerChrono* fFadeOutTimer;
+    QTimerChrono fFadeOutTimer;
     QTime fTimePos;
 
     // TADS callback to invoke on stop.
@@ -70,8 +71,6 @@ private slots:
     void fDoFadeOut();
 
     void fPrepareFadeOut();
-
-    void fDeleteTimer();
 
 signals:
     void readyToFadeOut();
