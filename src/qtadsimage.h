@@ -23,6 +23,16 @@ public:
     void drawFromPaintEvent(CHtmlSysWin* win, class CHtmlRect* pos, htmlimg_draw_mode_t mode);
 };
 
+/* Helper routine.  Loads any type of image from the specified offset inside
+ * the given file and returns it.  Has the same semantics as the various
+ * CHtmlSysImage*::create_*() routines.  The image type is specified in
+ * 'imageType'.  It has the same format as the list returned by
+ * QImageReader::supportedImageFormats() (like "JPG", "PNG", etc.)
+ */
+auto createImageFromFile(
+    const CHtmlUrl* url, const textchar_t* filename, unsigned long seekpos, unsigned long filesize,
+    CHtmlSysWin* win, const QString& imageType) -> CHtmlSysResource*;
+
 /*
     Copyright 2003-2020 Nikos Chantziaras <realnc@gmail.com>
 

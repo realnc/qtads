@@ -216,16 +216,24 @@ SOURCES += \
     src/osqt.cc \
     src/hos_qt.cc \
     src/globals.cc \
+    src/sysfont.cc \
     src/sysframe.cc \
     src/syswingroup.cc \
     src/syswin.cc \
     src/syswinaboutbox.cc \
     src/syswininput.cc \
-    src/sysimage.cc \
-    src/syssound.cc \
+    src/sysimagejpeg.cc \
+    src/sysimagepng.cc \
+    src/sysimagemng.cc \
+    src/syssoundmidi.cc \
+    src/syssoundmpeg.cc \
+    src/syssoundogg.cc \
+    src/syssoundwav.cc \
     src/missing.cc \
+    src/qtadshostifc.cc \
     src/qtadsimage.cc \
     src/qtadssound.cc \
+    src/qtadstimer.cc \
     src/main.cc \
     src/dispwidget.cc \
     src/dispwidgetinput.cc \

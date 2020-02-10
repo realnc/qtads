@@ -20,19 +20,8 @@ private:
     CResLoader* fCmapResLoader;
 
 public:
-    QTadsHostIfc(struct appctxdef* appctx)
-        : fAppctx(appctx)
-        , fIoSafetyRead(VM_IO_SAFETY_READWRITE_CUR)
-        , fIoSafetyWrite(VM_IO_SAFETY_READWRITE_CUR)
-    {
-        // TODO: Use the directory where charmap files are stored.
-        fCmapResLoader = new CResLoader("./");
-    }
-
-    ~QTadsHostIfc() override
-    {
-        delete fCmapResLoader;
-    }
+    QTadsHostIfc(struct appctxdef* appctx);
+    ~QTadsHostIfc() override;
 
     //
     // CVmHostIfc interface implementation.
