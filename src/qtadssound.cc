@@ -17,7 +17,6 @@
     #include <cerrno>
     #include <cstdio>
     #include <cstring>
-    #include <functional>
 #endif
 
 #include "globals.h"
@@ -337,9 +336,8 @@ auto QTadsSound::createSound(
         sound = new CHtmlSysSoundMidiQt(nullptr, stream, MIDI);
         break;
     }
-    using namespace std::placeholders;
-    stream->setFinishCallback(std::bind(&QTadsSound::fFinishCallback, sound, _1));
-    stream->setLoopCallback(std::bind(&QTadsSound::fLoopCallback, sound, _1));
+    stream->setFinishCallback([sound](Aulib::Stream& strm) { sound->fFinishCallback(strm); });
+    stream->setLoopCallback([sound](Aulib::Stream& strm) { sound->fLoopCallback(strm); });
     return dynamic_cast<CHtmlSysSound*>(sound);
 }
 #else
