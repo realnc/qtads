@@ -390,12 +390,22 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
 
     // Use the weight they provided (we may change this if a weight modifier is
     // specified).
-    if (newFontDesc.weight < 400) {
+    if (newFontDesc.weight <= 100) {
+        newFont.setWeight(QFont::Thin);
+    } else if (newFontDesc.weight <= 200) {
+        newFont.setWeight(QFont::ExtraLight);
+    } else if (newFontDesc.weight <= 300) {
         newFont.setWeight(QFont::Light);
-    } else if (newFontDesc.weight < 700) {
+    } else if (newFontDesc.weight <= 400) {
         newFont.setWeight(QFont::Normal);
-    } else if (newFontDesc.weight < 900) {
+    } else if (newFontDesc.weight <= 500) {
+        newFont.setWeight(QFont::Medium);
+    } else if (newFontDesc.weight <= 600) {
+        newFont.setWeight(QFont::DemiBold);
+    } else if (newFontDesc.weight <= 700) {
         newFont.setWeight(QFont::Bold);
+    } else if (newFontDesc.weight <= 800) {
+        newFont.setWeight(QFont::ExtraBold);
     } else {
         newFont.setWeight(QFont::Black);
     }
