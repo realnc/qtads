@@ -223,14 +223,12 @@ GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* const parent)
     // There's no point in having the tableview widget be any higher than the
     // sum of all rows.  This will also make sure that the widget is not shown
     // at all in case we have zero rows.
-    int topMargin;
-    int bottomMargin;
-    ui->table->getContentsMargins(nullptr, &topMargin, nullptr, &bottomMargin);
+    auto margins = ui->table->contentsMargins();
     int maxHeight = ui->table->rowCount() * ui->table->rowHeight(0);
     if (maxHeight > 0) {
         // Only add the margins to the maximum height if we're going to show
         // the table at all.
-        maxHeight += topMargin + bottomMargin;
+        maxHeight += margins.top() + margins.bottom();
         if (maxHeight < ui->table->minimumSizeHint().height()) {
             // Do not make it smaller than the minimum size hint, otherwise we'll
             // have a messed-up scrollbar.

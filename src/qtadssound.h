@@ -1,7 +1,7 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
+#include <QElapsedTimer>
 #include <QObject>
-#include <QTime>
 
 #include "config.h"
 #include "qtimerchrono.h"
@@ -38,7 +38,7 @@ private:
     std::chrono::milliseconds fFadeOut{};
     bool fCrossFade;
     QTimerChrono fFadeOutTimer;
-    QTime fTimePos;
+    QElapsedTimer fTimePos;
 
     // TADS callback to invoke on stop.
     void (*fDone_func)(void*, int repeat_count);
