@@ -576,6 +576,12 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
         newFont.bgColor(newFontDesc.bgcolor);
     }
 
+    // Some fonts don't have a bold version, and on some platforms Qt does not support synthesizing
+    // a bold variant. We need to take care of things ourselves in that case.
+    if (newFont.weight() >= QFont::Bold and QFontInfo(newFont).weight() < QFont::Bold) {
+        newFont.needs_fake_bold = true;
+    }
+
     // Check whether a matching font is already in our cache.
     for (int i = 0; i < fFontList.size(); ++i) {
         if (*fFontList.at(i) == newFont) {

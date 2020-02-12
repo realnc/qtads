@@ -601,6 +601,9 @@ void CHtmlSysWinQt::draw_text(
     QPainter painter(dispWidget);
     fSetupPainterForFont(painter, hilite, font);
     painter.drawText(x, y + painter.fontMetrics().ascent(), QString::fromUtf8(str, len));
+    if (static_cast<CHtmlSysFontQt*>(font)->needs_fake_bold) {
+        painter.drawText(x + 1, y + painter.fontMetrics().ascent(), QString::fromUtf8(str, len));
+    }
 }
 
 void CHtmlSysWinQt::draw_text_space(int hilite, long x, long y, CHtmlSysFont* font, long wid)

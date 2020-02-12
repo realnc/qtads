@@ -20,6 +20,10 @@ private:
     QColor fBgColor;
 
 public:
+    using QFont::QFont;
+
+    bool needs_fake_bold = false;
+
     // When color() is a valid color (QColor::isValid()) it should be used as
     // the foreground color when drawing text in this font.
     auto color() const -> const QColor&
@@ -56,7 +60,8 @@ public:
 
     auto operator==(const CHtmlSysFontQt& f) const -> bool
     {
-        return QFont::operator==(f) and fColor == f.fColor and fBgColor == f.fBgColor;
+        return QFont::operator==(f) and fColor == f.fColor and fBgColor == f.fBgColor
+            and needs_fake_bold == f.needs_fake_bold;
     }
 
     auto operator=(const QFont& f) -> CHtmlSysFontQt&
