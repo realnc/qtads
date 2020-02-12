@@ -3,11 +3,12 @@
 #include "config.h"
 #include "gameinfo.h"
 #include <QDialog>
+#include <memory>
 
 /* Implementation of the game information enumerator callback interface.
  * See tads3/gameinfo.h for details.
  */
-class QTadsGameInfoEnum: public CTadsGameInfo_enum
+class QTadsGameInfoEnum final: public CTadsGameInfo_enum
 {
 public:
     QString gameName;
@@ -51,7 +52,7 @@ public:
     static auto getMetaInfo(const QByteArray& fname) -> QTadsGameInfoEnum;
 
 private:
-    Ui::GameInfoDialog* ui;
+    std::unique_ptr<Ui::GameInfoDialog> ui;
 };
 
 /*

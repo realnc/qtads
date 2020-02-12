@@ -33,7 +33,7 @@ CHtmlSysWinQt::CHtmlSysWinQt(CHtmlFormatter* formatter, QWidget* parent)
     , bannerSize(0)
     , bannerSizeUnits(HTML_BANNERWIN_UNITS_PIX)
 {
-    dispWidget = new DisplayWidget(this, formatter);
+    dispWidget = new DisplayWidget(*this, *formatter);
     setWidget(dispWidget);
     formatter_->set_win(this, &margins);
     viewport()->setForegroundRole(QPalette::Text);
@@ -49,8 +49,8 @@ CHtmlSysWinQt::CHtmlSysWinQt(CHtmlFormatter* formatter, QWidget* parent)
     fBorderLine.setPalette(p);
 
     p = palette();
-    p.setColor(QPalette::Base, qFrame->settings()->bannerBgColor);
-    p.setColor(QPalette::Text, qFrame->settings()->bannerTextColor);
+    p.setColor(QPalette::Base, qFrame->settings().bannerBgColor);
+    p.setColor(QPalette::Text, qFrame->settings().bannerTextColor);
     setPalette(p);
 
     setAttribute(Qt::WA_InputMethodEnabled);
@@ -443,7 +443,7 @@ extern void os_sleep_ms(long ms);
 void CHtmlSysWinQt::scrollDown(bool force, bool justOneLine, bool instant)
 {
     QScrollBar* bar = verticalScrollBar();
-    instant = not qFrame->settings()->softScrolling or instant;
+    instant = not qFrame->settings().softScrolling or instant;
 
     // If we're very small, or shouldn't scroll, or there's nothing to scroll,
     // ignore the call.
@@ -796,7 +796,7 @@ auto CHtmlSysWinQt::get_default_font() -> CHtmlSysFont*
     // qDebug() << Q_FUNC_INFO;
 
     CHtmlFontDesc desc;
-    qFrame->settings()->mainFont.get_font_desc(&desc);
+    qFrame->settings().mainFont.get_font_desc(&desc);
     desc.htmlsize = 3;
     return get_font(&desc);
 }
@@ -946,7 +946,7 @@ void CHtmlSysWinQt::set_html_bg_color(HTML_color_t color, int use_default)
         if (fBannerStyleGrid) {
             p.setColor(QPalette::Base, Qt::black);
         } else {
-            p.setColor(QPalette::Base, qFrame->settings()->mainBgColor);
+            p.setColor(QPalette::Base, qFrame->settings().mainBgColor);
         }
         setPalette(p);
         return;
@@ -969,7 +969,7 @@ void CHtmlSysWinQt::set_html_text_color(HTML_color_t color, int use_default)
         if (fBannerStyleGrid) {
             p.setColor(QPalette::Text, Qt::lightGray);
         } else {
-            p.setColor(QPalette::Text, qFrame->settings()->mainTextColor);
+            p.setColor(QPalette::Text, qFrame->settings().mainTextColor);
         }
         setPalette(p);
         return;
@@ -993,19 +993,19 @@ void CHtmlSysWinQt::set_html_link_colors(
 
     QColor col;
     if (link_use_default) {
-        col = qFrame->settings()->unvisitedLinkColor;
+        col = qFrame->settings().unvisitedLinkColor;
         fLinkColor = HTML_make_color(col.red(), col.green(), col.blue());
     } else {
         fLinkColor = link_color;
     }
     if (alink_use_default) {
-        col = qFrame->settings()->clickedLinkColor;
+        col = qFrame->settings().clickedLinkColor;
         fALinkColor = HTML_make_color(col.red(), col.green(), col.blue());
     } else {
         fALinkColor = alink_color;
     }
     if (hlink_use_default) {
-        col = qFrame->settings()->hoveringLinkColor;
+        col = qFrame->settings().hoveringLinkColor;
         fHLinkColor = HTML_make_color(col.red(), col.green(), col.blue());
     } else {
         fHLinkColor = hlink_color;
@@ -1025,35 +1025,35 @@ auto CHtmlSysWinQt::map_system_color(HTML_color_t color) -> HTML_color_t
 
     switch (color) {
     case HTML_COLOR_STATUSBG:
-        col = qFrame->settings()->bannerBgColor;
+        col = qFrame->settings().bannerBgColor;
         break;
 
     case HTML_COLOR_STATUSTEXT:
-        col = qFrame->settings()->bannerTextColor;
+        col = qFrame->settings().bannerTextColor;
         break;
 
     case HTML_COLOR_LINK:
-        col = qFrame->settings()->unvisitedLinkColor;
+        col = qFrame->settings().unvisitedLinkColor;
         break;
 
     case HTML_COLOR_ALINK:
-        col = qFrame->settings()->clickedLinkColor;
+        col = qFrame->settings().clickedLinkColor;
         break;
 
     case HTML_COLOR_TEXT:
-        col = qFrame->settings()->mainTextColor;
+        col = qFrame->settings().mainTextColor;
         break;
 
     case HTML_COLOR_BGCOLOR:
-        col = qFrame->settings()->mainBgColor;
+        col = qFrame->settings().mainBgColor;
         break;
 
     case HTML_COLOR_INPUT:
-        col = qFrame->settings()->inputColor;
+        col = qFrame->settings().inputColor;
         break;
 
     case HTML_COLOR_HLINK:
-        col = qFrame->settings()->hoveringLinkColor;
+        col = qFrame->settings().hoveringLinkColor;
         break;
 
     default:
@@ -1097,21 +1097,21 @@ auto CHtmlSysWinQt::get_html_link_underline() const -> int
 {
     // qDebug() << Q_FUNC_INFO;
 
-    return qFrame->settings()->underlineLinks;
+    return qFrame->settings().underlineLinks;
 }
 
 auto CHtmlSysWinQt::get_html_show_links() const -> int
 {
     // qDebug() << Q_FUNC_INFO;
 
-    return qFrame->settings()->enableLinks;
+    return qFrame->settings().enableLinks;
 }
 
 auto CHtmlSysWinQt::get_html_show_graphics() const -> int
 {
     // qDebug() << Q_FUNC_INFO;
 
-    return qFrame->settings()->enableGraphics;
+    return qFrame->settings().enableGraphics;
 }
 
 void CHtmlSysWinQt::set_html_bg_image(CHtmlResCacheObject* image)

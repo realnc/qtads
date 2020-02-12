@@ -6,6 +6,10 @@
 
 #include "config.h"
 
+class CHtmlDispLink;
+class CHtmlFormatter;
+class CHtmlSysWinQt;
+
 /* The widget where CHtmlSysWin* performs actual paint operations.  It also
  * handles mouse events.
  */
@@ -13,62 +17,8 @@ class DisplayWidget: public QWidget
 {
     Q_OBJECT
 
-private:
-    // We track the current link the mouse is currently hovering over and the
-    // link over which the mouse button has been pressed but not released yet.
-    class CHtmlDispLink* fHoverLink;
-    class CHtmlDispLink* fClickedLink;
-
-    // Origin of current selection range.
-    QPoint fSelectOrigin;
-
-    // Do we currently have a selection?
-    bool fHasSelection;
-
-    // Drag start position.
-    QPoint fDragStartPos;
-
-    // Time of last double-click event.
-    QTime fLastDoubleClick;
-
-    // Stop tracking links.
-    void fInvalidateLinkTracking();
-
-    // Returns the text currently selected in this window.
-    auto fMySelectedText() -> QString;
-
-    void fHandleDoubleOrTripleClick(QMouseEvent* e, bool tripleClick);
-
-    void fSyncClipboard();
-
-protected:
-    // Are we in text selection mode?
-    bool inSelectMode;
-
-    // The window we're embeded in.
-    class CHtmlSysWinQt* parentSysWin;
-
-    // Our parent's formatter, for easy access.
-    class CHtmlFormatter* formatter;
-
-    // Holds the widget that currently has an active selection range, or null
-    // if there's no active selection.
-    static DisplayWidget* curSelWidget;
-
-    void paintEvent(QPaintEvent* e) override;
-
-    void mouseMoveEvent(QMouseEvent* e) override;
-
-    void leaveEvent(QEvent* e) override;
-
-    void mousePressEvent(QMouseEvent* e) override;
-
-    void mouseReleaseEvent(QMouseEvent* e) override;
-
-    void mouseDoubleClickEvent(QMouseEvent* e) override;
-
 public:
-    DisplayWidget(class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter);
+    DisplayWidget(CHtmlSysWinQt& parent, CHtmlFormatter& formatter_);
     ~DisplayWidget() override;
 
     // When our parent's notify_clear_contents() is called, we need to know
@@ -81,19 +31,41 @@ public:
         fInvalidateLinkTracking();
     }
 
-    // Clear the selection range.
     virtual void clearSelection();
-
-    // Get the text contained in the currently active selection. Returns a
-    // null string is there's currently no display widget with an active
-    // selection.
     static auto selectedText() -> QString;
+    void updateLinkTracking(QPoint pos);
 
-    // Update link tracking for specified mouse position.  If the specified
-    // position isNull(), it will be autodetected.
-    //
-    // TODO: What happens with multi-pointer systems?
-    void updateLinkTracking(const QPoint& pos);
+protected:
+    bool inSelectMode = false;
+    CHtmlSysWinQt& parentSysWin;
+    CHtmlFormatter& formatter_;
+
+    // Holds the widget that currently has an active selection range, or null
+    // if there's no active selection.
+    static DisplayWidget* curSelWidget;
+
+    void paintEvent(QPaintEvent* e) override;
+    void mouseMoveEvent(QMouseEvent* e) override;
+    void leaveEvent(QEvent* e) override;
+    void mousePressEvent(QMouseEvent* e) override;
+    void mouseReleaseEvent(QMouseEvent* e) override;
+    void mouseDoubleClickEvent(QMouseEvent* e) override;
+
+private:
+    // We track the current link the mouse is currently hovering over and the
+    // link over which the mouse button has been pressed but not released yet.
+    CHtmlDispLink* fHoverLink = nullptr;
+    CHtmlDispLink* fClickedLink = nullptr;
+
+    QPoint fSelectOrigin;
+    bool fHasSelection = false;
+    QPoint fDragStartPos;
+    QTime fLastDoubleClick;
+
+    void fInvalidateLinkTracking();
+    auto fMySelectedText() const -> QString;
+    void fHandleDoubleOrTripleClick(const QMouseEvent& e, bool tripleClick);
+    void fSyncClipboard() const;
 };
 
 /*

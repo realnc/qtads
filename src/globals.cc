@@ -1,4 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
+#include "globals.h"
 
 class CHtmlSysFrameQt* qFrame = nullptr;
 class CHtmlSysWinGroupQt* qWinGroup = nullptr;

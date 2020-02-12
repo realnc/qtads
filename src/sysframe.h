@@ -4,6 +4,7 @@
 
 #include "config.h"
 #include "htmlsys.h"
+#include "settings.h"
 
 /* Tads HTML layer class whose interface needs to be implemented by the
  * interpreter.
@@ -17,7 +18,7 @@ class CHtmlSysFrameQt: public QApplication, public CHtmlSysFrame
 
 private:
     // Preferences (fonts, colors, etc.)
-    class Settings* fSettings;
+    Settings fSettings;
 
     // Tads2 application container context.
     appctxdef fAppctx;
@@ -113,7 +114,7 @@ public:
         const char* orgDomain);
     ~CHtmlSysFrameQt() override;
 
-    auto settings() -> class Settings*
+    auto settings() -> Settings&
     {
         return fSettings;
     }
@@ -200,7 +201,7 @@ public:
     void pruneParseTree();
 
     // Notify the application that preferences have changed.
-    void notifyPreferencesChange(const class Settings* sett);
+    void notifyPreferencesChange(const class Settings& sett);
 
     // Advance the event loop.
     void advanceEventLoop(QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents)

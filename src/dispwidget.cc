@@ -16,20 +16,13 @@
 
 DisplayWidget* DisplayWidget::curSelWidget = nullptr;
 
-DisplayWidget::DisplayWidget(CHtmlSysWinQt* parent, CHtmlFormatter* formatter)
-    : QWidget(parent)
-    , fHoverLink(nullptr)
-    , fClickedLink(nullptr)
-    , fHasSelection(false)
-    , inSelectMode(false)
+DisplayWidget::DisplayWidget(CHtmlSysWinQt& parent, CHtmlFormatter& formatter)
+    : QWidget(&parent)
     , parentSysWin(parent)
-    , formatter(formatter)
+    , formatter_(formatter)
 {
     setForegroundRole(QPalette::Text);
     setBackgroundRole(QPalette::Base);
-
-    // Enable mouse tracking, since we need to change the mouse cursor shape
-    // when hovering over hyperlinks.
     setMouseTracking(true);
 }
 
@@ -47,11 +40,11 @@ void DisplayWidget::fInvalidateLinkTracking()
 {
     // If we're tracking links (hover/click), forget about them.
     if (fClickedLink != nullptr) {
-        fClickedLink->set_clicked(parentSysWin, CHtmlDispLink_none);
+        fClickedLink->set_clicked(&parentSysWin, CHtmlDispLink_none);
         fClickedLink = nullptr;
     }
     if (fHoverLink != nullptr) {
-        fHoverLink->set_clicked(parentSysWin, CHtmlDispLink_none);
+        fHoverLink->set_clicked(&parentSysWin, CHtmlDispLink_none);
         fHoverLink = nullptr;
     }
     unsetCursor();
@@ -60,52 +53,44 @@ void DisplayWidget::fInvalidateLinkTracking()
     qWinGroup->statusBar()->setUpdatesEnabled(true);
 }
 
-auto DisplayWidget::fMySelectedText() -> QString
+auto DisplayWidget::fMySelectedText() const -> QString
 {
     unsigned long startOfs, endOfs;
-    formatter->get_sel_range(&startOfs, &endOfs);
+    formatter_.get_sel_range(&startOfs, &endOfs);
 
     if (startOfs == endOfs) {
-        // There's nothing selected.
-        return QString();
+        return {};
     }
 
-    // Figure out how much space we need. This is a worst-case size.
-    unsigned long len = formatter->get_chars_in_ofs_range(startOfs, endOfs);
-
-    // Get the text in the internal format.
-    CStringBuf buf(len);
-    formatter->extract_text(&buf, startOfs, endOfs);
-    // Return only the useful part of the buffer (which is null-terminated).
+    CStringBuf buf(formatter_.get_chars_in_ofs_range(startOfs, endOfs));
+    formatter_.extract_text(&buf, startOfs, endOfs);
     return QString::fromUtf8(buf.get());
 }
 
-void DisplayWidget::fHandleDoubleOrTripleClick(QMouseEvent* e, bool tripleClick)
+void DisplayWidget::fHandleDoubleOrTripleClick(const QMouseEvent& e, const bool tripleClick)
 {
-    // Get the offsets of the current word or line, depending on whether this
-    // is a double or triple click.
-    unsigned long start, end, offs;
-    offs = formatter->find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
+    unsigned long start, end;
+    const auto offset = formatter_.find_textofs_by_pos({e.x(), e.y()});
     if (tripleClick) {
-        formatter->get_line_limits(&start, &end, offs);
+        formatter_.get_line_limits(&start, &end, offset);
     } else {
-        formatter->get_word_limits(&start, &end, offs);
+        formatter_.get_word_limits(&start, &end, offset);
     }
 
     // If this is a Ctrl+double-click, and pasting is enabled in the settings,
     // paste the word into the current line input. Otherwise, just select the
     // word.
-    if (qFrame->settings()->pasteOnDblClk and not tripleClick
+    if (qFrame->settings().pasteOnDblClk and not tripleClick
         and (QApplication::keyboardModifiers() & Qt::ControlModifier))
     {
         CStringBuf strBuf;
-        formatter->extract_text(&strBuf, start, end);
+        formatter_.extract_text(&strBuf, start, end);
         QString txt(QString::fromUtf8(strBuf.get()).trimmed());
         if (not txt.isEmpty()) {
             qFrame->gameWindow()->insertText(txt + QChar::fromLatin1(' '));
         }
     } else if (~QApplication::keyboardModifiers() & Qt::ControlModifier) {
-        formatter->set_sel_range(start, end);
+        formatter_.set_sel_range(start, end);
         fSyncClipboard();
         qWinGroup->enableCopyAction(true);
         inSelectMode = true;
@@ -113,7 +98,7 @@ void DisplayWidget::fHandleDoubleOrTripleClick(QMouseEvent* e, bool tripleClick)
     }
 }
 
-void DisplayWidget::fSyncClipboard()
+void DisplayWidget::fSyncClipboard() const
 {
     const QString txt(fMySelectedText());
     if (txt.isEmpty() or not QApplication::clipboard()->supportsSelection()) {
@@ -122,7 +107,7 @@ void DisplayWidget::fSyncClipboard()
     QApplication::clipboard()->setText(txt, QClipboard::Selection);
 }
 
-void DisplayWidget::paintEvent(QPaintEvent* e)
+void DisplayWidget::paintEvent(QPaintEvent* const e)
 {
     // qDebug() << Q_FUNC_INFO << "called";
 
@@ -130,10 +115,10 @@ void DisplayWidget::paintEvent(QPaintEvent* e)
     const QRect& qRect = e->region().boundingRect();
     CHtmlRect cRect(
         qRect.left(), qRect.top(), qRect.left() + qRect.width(), qRect.top() + qRect.height());
-    formatter->draw(&cRect, false, nullptr);
+    formatter_.draw(&cRect, false, nullptr);
 }
 
-void DisplayWidget::mouseMoveEvent(QMouseEvent* e)
+void DisplayWidget::mouseMoveEvent(QMouseEvent* const e)
 {
     // Avoid registering a triple click directly after the mouse was moved.
     fLastDoubleClick = QTime();
@@ -141,7 +126,7 @@ void DisplayWidget::mouseMoveEvent(QMouseEvent* e)
     if (e->buttons() & Qt::LeftButton) {
         // If we're tracking a selection, update the selection range.
         if (inSelectMode) {
-            formatter->set_sel_range(
+            formatter_.set_sel_range(
                 CHtmlPoint(fSelectOrigin.x(), fSelectOrigin.y()),
                 CHtmlPoint(e->pos().x(), e->pos().y()), nullptr, nullptr);
             fSyncClipboard();
@@ -167,69 +152,67 @@ void DisplayWidget::mouseMoveEvent(QMouseEvent* e)
     updateLinkTracking(e->pos());
 }
 
-void DisplayWidget::leaveEvent(QEvent*)
+void DisplayWidget::leaveEvent(QEvent* /*const e*/)
 {
     fInvalidateLinkTracking();
 }
 
-void DisplayWidget::mousePressEvent(QMouseEvent* e)
+void DisplayWidget::mousePressEvent(QMouseEvent* const e)
 {
     if (e->button() != Qt::LeftButton) {
         e->ignore();
         return;
     }
 
-    if (fHoverLink == nullptr) {
-        // We're not hover-tracking a link. Start selection mode if we're not
-        // already in that mode.
-        if (inSelectMode) {
-            return;
+    if (fHoverLink != nullptr) {
+        // We're hover-tracking a link. Click-track it if it's clickable.
+        if (fHoverLink->is_clickable_link() and qFrame->settings().enableLinks) {
+            // Draw all of the items involved in the link in the hilited state.
+            fHoverLink->set_clicked(&parentSysWin, CHtmlDispLink_clicked);
+            fClickedLink = fHoverLink;
         }
-
-        // If there was a double-click previously and not too much time has
-        // passed, then this is a triple-click.
-        if (fLastDoubleClick.isValid()
-            and fLastDoubleClick.msecsTo(QTime::currentTime())
-                <= QApplication::doubleClickInterval())
-        {
-            fHandleDoubleOrTripleClick(e, true);
-            return;
-        }
-
-        // We're not tracking a selection, but if we have a selection and the
-        // mouse was inside it, then prepare for a drag start operation.
-        unsigned long selStart, selEnd;
-        formatter->get_sel_range(&selStart, &selEnd);
-        unsigned long mousePos =
-            formatter->find_textofs_by_pos(CHtmlPoint(e->pos().x(), e->pos().y()));
-        if (mousePos > selStart and mousePos < selEnd) {
-            fDragStartPos = e->pos();
-            return;
-        }
-
-        inSelectMode = true;
-        fSelectOrigin = e->pos();
-        // Just in case we had a selection previously, clear it.
-        clearSelection();
-        // If another widget also has an active selection, clear it.
-        if (curSelWidget != nullptr and curSelWidget != this) {
-            curSelWidget->clearSelection();
-        }
-        // Remember that we're the widget with an active selection.
-        curSelWidget = this;
-        qWinGroup->enableCopyAction(true);
         return;
     }
 
-    // We're hover-tracking a link. Click-track it if it's clickable.
-    if (fHoverLink->is_clickable_link() and qFrame->settings()->enableLinks) {
-        // Draw all of the items involved in the link in the hilited state.
-        fHoverLink->set_clicked(parentSysWin, CHtmlDispLink_clicked);
-        fClickedLink = fHoverLink;
+    // We're not hover-tracking a link. Start selection mode if we're not
+    // already in that mode.
+    if (inSelectMode) {
+        return;
     }
+
+    // If there was a double-click previously and not too much time has
+    // passed, then this is a triple-click.
+    if (fLastDoubleClick.isValid()
+        and fLastDoubleClick.msecsTo(QTime::currentTime()) <= QApplication::doubleClickInterval())
+    {
+        fHandleDoubleOrTripleClick(*e, true);
+        return;
+    }
+
+    // We're not tracking a selection, but if we have a selection and the
+    // mouse was inside it, then prepare for a drag start operation.
+    unsigned long selStart, selEnd;
+    formatter_.get_sel_range(&selStart, &selEnd);
+    auto mousePos = formatter_.find_textofs_by_pos({e->pos().x(), e->pos().y()});
+    if (mousePos > selStart and mousePos < selEnd) {
+        fDragStartPos = e->pos();
+        return;
+    }
+
+    inSelectMode = true;
+    fSelectOrigin = e->pos();
+    // Just in case we had a selection previously, clear it.
+    clearSelection();
+    // If another widget also has an active selection, clear it.
+    if (curSelWidget != nullptr and curSelWidget != this) {
+        curSelWidget->clearSelection();
+    }
+    // Remember that we're the widget with an active selection.
+    curSelWidget = this;
+    qWinGroup->enableCopyAction(true);
 }
 
-void DisplayWidget::mouseReleaseEvent(QMouseEvent* e)
+void DisplayWidget::mouseReleaseEvent(QMouseEvent* const e)
 {
     if (e->button() == Qt::MiddleButton and QApplication::clipboard()->supportsSelection()) {
         qFrame->gameWindow()->insertText(QApplication::clipboard()->text(QClipboard::Selection));
@@ -271,18 +254,18 @@ void DisplayWidget::mouseReleaseEvent(QMouseEvent* e)
             cmd, strlen(cmd), fClickedLink->get_append(), not fClickedLink->get_noenter(),
             OS_CMD_NONE);
         // Put it back in hovering mode.
-        if (qFrame->settings()->highlightLinks) {
-            fClickedLink->set_clicked(parentSysWin, CHtmlDispLink_hover);
+        if (qFrame->settings().highlightLinks) {
+            fClickedLink->set_clicked(&parentSysWin, CHtmlDispLink_hover);
         }
         // Otherwise, if we're hovering over another link, put that one in hover mode.
     } else if (fHoverLink != nullptr) {
-        fHoverLink->set_clicked(parentSysWin, CHtmlDispLink_hover);
+        fHoverLink->set_clicked(&parentSysWin, CHtmlDispLink_hover);
     }
     // Stop click-tracking it.
     fClickedLink = nullptr;
 }
 
-void DisplayWidget::mouseDoubleClickEvent(QMouseEvent* e)
+void DisplayWidget::mouseDoubleClickEvent(QMouseEvent* const e)
 {
     if (e->button() != Qt::LeftButton) {
         e->ignore();
@@ -290,7 +273,7 @@ void DisplayWidget::mouseDoubleClickEvent(QMouseEvent* e)
     }
     // Note the time this occurred, since we need to detect triple-clicks.
     fLastDoubleClick = QTime::currentTime();
-    fHandleDoubleOrTripleClick(e, false);
+    fHandleDoubleOrTripleClick(*e, false);
 }
 
 void DisplayWidget::clearSelection()
@@ -299,8 +282,8 @@ void DisplayWidget::clearSelection()
     // of the range to the maximum text offset in the formatter's
     // display list.
     fHasSelection = false;
-    unsigned long start = formatter->get_text_ofs_max();
-    formatter->set_sel_range(start, start);
+    unsigned long start = formatter_.get_text_ofs_max();
+    formatter_.set_sel_range(start, start);
     // If we're the widget with the active selection, also disable the copy
     // action, since clearing the selection means there's nothing to copy.
     if (DisplayWidget::curSelWidget == this) {
@@ -312,12 +295,12 @@ auto DisplayWidget::selectedText() -> QString
 {
     if (DisplayWidget::curSelWidget == nullptr) {
         // There's no active selection.
-        return QString();
+        return {};
     }
     return DisplayWidget::curSelWidget->fMySelectedText();
 }
 
-void DisplayWidget::updateLinkTracking(const QPoint& mousePos)
+void DisplayWidget::updateLinkTracking(const QPoint mousePos)
 {
     // Get the display object containing the position.
     CHtmlPoint docPos;
@@ -329,13 +312,13 @@ void DisplayWidget::updateLinkTracking(const QPoint& mousePos)
     } else {
         docPos.set(mousePos.x(), mousePos.y());
     }
-    CHtmlDisp* disp = formatter->find_by_pos(docPos, true);
+    CHtmlDisp* disp = formatter_.find_by_pos(docPos, true);
 
     // If there's nothing, no need to continue.
     if (disp == nullptr) {
         // If we were tracking anything, forget about it.
         if (fHoverLink != nullptr) {
-            fHoverLink->set_clicked(parentSysWin, CHtmlDispLink_none);
+            fHoverLink->set_clicked(&parentSysWin, CHtmlDispLink_none);
             fHoverLink = nullptr;
             unsetCursor();
             qWinGroup->statusBar()->setUpdatesEnabled(false);
@@ -346,8 +329,8 @@ void DisplayWidget::updateLinkTracking(const QPoint& mousePos)
     }
 
     // It could be a link.
-    if (qFrame->settings()->enableLinks) {
-        CHtmlDispLink* link = disp->get_link(formatter, docPos.x, docPos.y);
+    if (qFrame->settings().enableLinks) {
+        CHtmlDispLink* link = disp->get_link(&formatter_, docPos.x, docPos.y);
 
         // If we're already tracking a hover over this link, we don't need to
         // do anything else.
@@ -359,7 +342,7 @@ void DisplayWidget::updateLinkTracking(const QPoint& mousePos)
         // forget about the previous one.
         if (link != fHoverLink) {
             if (fHoverLink != nullptr) {
-                fHoverLink->set_clicked(parentSysWin, CHtmlDispLink_none);
+                fHoverLink->set_clicked(&parentSysWin, CHtmlDispLink_none);
             }
             fHoverLink = link;
         }
@@ -369,8 +352,8 @@ void DisplayWidget::updateLinkTracking(const QPoint& mousePos)
         if (link != nullptr and link->is_clickable_link()) {
             setCursor(Qt::PointingHandCursor);
             // Only change its color if we're not click-tracking another link.
-            if (qFrame->settings()->highlightLinks and fClickedLink == nullptr) {
-                link->set_clicked(parentSysWin, CHtmlDispLink_hover);
+            if (qFrame->settings().highlightLinks and fClickedLink == nullptr) {
+                link->set_clicked(&parentSysWin, CHtmlDispLink_hover);
             }
         }
 
@@ -399,7 +382,7 @@ void DisplayWidget::updateLinkTracking(const QPoint& mousePos)
     qWinGroup->statusBar()->setUpdatesEnabled(true);
     unsetCursor();
     if (fHoverLink != nullptr) {
-        fHoverLink->set_clicked(parentSysWin, CHtmlDispLink_none);
+        fHoverLink->set_clicked(&parentSysWin, CHtmlDispLink_none);
         fHoverLink = nullptr;
     }
 }

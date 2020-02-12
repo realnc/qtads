@@ -37,9 +37,8 @@ void QTadsImage::drawFromPaintEvent(
         // If the image doesn't fit exactly, scale it. Use the "smooth"
         // transformation mode (which uses a bilinear filter) if enabled in
         // the settings.
-        Qt::TransformationMode mode = qFrame->settings()->useSmoothScaling
-            ? Qt::SmoothTransformation
-            : Qt::FastTransformation;
+        Qt::TransformationMode mode =
+            qFrame->settings().useSmoothScaling ? Qt::SmoothTransformation : Qt::FastTransformation;
         if (width() != pos->right - pos->left or height() != pos->bottom - pos->top) {
             painter.drawImage(
                 QPoint(pos->left, pos->top),

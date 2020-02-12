@@ -141,7 +141,7 @@ auto QTadsSound::startPlaying(
     // qDebug() << Q_FUNC_INFO;
 
     // Check if user disabled digital sound.
-    if (not qFrame->settings()->enableSoundEffects) {
+    if (not qFrame->settings().enableSoundEffects) {
         return 1;
     }
 

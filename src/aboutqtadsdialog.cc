@@ -7,9 +7,9 @@
 #include "trd.h"
 #include "vmvsn.h"
 
-AboutQtadsDialog::AboutQtadsDialog(QWidget* parent)
+AboutQtadsDialog::AboutQtadsDialog(QWidget* const parent)
     : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
-    , ui(new Ui::AboutQtadsDialog)
+    , ui(std::make_unique<Ui::AboutQtadsDialog>())
 {
     ui->setupUi(this);
 
@@ -41,8 +41,7 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget* parent)
                                 .arg(QLatin1String(QTADS_VERSION)));
 
     // Construct a string holding all version info.
-    QString str;
-    str += QString::fromLatin1("<p><table border=\"0\" width=\"100%\"><tr><td>");
+    auto str = QString::fromLatin1("<p><table border=\"0\" width=\"100%\"><tr><td>");
     str += tr("QTads:") + QString::fromLatin1("</td><td>") + QString::fromLatin1(QTADS_VERSION)
         + QString::fromLatin1("<br></td></tr><tr><td>") + tr("HTML TADS:")
         + QString::fromLatin1("</td><td>\t") + QString::fromLatin1(HTMLTADS_VERSION)
@@ -56,13 +55,10 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget* parent)
         + QString::fromLatin1("</td></tr><tr><td>") + tr("Qt runtime version:")
         + QString::fromLatin1("</td><td>") + QString::fromLatin1(qVersion())
         + QString::fromLatin1("</td></tr></table></p>");
-    ui->versionInfoLabel->setText(str);
+    ui->versionInfoLabel->setText(std::move(str));
 }
 
-AboutQtadsDialog::~AboutQtadsDialog()
-{
-    delete ui;
-}
+AboutQtadsDialog::~AboutQtadsDialog() = default;
 
 /*
     Copyright 2003-2020 Nikos Chantziaras <realnc@gmail.com>

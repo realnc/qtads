@@ -3,7 +3,14 @@
 #include "config.h"
 #include "dispwidget.h"
 
-class DisplayWidgetInput: public DisplayWidget
+#include <QTimer>
+
+class CHtmlFormatter;
+class CHtmlInputBuf;
+class CHtmlSysWinQt;
+class CHtmlTagTextInput;
+
+class DisplayWidgetInput final: public DisplayWidget
 {
     Q_OBJECT
 
@@ -18,20 +25,20 @@ private:
     QPoint fLastCursorPos;
 
     // Is the text cursor visible?
-    bool fCursorVisible;
+    bool fCursorVisible = false;
 
     // Text cursor blink visibility.  Changed by a timer to show/hide the
     // cursor at specific intervals if fCursorVisible is true.
-    bool fBlinkVisible;
+    bool fBlinkVisible = false;
 
     // Text cursor blink timer.
-    class QTimer* fBlinkTimer;
+    QTimer fBlinkTimer;
 
     // Current input tag, if there is one (null if there isn't.)
-    class CHtmlTagTextInput* fInpTag;
+    const CHtmlTagTextInput* fInpTag = nullptr;
 
     // The TADS input buffer we're working with.
-    class CHtmlInputBuf* fTadsBuffer;
+    CHtmlInputBuf& fTadsBuffer;
 
 private slots:
     // Called by the timer to blink the text cursor.
@@ -39,47 +46,44 @@ private slots:
 
     // We need to know when the application loses focus entirely so that we
     // can disable keyboard cursor blinking when we lose focus.
-    void fHandleFocusChange(QWidget* old, QWidget* now);
+    void fHandleFocusChange(const QWidget* old, const QWidget* now);
 
 protected:
     void paintEvent(QPaintEvent* e) override;
-
     void resizeEvent(QResizeEvent* e) override;
-
     void mousePressEvent(QMouseEvent* e) override;
-
     void mouseMoveEvent(QMouseEvent* e) override;
 
 public:
     DisplayWidgetInput(
-        class CHtmlSysWinQt* parent, class CHtmlFormatter* formatter, CHtmlInputBuf* tadsBuffer);
+        CHtmlSysWinQt& parent, CHtmlFormatter& formatter_, CHtmlInputBuf& tadsBuffer);
 
     // Set the height of the text cursor in pixels.
-    void setCursorHeight(unsigned height)
+    void setCursorHeight(const unsigned height)
     {
         fHeight = height - 1;
     }
 
     // Show/hide the text cursor.
-    void setCursorVisible(bool visible)
+    void setCursorVisible(const bool visible)
     {
         fCursorVisible = visible;
     }
 
-    auto isCursorVisible() -> bool
+    auto isCursorVisible() const -> bool
     {
         return fCursorVisible;
     }
 
-    void updateCursorPos(
-        class CHtmlFormatter* formatter, bool keepSelection, bool updateFormatterSelection);
+    void
+    updateCursorPos(CHtmlFormatter& formatter_, bool keepSelection, bool updateFormatterSelection);
 
     // Reset cursor blink timer.  This will read the blinking rate from the
     // desktop environment and ajust the blink timer as needed.
     void resetCursorBlinking();
 
     // Set the current input tag.
-    void setInputTag(CHtmlTagTextInput* inputTag)
+    void setInputTag(const CHtmlTagTextInput* const inputTag)
     {
         fInpTag = inputTag;
     }

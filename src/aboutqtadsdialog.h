@@ -1,6 +1,7 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
 #include <QDialog>
+#include <memory>
 
 #include "config.h"
 
@@ -8,7 +9,7 @@ namespace Ui {
 class AboutQtadsDialog;
 }
 
-class AboutQtadsDialog: public QDialog
+class AboutQtadsDialog final: public QDialog
 {
     Q_OBJECT
 
@@ -17,7 +18,7 @@ public:
     ~AboutQtadsDialog() override;
 
 private:
-    Ui::AboutQtadsDialog* ui;
+    std::unique_ptr<Ui::AboutQtadsDialog> ui;
 };
 
 /*

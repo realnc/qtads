@@ -13,11 +13,11 @@
 #include "sysframe.h"
 #include "syswininput.h"
 
-void QTadsGameInfoEnum::tads_enum_game_info(const char* name, const char* val)
+void QTadsGameInfoEnum::tads_enum_game_info(const char* const name, const char* const val)
 {
-    const QString& valStr = QString::fromUtf8(val);
-    const QString& nameStr = QString::fromUtf8(name).toLower();
-    const QString& htmlValStr = valStr.toHtmlEscaped();
+    const auto valStr = QString::fromUtf8(val);
+    const auto nameStr = QString::fromUtf8(name).toLower();
+    const auto htmlValStr = valStr.toHtmlEscaped();
 
     if (nameStr == QString::fromLatin1("name")) {
         gameName = QString::fromLatin1("<b><center><font size=\"+1\">") + htmlValStr
@@ -64,62 +64,52 @@ void QTadsGameInfoEnum::tads_enum_game_info(const char* name, const char* val)
     }
 }
 
-static void insertTableRow(QTableWidget* table, const QString& text1, const QString& text2)
+static void insertTableRow(QTableWidget& table, const QString& text1, const QString& text2)
 {
-    table->insertRow(table->rowCount());
-    QTableWidgetItem* item = new QTableWidgetItem(text1);
+    table.insertRow(table.rowCount());
+    auto* item = new QTableWidgetItem(text1);
     item->setFlags(Qt::ItemIsEnabled);
-    table->setItem(table->rowCount() - 1, 0, item);
+    table.setItem(table.rowCount() - 1, 0, item);
     item = new QTableWidgetItem(text2);
     item->setFlags(Qt::ItemIsEnabled);
-    table->setItem(table->rowCount() - 1, 1, item);
+    table.setItem(table.rowCount() - 1, 1, item);
 }
 
 static auto loadCoverArtImage() -> QImage
 {
-    CHtmlResFinder* resFinder = qFrame->gameWindow()->get_formatter()->get_res_finder();
+    auto* const resFinder = qFrame->gameWindow()->get_formatter()->get_res_finder();
 
     // Look for a cover art resource. We try four different resource names.
     // The first two (PNG and JPG with a ".system/" prefix) are defined in the
     // current cover art standard.  The other two were defined in the older
     // standard which did not use a prefix.
-    QByteArray coverArtResName;
-    bool coverArtFound = false;
-    const char coverArtPaths[][21] = {
-        ".system/CoverArt.png", ".system/CoverArt.jpg", "CoverArt.png", "CoverArt.jpg"};
-    for (int i = 0; i < 4 and not coverArtFound; ++i) {
-        coverArtResName = coverArtPaths[i];
-        if (resFinder->resfile_exists(coverArtResName.constData(), coverArtResName.length())) {
-            coverArtFound = true;
+    std::string coverArtResName;
+    for (std::string path :
+         {".system/CoverArt.png", ".system/CoverArt.jpg", "CoverArt.png", "CoverArt.jpg"})
+    {
+        if (resFinder->resfile_exists(path.c_str(), path.length())) {
+            coverArtResName = std::move(path);
+            break;
         }
     }
-
-    if (not coverArtFound) {
-        return QImage();
+    if (coverArtResName.empty()) {
+        return {};
     }
 
     CStringBuf strBuf;
     unsigned long offset;
     unsigned long size;
     resFinder->get_file_info(
-        &strBuf, coverArtResName.constData(), coverArtResName.length(), &offset, &size);
-
-    // Check if the file exists and is readable.
-    QFileInfo inf(fnameToQStr(strBuf.get()));
-    if (not inf.exists() or not inf.isReadable()) {
-        qWarning() << "ERROR:" << inf.filePath() << "doesn't exist or is unreadable";
-        return QImage();
-    }
+        &strBuf, coverArtResName.c_str(), coverArtResName.length(), &offset, &size);
 
     // Open the file and seek to the specified position.
-    QFile file(inf.filePath());
+    QFile file(fnameToQStr(strBuf.get()));
     if (not file.open(QIODevice::ReadOnly)) {
-        qWarning() << "ERROR: Can't open file" << inf.filePath();
+        qWarning() << "ERROR: Can't open file" << file.fileName();
         return QImage();
     }
     if (not file.seek(offset)) {
-        qWarning() << "ERROR: Can't seek in file" << inf.filePath();
-        file.close();
+        qWarning() << "ERROR: Can't seek in file" << file.fileName();
         return QImage();
     }
 
@@ -127,7 +117,7 @@ static auto loadCoverArtImage() -> QImage
     const QByteArray& data(file.read(size));
     file.close();
     if (data.isEmpty() or static_cast<unsigned long>(data.size()) < size) {
-        qWarning() << "ERROR: Could not read" << size << "bytes from file" << inf.filePath();
+        qWarning() << "ERROR: Could not read" << size << "bytes from file" << file.fileName();
         return QImage();
     }
     QImage image;
@@ -139,18 +129,17 @@ static auto loadCoverArtImage() -> QImage
     // If we got here, all went well.  Return the image scaled to a
     // 200 pixels width if it's too large.  Otherwise, return it as-is.
     if (image.width() > 200) {
-        Qt::TransformationMode mode = qFrame->settings()->useSmoothScaling
-            ? Qt::SmoothTransformation
-            : Qt::FastTransformation;
+        Qt::TransformationMode mode =
+            qFrame->settings().useSmoothScaling ? Qt::SmoothTransformation : Qt::FastTransformation;
         return image.scaledToWidth(200, mode);
     } else {
         return image;
     }
 }
 
-GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* parent)
+GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* const parent)
     : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
-    , ui(new Ui::GameInfoDialog)
+    , ui(std::make_unique<Ui::GameInfoDialog>())
 {
     ui->setupUi(this);
 
@@ -181,51 +170,51 @@ GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* parent)
     // Fill out the table.
     ui->table->setColumnCount(2);
     if (not cb.genre.isEmpty()) {
-        insertTableRow(ui->table, tr("Genre"), cb.genre);
+        insertTableRow(*ui->table, tr("Genre"), cb.genre);
     }
 
     if (not cb.version.isEmpty()) {
-        insertTableRow(ui->table, tr("Version"), cb.version);
+        insertTableRow(*ui->table, tr("Version"), cb.version);
     }
 
     if (not cb.forgiveness.isEmpty()) {
-        insertTableRow(ui->table, tr("Forgiveness"), cb.forgiveness);
+        insertTableRow(*ui->table, tr("Forgiveness"), cb.forgiveness);
     }
 
     if (not cb.series.isEmpty()) {
-        insertTableRow(ui->table, tr("Series"), cb.series);
+        insertTableRow(*ui->table, tr("Series"), cb.series);
     }
 
     if (not cb.seriesNumber.isEmpty()) {
-        insertTableRow(ui->table, tr("Series Number"), cb.seriesNumber);
+        insertTableRow(*ui->table, tr("Series Number"), cb.seriesNumber);
     }
 
     if (not cb.date.isEmpty()) {
-        insertTableRow(ui->table, tr("Date"), cb.date);
+        insertTableRow(*ui->table, tr("Date"), cb.date);
     }
 
     if (not cb.published.isEmpty()) {
-        insertTableRow(ui->table, tr("First Published"), cb.published);
+        insertTableRow(*ui->table, tr("First Published"), cb.published);
     }
 
     if (not cb.email.isEmpty()) {
-        insertTableRow(ui->table, tr("Author email"), cb.email);
+        insertTableRow(*ui->table, tr("Author email"), cb.email);
     }
 
     if (not cb.lang.isEmpty()) {
-        insertTableRow(ui->table, tr("Language"), cb.lang);
+        insertTableRow(*ui->table, tr("Language"), cb.lang);
     }
 
     if (not cb.license.isEmpty()) {
-        insertTableRow(ui->table, tr("License Type"), cb.license);
+        insertTableRow(*ui->table, tr("License Type"), cb.license);
     }
 
     if (not cb.copyRules.isEmpty()) {
-        insertTableRow(ui->table, tr("Copying Rules"), cb.copyRules);
+        insertTableRow(*ui->table, tr("Copying Rules"), cb.copyRules);
     }
 
     if (not cb.ifid.isEmpty()) {
-        insertTableRow(ui->table, tr("IFID"), cb.ifid);
+        insertTableRow(*ui->table, tr("IFID"), cb.ifid);
     }
 
     ui->table->resizeColumnsToContents();
@@ -251,10 +240,7 @@ GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* parent)
     ui->table->setMaximumHeight(maxHeight);
 }
 
-GameInfoDialog::~GameInfoDialog()
-{
-    delete ui;
-}
+GameInfoDialog::~GameInfoDialog() = default;
 
 auto GameInfoDialog::gameHasMetaInfo(const QByteArray& fname) -> bool
 {

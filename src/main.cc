@@ -47,7 +47,7 @@ auto main(int argc, char** argv) -> int
         }
     }
 
-    if (gameFileName.isEmpty() and app->settings()->askForGameFile) {
+    if (gameFileName.isEmpty() and app->settings().askForGameFile) {
         gameFileName = QFileDialog::getOpenFileName(
             nullptr, QObject::tr("Choose the TADS game you wish to run"), QString::fromLatin1(""),
             QObject::tr("TADS Games") + QString::fromLatin1("(*.gam *.Gam *.GAM *.t3 *.T3)"));

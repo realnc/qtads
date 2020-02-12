@@ -3,6 +3,7 @@
 #include <QQueue>
 
 #include "config.h"
+#include "htmlinp.h"
 #include "syswin.h"
 
 /* An input-capable CHtmlSysWinQt.
@@ -67,9 +68,8 @@ private:
     class CHtmlTagTextInput* fTag;
 
     // Our command input buffer.
-    class CHtmlInputBuf* fTadsBuffer;
-    textchar_t* fInputBuffer;
-    size_t fInputBufferSize;
+    std::vector<textchar_t> fInputBuffer;
+    CHtmlInputBuf fTadsBuffer;
 
     void fStartKeypressInput();
 
@@ -92,7 +92,6 @@ signals:
 
 public:
     CHtmlSysWinInputQt(class CHtmlFormatter* formatter, QWidget* parent);
-    ~CHtmlSysWinInputQt() override;
 
     // Change the height of the text cursor.
     void setCursorHeight(unsigned height);

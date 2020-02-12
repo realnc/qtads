@@ -178,7 +178,7 @@ CHtmlSysWinGroupQt::~CHtmlSysWinGroupQt()
 
 auto CHtmlSysWinGroupQt::fAskQuitGameDialog() -> bool
 {
-    if (not qFrame->settings()->confirmQuitGame or not qFrame->gameRunning()) {
+    if (not qFrame->settings().confirmQuitGame or not qFrame->gameRunning()) {
         return true;
     }
 
@@ -204,7 +204,7 @@ auto CHtmlSysWinGroupQt::fAskQuitGameDialog() -> bool
 
 auto CHtmlSysWinGroupQt::fAskRestartGameDialog() -> bool
 {
-    if (not qFrame->settings()->confirmRestartGame or not qFrame->gameRunning()) {
+    if (not qFrame->settings().confirmRestartGame or not qFrame->gameRunning()) {
         return true;
     }
 
@@ -386,7 +386,7 @@ void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
     fNetManager->deleteLater();
     fReply->deleteLater();
     fNetManager = nullptr;
-    qFrame->settings()->lastUpdateDate = QDate::currentDate();
+    qFrame->settings().lastUpdateDate = QDate::currentDate();
 }
 
 void CHtmlSysWinGroupQt::fShowGameInfoDialog()
@@ -501,11 +501,11 @@ void CHtmlSysWinGroupQt::fHideAboutQtads()
 void CHtmlSysWinGroupQt::fOpenNewGame()
 {
     QString fname = QFileDialog::getOpenFileName(
-        nullptr, tr("Choose the TADS game you wish to run"), qFrame->settings()->lastFileOpenDir,
+        nullptr, tr("Choose the TADS game you wish to run"), qFrame->settings().lastFileOpenDir,
         tr("TADS Games") + QString::fromLatin1(" (*.gam *.Gam *.GAM *.t3 *.T3)"));
     activateWindow();
     if (not fname.isEmpty()) {
-        qFrame->settings()->lastFileOpenDir = QFileInfo(fname).absolutePath();
+        qFrame->settings().lastFileOpenDir = QFileInfo(fname).absolutePath();
         qFrame->setNextGame(std::move(fname));
     }
 }
@@ -564,7 +564,7 @@ void CHtmlSysWinGroupQt::closeEvent(QCloseEvent* e)
     msgBox->setWindowModality(Qt::WindowModal);
 #endif
 
-    if (not qFrame->settings()->confirmQuitGame or msgBox->exec() == QMessageBox::Yes) {
+    if (not qFrame->settings().confirmQuitGame or msgBox->exec() == QMessageBox::Yes) {
         qFrame->setGameRunning(false);
         // Make sure the VM knows that we're closing.
         fWantsToQuit = true;
@@ -654,7 +654,7 @@ void CHtmlSysWinGroupQt::updateRecentGames()
     fRecentGamesMenu->clear();
 
     // If the list is empty, disable the menu.
-    if (qFrame->settings()->recentGamesList.isEmpty()) {
+    if (qFrame->settings().recentGamesList.isEmpty()) {
         fRecentGamesMenu->setEnabled(false);
         return;
     }
@@ -665,7 +665,7 @@ void CHtmlSysWinGroupQt::updateRecentGames()
     }
 
     // Populate it.
-    const QStringList& list = qFrame->settings()->recentGamesList;
+    const QStringList& list = qFrame->settings().recentGamesList;
     for (int i = 0; i < list.size(); ++i) {
         QString gameName = GameInfoDialog::getMetaInfo(qStrToFname(list.at(i))).plainGameName;
         if (gameName.isEmpty()) {

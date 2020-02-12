@@ -1224,7 +1224,7 @@ auto os_askfile(
     } else {
         // TADS 2 does not use UTF-8; use the encoding from our settings for the
         // prompt message.
-        QTextCodec* codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
+        QTextCodec* codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
         promptStr = codec->toUnicode(prompt);
     }
 
@@ -1277,7 +1277,7 @@ auto os_input_dialog(
     QMessageBox dialog(qWinGroup);
 
     // We'll use that if we're running a T2 game.
-    QTextCodec* t2Codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
+    QTextCodec* t2Codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
 
     dialog.setText(qFrame->tads3() ? QString::fromUtf8(prompt) : t2Codec->toUnicode(prompt));
 
@@ -1528,7 +1528,7 @@ auto os_get_sysinfo(int code, void* /*param*/, long* result) -> int
         break;
 
     case SYSINFO_PREF_IMAGES:
-        if (qFrame->settings()->enableGraphics) {
+        if (qFrame->settings().enableGraphics) {
             *result = 1;
         } else {
             *result = 0;
@@ -1536,7 +1536,7 @@ auto os_get_sysinfo(int code, void* /*param*/, long* result) -> int
         break;
 
     case SYSINFO_PREF_SOUNDS:
-        if (qFrame->settings()->enableSoundEffects) {
+        if (qFrame->settings().enableSoundEffects) {
             *result = 1;
         } else {
             *result = 0;
@@ -1544,7 +1544,7 @@ auto os_get_sysinfo(int code, void* /*param*/, long* result) -> int
         break;
 
     case SYSINFO_PREF_MUSIC:
-        if (qFrame->settings()->enableMusic) {
+        if (qFrame->settings().enableMusic) {
             *result = 1;
         } else {
             *result = 0;
@@ -1552,7 +1552,7 @@ auto os_get_sysinfo(int code, void* /*param*/, long* result) -> int
         break;
 
     case SYSINFO_PREF_LINKS:
-        if (qFrame->settings()->enableLinks) {
+        if (qFrame->settings().enableLinks) {
             *result = 1;
         } else {
             *result = 0;

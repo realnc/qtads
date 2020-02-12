@@ -35,7 +35,7 @@ auto stricmp(const char* s1, const char* s2) -> int
             QString::fromUtf8(s1).toLower(), QString::fromUtf8(s2).toLower());
     }
     // TADS 2 does not use UTF-8; use the encoding from our settings.
-    QTextCodec* codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
+    QTextCodec* codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
     return QString::localeAwareCompare(
         codec->toUnicode(s1).toLower(), codec->toUnicode(s2).toLower());
 }
@@ -50,7 +50,7 @@ auto strnicmp(const char* s1, const char* s2, size_t n) -> int
         qs2 = QString::fromUtf8(s2);
     } else {
         // TADS 2 does not use UTF-8; use the encoding from our settings.
-        QTextCodec* codec = QTextCodec::codecForName(qFrame->settings()->tads2Encoding);
+        QTextCodec* codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
         qs1 = codec->toUnicode(s1);
         qs2 = codec->toUnicode(s2);
     }

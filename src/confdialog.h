@@ -1,28 +1,26 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
 #include <QDialog>
+#include <memory>
 
 #include "config.h"
 
+class CHtmlSysWinGroupQt;
 namespace Ui {
 class ConfDialog;
 }
 
-class ConfDialog: public QDialog
+class ConfDialog final: public QDialog
 {
     Q_OBJECT
 
 public:
-    ConfDialog(class CHtmlSysWinGroupQt* parent = nullptr);
+    ConfDialog(CHtmlSysWinGroupQt* parent = nullptr);
     ~ConfDialog() override;
 
-protected:
-    void changeEvent(QEvent* e) override;
-
 private:
-    Ui::ConfDialog* ui;
+    std::unique_ptr<Ui::ConfDialog> ui;
 
-    // Makes the dialog's controls apply instantly when they change.
     void fMakeInstantApply();
 
 private slots:

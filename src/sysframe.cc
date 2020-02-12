@@ -13,7 +13,6 @@
 #include "gameinfodialog.h"
 #include "qtadshostifc.h"
 #include "qtadssound.h"
-#include "settings.h"
 #include "syswinaboutbox.h"
 #include "syswininput.h"
 
@@ -27,10 +26,10 @@ void CHtmlSysFrameQt::fCtxGetIOSafetyLevel(void*, int* read, int* write)
 {
     Q_ASSERT(qFrame != nullptr);
     if (read != nullptr) {
-        *read = qFrame->fSettings->ioSafetyLevelRead;
+        *read = qFrame->fSettings.ioSafetyLevelRead;
     }
     if (write != nullptr) {
-        *write = qFrame->fSettings->ioSafetyLevelWrite;
+        *write = qFrame->fSettings.ioSafetyLevelWrite;
     }
 }
 
@@ -53,12 +52,11 @@ CHtmlSysFrameQt::CHtmlSysFrameQt(
     setOrganizationDomain(QString::fromLatin1(orgDomain));
 
     // Load our persistent settings.
-    fSettings = new Settings;
-    fSettings->loadFromDisk();
+    fSettings.loadFromDisk();
 
     // Initialize the input color with the user-configured one.  The game is
     // free to change the input color later on.
-    const QColor& tmpCol = fSettings->inputColor;
+    const QColor& tmpCol = fSettings.inputColor;
     fInputColor = HTML_make_color(tmpCol.red(), tmpCol.green(), tmpCol.blue());
 
     fParser = nullptr;
@@ -105,7 +103,7 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
     CHtmlSysFrame::set_frame_obj(nullptr);
 
     // Save our persistent settings.
-    fSettings->saveToDisk();
+    fSettings.saveToDisk();
 
     // We're being destroyed, so our global pointer is no longer valid.
     qFrame = nullptr;
@@ -140,7 +138,6 @@ CHtmlSysFrameQt::~CHtmlSysFrameQt()
     // Delete our TADS application interfaces and settings.
     delete fClientifc;
     delete fHostifc;
-    delete fSettings;
 
     delete fMainWin;
 }
@@ -224,7 +221,7 @@ void CHtmlSysFrameQt::fRunGame()
             }
 
             // Add the game file to our "recent games" list.
-            QStringList& gamesList = fSettings->recentGamesList;
+            QStringList& gamesList = fSettings.recentGamesList;
             int recentIdx = gamesList.indexOf(finfo.absoluteFilePath());
             if (recentIdx > 0) {
                 // It's already in the list and it's not the first item.  Make
@@ -248,14 +245,14 @@ void CHtmlSysFrameQt::fRunGame()
                 } else {
                     // It's not in the list.  Prepend it as the most recent item
                     // and, if the list is full, delete the oldest one.
-                    if (gamesList.size() >= fSettings->recentGamesCapacity) {
+                    if (gamesList.size() >= fSettings.recentGamesCapacity) {
                         gamesList.removeLast();
                     }
                     gamesList.prepend(finfo.absoluteFilePath());
                 }
             }
             fMainWin->updateRecentGames();
-            fSettings->saveToDisk();
+            fSettings.saveToDisk();
             qWinGroup->updatePasteAction();
 
             // Run the appropriate VM.
@@ -339,8 +336,8 @@ bool CHtmlSysFrameQt::event(QEvent* e)
 void CHtmlSysFrameQt::entryPoint(QString gameFileName)
 {
     // Restore the application's size and position.
-    if (not fSettings->appGeometry.isEmpty()) {
-        fMainWin->restoreGeometry(fSettings->appGeometry);
+    if (not fSettings.appGeometry.isEmpty()) {
+        fMainWin->restoreGeometry(fSettings.appGeometry);
     } else {
         auto h = QApplication::primaryScreen()->availableSize().height() / 1.1;
         fMainWin->resize(h, h);
@@ -348,8 +345,8 @@ void CHtmlSysFrameQt::entryPoint(QString gameFileName)
     fMainWin->show();
 
     // Do an online update check.
-    int daysRequired;
-    switch (fSettings->updateFreq) {
+    int daysRequired = -1;
+    switch (fSettings.updateFreq) {
     case Settings::UpdateOnEveryStart:
         daysRequired = 0;
         break;
@@ -359,14 +356,15 @@ void CHtmlSysFrameQt::entryPoint(QString gameFileName)
     case Settings::UpdateWeekly:
         daysRequired = 7;
         break;
-    default:
+    case Settings::UpdateNever:
         daysRequired = -1;
+        break;
     }
-    if (not fSettings->lastUpdateDate.isValid()) {
+    if (not fSettings.lastUpdateDate.isValid()) {
         // Force update check.
         daysRequired = 0;
     }
-    int daysPassed = fSettings->lastUpdateDate.daysTo(QDate::currentDate());
+    int daysPassed = fSettings.lastUpdateDate.daysTo(QDate::currentDate());
     if (daysPassed >= daysRequired and daysRequired > -1) {
         fMainWin->checkForUpdates();
     }
@@ -414,7 +412,7 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
     // particular name given, the player has no way to directly specify the
     // base size for that font, so the best we can do is use the default text
     // font size for guidance.
-    int base_point_size = fSettings->mainFont.pointSize();
+    int base_point_size = fSettings.mainFont.pointSize();
 
     // System font name that is to be used.
     QString fontName;
@@ -434,27 +432,27 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
         for (int i = 0; i < strList.size() and not matchFound; ++i) {
             const QString& s = strList.at(i).simplified().toLower();
             if (s == QString::fromLatin1(HTMLFONT_TADS_SERIF).toLower()) {
-                fontName = fSettings->serifFont.family();
-                base_point_size = fSettings->serifFont.pointSize();
+                fontName = fSettings.serifFont.family();
+                base_point_size = fSettings.serifFont.pointSize();
                 matchFound = true;
             } else if (s == QString::fromLatin1(HTMLFONT_TADS_SANS).toLower()) {
-                fontName = fSettings->sansFont.family();
-                base_point_size = fSettings->sansFont.pointSize();
+                fontName = fSettings.sansFont.family();
+                base_point_size = fSettings.sansFont.pointSize();
                 matchFound = true;
             } else if (s == QString::fromLatin1(HTMLFONT_TADS_SCRIPT).toLower()) {
-                fontName = fSettings->scriptFont.family();
-                base_point_size = fSettings->scriptFont.pointSize();
+                fontName = fSettings.scriptFont.family();
+                base_point_size = fSettings.scriptFont.pointSize();
                 matchFound = true;
             } else if (s == QString::fromLatin1(HTMLFONT_TADS_TYPEWRITER).toLower()) {
-                fontName = fSettings->writerFont.family();
-                base_point_size = fSettings->writerFont.pointSize();
+                fontName = fSettings.writerFont.family();
+                base_point_size = fSettings.writerFont.pointSize();
                 matchFound = true;
             } else if (s == QString::fromLatin1(HTMLFONT_TADS_INPUT).toLower()) {
-                fontName = fSettings->inputFont.family();
-                base_point_size = fSettings->inputFont.pointSize();
+                fontName = fSettings.inputFont.family();
+                base_point_size = fSettings.inputFont.pointSize();
                 if (newFontDesc.face_set_explicitly) {
-                    newFont.setBold(fSettings->inputFont.bold());
-                    newFont.setItalic(fSettings->inputFont.italic());
+                    newFont.setBold(fSettings.inputFont.bold());
+                    newFont.setItalic(fSettings.inputFont.italic());
                     newFontDesc.color = HTML_COLOR_INPUT;
                     newFont.color(HTML_COLOR_INPUT);
                 } else if (newFontDesc.default_color) {
@@ -465,8 +463,8 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
             } else if (s == QString::fromLatin1("qtads-grid")) {
                 // "qtads-grid" is an internal face name; it means we should
                 // return a font suitable for a text grid banner.
-                fontName = fSettings->fixedFont.family();
-                base_point_size = fSettings->fixedFont.pointSize();
+                fontName = fSettings.fixedFont.family();
+                base_point_size = fSettings.fixedFont.pointSize();
                 matchFound = true;
             } else {
                 newFont.setFamily(s);
@@ -479,25 +477,25 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
         // If we didn't find a match, use the main game font as set by
         // the user.
         if (not matchFound) {
-            fontName = fSettings->mainFont.family();
+            fontName = fSettings.mainFont.family();
         }
         // Apply characteristics only if the face wasn't specified.
     } else {
         // See if fixed-pitch is desired.
         if (newFontDesc.fixed_pitch) {
             // Use prefered monospaced font.
-            fontName = fSettings->fixedFont.family();
-            base_point_size = fSettings->fixedFont.pointSize();
+            fontName = fSettings.fixedFont.family();
+            base_point_size = fSettings.fixedFont.pointSize();
         } else {
             // Use prefered proportional font.
-            fontName = fSettings->mainFont.family();
-            base_point_size = fSettings->mainFont.pointSize();
+            fontName = fSettings.mainFont.family();
+            base_point_size = fSettings.mainFont.pointSize();
         }
 
         // See if serifs are desired for a variable-pitch font.
         if (not newFontDesc.serif and not newFontDesc.fixed_pitch) {
-            fontName = fSettings->serifFont.family();
-            base_point_size = fSettings->serifFont.pointSize();
+            fontName = fSettings.serifFont.family();
+            base_point_size = fSettings.serifFont.pointSize();
         }
 
         // See if emphasis (EM) is desired - render italic if so.
@@ -528,8 +526,8 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
             if (newFontDesc.pe_kbd) {
                 newFont.setWeight(QFont::Bold);
             }
-            fontName = fSettings->fixedFont.family();
-            base_point_size = fSettings->fixedFont.pointSize();
+            fontName = fSettings.fixedFont.family();
+            base_point_size = fSettings.fixedFont.pointSize();
         }
 
         // See if this is a citation (CITE) - render in italics if so.
@@ -656,7 +654,7 @@ void CHtmlSysFrameQt::pruneParseTree()
     reformatBanners(false, true, false);
 }
 
-void CHtmlSysFrameQt::notifyPreferencesChange(const Settings* sett)
+void CHtmlSysFrameQt::notifyPreferencesChange(const Settings& sett)
 {
     // Bail out if we currently don't have an active formatter.
     if (fFormatter == nullptr) {
@@ -665,14 +663,14 @@ void CHtmlSysFrameQt::notifyPreferencesChange(const Settings* sett)
 
     // If digital sounds are now turned off, cancel sound playback in the
     // effects layers
-    if (not sett->enableSoundEffects) {
+    if (not sett.enableSoundEffects) {
         fFormatter->cancel_sound(HTML_Attrib_ambient, 0.0, false, false);
         fFormatter->cancel_sound(HTML_Attrib_bgambient, 0.0, false, false);
         fFormatter->cancel_sound(HTML_Attrib_foreground, 0.0, false, false);
     }
 
     // If background music is now turned off, cancel playback in the music layer.
-    if (not sett->enableMusic) {
+    if (not sett.enableMusic) {
         fFormatter->cancel_sound(HTML_Attrib_background, 0.0, false, false);
     }
 
@@ -691,7 +689,7 @@ void CHtmlSysFrameQt::notifyPreferencesChange(const Settings* sett)
     qFrame->reformatBanners(true, true, false);
 
     // Change the text cursor's height according to the new input font's height.
-    qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett->inputFont).height());
+    qFrame->gameWindow()->setCursorHeight(QFontMetrics(sett.inputFont).height());
 }
 
 void CHtmlSysFrame::kill_process()
@@ -775,7 +773,7 @@ void CHtmlSysFrameQt::display_output(const textchar_t* buf, size_t len)
         fBuffer.append(buf, len);
     } else {
         // TADS 2 does not use UTF-8; use the encoding from our settings.
-        QTextCodec* codec = QTextCodec::codecForName(fSettings->tads2Encoding);
+        QTextCodec* codec = QTextCodec::codecForName(fSettings.tads2Encoding);
         fBuffer.append(codec->toUnicode(buf, len).toUtf8().constData());
     }
 }
@@ -863,7 +861,7 @@ auto CHtmlSysFrameQt::get_input_event(unsigned long timeout, int use_timeout, os
                 info->href, fGameWin->pendingHrefEvent().toUtf8().constData(),
                 sizeof(info->href) - 1);
         } else {
-            QTextCodec* codec = QTextCodec::codecForName(fSettings->tads2Encoding);
+            QTextCodec* codec = QTextCodec::codecForName(fSettings.tads2Encoding);
             strncpy(
                 info->href, codec->fromUnicode(fGameWin->pendingHrefEvent()).constData(),
                 sizeof(info->href) - 1);
