@@ -25,7 +25,7 @@ auto main(int argc, char** argv) -> int
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     CHtmlSysFrameQt* app = new CHtmlSysFrameQt(
-        argc, argv, "QTads", QTADS_VERSION, "Nikos Chantziaras", "nikos.chantziaras.qtads");
+        argc, argv, "QTads", QTADS_VERSION, "Nikos Chantziaras", {});
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     QApplication::setDesktopFileName(QStringLiteral("nikos.chantziaras.qtads"));
