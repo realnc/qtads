@@ -391,7 +391,7 @@ static auto find_font_match(const std::vector<QString>& font_names) -> QString
                 return system_font;
             }
             // Also try the font name without the "[foundry]" part.
-            auto clean_font_name = font_name.leftRef(system_font.lastIndexOf('[')).trimmed();
+            auto clean_font_name = font_name.leftRef(font_name.lastIndexOf('[')).trimmed();
             auto clean_system_font = system_font.leftRef(system_font.lastIndexOf('[')).trimmed();
             if (clean_font_name.compare(clean_system_font, Qt::CaseInsensitive) == 0) {
                 return system_font;
