@@ -12,6 +12,7 @@ static auto fontForStyleHint(const QFont::StyleHint hint) -> QFont
     QFont f;
     f.setStyleHint(hint);
     f.setFamily(f.defaultFamily());
+    f.setPointSize(f.pointSize() + 4);
     return f;
 }
 
