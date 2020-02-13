@@ -6,6 +6,7 @@
 #include "config.h"
 
 class CHtmlSysWinGroupQt;
+class Settings;
 namespace Ui {
 class ConfDialog;
 }
@@ -20,11 +21,15 @@ public:
 
 private:
     std::unique_ptr<Ui::ConfDialog> ui;
+    bool is_instant_apply_ = false;
+    bool disable_apply_ = false;
 
     void fMakeInstantApply();
 
 private slots:
+    void fLoadSettings(const Settings& sett);
     void fApplySettings();
+    void fRestoreDefaults();
 };
 
 /*

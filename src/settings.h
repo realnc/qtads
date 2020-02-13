@@ -6,27 +6,27 @@
 class Settings
 {
 public:
+    Settings();
     void loadFromDisk();
-
     void saveToDisk();
 
-    bool enableGraphics;
-    bool enableSoundEffects;
-    bool enableMusic;
-    bool enableLinks;
-    bool useSmoothScaling;
+    bool enableGraphics = true;
+    bool enableSoundEffects = true;
+    bool enableMusic = true;
+    bool enableLinks = true;
+    bool useSmoothScaling = true;
 
-    QColor mainTextColor;
-    QColor mainBgColor;
-    QColor bannerTextColor;
-    QColor bannerBgColor;
-    QColor inputColor;
+    QColor mainTextColor = Qt::black;
+    QColor mainBgColor = Qt::white;
+    QColor bannerTextColor = Qt::black;
+    QColor bannerBgColor = Qt::lightGray;
+    QColor inputColor = {70, 70, 70};
 
-    bool underlineLinks;
-    bool highlightLinks;
-    QColor unvisitedLinkColor;
-    QColor hoveringLinkColor;
-    QColor clickedLinkColor;
+    bool underlineLinks = false;
+    bool highlightLinks = true;
+    QColor unvisitedLinkColor = Qt::blue;
+    QColor hoveringLinkColor = Qt::red;
+    QColor clickedLinkColor = Qt::cyan;
 
     CHtmlSysFontQt mainFont;
     CHtmlSysFontQt fixedFont;
@@ -35,17 +35,17 @@ public:
     CHtmlSysFontQt scriptFont;
     CHtmlSysFontQt writerFont;
     CHtmlSysFontQt inputFont;
-    bool useMainFontForInput;
+    bool useMainFontForInput = true;
 
-    int ioSafetyLevelRead;
-    int ioSafetyLevelWrite;
+    int ioSafetyLevelRead = 2;
+    int ioSafetyLevelWrite = 2;
 
-    QByteArray tads2Encoding;
-    bool pasteOnDblClk;
-    bool softScrolling;
-    bool askForGameFile;
-    bool confirmRestartGame;
-    bool confirmQuitGame;
+    QByteArray tads2Encoding = "windows-1252";
+    bool pasteOnDblClk = true;
+    bool softScrolling = true;
+    bool askForGameFile = false;
+    bool confirmRestartGame = true;
+    bool confirmQuitGame = true;
     QString lastFileOpenDir;
     int textWidth = 70;
 
@@ -60,7 +60,7 @@ public:
         UpdateDaily,
         UpdateWeekly,
         UpdateNever
-    } updateFreq;
+    } updateFreq = UpdateDaily;
 };
 
 /*

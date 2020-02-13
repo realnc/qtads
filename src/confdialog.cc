@@ -25,8 +25,6 @@ ConfDialog::ConfDialog(CHtmlSysWinGroupQt* const parent)
     , ui(std::make_unique<Ui::ConfDialog>())
 {
     ui->setupUi(this);
-    auto& sett = qFrame->settings();
-    sett.loadFromDisk();
 
 #ifdef Q_OS_MAC
     // On the Mac, make the color selection buttons smaller so that they
@@ -41,95 +39,6 @@ ConfDialog::ConfDialog(CHtmlSysWinGroupQt* const parent)
     ui->linkHoveringColorButton->setFixedSize(macSize);
     ui->linkClickedColorButton->setFixedSize(macSize);
 #endif
-
-    ui->allowGraphicsCheckBox->setChecked(sett.enableGraphics);
-#ifdef NO_AUDIO
-    ui->allowSoundEffectsCheckBox->setDisabled(true);
-    ui->allowSoundEffectsCheckBox->hide();
-    ui->allowMusicCheckBox->setDisabled(true);
-    ui->allowMusicCheckBox->hide();
-#else
-    ui->allowSoundEffectsCheckBox->setChecked(sett.enableSoundEffects);
-    ui->allowMusicCheckBox->setChecked(sett.enableMusic);
-#endif
-    ui->allowLinksCheckBox->setChecked(sett.enableLinks);
-    ui->smoothScalingCheckBox->setChecked(sett.useSmoothScaling);
-
-    ui->mainBgColorButton->setColor(sett.mainBgColor);
-    ui->mainTextColorButton->setColor(sett.mainTextColor);
-    ui->bannerBgColorButton->setColor(sett.bannerBgColor);
-    ui->bannerTextColorButton->setColor(sett.bannerTextColor);
-    ui->inputColorButton->setColor(sett.inputColor);
-    ui->linkUnvisitedColorButton->setColor(sett.unvisitedLinkColor);
-    ui->linkHoveringColorButton->setColor(sett.hoveringLinkColor);
-    ui->linkClickedColorButton->setColor(sett.clickedLinkColor);
-
-    ui->underlineLinksCheckBox->setChecked(sett.underlineLinks);
-    ui->highlightLinksCheckBox->setChecked(sett.highlightLinks);
-
-    ui->mainFontSizeSpinBox->setValue(sett.mainFont.pointSize());
-    ui->fixedFontSizeSpinBox->setValue(sett.fixedFont.pointSize());
-    ui->serifFontSizeSpinBox->setValue(sett.serifFont.pointSize());
-    ui->sansFontSizeSpinBox->setValue(sett.sansFont.pointSize());
-    ui->scriptFontSizeSpinBox->setValue(sett.scriptFont.pointSize());
-    ui->writerFontSizeSpinBox->setValue(sett.writerFont.pointSize());
-    if (sett.useMainFontForInput) {
-        ui->inputFontSizeSpinBox->setValue(sett.mainFont.pointSize());
-        ui->inputFontSizeSpinBox->setEnabled(false);
-    } else {
-        ui->inputFontSizeSpinBox->setValue(sett.inputFont.pointSize());
-    }
-
-    ui->mainFontBox->setCurrentFont(sett.mainFont);
-    ui->fixedFontBox->setCurrentFont(sett.fixedFont);
-    ui->serifFontBox->setCurrentFont(sett.serifFont);
-    ui->sansFontBox->setCurrentFont(sett.sansFont);
-    ui->scriptFontBox->setCurrentFont(sett.scriptFont);
-    ui->writerFontBox->setCurrentFont(sett.writerFont);
-    if (sett.useMainFontForInput) {
-        ui->inputFontBox->setCurrentFont(sett.mainFont);
-        ui->inputFontBox->setEnabled(false);
-    } else {
-        ui->inputFontBox->setCurrentFont(sett.inputFont);
-    }
-    ui->useMainFontCheckBox->setChecked(sett.useMainFontForInput);
-    connect(
-        ui->useMainFontCheckBox, &QAbstractButton::toggled, ui->inputFontBox,
-        &QWidget::setDisabled);
-    connect(
-        ui->useMainFontCheckBox, &QAbstractButton::toggled, ui->inputFontSizeSpinBox,
-        &QWidget::setDisabled);
-    ui->inputFontItalicCheckBox->setChecked(sett.inputFont.italic());
-    ui->inputFontBoldCheckBox->setChecked(sett.inputFont.bold());
-
-    switch (sett.ioSafetyLevelRead) {
-    case 0:
-        ui->safetyRead0RadioButton->setChecked(true);
-        break;
-    case 2:
-        ui->safetyRead2RadioButton->setChecked(true);
-        break;
-    case 4:
-        ui->safetyRead4RadioButton->setChecked(true);
-        break;
-    default:
-        ui->safetyRead2RadioButton->setChecked(true);
-        break;
-    }
-    switch (sett.ioSafetyLevelWrite) {
-    case 0:
-        ui->safetyWrite0RadioButton->setChecked(true);
-        break;
-    case 2:
-        ui->safetyWrite2RadioButton->setChecked(true);
-        break;
-    case 4:
-        ui->safetyWrite4RadioButton->setChecked(true);
-        break;
-    default:
-        ui->safetyWrite2RadioButton->setChecked(true);
-        break;
-    }
 
     const auto aliases = QTextCodec::availableCodecs();
     std::vector<QByteArray> codecs;
@@ -154,67 +63,55 @@ ConfDialog::ConfDialog(CHtmlSysWinGroupQt* const parent)
             ui->encodingComboBox->addItem(QString::fromLatin1(codec));
         }
     }
-    ui->encodingComboBox->setCurrentIndex(
-        ui->encodingComboBox->findText(QString::fromLatin1(sett.tads2Encoding)));
+
+    connect(
+        ui->useMainFontCheckBox, &QAbstractButton::toggled, ui->inputFontBox,
+        &QWidget::setDisabled);
+    connect(
+        ui->useMainFontCheckBox, &QAbstractButton::toggled, ui->inputFontSizeSpinBox,
+        &QWidget::setDisabled);
 
     QString txt(QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText));
     if (txt.endsWith(QChar::fromLatin1('+'))) {
         txt.truncate(txt.length() - 1);
     }
     ui->pasteOnDblClkCheckBox->setText(tr("%1 + double-click pastes current word").arg(txt));
-    ui->pasteOnDblClkCheckBox->setChecked(sett.pasteOnDblClk);
-    ui->softScrollCheckBox->setChecked(sett.softScrolling);
-    ui->askForGameFileCheckBox->setChecked(sett.askForGameFile);
-    ui->confirmRestartCheckBox->setChecked(sett.confirmRestartGame);
-    ui->confirmQuitCheckBox->setChecked(sett.confirmQuitGame);
-    if (sett.textWidth > 0) {
-        ui->limitWidthCheckBox->setChecked(true);
-        ui->limitWidthSpinBox->setValue(sett.textWidth);
-    } else {
-        ui->limitWidthCheckBox->setChecked(false);
-        ui->limitWidthSpinBox->setEnabled(false);
-    }
+
     connect(
         ui->limitWidthCheckBox, &QCheckBox::toggled, ui->limitWidthSpinBox, &QSpinBox::setEnabled);
 
-    switch (sett.updateFreq) {
-    case Settings::UpdateOnEveryStart:
-        ui->updateOnStartRadioButton->setChecked(true);
-        break;
-    case Settings::UpdateDaily:
-        ui->updateDailyRadioButton->setChecked(true);
-        break;
-    case Settings::UpdateWeekly:
-        ui->updateWeeklyRadioButton->setChecked(true);
-        break;
-    case Settings::UpdateNever:
-        ui->updateNeverRadioButton->setChecked(true);
-        break;
-    }
+    auto& sett = qFrame->settings();
+    sett.loadFromDisk();
+    fLoadSettings(sett);
 
     const auto layoutPolicy = QDialogButtonBox::ButtonLayout(
         ui->buttonBox->style()->styleHint(QStyle::SH_DialogButtonLayout));
     if (layoutPolicy == QDialogButtonBox::GnomeLayout) {
         // On Gnome (and other Gtk-based environments, like XFCE), we follow
-        // Gnome standards. We only provide a "Close" button and settings
+        // Gnome standards. We don't provide apply/ok buttons, and settings
         // changes should apply instantly.
         fMakeInstantApply();
-        ui->buttonBox->setStandardButtons(QDialogButtonBox::Close);
+        ui->buttonBox->setStandardButtons(
+            QDialogButtonBox::RestoreDefaults | QDialogButtonBox::Close);
     } else if (layoutPolicy == QDialogButtonBox::MacLayout) {
-        // On Mac OS X, the dialog should not have any buttons, and settings
+        // On Mac OS X, the dialog should only have the restore button. Settings
         // changes should apply instantly.
         fMakeInstantApply();
-        ui->buttonBox->setStandardButtons(QDialogButtonBox::NoButton);
+        ui->buttonBox->setStandardButtons(QDialogButtonBox::RestoreDefaults);
     } else {
         // Assume KDE/MS Windows standards. No instant apply, and use OK/Apply/Cancel
         // buttons.
         ui->buttonBox->setStandardButtons(
-            QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
+            QDialogButtonBox::RestoreDefaults | QDialogButtonBox::Ok | QDialogButtonBox::Apply
+            | QDialogButtonBox::Cancel);
         connect(
             ui->buttonBox->button(QDialogButtonBox::Apply), &QAbstractButton::clicked, this,
             &ConfDialog::fApplySettings);
         connect(this, &QDialog::accepted, this, &ConfDialog::fApplySettings);
     }
+    connect(
+        ui->buttonBox->button(QDialogButtonBox::RestoreDefaults), &QAbstractButton::clicked, this,
+        &ConfDialog::fRestoreDefaults);
 }
 
 ConfDialog::~ConfDialog() = default;
@@ -316,10 +213,136 @@ void ConfDialog::fMakeInstantApply()
             combobox, qOverload<int>(&QComboBox::currentIndexChanged), this,
             &ConfDialog::fApplySettings);
     }
+
+    is_instant_apply_ = true;
+}
+
+void ConfDialog::fLoadSettings(const Settings& sett)
+{
+    disable_apply_ = true;
+
+    ui->allowGraphicsCheckBox->setChecked(sett.enableGraphics);
+#ifdef NO_AUDIO
+    ui->allowSoundEffectsCheckBox->setDisabled(true);
+    ui->allowSoundEffectsCheckBox->hide();
+    ui->allowMusicCheckBox->setDisabled(true);
+    ui->allowMusicCheckBox->hide();
+#else
+    ui->allowSoundEffectsCheckBox->setChecked(sett.enableSoundEffects);
+    ui->allowMusicCheckBox->setChecked(sett.enableMusic);
+#endif
+    ui->allowLinksCheckBox->setChecked(sett.enableLinks);
+    ui->smoothScalingCheckBox->setChecked(sett.useSmoothScaling);
+
+    ui->mainBgColorButton->setColor(sett.mainBgColor);
+    ui->mainTextColorButton->setColor(sett.mainTextColor);
+    ui->bannerBgColorButton->setColor(sett.bannerBgColor);
+    ui->bannerTextColorButton->setColor(sett.bannerTextColor);
+    ui->inputColorButton->setColor(sett.inputColor);
+    ui->linkUnvisitedColorButton->setColor(sett.unvisitedLinkColor);
+    ui->linkHoveringColorButton->setColor(sett.hoveringLinkColor);
+    ui->linkClickedColorButton->setColor(sett.clickedLinkColor);
+
+    ui->underlineLinksCheckBox->setChecked(sett.underlineLinks);
+    ui->highlightLinksCheckBox->setChecked(sett.highlightLinks);
+
+    ui->mainFontSizeSpinBox->setValue(sett.mainFont.pointSize());
+    ui->fixedFontSizeSpinBox->setValue(sett.fixedFont.pointSize());
+    ui->serifFontSizeSpinBox->setValue(sett.serifFont.pointSize());
+    ui->sansFontSizeSpinBox->setValue(sett.sansFont.pointSize());
+    ui->scriptFontSizeSpinBox->setValue(sett.scriptFont.pointSize());
+    ui->writerFontSizeSpinBox->setValue(sett.writerFont.pointSize());
+    if (sett.useMainFontForInput) {
+        ui->inputFontSizeSpinBox->setValue(sett.mainFont.pointSize());
+        ui->inputFontSizeSpinBox->setEnabled(false);
+    } else {
+        ui->inputFontSizeSpinBox->setValue(sett.inputFont.pointSize());
+    }
+
+    ui->mainFontBox->setCurrentFont(sett.mainFont);
+    ui->fixedFontBox->setCurrentFont(sett.fixedFont);
+    ui->serifFontBox->setCurrentFont(sett.serifFont);
+    ui->sansFontBox->setCurrentFont(sett.sansFont);
+    ui->scriptFontBox->setCurrentFont(sett.scriptFont);
+    ui->writerFontBox->setCurrentFont(sett.writerFont);
+    if (sett.useMainFontForInput) {
+        ui->inputFontBox->setCurrentFont(sett.mainFont);
+        ui->inputFontBox->setEnabled(false);
+    } else {
+        ui->inputFontBox->setCurrentFont(sett.inputFont);
+    }
+    ui->useMainFontCheckBox->setChecked(sett.useMainFontForInput);
+    ui->inputFontItalicCheckBox->setChecked(sett.inputFont.italic());
+    ui->inputFontBoldCheckBox->setChecked(sett.inputFont.bold());
+
+    switch (sett.ioSafetyLevelRead) {
+    case 0:
+        ui->safetyRead0RadioButton->setChecked(true);
+        break;
+    case 2:
+        ui->safetyRead2RadioButton->setChecked(true);
+        break;
+    case 4:
+        ui->safetyRead4RadioButton->setChecked(true);
+        break;
+    default:
+        ui->safetyRead2RadioButton->setChecked(true);
+        break;
+    }
+    switch (sett.ioSafetyLevelWrite) {
+    case 0:
+        ui->safetyWrite0RadioButton->setChecked(true);
+        break;
+    case 2:
+        ui->safetyWrite2RadioButton->setChecked(true);
+        break;
+    case 4:
+        ui->safetyWrite4RadioButton->setChecked(true);
+        break;
+    default:
+        ui->safetyWrite2RadioButton->setChecked(true);
+        break;
+    }
+
+    ui->encodingComboBox->setCurrentIndex(
+        ui->encodingComboBox->findText(QString::fromLatin1(sett.tads2Encoding)));
+    ui->pasteOnDblClkCheckBox->setChecked(sett.pasteOnDblClk);
+    ui->softScrollCheckBox->setChecked(sett.softScrolling);
+    ui->askForGameFileCheckBox->setChecked(sett.askForGameFile);
+    ui->confirmRestartCheckBox->setChecked(sett.confirmRestartGame);
+    ui->confirmQuitCheckBox->setChecked(sett.confirmQuitGame);
+    if (sett.textWidth > 0) {
+        ui->limitWidthCheckBox->setChecked(true);
+        ui->limitWidthSpinBox->setValue(sett.textWidth);
+    } else {
+        ui->limitWidthCheckBox->setChecked(false);
+        ui->limitWidthSpinBox->setEnabled(false);
+    }
+
+    switch (sett.updateFreq) {
+    case Settings::UpdateOnEveryStart:
+        ui->updateOnStartRadioButton->setChecked(true);
+        break;
+    case Settings::UpdateDaily:
+        ui->updateDailyRadioButton->setChecked(true);
+        break;
+    case Settings::UpdateWeekly:
+        ui->updateWeeklyRadioButton->setChecked(true);
+        break;
+    case Settings::UpdateNever:
+        ui->updateNeverRadioButton->setChecked(true);
+        break;
+    }
+
+    disable_apply_ = false;
 }
 
 void ConfDialog::fApplySettings()
 {
+    if (disable_apply_) {
+        return;
+    }
+
     if (ui->useMainFontCheckBox->isChecked()) {
         ui->inputFontBox->setCurrentFont(ui->mainFontBox->currentFont());
         ui->inputFontSizeSpinBox->setValue(ui->mainFontSizeSpinBox->value());
@@ -405,6 +428,15 @@ void ConfDialog::fApplySettings()
     qFrame->notifyPreferencesChange(sett);
 
     sett.saveToDisk();
+}
+
+void ConfDialog::fRestoreDefaults()
+{
+    const Settings sett;
+    fLoadSettings(sett);
+    if (is_instant_apply_) {
+        fApplySettings();
+    }
 }
 
 /*
