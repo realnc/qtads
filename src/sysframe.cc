@@ -1,6 +1,7 @@
 // This is copyrighted software. More information is at the end of this file.
 #include <QDebug>
 #include <QDir>
+#include <QFontDatabase>
 #include <QIcon>
 #include <QLabel>
 #include <QLayout>
@@ -375,45 +376,64 @@ void CHtmlSysFrameQt::entryPoint(QString gameFileName)
     }
 }
 
+// Takes a list of font names and returns the first that exists on the system.
+static auto find_font_match(const std::vector<QString>& font_names) -> QString
+{
+    const QFontDatabase db;
+    const auto system_fonts = db.families();
+
+    for (const auto& font_name : font_names) {
+        for (const auto& system_font : system_fonts) {
+            if (db.isPrivateFamily(system_font)) {
+                continue;
+            }
+            if (font_name.compare(system_font, Qt::CaseInsensitive) == 0) {
+                return system_font;
+            }
+            // Also try the font name without the "[foundry]" part.
+            auto clean_font_name = font_name.leftRef(system_font.lastIndexOf('[')).trimmed();
+            auto clean_system_font = system_font.leftRef(system_font.lastIndexOf('[')).trimmed();
+            if (clean_font_name.compare(clean_system_font, Qt::CaseInsensitive) == 0) {
+                return system_font;
+            }
+        }
+    }
+    // Fall back to the configured main window font.
+    return qFrame->settings().mainFont.family();
+};
+
 auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFontQt*
 {
     // qDebug() << Q_FUNC_INFO;
     Q_ASSERT(font_desc != nullptr);
 
     CHtmlFontDesc newFontDesc = *font_desc;
-    CHtmlSysFontQt newFont;
-    QFont::StyleStrategy strat;
-    // We're building with a recent enough Qt; use ForceIntegerMetrics directly.
-    strat = QFont::StyleStrategy(
-        QFont::PreferOutline | QFont::PreferQuality | QFont::ForceIntegerMetrics);
-    newFont.setStyleStrategy(strat);
+    int weight = QFont::Normal;
+    bool use_italic = newFontDesc.italic;
+    bool use_bold = false;
+    HTML_color_t color = 0;
 
     // Use the weight they provided (we may change this if a weight modifier is
     // specified).
     if (newFontDesc.weight <= 100) {
-        newFont.setWeight(QFont::Thin);
+        weight = QFont::Thin;
     } else if (newFontDesc.weight <= 200) {
-        newFont.setWeight(QFont::ExtraLight);
+        weight = QFont::ExtraLight;
     } else if (newFontDesc.weight <= 300) {
-        newFont.setWeight(QFont::Light);
+        weight = QFont::Light;
     } else if (newFontDesc.weight <= 400) {
-        newFont.setWeight(QFont::Normal);
+        weight = QFont::Normal;
     } else if (newFontDesc.weight <= 500) {
-        newFont.setWeight(QFont::Medium);
+        weight = QFont::Medium;
     } else if (newFontDesc.weight <= 600) {
-        newFont.setWeight(QFont::DemiBold);
+        weight = QFont::DemiBold;
     } else if (newFontDesc.weight <= 700) {
-        newFont.setWeight(QFont::Bold);
+        weight = QFont::Bold;
     } else if (newFontDesc.weight <= 800) {
-        newFont.setWeight(QFont::ExtraBold);
+        weight = QFont::ExtraBold;
     } else {
-        newFont.setWeight(QFont::Black);
+        weight = QFont::Black;
     }
-
-    // Apply the specific font attributes.
-    newFont.setItalic(newFontDesc.italic);
-    newFont.setUnderline(newFontDesc.underline);
-    newFont.setStrikeOut(newFontDesc.strikeout);
 
     // Assume that we'll use the base point size of the default text font (the
     // main proportional font) as the basis of the size.  If we find a specific
@@ -424,8 +444,7 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
     // font size for guidance.
     int base_point_size = fSettings.mainFont.pointSize();
 
-    // System font name that is to be used.
-    QString fontName;
+    std::vector<QString> font_names;
 
     // If a face name is listed, try to find the given face in the system.
     // Note that we wait until after setting all of the basic attributes (in
@@ -433,100 +452,89 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
     // name; this is to allow parameterized face names to override the basic
     // attributes.  For example, the "TADS-Input" font allows the player to
     // specify color, bold, and italic styles in addition to the font name.
-    if (newFontDesc.face[0] != 0) {
+    if (newFontDesc.face[0] != '\0') {
         // The face name field can contain multiple face names separated by
         // commas.  We split them into a list and try each one individualy.
-        bool matchFound = false;
-        const QStringList& strList = QString(QString::fromLatin1(newFontDesc.face))
-                                         .split(QChar::fromLatin1(','), QString::SkipEmptyParts);
-        for (int i = 0; i < strList.size() and not matchFound; ++i) {
-            const QString& s = strList.at(i).simplified().toLower();
+        const auto strList = QString(QString::fromLatin1(newFontDesc.face))
+                                 .split(QChar::fromLatin1(','), QString::SkipEmptyParts);
+        for (int i = 0; i < strList.size(); ++i) {
+            auto s = strList.at(i).simplified().toLower();
             if (s == QString::fromLatin1(HTMLFONT_TADS_SERIF).toLower()) {
-                fontName = fSettings.serifFont.family();
+                font_names.emplace_back(fSettings.serifFont.family());
                 base_point_size = fSettings.serifFont.pointSize();
-                matchFound = true;
-            } else if (s == QString::fromLatin1(HTMLFONT_TADS_SANS).toLower()) {
-                fontName = fSettings.sansFont.family();
+                break;
+            }
+            if (s == QString::fromLatin1(HTMLFONT_TADS_SANS).toLower()) {
+                font_names.emplace_back(fSettings.sansFont.family());
                 base_point_size = fSettings.sansFont.pointSize();
-                matchFound = true;
-            } else if (s == QString::fromLatin1(HTMLFONT_TADS_SCRIPT).toLower()) {
-                fontName = fSettings.scriptFont.family();
+                break;
+            }
+            if (s == QString::fromLatin1(HTMLFONT_TADS_SCRIPT).toLower()) {
+                font_names.emplace_back(fSettings.scriptFont.family());
                 base_point_size = fSettings.scriptFont.pointSize();
-                matchFound = true;
-            } else if (s == QString::fromLatin1(HTMLFONT_TADS_TYPEWRITER).toLower()) {
-                fontName = fSettings.writerFont.family();
+                break;
+            }
+            if (s == QString::fromLatin1(HTMLFONT_TADS_TYPEWRITER).toLower()) {
+                font_names.emplace_back(fSettings.writerFont.family());
                 base_point_size = fSettings.writerFont.pointSize();
-                matchFound = true;
-            } else if (s == QString::fromLatin1(HTMLFONT_TADS_INPUT).toLower()) {
-                fontName = fSettings.inputFont.family();
+                break;
+            }
+            if (s == QString::fromLatin1(HTMLFONT_TADS_INPUT).toLower()) {
+                font_names.emplace_back(fSettings.inputFont.family());
                 base_point_size = fSettings.inputFont.pointSize();
                 if (newFontDesc.face_set_explicitly) {
-                    newFont.setBold(fSettings.inputFont.bold());
-                    newFont.setItalic(fSettings.inputFont.italic());
-                    newFontDesc.color = HTML_COLOR_INPUT;
-                    newFont.color(HTML_COLOR_INPUT);
+                    use_bold = fSettings.inputFont.bold();
+                    use_italic = fSettings.inputFont.italic();
+                    newFontDesc.color = color = HTML_COLOR_INPUT;
                 } else if (newFontDesc.default_color) {
-                    newFontDesc.color = HTML_COLOR_INPUT;
-                    newFont.color(HTML_COLOR_INPUT);
+                    newFontDesc.color = color = HTML_COLOR_INPUT;
                 }
-                matchFound = true;
-            } else if (s == QString::fromLatin1("qtads-grid")) {
+                break;
+            }
+            if (s == QString::fromLatin1("qtads-grid")) {
                 // "qtads-grid" is an internal face name; it means we should
                 // return a font suitable for a text grid banner.
-                fontName = fSettings.fixedFont.family();
+                font_names.emplace_back(fSettings.fixedFont.family());
                 base_point_size = fSettings.fixedFont.pointSize();
-                matchFound = true;
-            } else {
-                newFont.setFamily(s);
-                if (s.compare(QFontInfo(newFont).family().trimmed(), Qt::CaseInsensitive) == 0) {
-                    matchFound = true;
-                    fontName = s;
-                }
+                break;
             }
+            font_names.emplace_back(std::move(s));
         }
-        // If we didn't find a match, use the main game font as set by
-        // the user.
-        if (not matchFound) {
-            fontName = fSettings.mainFont.family();
-        }
-        // Apply characteristics only if the face wasn't specified.
     } else {
-        // See if fixed-pitch is desired.
+        font_names.emplace_back();
+
         if (newFontDesc.fixed_pitch) {
-            // Use prefered monospaced font.
-            fontName = fSettings.fixedFont.family();
+            font_names[0] = fSettings.fixedFont.family();
             base_point_size = fSettings.fixedFont.pointSize();
         } else {
-            // Use prefered proportional font.
-            fontName = fSettings.mainFont.family();
+            font_names[0] = fSettings.mainFont.family();
             base_point_size = fSettings.mainFont.pointSize();
         }
 
-        // See if serifs are desired for a variable-pitch font.
         if (not newFontDesc.serif and not newFontDesc.fixed_pitch) {
-            fontName = fSettings.serifFont.family();
+            font_names[0] = fSettings.serifFont.family();
             base_point_size = fSettings.serifFont.pointSize();
         }
 
         // See if emphasis (EM) is desired - render italic if so.
         if (newFontDesc.pe_em) {
-            newFont.setItalic(true);
+            use_italic = true;
         }
 
         // See if strong emphasis (STRONG) is desired - render bold if so.
         if (newFontDesc.pe_strong) {
             newFontDesc.weight = 700;
-            newFont.setWeight(QFont::Bold);
+            weight = QFont::Bold;
         }
 
         // If we're in an address block, render in italics.
         if (newFontDesc.pe_address) {
-            newFont.setItalic(true);
+            use_italic = true;
         }
 
         // See if this is a defining instance (DFN) - render in italics.
         if (newFontDesc.pe_dfn) {
-            newFont.setItalic(true);
+            use_italic = true;
         }
 
         // See if this is sample code (SAMP), keyboard code (KBD), or a
@@ -534,19 +542,17 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
         if (newFontDesc.pe_samp or newFontDesc.pe_kbd or newFontDesc.pe_var) {
             // Render KBD in bold.
             if (newFontDesc.pe_kbd) {
-                newFont.setWeight(QFont::Bold);
+                weight = QFont::Bold;
             }
-            fontName = fSettings.fixedFont.family();
+            font_names[0] = fSettings.fixedFont.family();
             base_point_size = fSettings.fixedFont.pointSize();
         }
 
         // See if this is a citation (CITE) - render in italics if so.
         if (newFontDesc.pe_cite) {
-            newFont.setItalic(true);
+            use_italic = true;
         }
     }
-
-    newFont.setFamily(fontName);
 
     // Note the HTML SIZE parameter requested - if this is zero, it indicates
     // that we want to use a specific point size instead.
@@ -577,34 +583,45 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
         pointsize = newFontDesc.pointsize;
     }
 
-    newFont.setPointSize(pointsize > 0 ? pointsize : base_point_size);
+    CHtmlSysFontQt new_font(
+        find_font_match(font_names), pointsize > 0 ? pointsize : base_point_size, weight,
+        use_italic);
 
-    if (not newFontDesc.default_color) {
-        newFont.color(newFontDesc.color);
+    // Workaround for QTBUG-76908 (wrong font variant is used and is out of sync with font metrics.)
+    new_font.setStyleName({});
+
+    new_font.setStyleStrategy(QFont::StyleStrategy(
+        QFont::PreferOutline | QFont::PreferQuality | QFont::ForceIntegerMetrics));
+    new_font.setUnderline(newFontDesc.underline);
+    new_font.setStrikeOut(newFontDesc.strikeout);
+    if (use_bold and weight < QFont::Bold) {
+        new_font.setWeight(QFont::Bold);
+    }
+    if (newFontDesc.default_color) {
+        new_font.color(color);
+    } else {
+        new_font.color(newFontDesc.color);
     }
     if (not newFontDesc.default_bgcolor) {
-        newFont.bgColor(newFontDesc.bgcolor);
+        new_font.bgColor(newFontDesc.bgcolor);
     }
 
     // Some fonts don't have a bold version, and on some platforms Qt does not support synthesizing
     // a bold variant. We need to take care of things ourselves in that case.
-    if (newFont.weight() >= QFont::Bold and QFontInfo(newFont).weight() < QFont::Bold) {
-        newFont.needs_fake_bold = true;
+    if (new_font.weight() >= QFont::Bold and QFontInfo(new_font).weight() < QFont::Bold) {
+        new_font.needs_fake_bold = true;
     }
 
     // Check whether a matching font is already in our cache.
-    for (int i = 0; i < fFontList.size(); ++i) {
-        if (*fFontList.at(i) == newFont) {
-            return fFontList[i];
+    for (auto* cached_font : fFontList) {
+        if (*cached_font == new_font) {
+            return cached_font;
         }
     }
 
-    // qDebug() << "Font not found in cache; creating new font:" << newFont
-    //      << "\nFonts so far:" << fFontList.size() + 1;
-
     // There was no match in our cache. Create a new font and store it in our
     // cache.
-    CHtmlSysFontQt* font = new CHtmlSysFontQt(newFont);
+    CHtmlSysFontQt* font = new CHtmlSysFontQt(new_font);
     font->set_font_desc(&newFontDesc);
     fFontList.append(font);
     return font;
