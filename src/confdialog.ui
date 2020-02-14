@@ -5,6 +5,12 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -756,91 +762,16 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
-        <widget class="QLabel" name="label_16">
-         <property name="text">
-          <string>The majority of TADS 2 games don't use Unicode to display characters not covered by the ASCII character set. They also don't tell interpreters what encoding they actually use. Here you can select the character set that should be used for TADS 2 games. Note that this setting only takes effect on newly added text; already existing text will not be converted.</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QFormLayout" name="formLayout_5">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_17">
-           <property name="text">
-            <string>TADS 2 Encoding</string>
-           </property>
-           <property name="buddy">
-            <cstring>encodingComboBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="encodingComboBox"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="pasteOnDblClkCheckBox">
-         <property name="text">
-          <string>Paste on double-click</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="softScrollCheckBox">
-         <property name="text">
-          <string>Soft Scrolling</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="askForGameFileCheckBox">
-         <property name="text">
-          <string>Ask for a game file at startup</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="confirmRestartCheckBox">
-         <property name="text">
-          <string>Ask for confirmation when restarting a game</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="confirmQuitCheckBox">
-         <property name="text">
-          <string>Ask for confirmation when quitting a game</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QFormLayout" name="formLayout_6">
-         <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="5" column="0">
           <widget class="QCheckBox" name="limitWidthCheckBox">
            <property name="text">
             <string>Limit text width</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="5" column="1">
           <widget class="QSpinBox" name="limitWidthSpinBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
            <property name="suffix">
             <string> characters</string>
            </property>
@@ -855,7 +786,80 @@
            </property>
           </widget>
          </item>
+         <item row="5" column="2">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="0" column="0" colspan="3">
+          <widget class="QCheckBox" name="pasteOnDblClkCheckBox">
+           <property name="text">
+            <string>Paste on double-click</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="3">
+          <widget class="QCheckBox" name="softScrollCheckBox">
+           <property name="text">
+            <string>Soft Scrolling</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="3">
+          <widget class="QCheckBox" name="askForGameFileCheckBox">
+           <property name="text">
+            <string>Ask for a game file at startup</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="3">
+          <widget class="QCheckBox" name="confirmRestartCheckBox">
+           <property name="text">
+            <string>Ask for confirmation when restarting a game</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0" colspan="3">
+          <widget class="QCheckBox" name="confirmQuitCheckBox">
+           <property name="text">
+            <string>Ask for confirmation when quitting a game</string>
+           </property>
+          </widget>
+         </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_6">
+         <property name="title">
+          <string>TADS 2 Encoding</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_5">
+          <item row="1" column="0">
+           <widget class="QComboBox" name="encodingComboBox"/>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>The majority of TADS 2 games don't use Unicode to display characters not covered by the ASCII character set. They also don't tell interpreters what encoding they actually use. Here you can select the character set that should be used for TADS 2 games. Note that this setting only takes effect on newly added text; already existing text will not be converted.</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="buddy">
+             <cstring>encodingComboBox</cstring>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -873,6 +877,59 @@
    <header>kcolorbutton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>mainFontBox</tabstop>
+  <tabstop>mainFontSizeSpinBox</tabstop>
+  <tabstop>fixedFontBox</tabstop>
+  <tabstop>fixedFontSizeSpinBox</tabstop>
+  <tabstop>serifFontBox</tabstop>
+  <tabstop>serifFontSizeSpinBox</tabstop>
+  <tabstop>sansFontBox</tabstop>
+  <tabstop>sansFontSizeSpinBox</tabstop>
+  <tabstop>scriptFontBox</tabstop>
+  <tabstop>scriptFontSizeSpinBox</tabstop>
+  <tabstop>writerFontBox</tabstop>
+  <tabstop>writerFontSizeSpinBox</tabstop>
+  <tabstop>useMainFontCheckBox</tabstop>
+  <tabstop>inputFontBox</tabstop>
+  <tabstop>inputFontSizeSpinBox</tabstop>
+  <tabstop>inputFontItalicCheckBox</tabstop>
+  <tabstop>inputFontBoldCheckBox</tabstop>
+  <tabstop>mainTextColorButton</tabstop>
+  <tabstop>mainBgColorButton</tabstop>
+  <tabstop>inputColorButton</tabstop>
+  <tabstop>bannerTextColorButton</tabstop>
+  <tabstop>bannerBgColorButton</tabstop>
+  <tabstop>underlineLinksCheckBox</tabstop>
+  <tabstop>highlightLinksCheckBox</tabstop>
+  <tabstop>linkUnvisitedColorButton</tabstop>
+  <tabstop>linkHoveringColorButton</tabstop>
+  <tabstop>linkClickedColorButton</tabstop>
+  <tabstop>allowGraphicsCheckBox</tabstop>
+  <tabstop>allowSoundEffectsCheckBox</tabstop>
+  <tabstop>allowMusicCheckBox</tabstop>
+  <tabstop>allowLinksCheckBox</tabstop>
+  <tabstop>smoothScalingCheckBox</tabstop>
+  <tabstop>safetyRead4RadioButton</tabstop>
+  <tabstop>safetyRead2RadioButton</tabstop>
+  <tabstop>safetyRead0RadioButton</tabstop>
+  <tabstop>safetyWrite4RadioButton</tabstop>
+  <tabstop>safetyWrite2RadioButton</tabstop>
+  <tabstop>safetyWrite0RadioButton</tabstop>
+  <tabstop>updateOnStartRadioButton</tabstop>
+  <tabstop>updateDailyRadioButton</tabstop>
+  <tabstop>updateWeeklyRadioButton</tabstop>
+  <tabstop>updateNeverRadioButton</tabstop>
+  <tabstop>pasteOnDblClkCheckBox</tabstop>
+  <tabstop>softScrollCheckBox</tabstop>
+  <tabstop>askForGameFileCheckBox</tabstop>
+  <tabstop>confirmRestartCheckBox</tabstop>
+  <tabstop>confirmQuitCheckBox</tabstop>
+  <tabstop>limitWidthCheckBox</tabstop>
+  <tabstop>limitWidthSpinBox</tabstop>
+  <tabstop>encodingComboBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
