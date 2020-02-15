@@ -102,9 +102,11 @@ void CHtmlSysWinInputQt::processCommand(
         return;
     }
 
-    // If the command starts with "http:", "ftp:", "news:" "mailto:", or
+    // If the command starts with "http(s):", "ftp:", "news:" "mailto:", or
     // "telnet:", try to open it in the external application that handles it.
-    if (strnicmp(cmd, "http:", 5) == 0 || strnicmp(cmd, "ftp:", 4) == 0) {
+    if (strnicmp(cmd, "http:", 5) == 0 || strnicmp(cmd, "https:", 6) == 0
+        || strnicmp(cmd, "ftp:", 4) == 0)
+    {
         // Parse http and ftp URLs in strict mode.
         auto url = QUrl::fromEncoded(cmd, QUrl::StrictMode);
         QTimer::singleShot(0, [url] { QDesktopServices::openUrl(url); });
