@@ -1,4 +1,4 @@
-3.0 - 2020-02-08
+3.0 - 2020-02-15
 ================
 
   - Improved audio engine:
@@ -16,6 +16,12 @@
     thus it no longer matters whether or not the operating system supports
     MIDI.
 
+  - Fixed font rendering issues on Windows, improved font quality of bold and
+    italics.
+
+  - Fake bold is now used on macOS when the selected font does not have a bold
+    variant (like Monaco.)
+
   - The maximum text width of the game's main window is now configurable (set
     to 70 characters by default. This only applies to the main window. Banner
     windows created by the game are not affected.
@@ -32,6 +38,8 @@
   - Fixed an issue where the interpreter sometimes failed to set custom fonts
     requested by the game.
 
+  - Added config dialog button for restoring default settings.
+
   - The "Typewriter" font setting now allows selecting proportional fonts. Many
     typewriter fonts don't identify themselves as fixed-width. Lift the
     restriction so that they can be selected.
@@ -42,6 +50,8 @@
   - Improvements for high DPI displays.
 
   - Fixed not being able to close some dialog windows on Windows.
+
+  - HTTPS links in games are now supported.
 
   - Improved random number generator.
 
