@@ -49,15 +49,28 @@
 
 <div class="section">
 <h1 id="downloads">Downloads</h1>
-	<h3>Source Code</h3>
+	<p>
+	The current version is 3.0, released on 2020-02-15. The list of changes since 2.1.7 can be found on the
+	<a target="_blank" rel="noopener noreferrer" href="https://github.com/realnc/qtads/releases/tag/v3.0.0">GitHub release page</a>.
+	</p>
+	<p>
+	The Linux downloads are self-contained AppImages and do not require any uncommon external
+	dependencies. They should work on all Linux distributions that are at least as recent as
+	Ubuntu 16.04.
+	</p>
 
-	<blockquote><p>
-	<a href="https://github.com/realnc/qtads/releases/download/2.1.7/qtads-2.1.7.tar.bz2">
-	Source code</a> v2.1.7
-	</p></blockquote>
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.0.0/QTads-3.0-Linux-64bit.tar.gz">
+	Linux 64-bit</a></h3>
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.0.0/QTads-3.0-Linux-32bit.tar.gz">
+	Linux 32-bit</a></h3>
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.0.0/QTads-3.0-Windows.zip">
+	Microsoft Windows 7 or later</a></h3>
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.0.0/QTads-3.0-macOS.zip">
+	macOS 10.13 (High Sierra) or later </a></h3>
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.0.0/qtads-3.0.0-source.tar.xz">
+	Source code</a></h3>
 
 	<h3>Gentoo Linux (and other Portage-based distros)</h3>
-
 	<p>
 	QTads is included in Portage; simply emerge &ldquo;games-engines/qtads&rdquo;. If you're not on ~arch (aka
 	&ldquo;testing&rdquo;), you might want to keyword it in your package.keywords to ensure that you get the
@@ -68,62 +81,6 @@
 	<a href="https://repo.or.cz/w/gentoo-interactive-fiction.git">interactive-fiction overlay</a>. It is
 	accessible with the &ldquo;layman&rdquo; utility (app-portage/layman). If you don't already have layman
 	installed, please read its documentation on how to configure your make.conf before adding overlays.
-	</p>
-
-	<h3>Arch Linux</h3>
-
-	<p>
-	You should be able to find QTads on <a href="https://aur.archlinux.org">AUR</a>. Another place of interest for
-	Arch Linux users is <a href="https://esclinux.tuxfamily.org">ESCLINUX</a>. Note that if you can't find a
-	recent version of QTads in the above places, the binaries provided here should work on Arch without problems.
-	</p>
-
-	<h3>Other Linux Distros</h3>
-
-	<blockquote><p>
-	<a href="https://github.com/realnc/qtads/releases/download/2.1.7/qtads-2.1.7-linux.tar.bz2">
-	Linux (32-bit and 64-bit)</a> v2.1.7
-	</p></blockquote>
-
-	<p>
-	The Linux binaries require that the Qt4-GUI and SDL runtime libraries are installed
-	on the system.  Please refer to the included README file for information about needed
-	library dependencies.
-	</p>
-
-	<p>
-	Qt version 4.8 or newer is required for the binaries. If you want to use an older version of Qt,
-	you need to build QTads from source code.
-	</p>
-
-	<p>
-	For correct MIDI support it is recommended to install the &ldquo;eawpatches&rdquo;; a complete GM-compatible MIDI
-	sound set. You can find an easy to install package for Ubuntu at
-	<a href="https://help.ubuntu.com/community/Midi/SoftwareSynthesisHowTo?action=show&amp;redirect=MidiSoftwareSynthesisHowTo#Install%20samples">
-	help.ubuntu.com</a>. Note that QTads does not use Timidity, though a "timidify.cfg" file that points at the
-	correct MIDI patches is still needed.
-	</p>
-
-	<h3>macOS 10.7 (Lion) and newer</h3>
-	<blockquote><p>
-	<a href="https://github.com/realnc/qtads/releases/download/2.1.7/QTads-2.1.7.dmg">
-	macOS DMG file</a> v2.1.7
-	</p></blockquote>
-
-	<p>
-	The Mac OS X application is self-contained and does not need any external runtime libraries.
-	</p>
-
-	<h3>Microsoft Windows (XP and higher)</h3>
-
-	<blockquote><p>
-	<a href="https://github.com/realnc/qtads/releases/download/2.1.7/QTads-2.1.7-w32.zip">
-	Microsoft Windows (XP and newer)</a> v2.1.7
-	</p></blockquote>
-
-	<p>
-	Like the Mac OS X application, this is a self-contained application. Simply unzip and run it. Note that
-	Windows XP hasn't been tested much, but it should work.
 	</p>
 </div>
 
@@ -146,10 +103,16 @@
 <div class="section">
 <h1 id="license">License</h1>
 	<p>
-	QTads is dual-licensed; the source code can be redistributed and/or modified either under the terms of the
-	<a href="LICENSE.TXT">HTML TADS Freeware Source Code License</a>, or under the terms of the
-	<a href="gpl-3.0-standalone.html">GNU General Public License</a> as published by the Free Software Foundation
-	(either version 2 of the license, or, at your option, any later version).
+	QTads is free software: you can redistribute it and/or modify it under the
+	terms of the <a href="gpl-3.0-standalone.html">GNU General Public License</a>
+	as published by the Free Software Foundation, either version 3 of the License,
+	or (at your option) any later version.
+	</p>
+	<p>
+	QTads is distributed in the hope that it will be useful, but WITHOUT ANY
+	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+	FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+	details.
 	</p>
 </div>
 
@@ -171,7 +134,7 @@
 		Like Gargoyle, it places a strong focus on typography. Tads games run in text-only mode.
 	</li>
 	<li>
-		<a href="https://tads.org/frobtads.htm">FrobTADS</a>
+		<a href="https://github.com/realnc/frobtads">FrobTADS</a>
 		<br>Cross-platform terminal (curses/ncurses) interpreter and development tool. It supports
 		most of the latest text-mode Tads user interface features, including colored text and backgrounds,
 		Tads&nbsp;3 banner windows, and timed input. There is no support for Multimedia Tads games;
@@ -191,42 +154,49 @@
 	<blockquote><p>
 	Adam Thornton<br>
 	Adrien Beau<br>
-	Andrew Plotkin<br>
 	Alan Mead<br>
+	Andrew Plotkin<br>
 	Beni Serfaty<br>
 	C.E.J. Pacian<br>
 	Chris Odhner<br>
 	Christophe Antoine<br>
 	Curt Siffert<br>
 	Daniel Schepler<br>
+	Delta477<br>
 	Denis Pokataev<br>
+	Dominik 'disconnect3d' Czarnota<br>
 	Emily Boegheim<br>
 	Eric Eve<br>
 	Eric Forgeot<br>
 	Erik Temple<br>
+	František Dvořák<br>
 	Greg Boettcher<br>
 	Guilherme De Sousa<br>
+	Hugo Landau<br>
 	Jim Aikin<br>
 	Joe Mason<br>
+	John Ziegler<br>
+	Kevin Boone<br>
 	Kodath duMatri<br>
 	Kris Kennaway<br>
 	Krister Fundin<br>
 	Leif Huhn<br>
 	Marc Simpson<br>
 	Ming Hua<br>
+	NR Turner<br>
 	Nicolas Lécureuil<br>
 	Ornithopter<br>
 	Petter Sjölund<br>
 	Poster<br>
-	Rémi Verschelde<br>
 	Rune Berg<br>
+	Rémi Verschelde<br>
 	Samuel Verschelde<br>
 	Stefan Müller<br>
-	tetzank<br>
 	Thom Brown<br>
 	Tomas Blaha<br>
 	Tony Houlbrooke<br>
-	Xenius
+	Xenius<br>
+	tetzank
 	</p></blockquote>
 
 	<p>
