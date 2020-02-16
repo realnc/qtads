@@ -455,6 +455,9 @@ docs.path = "$$DOCDIR"
 desktop.path = "$$DATADIR"
 INSTALLS += desktop docs target
 
+# Makefile target for AppImage creation (make appimage).
+# Needs https://github.com/linuxdeploy and a binary called "linuxdeploy" (can be a symlink to the
+# linuxdeploy AppImage.) Also needs the linuxdeploy "qt" and "appimage" plugins.
 linux {
     appimage.target = appimage
     appimage.commands = \
@@ -462,14 +465,12 @@ linux {
         && rm -rf AppDir \
         && "$$QMAKE_QMAKE" PREFIX="$$OUT_PWD/AppDir/usr" -config release "$$_PRO_FILE_" \
         && make -j$$QMAKE_HOST.cpu_count install \
-        && linuxdeployqt \
-            AppDir/usr/share/applications/nikos.chantziaras.qtads.desktop \
-            -appimage \
-            -no-copy-copyright-files \
-            -no-translations \
-            -qmake="$$QMAKE_QMAKE" \
-            -extra-plugins=iconengines,platformthemes \
-        && mv *.AppImage QTads.AppImage
+        && rm -rf AppDir/usr/share/metainfo \
+        && env PATH="$$(PATH)" QMAKE="$$QMAKE_QMAKE" OUTPUT=QTads.AppImage linuxdeploy \
+            -v2 \
+            --appdir AppDir \
+            --plugin qt \
+            --output appimage
 
     QMAKE_EXTRA_TARGETS += appimage
 }
