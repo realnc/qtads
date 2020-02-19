@@ -87,7 +87,7 @@ void DisplayWidget::fHandleDoubleOrTripleClick(const QMouseEvent& e, const bool 
         formatter_.extract_text(&strBuf, start, end);
         QString txt(QString::fromUtf8(strBuf.get()).trimmed());
         if (not txt.isEmpty()) {
-            qFrame->gameWindow()->insertText(txt + QChar::fromLatin1(' '));
+            qFrame->gameWindow()->insertText(txt + ' ');
         }
     } else if (~QApplication::keyboardModifiers() & Qt::ControlModifier) {
         formatter_.set_sel_range(start, end);

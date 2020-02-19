@@ -88,7 +88,7 @@ CHtmlSysFrameQt::CHtmlSysFrameQt(
     // Set application window icon, unless we're on OS X where the bundle
     // icon is used.
 #ifndef Q_OS_MAC
-    setWindowIcon(QIcon(QString::fromLatin1(":/qtads_48x48.png")));
+    setWindowIcon(QIcon(":/qtads_48x48.png"));
 #endif
 }
 
@@ -214,8 +214,7 @@ void CHtmlSysFrameQt::fRunGame()
                 qWinGroup->setWindowTitle(finfo.fileName());
 #else
                 // On all other systems, also append the application name.
-                qWinGroup->setWindowTitle(
-                    finfo.fileName() + QString::fromLatin1(" - ") + qFrame->applicationName());
+                qWinGroup->setWindowTitle(finfo.fileName() + " - " + qFrame->applicationName());
 #endif
             } else {
                 qWinGroup->setWindowTitle(titleStr.trimmed());
@@ -277,8 +276,8 @@ void CHtmlSysFrameQt::fRunGame()
             // Display a "game has ended" message. We use HTML, so Make sure
             // the parser is in markup mode.
             fParser->obey_markups(true);
-            QString endMsg(QString::fromLatin1(
-                "<p><br><font face=tads-serif size=-1>(The game has ended.)</font></p>"));
+            QString endMsg =
+                "<p><br><font face=tads-serif size=-1>(The game has ended.)</font></p>";
             display_output(endMsg.toUtf8().constData(), endMsg.length());
             flush_txtbuf(true, false);
         } else {
@@ -455,8 +454,8 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
     if (newFontDesc.face[0] != '\0') {
         // The face name field can contain multiple face names separated by
         // commas.  We split them into a list and try each one individualy.
-        const auto strList = QString(QString::fromLatin1(newFontDesc.face))
-                                 .split(QChar::fromLatin1(','), QString::SkipEmptyParts);
+        const auto strList =
+            QString(QString::fromLatin1(newFontDesc.face)).split(',', QString::SkipEmptyParts);
         for (int i = 0; i < strList.size(); ++i) {
             auto s = strList.at(i).simplified().toLower();
             if (s == QString::fromLatin1(HTMLFONT_TADS_SERIF).toLower()) {
@@ -491,7 +490,7 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
                 }
                 break;
             }
-            if (s == QString::fromLatin1("qtads-grid")) {
+            if (s == "qtads-grid") {
                 // "qtads-grid" is an internal face name; it means we should
                 // return a font suitable for a text grid banner.
                 font_names.emplace_back(fSettings.fixedFont.family());

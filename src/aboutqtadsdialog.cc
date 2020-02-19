@@ -38,24 +38,23 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget* const parent)
         or (at your option) any later version.
         </p>
     )")
-                                .arg(QLatin1String(QTADS_VERSION)));
+                                .arg(QTADS_VERSION));
 
-    // Construct a string holding all version info.
-    auto str = QString::fromLatin1("<p><table border=\"0\" width=\"100%\"><tr><td>");
-    str += tr("QTads:") + QString::fromLatin1("</td><td>") + QString::fromLatin1(QTADS_VERSION)
-        + QString::fromLatin1("<br></td></tr><tr><td>") + tr("HTML TADS:")
-        + QString::fromLatin1("</td><td>\t") + QString::fromLatin1(HTMLTADS_VERSION)
-        + QString::fromLatin1("</td></tr><tr><td>") + tr("TADS 2 virtual machine:")
-        + QString::fromLatin1("</td><td>\t") + QString::fromLatin1(TADS_RUNTIME_VERSION)
-        + QString::fromLatin1("</td></tr><tr><td>") + tr("TADS 3 virtual machine:")
-        + QString::fromLatin1("</td><td>\t") + QString::fromLatin1(T3VM_VSN_STRING)
-        + QString::fromLatin1(" (") + QString::fromLatin1(T3VM_IDENTIFICATION)
-        + QString::fromLatin1(")<br></td></tr><tr><td>") + tr("Qt build version:")
-        + QString::fromLatin1("</td><td>") + QString::fromLatin1(QT_VERSION_STR)
-        + QString::fromLatin1("</td></tr><tr><td>") + tr("Qt runtime version:")
-        + QString::fromLatin1("</td><td>") + QString::fromLatin1(qVersion())
-        + QString::fromLatin1("</td></tr></table></p>");
-    ui->versionInfoLabel->setText(std::move(str));
+    ui->versionInfoLabel->setText(
+        "<p><table border=\"0\" width=\"100%\">"
+        "<tr><td>QTads:</td><td>" QTADS_VERSION "<br></td></tr>"
+        "<tr><td>HTML TADS:</td><td>\t" HTMLTADS_VERSION "</td></tr>"
+        "<tr>"
+            "<td>TADS 2 " + tr("virtual machine:") + "</td>"
+            "<td>\t" TADS_RUNTIME_VERSION "</td>"
+        "</tr>"
+        "<tr>"
+            "<td>TADS 3 " + tr("virtual machine:") + "</td>"
+            "<td>\t" T3VM_VSN_STRING + " (" T3VM_IDENTIFICATION + ")<br></td>"
+        "</tr>"
+        "<tr><td>Qt " + tr("build version:") + "</td><td>" QT_VERSION_STR "</td></tr>"
+        "<tr><td>Qt " + tr("runtime version:") + "</td><td>" + qVersion() + "</td></tr></table></p>"
+    );
 }
 
 AboutQtadsDialog::~AboutQtadsDialog() = default;

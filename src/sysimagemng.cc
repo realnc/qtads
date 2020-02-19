@@ -5,7 +5,7 @@ auto CHtmlSysImageMng::create_mng(
     const CHtmlUrl* const url, const textchar_t* const filename, const unsigned long seekpos,
     const unsigned long filesize, CHtmlSysWin* const win) -> CHtmlSysResource*
 {
-    return createImageFromFile(url, filename, seekpos, filesize, win, QString::fromLatin1("MNG"));
+    return createImageFromFile(url, filename, seekpos, filesize, win, "MNG");
 }
 
 /*

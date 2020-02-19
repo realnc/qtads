@@ -132,7 +132,7 @@ void CHtmlSysWinInputQt::processCommand(
         // If the HREF string is empty, use a single space so that we know that
         // an HREF event actually occured.
         if (cmd[0] == '\0') {
-            fHrefEvent = QChar::fromLatin1(' ');
+            fHrefEvent = ' ';
         } else {
             fHrefEvent = QString::fromUtf8(cmd);
         }
@@ -721,8 +721,8 @@ void CHtmlSysWinInputQt::insertText(QString str)
     }
     // Replace tabs and newlines with spaces.
     for (int i = 0; i < str.length(); ++i) {
-        if (str.at(i) == QChar::fromLatin1('\t') or str.at(i) == QChar::fromLatin1('\n')) {
-            str[i] = QChar::fromLatin1(' ');
+        if (str.at(i) == '\t' or str.at(i) == '\n') {
+            str[i] = ' ';
         }
     }
     const QByteArray& utfTxt = str.toUtf8();

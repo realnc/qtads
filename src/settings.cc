@@ -35,65 +35,55 @@ void Settings::loadFromDisk()
 {
     QSettings sett;
 
-    sett.beginGroup(QString::fromLatin1("media"));
-    enableGraphics = sett.value(QString::fromLatin1("graphics"), enableGraphics).toBool();
+    sett.beginGroup("media");
+    enableGraphics = sett.value("graphics", enableGraphics).toBool();
 #ifndef NO_AUDIO
-    enableSoundEffects = sett.value(QString::fromLatin1("sounds"), enableSoundEffects).toBool();
-    enableMusic = sett.value(QString::fromLatin1("music"), enableMusic).toBool();
+    enableSoundEffects = sett.value("sounds", enableSoundEffects).toBool();
+    enableMusic = sett.value("music", enableMusic).toBool();
 #endif
-    enableLinks = sett.value(QString::fromLatin1("links"), enableLinks).toBool();
-    useSmoothScaling =
-        sett.value(QString::fromLatin1("smoothImageScaling"), useSmoothScaling).toBool();
+    enableLinks = sett.value("links", enableLinks).toBool();
+    useSmoothScaling = sett.value("smoothImageScaling", useSmoothScaling).toBool();
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("colors"));
-    mainBgColor = sett.value(QString::fromLatin1("mainbg"), mainBgColor).value<QColor>();
-    mainTextColor = sett.value(QString::fromLatin1("maintext"), mainTextColor).value<QColor>();
-    bannerBgColor = sett.value(QString::fromLatin1("bannerbg"), bannerBgColor).value<QColor>();
-    bannerTextColor =
-        sett.value(QString::fromLatin1("bannertext"), bannerTextColor).value<QColor>();
-    inputColor = sett.value(QString::fromLatin1("input"), inputColor).value<QColor>();
-    underlineLinks = sett.value(QString::fromLatin1("underlinelinks"), underlineLinks).toBool();
-    highlightLinks = sett.value(QString::fromLatin1("highlightlinks"), highlightLinks).toBool();
-    unvisitedLinkColor =
-        sett.value(QString::fromLatin1("unvisitedlinks"), unvisitedLinkColor).value<QColor>();
-    hoveringLinkColor =
-        sett.value(QString::fromLatin1("hoveringlinks"), hoveringLinkColor).value<QColor>();
-    clickedLinkColor =
-        sett.value(QString::fromLatin1("clickedlinks"), clickedLinkColor).value<QColor>();
+    sett.beginGroup("colors");
+    mainBgColor = sett.value("mainbg", mainBgColor).value<QColor>();
+    mainTextColor = sett.value("maintext", mainTextColor).value<QColor>();
+    bannerBgColor = sett.value("bannerbg", bannerBgColor).value<QColor>();
+    bannerTextColor = sett.value("bannertext", bannerTextColor).value<QColor>();
+    inputColor = sett.value("input", inputColor).value<QColor>();
+    underlineLinks = sett.value("underlinelinks", underlineLinks).toBool();
+    highlightLinks = sett.value("highlightlinks", highlightLinks).toBool();
+    unvisitedLinkColor = sett.value("unvisitedlinks", unvisitedLinkColor).value<QColor>();
+    hoveringLinkColor = sett.value("hoveringlinks", hoveringLinkColor).value<QColor>();
+    clickedLinkColor = sett.value("clickedlinks", clickedLinkColor).value<QColor>();
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("fonts"));
-    mainFont.fromString(sett.value(QString::fromLatin1("main"), mainFont).toString());
-    fixedFont.fromString(sett.value(QString::fromLatin1("fixed"), fixedFont).toString());
-    serifFont.fromString(sett.value(QString::fromLatin1("serif"), serifFont).toString());
-    sansFont.fromString(sett.value(QString::fromLatin1("sans"), sansFont).toString());
-    scriptFont.fromString(sett.value(QString::fromLatin1("script"), scriptFont).toString());
-    writerFont.fromString(sett.value(QString::fromLatin1("typewriter"), writerFont).toString());
-    inputFont.fromString(sett.value(QString::fromLatin1("input"), inputFont).toString());
-    useMainFontForInput =
-        sett.value(QString::fromLatin1("useMainFontForInput"), useMainFontForInput).toBool();
+    sett.beginGroup("fonts");
+    mainFont.fromString(sett.value("main", mainFont).toString());
+    fixedFont.fromString(sett.value("fixed", fixedFont).toString());
+    serifFont.fromString(sett.value("serif", serifFont).toString());
+    sansFont.fromString(sett.value("sans", sansFont).toString());
+    scriptFont.fromString(sett.value("script", scriptFont).toString());
+    writerFont.fromString(sett.value("typewriter", writerFont).toString());
+    inputFont.fromString(sett.value("input", inputFont).toString());
+    useMainFontForInput = sett.value("useMainFontForInput", useMainFontForInput).toBool();
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("misc"));
-    ioSafetyLevelRead =
-        sett.value(QString::fromLatin1("ioSafetyLevelRead"), ioSafetyLevelRead).toInt();
-    ioSafetyLevelWrite =
-        sett.value(QString::fromLatin1("ioSafetyLevelWrite"), ioSafetyLevelWrite).toInt();
-    tads2Encoding = sett.value(QString::fromLatin1("tads2encoding"), tads2Encoding).toByteArray();
-    pasteOnDblClk = sett.value(QString::fromLatin1("pasteondoubleclick"), pasteOnDblClk).toBool();
-    softScrolling = sett.value(QString::fromLatin1("softscrolling"), softScrolling).toBool();
-    askForGameFile = sett.value(QString::fromLatin1("askforfileatstart"), askForGameFile).toBool();
-    confirmRestartGame =
-        sett.value(QString::fromLatin1("confirmrestartgame"), confirmRestartGame).toBool();
-    confirmQuitGame = sett.value(QString::fromLatin1("confirmquitgame"), confirmQuitGame).toBool();
-    textWidth = sett.value(QString::fromLatin1("linewidth"), textWidth).toInt();
-    lastFileOpenDir =
-        sett.value(QString::fromLatin1("lastFileOpenDir"), QString::fromLatin1("")).toString();
+    sett.beginGroup("misc");
+    ioSafetyLevelRead = sett.value("ioSafetyLevelRead", ioSafetyLevelRead).toInt();
+    ioSafetyLevelWrite = sett.value("ioSafetyLevelWrite", ioSafetyLevelWrite).toInt();
+    tads2Encoding = sett.value("tads2encoding", tads2Encoding).toByteArray();
+    pasteOnDblClk = sett.value("pasteondoubleclick", pasteOnDblClk).toBool();
+    softScrolling = sett.value("softscrolling", softScrolling).toBool();
+    askForGameFile = sett.value("askforfileatstart", askForGameFile).toBool();
+    confirmRestartGame = sett.value("confirmrestartgame", confirmRestartGame).toBool();
+    confirmQuitGame = sett.value("confirmquitgame", confirmQuitGame).toBool();
+    textWidth = sett.value("linewidth", textWidth).toInt();
+    lastFileOpenDir = sett.value("lastFileOpenDir", "").toString();
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("recent"));
-    recentGamesList = sett.value(QString::fromLatin1("games"), QStringList()).toStringList();
+    sett.beginGroup("recent");
+    recentGamesList = sett.value("games", QStringList()).toStringList();
     Q_ASSERT(recentGamesList.size() <= recentGamesCapacity);
     // Remove any files that don't exist or aren't readable.
     for (int i = 0; i < recentGamesList.size(); ++i) {
@@ -105,71 +95,69 @@ void Settings::loadFromDisk()
     }
     sett.endGroup();
 
-    appGeometry =
-        sett.value(QString::fromLatin1("geometry/appgeometry"), QByteArray()).toByteArray();
-    lastUpdateDate = sett.value(QString::fromLatin1("update/lastupdatedate"), QDate()).toDate();
-    updateFreq = static_cast<UpdateFreq>(
-        sett.value(QString::fromLatin1("update/updatefreq"), updateFreq).toInt());
+    appGeometry = sett.value("geometry/appgeometry", QByteArray()).toByteArray();
+    lastUpdateDate = sett.value("update/lastupdatedate", QDate()).toDate();
+    updateFreq = static_cast<UpdateFreq>(sett.value("update/updatefreq", updateFreq).toInt());
 }
 
 void Settings::saveToDisk()
 {
     QSettings sett;
 
-    sett.beginGroup(QString::fromLatin1("media"));
-    sett.setValue(QString::fromLatin1("graphics"), enableGraphics);
+    sett.beginGroup("media");
+    sett.setValue("graphics", enableGraphics);
 #ifndef NO_AUDIO
-    sett.setValue(QString::fromLatin1("sounds"), enableSoundEffects);
-    sett.setValue(QString::fromLatin1("music"), enableMusic);
+    sett.setValue("sounds", enableSoundEffects);
+    sett.setValue("music", enableMusic);
 #endif
-    sett.setValue(QString::fromLatin1("links"), enableLinks);
-    sett.setValue(QString::fromLatin1("smoothImageScaling"), useSmoothScaling);
+    sett.setValue("links", enableLinks);
+    sett.setValue("smoothImageScaling", useSmoothScaling);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("colors"));
-    sett.setValue(QString::fromLatin1("mainbg"), mainBgColor);
-    sett.setValue(QString::fromLatin1("maintext"), mainTextColor);
-    sett.setValue(QString::fromLatin1("bannerbg"), bannerBgColor);
-    sett.setValue(QString::fromLatin1("bannertext"), bannerTextColor);
-    sett.setValue(QString::fromLatin1("input"), inputColor);
-    sett.setValue(QString::fromLatin1("underlinelinks"), underlineLinks);
-    sett.setValue(QString::fromLatin1("highlightlinks"), highlightLinks);
-    sett.setValue(QString::fromLatin1("unvisitedlinks"), unvisitedLinkColor);
-    sett.setValue(QString::fromLatin1("hoveringlinks"), hoveringLinkColor);
-    sett.setValue(QString::fromLatin1("clickedlinks"), clickedLinkColor);
+    sett.beginGroup("colors");
+    sett.setValue("mainbg", mainBgColor);
+    sett.setValue("maintext", mainTextColor);
+    sett.setValue("bannerbg", bannerBgColor);
+    sett.setValue("bannertext", bannerTextColor);
+    sett.setValue("input", inputColor);
+    sett.setValue("underlinelinks", underlineLinks);
+    sett.setValue("highlightlinks", highlightLinks);
+    sett.setValue("unvisitedlinks", unvisitedLinkColor);
+    sett.setValue("hoveringlinks", hoveringLinkColor);
+    sett.setValue("clickedlinks", clickedLinkColor);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("fonts"));
-    sett.setValue(QString::fromLatin1("main"), mainFont.toString());
-    sett.setValue(QString::fromLatin1("fixed"), fixedFont.toString());
-    sett.setValue(QString::fromLatin1("serif"), serifFont.toString());
-    sett.setValue(QString::fromLatin1("sans"), sansFont.toString());
-    sett.setValue(QString::fromLatin1("script"), scriptFont.toString());
-    sett.setValue(QString::fromLatin1("typewriter"), writerFont.toString());
-    sett.setValue(QString::fromLatin1("input"), inputFont.toString());
-    sett.setValue(QString::fromLatin1("useMainFontForInput"), useMainFontForInput);
+    sett.beginGroup("fonts");
+    sett.setValue("main", mainFont.toString());
+    sett.setValue("fixed", fixedFont.toString());
+    sett.setValue("serif", serifFont.toString());
+    sett.setValue("sans", sansFont.toString());
+    sett.setValue("script", scriptFont.toString());
+    sett.setValue("typewriter", writerFont.toString());
+    sett.setValue("input", inputFont.toString());
+    sett.setValue("useMainFontForInput", useMainFontForInput);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("misc"));
-    sett.setValue(QString::fromLatin1("ioSafetyLevelRead"), ioSafetyLevelRead);
-    sett.setValue(QString::fromLatin1("ioSafetyLevelWrite"), ioSafetyLevelWrite);
-    sett.setValue(QString::fromLatin1("tads2encoding"), tads2Encoding);
-    sett.setValue(QString::fromLatin1("pasteondoubleclick"), pasteOnDblClk);
-    sett.setValue(QString::fromLatin1("softscrolling"), softScrolling);
-    sett.setValue(QString::fromLatin1("askforfileatstart"), askForGameFile);
-    sett.setValue(QString::fromLatin1("confirmrestartgame"), confirmRestartGame);
-    sett.setValue(QString::fromLatin1("confirmquitgame"), confirmQuitGame);
-    sett.setValue(QString::fromLatin1("linewidth"), textWidth);
-    sett.setValue(QString::fromLatin1("lastFileOpenDir"), lastFileOpenDir);
+    sett.beginGroup("misc");
+    sett.setValue("ioSafetyLevelRead", ioSafetyLevelRead);
+    sett.setValue("ioSafetyLevelWrite", ioSafetyLevelWrite);
+    sett.setValue("tads2encoding", tads2Encoding);
+    sett.setValue("pasteondoubleclick", pasteOnDblClk);
+    sett.setValue("softscrolling", softScrolling);
+    sett.setValue("askforfileatstart", askForGameFile);
+    sett.setValue("confirmrestartgame", confirmRestartGame);
+    sett.setValue("confirmquitgame", confirmQuitGame);
+    sett.setValue("linewidth", textWidth);
+    sett.setValue("lastFileOpenDir", lastFileOpenDir);
     sett.endGroup();
 
-    sett.beginGroup(QString::fromLatin1("recent"));
-    sett.setValue(QString::fromLatin1("games"), recentGamesList);
+    sett.beginGroup("recent");
+    sett.setValue("games", recentGamesList);
     sett.endGroup();
 
-    sett.setValue(QString::fromLatin1("geometry/appgeometry"), qWinGroup->saveGeometry());
-    sett.setValue(QString::fromLatin1("update/lastupdatedate"), lastUpdateDate);
-    sett.setValue(QString::fromLatin1("update/updatefreq"), updateFreq);
+    sett.setValue("geometry/appgeometry", qWinGroup->saveGeometry());
+    sett.setValue("update/lastupdatedate", lastUpdateDate);
+    sett.setValue("update/updatefreq", updateFreq);
     sett.sync();
 }
 

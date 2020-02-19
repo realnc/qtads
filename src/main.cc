@@ -28,7 +28,7 @@ auto main(int argc, char** argv) -> int
         argc, argv, "QTads", QTADS_VERSION, "Nikos Chantziaras", {});
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
-    QApplication::setDesktopFileName(QStringLiteral("nikos.chantziaras.qtads"));
+    QApplication::setDesktopFileName("nikos.chantziaras.qtads");
 #endif
 
     // Filename of the game to run.
@@ -38,10 +38,10 @@ auto main(int argc, char** argv) -> int
     if (args.size() == 2) {
         if (QFile::exists(args.at(1))) {
             gameFileName = args.at(1);
-        } else if (QFile::exists(args.at(1) + QString::fromLatin1(".gam"))) {
-            gameFileName = args.at(1) + QString::fromLatin1(".gam");
-        } else if (QFile::exists(args.at(1) + QString::fromLatin1(".t3"))) {
-            gameFileName = args.at(1) + QString::fromLatin1(".t3");
+        } else if (QFile::exists(args.at(1) + ".gam")) {
+            gameFileName = args.at(1) + ".gam";
+        } else if (QFile::exists(args.at(1) + ".t3")) {
+            gameFileName = args.at(1) + ".t3";
         } else {
             qWarning() << "File" << args.at(1) << "not found.";
         }
@@ -49,8 +49,8 @@ auto main(int argc, char** argv) -> int
 
     if (gameFileName.isEmpty() and app->settings().askForGameFile) {
         gameFileName = QFileDialog::getOpenFileName(
-            nullptr, QObject::tr("Choose the TADS game you wish to run"), QString::fromLatin1(""),
-            QObject::tr("TADS Games") + QString::fromLatin1("(*.gam *.Gam *.GAM *.t3 *.T3)"));
+            nullptr, QObject::tr("Choose the TADS game you wish to run"), {},
+            QObject::tr("TADS Games") + "(*.gam *.Gam *.GAM *.t3 *.T3)");
     }
 
 #ifndef NO_AUDIO

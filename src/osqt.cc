@@ -401,8 +401,7 @@ auto os_file_stat(const char* fname, int follow_links, os_file_stat_t* s) -> int
     bool isLink = inf.isSymLink();
 #ifdef Q_OS_WIN
     // Don't treat shortcut files as symlinks.
-    if (isLink and (QString::compare(inf.suffix(), QLatin1String("lnk"), Qt::CaseInsensitive) == 0))
-    {
+    if (isLink and (QString::compare(inf.suffix(), "lnk", Qt::CaseInsensitive) == 0)) {
         isLink = false;
     }
 #endif
@@ -665,7 +664,7 @@ auto os_create_tempfile(const char* fname, char* buf) -> osfildef*
 
     // No filename was given; create a temporary file.
     buf[0] = '\0';
-    QTemporaryFile* file = new QTemporaryFile(QString::fromLatin1("/qtads_XXXXXX"));
+    QTemporaryFile* file = new QTemporaryFile("/qtads_XXXXXX");
     if (not file->open()) {
         delete file;
         return nullptr;
@@ -702,7 +701,7 @@ os_get_tmp_path( char* buf )
  */
 auto os_gen_temp_filename(char* buf, size_t buflen) -> int
 {
-    QTemporaryFile tmpfile(QDir::tempPath() + QString::fromLatin1("/qtads_XXXXXX"));
+    QTemporaryFile tmpfile(QDir::tempPath() + "/qtads_XXXXXX");
     if (not tmpfile.open()) {
         return false;
     }
@@ -937,8 +936,8 @@ static void canonicalize_path(char* path)
         int i = cleanFilename.length();
         do {
             --i;
-        } while (i > 0 and cleanFilename[i] != QChar::fromLatin1('/'));
-        canonPath.append(qStrToFname(cleanFilename.mid(i)));
+        } while (i > 0 and cleanFilename[i] != '/');
+        canonPath += qStrToFname(cleanFilename.mid(i));
     }
     qstrncpy(path, canonPath.constData(), OSFNMAX);
 }
@@ -1193,29 +1192,28 @@ auto os_askfile(
 
     switch (file_type) {
     case OSFTGAME:
-        filter = QObject::tr("TADS 2 Games") + QString::fromLatin1(" (*.gam *.Gam *.GAM)");
+        filter = QObject::tr("TADS 2 Games") + " (*.gam *.Gam *.GAM)";
         break;
     case OSFTSAVE:
-        filter = QObject::tr("TADS 2 Saved Games") + QString::fromLatin1(" (*.sav *.Sav *.SAV)");
+        filter = QObject::tr("TADS 2 Saved Games") + " (*.sav *.Sav *.SAV)";
         break;
     case OSFTLOG:
-        filter = QObject::tr("Game Transcripts") + QString::fromLatin1(" (*.txt *.Txt *.TXT)");
+        filter = QObject::tr("Game Transcripts") + " (*.txt *.Txt *.TXT)";
         break;
     case OSFTT3IMG:
         Q_ASSERT(qFrame->tads3());
-        filter = QObject::tr("TADS 3 Games") + QString::fromLatin1(" (*.t3 *.T3)");
+        filter = QObject::tr("TADS 3 Games") + " (*.t3 *.T3)";
         break;
     case OSFTT3SAV:
         Q_ASSERT(qFrame->tads3());
-        filter = QObject::tr("TADS 3 Saved Games") + QString::fromLatin1(" (*.t3v *.T3v *.T3V)");
-        ext = QString::fromLatin1("t3v");
+        filter = QObject::tr("TADS 3 Saved Games") + " (*.t3v *.T3v *.T3V)";
+        ext = "t3v";
         break;
     }
 
     // Always provide an "All Files" filter.
     if (not filter.isEmpty()) {
-        filter.append(QString::fromLatin1(";;"));
-        filter.append(QObject::tr("All Files") + QString::fromLatin1(" (*)"));
+        filter += ";;" + QObject::tr("All Files") + " (*)";
     }
 
     QString promptStr;
@@ -1303,20 +1301,20 @@ auto os_input_dialog(
     if (standard_button_set != 0) {
         switch (standard_button_set) {
         case OS_INDLG_OK:
-            buttonList.append(dialog.addButton(QMessageBox::Ok));
+            buttonList += dialog.addButton(QMessageBox::Ok);
             break;
         case OS_INDLG_OKCANCEL:
-            buttonList.append(dialog.addButton(QMessageBox::Ok));
-            buttonList.append(dialog.addButton(QMessageBox::Cancel));
+            buttonList += dialog.addButton(QMessageBox::Ok);
+            buttonList += dialog.addButton(QMessageBox::Cancel);
             break;
         case OS_INDLG_YESNO:
-            buttonList.append(dialog.addButton(QMessageBox::Yes));
-            buttonList.append(dialog.addButton(QMessageBox::No));
+            buttonList += dialog.addButton(QMessageBox::Yes);
+            buttonList += dialog.addButton(QMessageBox::No);
             break;
         case OS_INDLG_YESNOCANCEL:
-            buttonList.append(dialog.addButton(QMessageBox::Yes));
-            buttonList.append(dialog.addButton(QMessageBox::No));
-            buttonList.append(dialog.addButton(QMessageBox::Cancel));
+            buttonList += dialog.addButton(QMessageBox::Yes);
+            buttonList += dialog.addButton(QMessageBox::No);
+            buttonList += dialog.addButton(QMessageBox::Cancel);
             break;
         default:
             qWarning("os_input_dialog: unrecognized button set");
@@ -1326,7 +1324,7 @@ auto os_input_dialog(
             Q_ASSERT(buttons[i] != nullptr);
             const QString& buttonText =
                 qFrame->tads3() ? QString::fromUtf8(buttons[i]) : t2Codec->toUnicode(buttons[i]);
-            buttonList.append(dialog.addButton(buttonText, QMessageBox::AcceptRole));
+            buttonList += dialog.addButton(buttonText, QMessageBox::AcceptRole);
         }
 
     if (default_index != 0) {
@@ -1337,7 +1335,7 @@ auto os_input_dialog(
     }
     // We append a space to the window title to avoid the "<2>" that would
     // otherwise be appended automatically by some window managers (like KDE.)
-    dialog.setWindowTitle(qWinGroup->windowTitle() + QChar::fromLatin1(' '));
+    dialog.setWindowTitle(qWinGroup->windowTitle() + ' ');
     dialog.exec();
     QAbstractButton* result = dialog.clickedButton();
     if (result == nullptr) {
@@ -1459,10 +1457,7 @@ void os_gen_charmap_filename(char* filename, char* internal_id, char* /*argv0*/)
     qDebug() << Q_FUNC_INFO;
     Q_ASSERT(filename != nullptr);
 
-    strncpy(
-        filename,
-        qStrToFname(QString::fromLatin1(internal_id) + QString::fromLatin1(".tcp")).constData(),
-        OSFNMAX);
+    strncpy(filename, qStrToFname(QString::fromLatin1(internal_id) + ".tcp").constData(), OSFNMAX);
     filename[OSFNMAX - 1] = '\0';
 }
 

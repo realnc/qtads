@@ -19,47 +19,43 @@ void QTadsGameInfoEnum::tads_enum_game_info(const char* const name, const char* 
     const auto nameStr = QString::fromUtf8(name).toLower();
     const auto htmlValStr = valStr.toHtmlEscaped();
 
-    if (nameStr == QString::fromLatin1("name")) {
-        gameName = QString::fromLatin1("<b><center><font size=\"+1\">") + htmlValStr
-            + QString::fromLatin1("</font></center></b><p>");
+    if (nameStr == "name") {
+        gameName = "<b><center><font size=\"+1\">" + htmlValStr + "</font></center></b><p>";
         plainGameName = valStr;
-    } else if (nameStr == QString::fromLatin1("headline")) {
-        headline =
-            QString::fromLatin1("<center>") + htmlValStr + QString::fromLatin1("</center><p>");
-    } else if (nameStr == QString::fromLatin1("byline")) {
-        byLine = QString::fromLatin1("<i><center>") + htmlValStr
-            + QString::fromLatin1("</center></i><p>");
-    } else if (nameStr == QString::fromLatin1("htmlbyline")) {
-        htmlByLine =
-            QString::fromLatin1("<i><center>") + valStr + QString::fromLatin1("</center></i><p>");
-    } else if (nameStr == QString::fromLatin1("authoremail")) {
+    } else if (nameStr == "headline") {
+        headline = "<center>" + htmlValStr + "</center><p>";
+    } else if (nameStr == "byline") {
+        byLine = "<i><center>" + htmlValStr + "</center></i><p>";
+    } else if (nameStr == "htmlbyline") {
+        htmlByLine = "<i><center>" + valStr + "</center></i><p>";
+    } else if (nameStr == "authoremail") {
         email = valStr;
-    } else if (nameStr == QString::fromLatin1("desc")) {
+    } else if (nameStr == "desc") {
         desc = htmlValStr;
-        desc.replace(QString::fromLatin1("\\n"), QString::fromLatin1("<p>"));
-    } else if (nameStr == QString::fromLatin1("htmldesc")) {
+        desc.replace("\\n", "<p>");
+    } else if (nameStr == "htmldesc") {
         htmlDesc = valStr;
-    } else if (nameStr == QString::fromLatin1("version")) {
+    } else if (nameStr == "version") {
         version = valStr;
-    } else if (nameStr == QString::fromLatin1("firstpublished")) {
+    } else if (nameStr == "firstpublished") {
         published = valStr;
-    } else if (nameStr == QString::fromLatin1("releasedate")) {
+    } else if (nameStr == "releasedate") {
         date = valStr;
-    } else if (nameStr == QString::fromLatin1("language")) {
+    } else if (nameStr == "language") {
         lang = valStr;
-    } else if (nameStr == QString::fromLatin1("series")) {
+    } else if (nameStr == "series") {
         series = valStr;
-    } else if (nameStr == QString::fromLatin1("seriesnumber")) {
+    } else if (nameStr == "seriesnumber") {
         seriesNumber = valStr;
-    } else if (nameStr == QString::fromLatin1("genre")) {
+    } else if (nameStr == "genre") {
         genre = valStr;
-    } else if (nameStr == QString::fromLatin1("forgiveness")) {
+    } else if (nameStr == "forgiveness") {
         forgiveness = valStr;
-    } else if (nameStr == QString::fromLatin1("licensetype")) {
+    } else if (nameStr == "licensetype") {
         license = valStr;
-    } else if (nameStr == QString::fromLatin1("copyingrules")) {
+    } else if (nameStr == "copyingrules") {
         copyRules = valStr;
-    } else if (nameStr == QString::fromLatin1("ifid")) {
+    } else if (nameStr == "ifid") {
         ifid = valStr;
     }
 }
@@ -151,7 +147,7 @@ GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* const parent)
     const QImage& image = loadCoverArtImage();
     if (not image.isNull()) {
         ui->description->document()->addResource(
-            QTextDocument::ImageResource, QUrl(QString::fromLatin1("CoverArt")), image);
+            QTextDocument::ImageResource, QUrl("CoverArt"), image);
         resize(width(), height() + image.height());
     }
 
@@ -161,7 +157,7 @@ GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* const parent)
     // Fill out the description.
     QString tmp;
     if (not image.isNull()) {
-        tmp += QString::fromLatin1("<center><img src=\"CoverArt\"></center><p>");
+        tmp += "<center><img src=\"CoverArt\"></center><p>";
     }
     tmp += cb.gameName + cb.headline + (cb.htmlByLine.isEmpty() ? cb.byLine : cb.htmlByLine)
         + (cb.htmlDesc.isEmpty() ? cb.desc : cb.htmlDesc);

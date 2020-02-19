@@ -65,20 +65,20 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
 
     // "Game" menu.
     QMenu* menu = menuBar->addMenu(tr("&Game"));
-    QAction* act = new QAction(tr("&Open") + QString::fromLatin1("..."), this);
-    act->setIcon(QIcon::fromTheme(QString::fromLatin1("document-open")));
+    QAction* act = new QAction(tr("&Open") + "...", this);
+    act->setIcon(QIcon::fromTheme("document-open"));
     act->setShortcuts(QKeySequence::Open);
     menu->addAction(act);
     connect(act, &QAction::triggered, this, &CHtmlSysWinGroupQt::fOpenNewGame);
     act = new QAction(tr("Open &Recent"), this);
-    act->setIcon(QIcon::fromTheme(QString::fromLatin1("document-open-recent")));
+    act->setIcon(QIcon::fromTheme("document-open-recent"));
     fRecentGamesMenu = new QMenu(this);
     act->setMenu(fRecentGamesMenu);
     menu->addAction(act);
     connect(fRecentGamesMenu, &QMenu::triggered, this, &CHtmlSysWinGroupQt::fRecentGameTriggered);
     fRestartCurrentGameAction = new QAction(tr("Re&start"), this);
-    fRestartCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("view-refresh")));
-    fRestartCurrentGameAction->setShortcut(QKeySequence(QString::fromLatin1("Ctrl+R")));
+    fRestartCurrentGameAction->setIcon(QIcon::fromTheme("view-refresh"));
+    fRestartCurrentGameAction->setShortcut(QKeySequence("Ctrl+R"));
     menu->addAction(fRestartCurrentGameAction);
     fRestartCurrentGameAction->setEnabled(false);
     connect(
@@ -86,7 +86,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
         &CHtmlSysWinGroupQt::fRestartCurrentGame);
     fEndCurrentGameAction = new QAction(tr("Qui&t"), this);
     fEndCurrentGameAction->setMenuRole(QAction::NoRole);
-    fEndCurrentGameAction->setIcon(QIcon::fromTheme(QString::fromLatin1("process-stop")));
+    fEndCurrentGameAction->setIcon(QIcon::fromTheme("process-stop"));
     fEndCurrentGameAction->setShortcuts(QKeySequence::Close);
     menu->addAction(fEndCurrentGameAction);
     fEndCurrentGameAction->setEnabled(false);
@@ -98,14 +98,14 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     menu->addAction(fAboutGameAction);
     connect(fAboutGameAction, &QAction::triggered, this, &CHtmlSysWinGroupQt::fShowAboutGame);
     fGameInfoAction = new QAction(tr("View Metadata"), this);
-    fGameInfoAction->setIcon(QIcon::fromTheme(QString::fromLatin1("document-properties")));
+    fGameInfoAction->setIcon(QIcon::fromTheme("document-properties"));
     menu->addAction(fGameInfoAction);
     fGameInfoAction->setEnabled(false);
     connect(fGameInfoAction, &QAction::triggered, this, &CHtmlSysWinGroupQt::fShowGameInfoDialog);
     menu->addSeparator();
     act = new QAction(tr("&Quit QTads"), this);
     act->setMenuRole(QAction::QuitRole);
-    act->setIcon(QIcon::fromTheme(QString::fromLatin1("application-exit")));
+    act->setIcon(QIcon::fromTheme("application-exit"));
     act->setShortcuts(QKeySequence::Quit);
     menu->addAction(act);
     connect(act, &QAction::triggered, this, &QWidget::close);
@@ -113,13 +113,13 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     // "Edit" menu.
     menu = menuBar->addMenu(tr("&Edit"));
     fCopyAction = new QAction(tr("&Copy"), this);
-    fCopyAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-copy")));
+    fCopyAction->setIcon(QIcon::fromTheme("edit-copy"));
     fCopyAction->setShortcuts(QKeySequence::Copy);
     fCopyAction->setEnabled(false);
     menu->addAction(fCopyAction);
     connect(fCopyAction, &QAction::triggered, this, &CHtmlSysWinGroupQt::copyToClipboard);
     fPasteAction = new QAction(tr("&Paste"), this);
-    fPasteAction->setIcon(QIcon::fromTheme(QString::fromLatin1("edit-paste")));
+    fPasteAction->setIcon(QIcon::fromTheme("edit-paste"));
     fPasteAction->setShortcuts(QKeySequence::Paste);
     fPasteAction->setDisabled(true);
     menu->addAction(fPasteAction);
@@ -129,7 +129,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
         &CHtmlSysWinGroupQt::updatePasteAction);
     menu->addSeparator();
     act = new QAction(tr("&Preferences..."), this);
-    act->setIcon(QIcon::fromTheme(QString::fromLatin1("configure")));
+    act->setIcon(QIcon::fromTheme("configure"));
     act->setShortcuts(QKeySequence::Preferences);
     menu->addAction(act);
     connect(act, &QAction::triggered, this, &CHtmlSysWinGroupQt::fShowConfDialog);
@@ -137,7 +137,7 @@ CHtmlSysWinGroupQt::CHtmlSysWinGroupQt()
     // "Help" menu.
     menu = menuBar->addMenu(tr("&Help"));
     fAboutQtadsAction = new QAction(tr("A&bout QTads"), this);
-    fAboutQtadsAction->setIcon(QIcon::fromTheme(QString::fromLatin1("help-about")));
+    fAboutQtadsAction->setIcon(QIcon::fromTheme("help-about"));
     menu->addAction(fAboutQtadsAction);
     connect(fAboutQtadsAction, &QAction::triggered, this, &CHtmlSysWinGroupQt::fShowAboutQtads);
     act = new QAction(tr("&Check for Updates"), this);
@@ -183,15 +183,14 @@ auto CHtmlSysWinGroupQt::fAskQuitGameDialog() -> bool
     }
 
     QMessageBox* msgBox = new QMessageBox(
-        QMessageBox::Question,
-        tr("Quit Current Game") + QString::fromLatin1(" - ") + qFrame->applicationName(),
+        QMessageBox::Question, tr("Quit Current Game") + " - " + qFrame->applicationName(),
         tr("If you didn't save the current game, all progress will"
            " be lost. Do you wish to quit the game?"),
         QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setDefaultButton(QMessageBox::Cancel);
 #ifdef Q_OS_MAC
-    msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
+    msgBox->setIconPixmap(QPixmap(":/qtads_72x72.png"));
     // This presents the dialog as a sheet in OS X.
     msgBox->setWindowModality(Qt::WindowModal);
 #endif
@@ -209,15 +208,14 @@ auto CHtmlSysWinGroupQt::fAskRestartGameDialog() -> bool
     }
 
     QMessageBox* msgBox = new QMessageBox(
-        QMessageBox::Question,
-        tr("Restart Current Game") + QString::fromLatin1(" - ") + qFrame->applicationName(),
+        QMessageBox::Question, tr("Restart Current Game") + " - " + qFrame->applicationName(),
         tr("If you didn't save the current game, all progress will be lost."
            " Do you wish to restart the game?"),
         QMessageBox::Yes | QMessageBox::Cancel, this);
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setDefaultButton(QMessageBox::Cancel);
 #ifdef Q_OS_MAC
-    msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
+    msgBox->setIconPixmap(QPixmap(":/qtads_72x72.png"));
     // This presents the dialog as a sheet in OS X.
     msgBox->setWindowModality(Qt::WindowModal);
 #endif
@@ -254,8 +252,7 @@ void CHtmlSysWinGroupQt::fCheckForUpdates()
         fNetManager, &QNetworkAccessManager::finished, this, &CHtmlSysWinGroupQt::fReplyFinished);
 
     fHttpRedirectCount = 0;
-    fReply = sendNetRequest(
-        fNetManager, QUrl(QString::fromLatin1("https://realnc.github.io/qtads/currentversion")));
+    fReply = sendNetRequest(fNetManager, QUrl("https://realnc.github.io/qtads/currentversion"));
 }
 
 static void showUpdateErrorMsg(const QString& detailedText)
@@ -307,7 +304,7 @@ void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
         QString httpReason =
             reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
         if (not httpReason.isEmpty()) {
-            errMsg += QString::fromLatin1(" (") + httpReason + QString::fromLatin1(")");
+            errMsg += " (" + httpReason + ")";
         }
         showUpdateErrorMsg(errMsg);
         fNetManager->deleteLater();
@@ -317,12 +314,12 @@ void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
     }
 
     // Convert current version to hex.
-    QString str(QString::fromLatin1(QTADS_VERSION));
+    QString str = QTADS_VERSION;
     // If this is a git snapshot, strip the " git".
-    if (str.endsWith(QString::fromLatin1(" git"), Qt::CaseInsensitive)) {
+    if (str.endsWith(" git", Qt::CaseInsensitive)) {
         str.chop(4);
     }
-    QStringList strList = str.split(QChar::fromLatin1('.'));
+    QStringList strList = str.split('.');
     int curVersion =
         QT_VERSION_CHECK(strList.at(0).toInt(), strList.at(1).toInt(), strList.at(2).toInt());
 
@@ -331,10 +328,10 @@ void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
     int newVersion = 0;
     if (str.length() > 3) {
         // Chop the newline at the end, if there is one.
-        if (str.endsWith(QChar::fromLatin1('\n'))) {
+        if (str.endsWith('\n')) {
             str.chop(1);
         }
-        strList = str.split(QChar::fromLatin1('.'));
+        strList = str.split('.');
         newVersion =
             QT_VERSION_CHECK(strList.at(0).toInt(), strList.at(1).toInt(), strList.at(2).toInt());
     }
@@ -351,14 +348,14 @@ void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
             text.append(QString::fromUtf8(reply->readLine(100)));
         }
         // Remove that last newline.
-        if (text.endsWith(QString::fromLatin1("\n"))) {
+        if (text.endsWith("\n")) {
             text.truncate(text.length() - 1);
         }
         if (text.length() > 2) {
             msgBox->setDetailedText(text);
         }
 #ifdef Q_OS_MAC
-        msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
+        msgBox->setIconPixmap(QPixmap(":/qtads_72x72.png"));
 #else
         msgBox->setIcon(QMessageBox::Question);
 #endif
@@ -370,12 +367,11 @@ void CHtmlSysWinGroupQt::fReplyFinished(QNetworkReply* reply)
         msgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox->setDefaultButton(QMessageBox::Yes);
         if (msgBox->exec() == QMessageBox::Yes) {
-            QDesktopServices::openUrl(
-                QUrl(QString::fromLatin1("https://realnc.github.io/qtads/#downloads")));
+            QDesktopServices::openUrl(QUrl("https://realnc.github.io/qtads/#downloads"));
         }
     } else if (not fSilentIfNoUpdates) {
 #ifdef Q_OS_MAC
-        msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
+        msgBox->setIconPixmap(QPixmap(":/qtads_72x72.png"));
 #else
         msgBox->setIcon(QMessageBox::Information);
 #endif
@@ -502,7 +498,7 @@ void CHtmlSysWinGroupQt::fOpenNewGame()
 {
     QString fname = QFileDialog::getOpenFileName(
         nullptr, tr("Choose the TADS game you wish to run"), qFrame->settings().lastFileOpenDir,
-        tr("TADS Games") + QString::fromLatin1(" (*.gam *.Gam *.GAM *.t3 *.T3)"));
+        tr("TADS Games") + " (*.gam *.Gam *.GAM *.t3 *.T3)");
     activateWindow();
     if (not fname.isEmpty()) {
         qFrame->settings().lastFileOpenDir = QFileInfo(fname).absolutePath();
@@ -559,7 +555,7 @@ void CHtmlSysWinGroupQt::closeEvent(QCloseEvent* e)
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setDefaultButton(QMessageBox::Cancel);
 #ifdef Q_OS_MAC
-    msgBox->setIconPixmap(QPixmap(QString::fromLatin1(":/qtads_72x72.png")));
+    msgBox->setIconPixmap(QPixmap(":/qtads_72x72.png"));
     // This presents the dialog as a sheet in OS X.
     msgBox->setWindowModality(Qt::WindowModal);
 #endif
@@ -671,7 +667,7 @@ void CHtmlSysWinGroupQt::updateRecentGames()
         if (gameName.isEmpty()) {
             gameName = QFileInfo(list.at(i)).fileName();
         }
-        gameName = gameName.replace(QString::fromLatin1("&"), QString::fromLatin1("&&"));
+        gameName = gameName.replace("&", "&&");
         QAction* act = fRecentGamesMenu->addAction(gameName);
         // Elide the text in case it's too long.
         act->setText(QFontMetrics(act->font()).elidedText(gameName, Qt::ElideRight, 300));

@@ -72,7 +72,7 @@ ConfDialog::ConfDialog(CHtmlSysWinGroupQt* const parent)
         &QWidget::setDisabled);
 
     QString txt(QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText));
-    if (txt.endsWith(QChar::fromLatin1('+'))) {
+    if (txt.endsWith('+')) {
         txt.truncate(txt.length() - 1);
     }
     ui->pasteOnDblClkCheckBox->setText(tr("%1 + double-click pastes current word").arg(txt));

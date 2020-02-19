@@ -92,13 +92,13 @@ auto createImageFromFile(
 
     // Create an object of the appropriate class for the specified image type.
     // Also cast the object to a QTadsImage so we can loadFromData() later on.
-    if (imageType == QString::fromLatin1("JPG") or imageType == QString::fromLatin1("JPEG")) {
+    if (imageType == "JPG" or imageType == "JPEG") {
         image = new CHtmlSysImageJpegQt;
         cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImageJpegQt*>(image));
-    } else if (imageType == QString::fromLatin1("PNG")) {
+    } else if (imageType == "PNG") {
         image = new CHtmlSysImagePngQt;
         cast = static_cast<QTadsImage*>(static_cast<CHtmlSysImagePngQt*>(image));
-    } else if (imageType == QString::fromLatin1("MNG")) {
+    } else if (imageType == "MNG") {
         image = new CHtmlSysImageMngQt;
         mngCast = static_cast<CHtmlSysImageMngQt*>(image);
     } else {
@@ -116,7 +116,7 @@ auto createImageFromFile(
         return nullptr;
     }
 
-    if (imageType == QString::fromLatin1("MNG")) {
+    if (imageType == "MNG") {
         QBuffer* buf = new QBuffer(mngCast);
         buf->setData(data);
         buf->open(QBuffer::ReadOnly);
