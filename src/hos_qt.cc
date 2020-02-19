@@ -21,7 +21,8 @@ auto os_get_default_charset() -> oshtml_charset_id_t
 
 /* Get the next character in a string.
  */
-auto os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t len) -> textchar_t*
+auto os_next_char(const oshtml_charset_id_t /*id*/, const textchar_t* p, const size_t /*len*/)
+    -> const textchar_t*
 {
     if (p == nullptr) {
         return nullptr;
@@ -41,13 +42,13 @@ auto os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t len) -
         qWarning() << Q_FUNC_INFO << "corrupt UTF-8 sequence";
         p += 1;
     }
-    return const_cast<textchar_t*>(p);
+    return p;
 }
 
 /* Get the previous character in a string.
  */
 auto os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart)
-    -> textchar_t*
+    -> const textchar_t*
 {
     if (p == nullptr) {
         return nullptr;
@@ -60,7 +61,7 @@ auto os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const textcha
     while (p != pstart and (*p & 0xC0) == 0x80) {
         --p;
     }
-    return const_cast<textchar_t*>(p);
+    return p;
 }
 
 /* Determine if the character at the given string position is a word

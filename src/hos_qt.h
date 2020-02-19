@@ -77,8 +77,19 @@ auto os_get_default_charset() -> oshtml_charset_id_t;
  *   Callers should take care not to misuse the const removal.  (It's not
  *   like this is a security breach or anything; the caller can always use
  *   an ordinary type-cast if they really want to remove the const-ness.)
+ *
+ *   (This is undefined behavior when an actually const object has the const casted away. It results
+ *   in wrong code gen with Clang 10. We fix this by simply overloading with const and non-const
+ *   signatures where the const is only casted away when the passed-in object is not const.
+ *   -- Nikos)
  */
-auto os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*/) -> textchar_t*;
+auto os_next_char(oshtml_charset_id_t id, const textchar_t* p, size_t len) -> const textchar_t*;
+
+inline auto os_next_char(const oshtml_charset_id_t id, textchar_t* const p, const size_t len)
+    -> textchar_t*
+{
+    return const_cast<textchar_t*>(os_next_char(id, static_cast<const textchar_t*>(p), len));
+}
 
 /*
  *   Decrement a character string pointer to point to the previous character
@@ -95,7 +106,15 @@ auto os_next_char(oshtml_charset_id_t /*id*/, const textchar_t* p, size_t /*len*
  *   multi-byte character but should always be at a byte that starts a
  *   character OR at the byte just after the end of the string...
  */
-auto os_prev_char(oshtml_charset_id_t /*id*/, const textchar_t* p, const textchar_t* pstart) -> textchar_t*;
+auto os_prev_char(oshtml_charset_id_t id, const textchar_t* p, const textchar_t* pstart)
+    -> const textchar_t*;
+
+inline auto
+os_prev_char(const oshtml_charset_id_t id, textchar_t* const p, const textchar_t* const pstart)
+    -> textchar_t*
+{
+    return const_cast<textchar_t*>(os_prev_char(id, static_cast<const textchar_t*>(p), pstart));
+}
 
 /*
  *   Determine if the character at the given string position is a word
