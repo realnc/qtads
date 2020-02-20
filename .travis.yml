@@ -5,7 +5,7 @@ language: cpp
 addons:
     apt:
         sources:
-            - sourceline: 'ppa:beineri/opt-qt-5.12.1-xenial'
+            - sourceline: 'ppa:beineri/opt-qt-5.12.7-xenial'
 
         packages:
             - libmpg123-dev
@@ -46,9 +46,9 @@ before_install:
     # Install fluidsynth
     #
     - cd "$HOME"
-    - wget 'https://github.com/FluidSynth/fluidsynth/archive/v2.0.4.tar.gz'
-    - tar xf 'v2.0.4.tar.gz'
-    - cd fluidsynth-2.0.4
+    - wget 'https://github.com/FluidSynth/fluidsynth/archive/v2.1.1.tar.gz'
+    - tar xf 'v2.1.1.tar.gz'
+    - cd fluidsynth-2.1.1
     - mkdir build
     - cd build
     - cmake -Denable-framework=off ..
