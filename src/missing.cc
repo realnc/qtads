@@ -11,53 +11,34 @@
 #include "settings.h"
 #include "sysframe.h"
 
-#ifndef _WIN32
-auto memicmp(const char* s1, const char* s2, size_t len) -> int
-{
-    char* x1 = new char[len];
-    char* x2 = new char[len];
+/*
+ * These functions are only used by the base code to compare ASCII strings. No need to convert
+ * anything to QString for unicode-aware comparisons.
+ */
 
+#ifndef _WIN32
+auto memicmp(const char* const s1, const char* const s2, const size_t len) -> int
+{
     for (size_t i = 0; i < len; ++i) {
-        x1[i] = std::tolower(s1[i]);
-        x2[i] = std::tolower(s2[i]);
+        if (std::tolower(s1[i]) < std::tolower(s2[i])) {
+            return -1;
+        }
+        if (std::tolower(s1[i]) > std::tolower(s2[i])) {
+            return 1;
+        }
     }
-    int ret = std::memcmp(x1, x2, len);
-    delete[] x1;
-    delete[] x2;
-    return ret;
+    return 0;
 }
 #endif
 
-auto stricmp(const char* s1, const char* s2) -> int
+auto stricmp(const char* const s1, const char* const s2) -> int
 {
-    if (qFrame->tads3()) {
-        return QString::localeAwareCompare(
-            QString::fromUtf8(s1).toLower(), QString::fromUtf8(s2).toLower());
-    }
-    // TADS 2 does not use UTF-8; use the encoding from our settings.
-    QTextCodec* codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
-    return QString::localeAwareCompare(
-        codec->toUnicode(s1).toLower(), codec->toUnicode(s2).toLower());
+    return qstricmp(s1, s2);
 }
 
-auto strnicmp(const char* s1, const char* s2, size_t n) -> int
+auto strnicmp(const char* const s1, const char* const s2, const size_t n) -> int
 {
-    QString qs1;
-    QString qs2;
-
-    if (qFrame->tads3()) {
-        qs1 = QString::fromUtf8(s1);
-        qs2 = QString::fromUtf8(s2);
-    } else {
-        // TADS 2 does not use UTF-8; use the encoding from our settings.
-        QTextCodec* codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
-        qs1 = codec->toUnicode(s1);
-        qs2 = codec->toUnicode(s2);
-    }
-
-    qs1.truncate(n);
-    qs2.truncate(n);
-    return QString::compare(qs1.toLower(), qs2.toLower());
+    return qstrnicmp(s1, s2, n);
 }
 
 /*
