@@ -477,6 +477,7 @@ auto os_open_dir(const char* dirname, osdirhdl_t* handle) -> int
         fnameToQStr(dirname), QDir::Dirs | QDir::Files | QDir::Hidden | QDir::System);
     if (d->next().isEmpty()) {
         // We can't read anything.  Don't know why, don't care.
+        delete d;
         return false;
     }
     *handle = d;
