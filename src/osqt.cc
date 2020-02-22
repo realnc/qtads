@@ -538,9 +538,19 @@ auto os_is_special_file(const char* fname) -> os_specfile_t
 auto os_strlwr(char* s) -> char*
 {
     Q_ASSERT(s != nullptr);
-    Q_ASSERT(std::strlen(s) >= std::strlen(QString::fromUtf8(s).toLower().toUtf8()));
 
-    return std::strcpy(s, QString::fromUtf8(s).toLower().toUtf8());
+    // There's not much we can do here about the possible buffer overflow. We just hope the caller
+    // has made the 's' buffer large enough to hold a string that's possibly longer after converting
+    // to lower case (can happen in some languages.) There's no way for us to check.
+    QByteArray lower;
+    if (qFrame->tads3()) {
+        lower = QString::fromUtf8(s).toLower().toUtf8();
+    } else {
+        const auto* const codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
+        lower = codec->fromUnicode(codec->toUnicode(s).toLower());
+    }
+    std::memcpy(s, lower.constData(), lower.size() + 1);
+    return s;
 }
 
 /* --------------------------------------------------------------------
