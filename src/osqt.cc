@@ -796,11 +796,10 @@ void os_remext(char* fn)
 {
     Q_ASSERT(fn != nullptr);
 
-    QFileInfo file(fnameToQStr(fn));
-    if (file.suffix().isEmpty()) {
-        return;
+    QFileInfo info(fnameToQStr(fn));
+    if (not info.suffix().isEmpty()) {
+        fn[qstrlen(fn) - qStrToFname(info.suffix()).size() - 1] = '\0';
     }
-    std::strcpy(fn, qStrToFname(file.completeBaseName()));
 }
 
 /* Get a pointer to the root name portion of a filename.
