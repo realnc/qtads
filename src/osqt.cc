@@ -682,7 +682,7 @@ auto os_create_tempfile(const char* fname, char* buf) -> osfildef*
 
     // No filename was given; create a temporary file.
     buf[0] = '\0';
-    QTemporaryFile* file = new QTemporaryFile("/qtads_XXXXXX");
+    QTemporaryFile* file = new QTemporaryFile(QDir::tempPath() + "/qtads_XXXXXX");
     if (not file->open()) {
         delete file;
         return nullptr;
