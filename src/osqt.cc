@@ -610,25 +610,32 @@ void os_get_special_path(char* buf, size_t buflen, const char* /*argv0*/, int id
     case OS_GSP_LOGFILE: {
         const QString& dirStr = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
         QDir dir(dirStr);
+        QByteArray result;
         // Create the directory if it doesn't exist.
         if (not dir.exists() and not dir.mkpath(dirStr)) {
             // TODO: Error dialog.
-            qWarning() << "Could not create directory path:" << dirStr;
-            Q_ASSERT(qStrToFname(QDir::tempPath()).size() < static_cast<int>(buflen));
-            strncpy(buf, qStrToFname(QDir::tempPath()).constData(), buflen);
-            return;
+            qWarning().nospace() << "Could not create directory path " << dirStr << ", will use "
+                                 << QDir::tempPath() << " instead";
+            result = qStrToFname(QDir::tempPath());
+        } else {
+            result = qStrToFname(dirStr);
         }
-        Q_ASSERT(qStrToFname(dirStr).size() < static_cast<int>(buflen));
-        strncpy(buf, qStrToFname(dirStr).constData(), buflen);
-        buf[buflen - 1] = '\0';
-        break;
+        if (result.size() < static_cast<int>(buflen)) {
+            std::memcpy(buf, result.constData(), result.size() + 1);
+        } else {
+            qWarning() << Q_FUNC_INFO
+                       << "Result would overflow output buffer, returning empty path instead";
+            buf[0] = '\0';
+        }
+        return;
     }
 
     default:
         // We didn't recognize the specified id. That means the base code
         // added a new value for it that we don't know about.
         // TODO: Error dialog.
-        qWarning("Unknown id in os_get_special_path()");
+        qWarning("Unknown id in os_get_special_path(), will use empty path");
+        buf[0] = '\0';
     }
 }
 
