@@ -23,7 +23,6 @@
 #endif
 
 #include <QApplication>
-#include <QDateTime>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
@@ -38,6 +37,7 @@
 #include <QTextCodec>
 #include <QTimer>
 #include <algorithm>
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
@@ -1369,10 +1369,13 @@ auto os_input_dialog(
  */
 void os_time_ns(os_time_t* seconds, long* nanoseconds)
 {
-    auto ms = QDateTime::currentMSecsSinceEpoch();
-    *seconds = ms / 1000;
-    ms -= *seconds * 1000;
-    *nanoseconds = ms * 1000000;
+    namespace cr = std::chrono;
+
+    // C++ does not guarantee that the system clock's epoch is the same as
+    // the Unix Epoch, but it's the de-facto standard in all compilers.
+    const auto now = cr::system_clock::now().time_since_epoch();
+    *seconds = cr::duration_cast<cr::seconds>(now).count();
+    *nanoseconds = cr::duration_cast<cr::nanoseconds>(now - cr::seconds(*seconds)).count();
 }
 
 /* Get the current system high-precision timer.
