@@ -92,9 +92,12 @@ extern "C" {
 /* Link error messages into the application. */
 #define ERR_LINK_MESSAGES
 
-/* System identifier and system descriptive name. */
-#define OS_SYSTEM_NAME "Qt"
-#define OS_SYSTEM_LDESC "Qt (Unix/MacOSX/MS-Windows)"
+/* System identifier and system descriptive name. We detect these at runtime instead of hardcoding
+ * them as macros. We still define the macros because other code does ifdef checks on them. */
+#define OS_SYSTEM_NAME OS_SYSTEM_NAME_str
+#define OS_SYSTEM_LDESC OS_SYSTEM_LDESC_str
+extern const char* OS_SYSTEM_NAME_str;
+extern const char* OS_SYSTEM_LDESC_str;
 
 /* Program Exit Codes. */
 #define OSEXSUCC 0 /* Successful completion. */

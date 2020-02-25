@@ -34,6 +34,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QStandardPaths>
+#include <QSysInfo>
 #include <QTemporaryFile>
 #include <QTextCodec>
 #include <QTimer>
@@ -42,10 +43,46 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <locale>
 #include <random>
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
     #include <QRandomGenerator>
 #endif
+
+const char* OS_SYSTEM_NAME_str = [] {
+// Use "linux" instead of the distro name returned by QSysInfo.
+#ifdef Q_OS_LINUX
+    return "linux";
+#else
+    auto tmp = QSysInfo::productType();
+    if (tmp == "unknown") {
+        tmp = QSysInfo::kernelType();
+    }
+
+    static auto result = tmp.toLatin1();
+    std::locale c_locale("C");
+
+    // It needs be a valid TADS identifier, so if it doesn't start with an ASCII letter or
+    // underscore, prepend an underscore.
+    if (not std::isalpha(result.at(0), c_locale) and result[0] != '_') {
+        result.prepend('_');
+    }
+    // Convert any non-alphanumeric characters to underscores.
+    for (auto& c : result) {
+        if (not std::isalnum(c, c_locale)) {
+            c = '_';
+        }
+    }
+    return result.constData();
+#endif
+}();
+
+const char* OS_SYSTEM_LDESC_str = [] {
+    static auto result =
+        (QSysInfo::prettyProductName() + " (" + QSysInfo::currentCpuArchitecture() + ")")
+            .toLatin1();
+    return result.constData();
+}();
 
 /* Translates a local filename to a unicode QString.
  */
