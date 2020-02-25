@@ -2,7 +2,6 @@
 #pragma once
 #include "config.h"
 #include "dispwidget.h"
-
 #include <QTimer>
 
 class CHtmlFormatter;
@@ -13,46 +12,6 @@ class CHtmlTagTextInput;
 class DisplayWidgetInput final: public DisplayWidget
 {
     Q_OBJECT
-
-private:
-    // Position of the text cursor.
-    QPoint fCursorPos;
-
-    // Height of the text cursor in pixels.
-    unsigned fHeight;
-
-    // Last position of the text cursor.
-    QPoint fLastCursorPos;
-
-    // Is the text cursor visible?
-    bool fCursorVisible = false;
-
-    // Text cursor blink visibility.  Changed by a timer to show/hide the
-    // cursor at specific intervals if fCursorVisible is true.
-    bool fBlinkVisible = false;
-
-    // Text cursor blink timer.
-    QTimer fBlinkTimer;
-
-    // Current input tag, if there is one (null if there isn't.)
-    const CHtmlTagTextInput* fInpTag = nullptr;
-
-    // The TADS input buffer we're working with.
-    CHtmlInputBuf& fTadsBuffer;
-
-private slots:
-    // Called by the timer to blink the text cursor.
-    void fBlinkCursor();
-
-    // We need to know when the application loses focus entirely so that we
-    // can disable keyboard cursor blinking when we lose focus.
-    void fHandleFocusChange(const QWidget* old, const QWidget* now);
-
-protected:
-    void paintEvent(QPaintEvent* e) override;
-    void resizeEvent(QResizeEvent* e) override;
-    void mousePressEvent(QMouseEvent* e) override;
-    void mouseMoveEvent(QMouseEvent* e) override;
 
 public:
     DisplayWidgetInput(
@@ -89,6 +48,46 @@ public:
     }
 
     void clearSelection() override;
+
+protected:
+    void paintEvent(QPaintEvent* e) override;
+    void resizeEvent(QResizeEvent* e) override;
+    void mousePressEvent(QMouseEvent* e) override;
+    void mouseMoveEvent(QMouseEvent* e) override;
+
+private:
+    // Position of the text cursor.
+    QPoint fCursorPos;
+
+    // Height of the text cursor in pixels.
+    unsigned fHeight;
+
+    // Last position of the text cursor.
+    QPoint fLastCursorPos;
+
+    // Is the text cursor visible?
+    bool fCursorVisible = false;
+
+    // Text cursor blink visibility.  Changed by a timer to show/hide the
+    // cursor at specific intervals if fCursorVisible is true.
+    bool fBlinkVisible = false;
+
+    // Text cursor blink timer.
+    QTimer fBlinkTimer;
+
+    // Current input tag, if there is one (null if there isn't.)
+    const CHtmlTagTextInput* fInpTag = nullptr;
+
+    // The TADS input buffer we're working with.
+    CHtmlInputBuf& fTadsBuffer;
+
+private slots:
+    // Called by the timer to blink the text cursor.
+    void fBlinkCursor();
+
+    // We need to know when the application loses focus entirely so that we
+    // can disable keyboard cursor blinking when we lose focus.
+    void fHandleFocusChange(const QWidget* old, const QWidget* now);
 };
 
 /*

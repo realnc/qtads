@@ -14,14 +14,18 @@
     #define _GNU_SOURCE
     #define GNU_SOURCE_DEFINED
 #endif
-
 #include <cstdio>
-
 #ifdef GNU_SOURCE_DEFINED
     #undef _GNU_SOURCE
     #undef GNU_SOURCE_DEFINED
 #endif
 
+#include "globals.h"
+#include "os.h"
+#include "osifcext.h"
+#include "settings.h"
+#include "sysframe.h"
+#include "syswininput.h"
 #include <QApplication>
 #include <QDebug>
 #include <QDir>
@@ -29,9 +33,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-    #include <QRandomGenerator>
-#endif
 #include <QStandardPaths>
 #include <QTemporaryFile>
 #include <QTextCodec>
@@ -42,43 +43,35 @@
 #include <cstring>
 #include <ctime>
 #include <random>
-
-#include "globals.h"
-#include "os.h"
-#include "osifcext.h"
-#include "settings.h"
-#include "sysframe.h"
-#include "syswininput.h"
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    #include <QRandomGenerator>
+#endif
 
 /* Translates a local filename to a unicode QString.
  */
-auto fnameToQStr(const char* fname) -> QString
+auto fnameToQStr(const char* const fname) -> QString
 {
     Q_ASSERT(qFrame != nullptr);
 
-    if (qFrame->tads3())
-        return QString::fromUtf8(fname);
-    return QFile::decodeName(fname);
+    return qFrame->tads3() ? QString::fromUtf8(fname) : QFile::decodeName(fname);
 }
 
 /* Translates a unicode QString filename to a local filename.
  */
 auto qStrToFname(const QString& fnameStr) -> QByteArray
 {
-    if (qFrame->tads3())
-        return fnameStr.toUtf8();
-    return QFile::encodeName(fnameStr);
+    return qFrame->tads3() ? fnameStr.toUtf8() : QFile::encodeName(fnameStr);
 }
 
 /* --------------------------------------------------------------------
  * Basic file I/O interface.
  */
 
-static auto createQFile(const char* fname, QFile::OpenMode mode) -> osfildef*
+static auto createQFile(const char* const fname, const QFile::OpenMode mode) -> osfildef*
 {
     Q_ASSERT(fname != nullptr);
 
-    QFile* file = new QFile(fnameToQStr(fname));
+    auto* const file = new QFile(fnameToQStr(fname));
     if (not file->open(mode)) {
         delete file;
         return nullptr;
@@ -88,69 +81,85 @@ static auto createQFile(const char* fname, QFile::OpenMode mode) -> osfildef*
 
 /* Open text file for reading.
  */
-auto osfoprt(const char* fname, os_filetype_t) -> osfildef*
+auto osfoprt(const char* const fname, const os_filetype_t /*type*/) -> osfildef*
 {
+    Q_ASSERT(fname != nullptr);
+
     return createQFile(fname, QFile::ReadOnly | QFile::Text);
 }
 
 /* Open text file for writing.
  */
-auto osfopwt(const char* fname, os_filetype_t) -> osfildef*
+auto osfopwt(const char* const fname, const os_filetype_t /*type*/) -> osfildef*
 {
+    Q_ASSERT(fname != nullptr);
+
     return createQFile(fname, QFile::WriteOnly | QFile::Truncate | QFile::Text);
 }
 
 /* Open text file for reading and writing, keeping existing contents.
  */
-auto osfoprwt(const char* fname, os_filetype_t) -> osfildef*
+auto osfoprwt(const char* const fname, const os_filetype_t /*type*/) -> osfildef*
 {
+    Q_ASSERT(fname != nullptr);
+
     return createQFile(fname, QFile::ReadWrite | QFile::Text);
 }
 
 /* Open text file for reading and writing, truncating existing contents.
  */
-auto osfoprwtt(const char* fname, os_filetype_t) -> osfildef*
+auto osfoprwtt(const char* const fname, const os_filetype_t /*type*/) -> osfildef*
 {
+    Q_ASSERT(fname != nullptr);
+
     return createQFile(fname, QFile::ReadWrite | QFile::Truncate | QFile::Text);
 }
 
 /* Open binary file for writing.
  */
-auto osfopwb(const char* fname, os_filetype_t) -> osfildef*
+auto osfopwb(const char* const fname, const os_filetype_t /*type*/) -> osfildef*
 {
+    Q_ASSERT(fname != nullptr);
+
     return createQFile(fname, QFile::WriteOnly | QFile::Truncate);
 }
 
 /* Open binary file for reading.
  */
-auto osfoprb(const char* fname, os_filetype_t) -> osfildef*
+auto osfoprb(const char* const fname, const os_filetype_t /*type*/) -> osfildef*
 {
+    Q_ASSERT(fname != nullptr);
+
     return createQFile(fname, QFile::ReadOnly);
 }
 
 /* Open binary file for reading and writing, keeping any existing contents.
  */
-auto osfoprwb(const char* fname, os_filetype_t) -> osfildef*
+auto osfoprwb(const char* const fname, const os_filetype_t /*type*/) -> osfildef*
 {
+    Q_ASSERT(fname != nullptr);
+
     return createQFile(fname, QFile::ReadWrite);
 }
 
 /* Open binary file for reading and writing, truncating existing contents.
  */
-auto osfoprwtb(const char* fname, os_filetype_t) -> osfildef*
+auto osfoprwtb(const char* const fname, const os_filetype_t /*type*/) -> osfildef*
 {
+    Q_ASSERT(fname != nullptr);
+
     return createQFile(fname, QFile::ReadWrite | QFile::Truncate);
 }
 
 /* Duplicate a file handle.
  */
-auto osfdup(osfildef* orig, const char* mode) -> osfildef*
+auto osfdup(osfildef* const orig, const char* const mode) -> osfildef*
 {
     Q_ASSERT(orig != nullptr);
     Q_ASSERT(mode != nullptr);
     Q_ASSERT(mode[0] != '\0');
 
-    QFile::OpenMode qMode = nullptr;
+    QFile::OpenMode qMode = {};
     size_t i = 0;
 
     if (mode[i] == 'r') {
@@ -176,7 +185,7 @@ auto osfdup(osfildef* orig, const char* mode) -> osfildef*
         return nullptr;
     }
 
-    QFile* file = new QFile(nullptr);
+    auto* const file = new QFile;
     if (not file->open(orig->handle(), qMode)) {
         delete file;
         return nullptr;
@@ -186,29 +195,27 @@ auto osfdup(osfildef* orig, const char* mode) -> osfildef*
 
 /* Get a line of text from a text file.
  */
-auto osfgets(char* buf, size_t len, osfildef* fp) -> char*
+auto osfgets(char* const buf, const size_t len, osfildef* const fp) -> char*
 {
     Q_ASSERT(buf != nullptr);
     Q_ASSERT(fp != nullptr);
 
-    if (fp->readLine(buf, len) != static_cast<qint64>(len)) {
-        return nullptr;
-    }
-    return buf;
+    return fp->readLine(buf, len) == static_cast<qint64>(len) ? buf : nullptr;
 }
 
 /* Write a line of text to a text file.
  */
-auto osfputs(const char* buf, osfildef* fp) -> int
+auto osfputs(const char* const buf, osfildef* const fp) -> int
 {
-    if (fp->write(buf, qstrlen(buf)) < 1)
-        return EOF;
-    return 1;
+    Q_ASSERT(buf != nullptr);
+    Q_ASSERT(fp != nullptr);
+
+    return fp->write(buf, qstrlen(buf)) > 0 ? 1 : EOF;
 }
 
 /* Write a null-terminated string to a text file.
  */
-void os_fprintz(osfildef* fp, const char* str)
+void os_fprintz(osfildef* const fp, const char* const str)
 {
     Q_ASSERT(fp != nullptr);
     Q_ASSERT(str != nullptr);
@@ -219,7 +226,7 @@ void os_fprintz(osfildef* fp, const char* str)
 /* Print a counted-length string (which might not be null-terminated)
  * to a file.
  */
-void os_fprint(osfildef* fp, const char* str, size_t len)
+void os_fprint(osfildef* const fp, const char* const str, const size_t len)
 {
     Q_ASSERT(fp != nullptr);
     Q_ASSERT(str != nullptr);
@@ -229,42 +236,36 @@ void os_fprint(osfildef* fp, const char* str, size_t len)
 
 /* Write bytes to file.
  */
-auto osfwb(osfildef* fp, const void* buf, int bufl) -> int
+auto osfwb(osfildef* const fp, const void* const buf, const int bufl) -> int
 {
     Q_ASSERT(fp != nullptr);
     Q_ASSERT(buf != nullptr);
 
-    if (fp->write(static_cast<const char*>(buf), bufl) < 1)
-        return 1;
-    return 0;
+    return fp->write(static_cast<const char*>(buf), bufl) != bufl;
 }
 
 /* Flush buffered writes to a file.
  */
-auto osfflush(osfildef* fp) -> int
+auto osfflush(osfildef* const fp) -> int
 {
     Q_ASSERT(fp != nullptr);
 
-    if (not fp->flush())
-        return EOF;
-    return 0;
+    return fp->flush() ? 0 : EOF;
 }
 
 /* Get a character from a file.
  */
-auto osfgetc(osfildef* fp) -> int
+auto osfgetc(osfildef* const fp) -> int
 {
     Q_ASSERT(fp != nullptr);
 
     char c;
-    if (not fp->getChar(&c))
-        return EOF;
-    return c;
+    return fp->getChar(&c) ? c : EOF;
 }
 
 /* Read bytes from file.
  */
-auto osfrb(osfildef* fp, void* buf, int bufl) -> int
+auto osfrb(osfildef* const fp, void* const buf, const int bufl) -> int
 {
     Q_ASSERT(fp != nullptr);
     Q_ASSERT(buf != nullptr);
@@ -274,20 +275,18 @@ auto osfrb(osfildef* fp, void* buf, int bufl) -> int
 
 /* Read bytes from file and return the number of bytes read.
  */
-auto osfrbc(osfildef* fp, void* buf, size_t bufl) -> size_t
+auto osfrbc(osfildef* const fp, void* const buf, const size_t bufl) -> size_t
 {
     Q_ASSERT(fp != nullptr);
     Q_ASSERT(buf != nullptr);
 
-    int bytesRead = fp->read(static_cast<char*>(buf), bufl);
-    if (bytesRead < 0)
-        return 0;
-    return bytesRead;
+    const auto bytesRead = fp->read(static_cast<char*>(buf), bufl);
+    return bytesRead > 0 ? bytesRead : 0;
 }
 
 /* Get the current seek location in the file.
  */
-auto osfpos(osfildef* fp) -> long
+auto osfpos(osfildef* const fp) -> long
 {
     Q_ASSERT(fp != nullptr);
 
@@ -296,49 +295,61 @@ auto osfpos(osfildef* fp) -> long
 
 /* Seek to a location in the file.
  */
-auto osfseek(osfildef* fp, long pos, int mode) -> int
+auto osfseek(osfildef* const fp, const long pos, const int mode) -> int
 {
     Q_ASSERT(fp != nullptr);
 
-    if (mode == OSFSK_CUR)
-        pos += fp->pos();
-    else if (mode == OSFSK_END)
-        pos += fp->size();
-    return not fp->seek(pos);
+    switch (mode) {
+    default:
+        qWarning() << Q_FUNC_INFO << "unknown seek mode, assuming OSFSK_SET";
+        Q_FALLTHROUGH();
+    case OSFSK_SET:
+        return not fp->seek(pos);
+    case OSFSK_CUR:
+        return not fp->seek(fp->pos() + pos);
+    case OSFSK_END:
+        return not fp->seek(fp->size() + pos);
+    }
 }
 
 /* Close a file.
  */
-void osfcls(osfildef* fp)
+void osfcls(osfildef* const fp)
 {
+    Q_ASSERT(fp != nullptr);
+
     delete fp;
 }
 
 /* Delete a file.
  */
-auto osfdel(const char* fname) -> int
+auto osfdel(const char* const fname) -> int
 {
+    Q_ASSERT(fname != nullptr);
+
     return not QFile::remove(fnameToQStr(fname));
 }
 
 /* Rename a file.
  */
-auto os_rename_file(const char* oldname, const char* newname) -> int
+auto os_rename_file(const char* const oldname, const char* const newname) -> int
 {
+    Q_ASSERT(oldname != nullptr);
+    Q_ASSERT(newname != nullptr);
+
     return QFile::rename(fnameToQStr(oldname), fnameToQStr(newname));
 }
 
 /* Access a file - determine if the file exists.
  */
-auto osfacc(const char* fname) -> int
+auto osfacc(const char* const fname) -> int
 {
+    Q_ASSERT(fname != nullptr);
+
     const QFileInfo info(fnameToQStr(fname));
     // Since exists() returns false for dangling symlinks, we need
     // to explicitly check whether it's a symlink or not.
-    if (not info.exists() and not info.isSymLink()) {
-        return 1;
-    }
-    return 0;
+    return not info.exists() and not info.isSymLink();
 }
 
 // On Windows, we need to enable NTFS permission lookups.
@@ -346,12 +357,12 @@ auto osfacc(const char* fname) -> int
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 #endif
 
-auto os_file_stat(const char* fname, int follow_links, os_file_stat_t* s) -> int
+auto os_file_stat(const char* const fname, const int follow_links, os_file_stat_t* const s) -> int
 {
     Q_ASSERT(fname != nullptr);
     Q_ASSERT(s != nullptr);
 
-    const QString& fnameStr = fnameToQStr(fname);
+    const auto fnameStr = fnameToQStr(fname);
 
 #ifdef Q_OS_WIN
     struct __stat64 info;
@@ -361,7 +372,7 @@ auto os_file_stat(const char* fname, int follow_links, os_file_stat_t* s) -> int
     wFname[fnameStr.toWCharArray(wFname)] = L'\0';
 
     // Get the file information.
-    int statRet = _wstat64(wFname, &info);
+    const int statRet = _wstat64(wFname, &info);
     delete[] wFname;
     if (statRet != 0)
         return FALSE;
@@ -375,13 +386,11 @@ auto os_file_stat(const char* fname, int follow_links, os_file_stat_t* s) -> int
     s->mode = info.st_mode;
 #else
     struct stat buf;
-    int statRet;
-    if (follow_links)
-        statRet = stat(QFile::encodeName(fnameStr).constData(), &buf);
-    else
-        statRet = lstat(QFile::encodeName(fnameStr).constData(), &buf);
-    if (statRet != 0)
+    const auto statRet = follow_links ? stat(QFile::encodeName(fnameStr).constData(), &buf)
+                                      : lstat(QFile::encodeName(fnameStr).constData(), &buf);
+    if (statRet != 0) {
         return false;
+    }
 
     s->sizelo = (uint32_t)(buf.st_size & 0xFFFFFFFF);
     s->sizehi = sizeof(buf.st_size) > 4 ? (uint32_t)((buf.st_size >> 32) & 0xFFFFFFFF) : 0;
@@ -398,7 +407,7 @@ auto os_file_stat(const char* fname, int follow_links, os_file_stat_t* s) -> int
         return false;
     }
     QFileInfo inf(fnameStr);
-    bool isLink = inf.isSymLink();
+    auto isLink = inf.isSymLink();
 #ifdef Q_OS_WIN
     // Don't treat shortcut files as symlinks.
     if (isLink and (QString::compare(inf.suffix(), "lnk", Qt::CaseInsensitive) == 0)) {
@@ -436,67 +445,80 @@ auto os_file_stat(const char* fname, int follow_links, os_file_stat_t* s) -> int
 
 /* Manually resolve a symbolic link.
  */
-auto os_resolve_symlink(const char* fname, char* target, size_t target_size) -> int
+auto os_resolve_symlink(const char* const fname, char* const target, const size_t target_size)
+    -> int
 {
-    const QByteArray& str = qStrToFname(QFileInfo(fnameToQStr(fname)).symLinkTarget());
-    if (str.isEmpty() or str.size() >= static_cast<int>(target_size)) {
+    Q_ASSERT(fname != nullptr);
+    Q_ASSERT(target != nullptr);
+
+    const auto resolved = qStrToFname(QFileInfo(fnameToQStr(fname)).symLinkTarget());
+    if (resolved.isEmpty() or resolved.size() >= static_cast<int>(target_size)) {
         return false;
     }
-    qstrcpy(target, str.constData());
+    std::memcpy(target, resolved.constData(), resolved.size() + 1);
     return true;
 }
 
 /* Get a list of root directories.
  */
-auto os_get_root_dirs(char* buf, size_t buflen) -> size_t
+auto os_get_root_dirs(char* const buf, const size_t buflen) -> size_t
 {
-    const QFileInfoList& rootList = QDir::drives();
+    const auto rootList = QDir::drives();
     // Paranoia.
     if (rootList.size() == 0) {
         return 0;
     }
 
     QByteArray str;
-    for (int i = 0; i < rootList.size(); ++i) {
-        str += rootList.at(i).path().toLatin1();
+    for (const auto& i : rootList) {
+        str += i.path().toLatin1();
         // Every path needs to be NULL-terminated.
         str += '\0';
     }
+
     // The whole result must end with two NULL bytes.
     str += '\0';
 
     if (buf != nullptr and static_cast<int>(buflen) >= str.size()) {
-        memcpy(buf, str.constData(), str.size());
+        std::memcpy(buf, str.constData(), str.size());
     }
     return str.size();
 }
 
-auto os_open_dir(const char* dirname, osdirhdl_t* handle) -> int
+auto os_open_dir(const char* const dirname, osdirhdl_t* const handle) -> int
 {
-    QDirIterator* d = new QDirIterator(
+    Q_ASSERT(dirname != nullptr);
+    Q_ASSERT(handle != nullptr);
+
+    auto* const it = new QDirIterator(
         fnameToQStr(dirname), QDir::Dirs | QDir::Files | QDir::Hidden | QDir::System);
-    if (d->next().isEmpty()) {
+    if (it->next().isEmpty()) {
         // We can't read anything.  Don't know why, don't care.
-        delete d;
+        delete it;
         return false;
     }
-    *handle = d;
+    *handle = it;
     return true;
 }
 
-auto os_read_dir(osdirhdl_t handle, char* fname, size_t fname_size) -> int
+auto os_read_dir(const osdirhdl_t handle, char* const fname, const size_t fname_size) -> int
 {
-    const QByteArray& str = qStrToFname(handle->fileName());
+    Q_ASSERT(handle != nullptr);
+    Q_ASSERT(fname != nullptr);
+
+    const auto str = qStrToFname(handle->fileName());
     if (str.isEmpty() or str.size() >= static_cast<int>(fname_size)) {
         return false;
     }
-    qstrcpy(fname, str.constData());
+    std::memcpy(fname, str.constData(), str.size() + 1);
     handle->next();
     return true;
 }
 
-void os_close_dir(osdirhdl_t handle)
+void os_close_dir(const osdirhdl_t handle)
 {
+    Q_ASSERT(handle != nullptr);
+
     delete handle;
 }
 
@@ -504,27 +526,35 @@ void os_close_dir(osdirhdl_t handle)
  * the 'mode' member of os_file_stat_t from os_file_stat(), so we
  * simply call that routine and return the value.
  */
-auto osfmode(const char* fname, int follow_links, unsigned long* mode, unsigned long* attr) -> int
+auto osfmode(
+    const char* const fname, const int follow_links, unsigned long* const mode,
+    unsigned long* const attr) -> int
 {
+    Q_ASSERT(fname != nullptr);
+
     os_file_stat_t s;
-    int ok;
-    if ((ok = os_file_stat(fname, follow_links, &s)) != false) {
-        if (mode != nullptr)
+    const auto ok = os_file_stat(fname, follow_links, &s);
+    if (ok) {
+        if (mode != nullptr) {
             *mode = s.mode;
-        if (attr != nullptr)
+        }
+        if (attr != nullptr) {
             *attr = s.attrs;
+        }
     }
     return ok;
 }
 
 /* Determine if the given filename refers to a special file.
  */
-auto os_is_special_file(const char* fname) -> os_specfile_t
+auto os_is_special_file(const char* const fname) -> os_specfile_t
 {
+    Q_ASSERT(fname != nullptr);
+
     // We also check for "./" and "../" instead of just "." and
     // "..".  (We use OSPATHCHAR instead of '/' though.)
-    const char selfWithSep[3] = {'.', OSPATHCHAR, '\0'};
-    const char parentWithSep[4] = {'.', '.', OSPATHCHAR, '\0'};
+    constexpr char selfWithSep[] = {'.', OSPATHCHAR, '\0'};
+    constexpr char parentWithSep[] = {'.', '.', OSPATHCHAR, '\0'};
     if ((strcmp(fname, ".") == 0) or (strcmp(fname, selfWithSep) == 0))
         return OS_SPECFILE_SELF;
     if ((strcmp(fname, "..") == 0) or (strcmp(fname, parentWithSep) == 0))
@@ -536,7 +566,7 @@ auto os_is_special_file(const char* fname) -> os_specfile_t
 
 /* Convert string to all-lowercase.
  */
-auto os_strlwr(char* s) -> char*
+auto os_strlwr(char* const s) -> char*
 {
     Q_ASSERT(s != nullptr);
 
@@ -562,7 +592,7 @@ auto os_strlwr(char* s) -> char*
  *
  * We don't support this (and probably never will.)
  */
-auto os_exeseek(const char*, const char*) -> osfildef*
+auto os_exeseek(const char* const /*argv0*/, const char* const /*type*/) -> osfildef*
 {
     return nullptr;
 }
@@ -570,26 +600,28 @@ auto os_exeseek(const char*, const char*) -> osfildef*
 /* Get the full filename (including directory path) to the executable
  * file.
  */
-auto os_get_exe_filename(char* buf, size_t buflen, const char*) -> int
+auto os_get_exe_filename(char* const buf, const size_t buflen, const char* const /*argv0*/) -> int
 {
+    Q_ASSERT(buf != nullptr);
+
     QFileInfo inf(QApplication::applicationFilePath());
 
     if (not inf.exists() or not inf.isReadable()) {
         return false;
     }
 
-    const QByteArray& encodedFilename = qStrToFname(inf.filePath());
-    if (encodedFilename.length() + 1 > static_cast<int>(buflen)) {
-        // The result would not fit in the buffer.
+    const auto encodedFilename = qStrToFname(inf.filePath());
+    if (encodedFilename.size() >= static_cast<int>(buflen)) {
         return false;
     }
-    qstrcpy(buf, encodedFilename.constData());
+    std::memcpy(buf, encodedFilename.constData(), encodedFilename.size() + 1);
     return true;
 }
 
 /* Get a special directory path.
  */
-void os_get_special_path(char* buf, size_t buflen, const char* /*argv0*/, int id)
+void os_get_special_path(
+    char* const buf, const size_t buflen, const char* const /*argv0*/, const int id)
 {
     Q_ASSERT(buf != nullptr);
     Q_ASSERT(buflen > 0);
@@ -608,7 +640,7 @@ void os_get_special_path(char* buf, size_t buflen, const char* /*argv0*/, int id
 
     case OS_GSP_T3_APP_DATA:
     case OS_GSP_LOGFILE: {
-        const QString& dirStr = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+        const auto dirStr = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
         QDir dir(dirStr);
         QByteArray result;
         // Create the directory if it doesn't exist.
@@ -648,12 +680,13 @@ void os_get_special_path(char* buf, size_t buflen, const char* /*argv0*/, int id
  * FIXME: We only look in the current directory, whatever that might be.
  */
 #if 0
-int
-os_locate( const char* fname, int /*flen*/, const char* /*arg0*/, char* buf, size_t bufsiz )
+auto os_locate(
+    const char* const fname, const int /*flen*/, const char* const /*arg0*/, char* const buf,
+    const size_t bufsiz) -> int
 {
-    //qDebug() << Q_FUNC_INFO << "\n Looking for:" << fname;
-    Q_ASSERT(fname != 0);
-    Q_ASSERT(buf != 0);
+    // qDebug() << Q_FUNC_INFO << "\n Looking for:" << fname;
+    Q_ASSERT(fname != nullptr);
+    Q_ASSERT(buf != nullptr);
 
     const QFileInfo& fileInfo = QFileInfo(fnameToQStr(fname));
     const QByteArray& result = qStrToFname(fileInfo.absoluteFilePath());
@@ -671,7 +704,7 @@ os_locate( const char* fname, int /*flen*/, const char* /*arg0*/, char* buf, siz
 
 /* Create and open a temporary file.
  */
-auto os_create_tempfile(const char* fname, char* buf) -> osfildef*
+auto os_create_tempfile(const char* const fname, char* const buf) -> osfildef*
 {
     if (fname != nullptr and fname[0] != '\0') {
         // A filename has been specified; use it.
@@ -682,7 +715,7 @@ auto os_create_tempfile(const char* fname, char* buf) -> osfildef*
 
     // No filename was given; create a temporary file.
     buf[0] = '\0';
-    QTemporaryFile* file = new QTemporaryFile(QDir::tempPath() + "/qtads_XXXXXX");
+    auto* const file = new QTemporaryFile(QDir::tempPath() + "/qtads_XXXXXX");
     if (not file->open()) {
         delete file;
         return nullptr;
@@ -696,14 +729,10 @@ auto osfdel_temp(const char* fname) -> int
 {
     Q_ASSERT(fname != nullptr);
 
-    if (fname[0] == '\0' or QFile::remove(fnameToQStr(fname))) {
-        // If fname was empty, it has been already deleted automatically by
-        // osfcls().  If fname was not empty, QFile::remove has taken care of
-        // deleting the file.
-        return 0;
+    if (fname[0] != '\0') {
+        return not QFile::remove(fnameToQStr(fname));
     }
-    // QFile::remove() failed.
-    return 1;
+    return 0;
 }
 
 /* This isn't actually used by the basecode.
@@ -717,8 +746,10 @@ os_get_tmp_path( char* buf )
 
 /* Generate a name for a temporary file.
  */
-auto os_gen_temp_filename(char* buf, size_t buflen) -> int
+auto os_gen_temp_filename(char* const buf, const size_t buflen) -> int
 {
+    Q_ASSERT(buf != nullptr);
+
     QTemporaryFile tmpfile(QDir::tempPath() + "/qtads_XXXXXX");
     if (not tmpfile.open()) {
         return false;
@@ -729,13 +760,11 @@ auto os_gen_temp_filename(char* buf, size_t buflen) -> int
     // before our caller gets the chance to re-create the file.
     tmpfile.setAutoRemove(false);
 
-    const QByteArray& data = qStrToFname(tmpfile.fileName());
-    if (data.length() >= static_cast<int>(buflen)) {
-        // 'buf' isn't big enough to hold the result, including the
-        // terminating '\0'.
+    const auto filename = qStrToFname(tmpfile.fileName());
+    if (filename.size() >= static_cast<int>(buflen)) {
         return false;
     }
-    qstrcpy(buf, data.constData());
+    std::memcpy(buf, filename.constData(), filename.size() + 1);
     return true;
 }
 
@@ -745,18 +774,19 @@ auto os_gen_temp_filename(char* buf, size_t buflen) -> int
 
 /* Create a directory.
  */
-auto os_mkdir(const char* dir, int create_parents) -> int
+auto os_mkdir(const char* const dir, const int create_parents) -> int
 {
-    if (create_parents) {
-        return QDir().mkpath(fnameToQStr(dir));
-    }
-    return QDir().mkdir(fnameToQStr(dir));
+    Q_ASSERT(dir != nullptr);
+
+    return create_parents ? QDir().mkpath(fnameToQStr(dir)) : QDir().mkdir(fnameToQStr(dir));
 }
 
 /* Remove a directory.
  */
-auto os_rmdir(const char* dir) -> int
+auto os_rmdir(const char* const dir) -> int
 {
+    Q_ASSERT(dir != nullptr);
+
     return QDir().rmdir(fnameToQStr(dir));
 }
 
@@ -766,7 +796,7 @@ auto os_rmdir(const char* dir) -> int
 
 /* Apply a default extension to a filename, if it doesn't already have one.
  */
-void os_defext(char* fn, const char* ext)
+void os_defext(char* const fn, const char* const ext)
 {
     Q_ASSERT(fn != nullptr);
     Q_ASSERT(ext != nullptr);
@@ -777,11 +807,8 @@ void os_defext(char* fn, const char* ext)
 }
 
 /* Unconditionally add an extention to a filename.
- *
- * TODO: Find out if there are systems that don't use the dot as the extension
- * separator.  (Only systems supported by Qt of course.)
  */
-void os_addext(char* fn, const char* ext)
+void os_addext(char* const fn, const char* const ext)
 {
     Q_ASSERT(fn != nullptr);
     Q_ASSERT(ext != nullptr);
@@ -792,7 +819,7 @@ void os_addext(char* fn, const char* ext)
 
 /* Remove the extension from a filename.
  */
-void os_remext(char* fn)
+void os_remext(char* const fn)
 {
     Q_ASSERT(fn != nullptr);
 
@@ -809,11 +836,11 @@ void os_remext(char* fn)
  *
  * FIXME: This only works for UTF-8 (T3 only).
  */
-auto os_get_root_name(const char* buf) -> char*
+auto os_get_root_name(const char* const buf) -> char*
 {
     Q_ASSERT(buf != nullptr);
 
-    const char* p = buf;
+    const auto* p = buf;
     for (p += std::strlen(buf) - 1; p > buf and *p != '/'; --p)
         ;
     if (p != buf) {
@@ -825,7 +852,8 @@ auto os_get_root_name(const char* buf) -> char*
 /* Build a full path name, given a path and a filename.
  */
 void os_build_full_path(
-    char* fullpathbuf, size_t fullpathbuflen, const char* path, const char* filename)
+    char* const fullpathbuf, const size_t fullpathbuflen, const char* const path,
+    const char* const filename)
 {
     Q_ASSERT(fullpathbuf != nullptr);
     Q_ASSERT(path != nullptr);
@@ -838,7 +866,8 @@ void os_build_full_path(
 }
 
 void os_combine_paths(
-    char* fullpathbuf, size_t fullpathbuflen, const char* path, const char* filename)
+    char* const fullpathbuf, const size_t fullpathbuflen, const char* const path,
+    const char* const filename)
 {
     Q_ASSERT(fullpathbuf != nullptr);
     Q_ASSERT(path != nullptr);
@@ -864,7 +893,7 @@ void os_combine_paths(
 
 /* Extract the path from a filename.
  */
-void os_get_path_name(char* pathbuf, size_t pathbuflen, const char* fname)
+void os_get_path_name(char* const pathbuf, const size_t pathbuflen, const char* const fname)
 {
     Q_ASSERT(pathbuf != nullptr);
     Q_ASSERT(fname != nullptr);
@@ -874,18 +903,18 @@ void os_get_path_name(char* pathbuf, size_t pathbuflen, const char* fname)
 
 /* Convert a relative URL into a relative filename path.
  */
-void os_cvt_url_dir(char* result_buf, size_t result_buf_size, const char* src_url)
+void os_cvt_url_dir(char* const result_buf, const size_t result_buf_size, const char* const src_url)
 {
     Q_ASSERT(result_buf != nullptr);
     Q_ASSERT(src_url != nullptr);
 
-    QString result(fnameToQStr(src_url));
+    const auto result = fnameToQStr(src_url);
     qstrncpy(result_buf, qStrToFname(result).constData(), result_buf_size);
 }
 
 /* Determine whether a filename specifies an absolute or relative path.
  */
-auto os_is_file_absolute(const char* fname) -> int
+auto os_is_file_absolute(const char* const fname) -> int
 {
     Q_ASSERT(fname != nullptr);
 
@@ -894,11 +923,13 @@ auto os_is_file_absolute(const char* fname) -> int
 
 /* Get the absolute, fully qualified filename for a file.
  */
-auto os_get_abs_filename(char* result_buf, size_t result_buf_size, const char* filename) -> int
+auto os_get_abs_filename(
+    char* const result_buf, const size_t result_buf_size, const char* const filename) -> int
 {
     Q_ASSERT(result_buf != nullptr);
+    Q_ASSERT(filename != nullptr);
 
-    const QByteArray& data = qStrToFname(QFileInfo(fnameToQStr(filename)).absoluteFilePath());
+    const auto data = qStrToFname(QFileInfo(fnameToQStr(filename)).absoluteFilePath());
     qstrncpy(result_buf, data.constData(), result_buf_size);
     if (data.length() >= static_cast<int>(result_buf_size)) {
         // Result didn't fit in 'result_buf'.
@@ -910,15 +941,16 @@ auto os_get_abs_filename(char* result_buf, size_t result_buf_size, const char* f
 // This is only used by the HTML TADS debugger, which we don't include
 // in our build.
 #if 0
-int
-os_get_rel_path( char* result_buf, size_t result_buf_size, const char* basepath, const char* filename)
+int os_get_rel_path(
+    char* const result_buf, const size_t result_buf_size, const char* const basepath,
+    const char* const filename)
 {
-    Q_ASSERT(result_buf != 0);
-    Q_ASSERT(basepath != 0);
-    Q_ASSERT(filename != 0);
+    Q_ASSERT(result_buf != nullptr);
+    Q_ASSERT(basepath != nullptr);
+    Q_ASSERT(filename != nullptr);
 
     QDir baseDir(fnameToQStr(basepath));
-    const QString& result = baseDir.relativeFilePath(fnameToQStr(filename));
+    const auto result = baseDir.relativeFilePath(fnameToQStr(filename));
     if (result.isEmpty()) {
         qstrncpy(result_buf, filename, result_buf_size);
         return false;
@@ -934,8 +966,10 @@ os_get_rel_path( char* result_buf, size_t result_buf_size, const char* basepath,
 /* TODO: We use the version from the DOS/Windows implementation for now.
  * I'll do the Qt-specific implementation later.
  */
-static void canonicalize_path(char* path)
+static void canonicalize_path(char* const path)
 {
+    Q_ASSERT(path != nullptr);
+
     // We canonicalize only the path, in case the file doesn't actually exist.
     // QFileInfo::canonicalFilePath() doesn't work for non-existent files.
     QFileInfo info(fnameToQStr(path));
@@ -946,10 +980,10 @@ static void canonicalize_path(char* path)
         cleanPath = info.path();
     }
 
-    QByteArray canonPath(qStrToFname(QDir(cleanPath).canonicalPath()));
+    auto canonPath = qStrToFname(QDir(cleanPath).canonicalPath());
     // Append the filename if we previously stripped it.
     if (not info.isDir()) {
-        QString cleanFilename(fnameToQStr(path));
+        const auto cleanFilename = fnameToQStr(path);
         int i = cleanFilename.length();
         do {
             --i;
@@ -959,9 +993,12 @@ static void canonicalize_path(char* path)
     qstrncpy(path, canonPath.constData(), OSFNMAX);
 }
 
-auto os_is_file_in_dir(const char* filename, const char* path, int include_subdirs, int match_self)
-    -> int
+auto os_is_file_in_dir(
+    const char* filename, const char* path, const int include_subdirs, const int match_self) -> int
 {
+    Q_ASSERT(filename != nullptr);
+    Q_ASSERT(path != nullptr);
+
     char filename_buf[OSFNMAX], path_buf[OSFNMAX];
     size_t flen, plen;
 
@@ -1058,15 +1095,16 @@ auto os_is_file_in_dir(const char* filename, const char* path, int include_subdi
 
 #else
 
-int os_is_file_in_dir(const char* filename, const char* path, int include_subdirs)
+auto os_is_file_in_dir(
+    const char* const filename, const char* const path, const int include_subdirs) -> int
 {
-    Q_ASSERT(filename != 0);
-    Q_ASSERT(path != 0);
+    Q_ASSERT(filename != nullptr);
+    Q_ASSERT(path != nullptr);
     Q_ASSERT(filename[0] != '\0');
     Q_ASSERT(filename[qstrlen(filename) - 1] != '/');
 
     QFileInfo fileInf(fnameToQStr(filename));
-    const QString& pathStr = QFileInfo(fnameToQStr(path)).canonicalFilePath();
+    const auto pathStr = QFileInfo(fnameToQStr(path)).canonicalFilePath();
 
     // If the filename is absolute but the file doesn't exist, we know
     // that we're not going to find it anywhere, so report failure.
@@ -1074,20 +1112,13 @@ int os_is_file_in_dir(const char* filename, const char* path, int include_subdir
         return false;
     }
 
-    const QString& fnameStr = fileInf.filePath();
-
-    // Look in 'path' first, before recursing its subdirectories.
-    bool found;
-    if (fnameStr.startsWith(pathStr) and fileInf.exists())
-        found = true;
-    else
-        found = false;
+    const auto fnameStr = fileInf.filePath();
 
     // If we already found the file in 'path', or we're not searching in
     // subdirectories, report the result now; in both cases, we don't need
     // to recurse subdirectories.
-    if (found or not include_subdirs) {
-        return found;
+    if ((fnameStr.startsWith(pathStr) and fileInf.exists()) or not include_subdirs) {
+        return true;
     }
 
     // We didn't find the file and need to recurse all subdirectories.
@@ -1098,12 +1129,12 @@ int os_is_file_in_dir(const char* filename, const char* path, int include_subdir
     QDirIterator it(
         pathStr, QDir::Dirs | QDir::NoDotAndDotDot,
         QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-    while (it.hasNext() and not found) {
+    while (it.hasNext()) {
         if (fnameStr.startsWith(QDir(it.next()).canonicalPath()) and fileInf.exists()) {
-            found = true;
+            return true;
         }
     }
-    return found;
+    return false;
 }
 #endif
 
@@ -1121,7 +1152,7 @@ int os_is_file_in_dir(const char* filename, const char* path, int include_subdir
 
 /* Get a suitable seed for a random number generator.
  */
-void os_rand(long* val)
+void os_rand(long* const val)
 {
     Q_ASSERT(val != nullptr);
 
@@ -1140,7 +1171,7 @@ void os_rand(long* val)
 
 /* Generate random bytes for use in seeding a PRNG (pseudo-random number generator).
  */
-void os_gen_rand_bytes(unsigned char* buf, size_t len)
+void os_gen_rand_bytes(unsigned char* const buf, const size_t len)
 {
     Q_ASSERT(buf != nullptr);
 
@@ -1148,7 +1179,7 @@ void os_gen_rand_bytes(unsigned char* buf, size_t len)
     Q_ASSERT(len % 4 == 0);
     std::vector<quint32> tmp(len / 4);
     QRandomGenerator::system()->fillRange(tmp.data(), tmp.size());
-    memcpy(buf, tmp.data(), tmp.size() * sizeof(*tmp.data()));
+    std::memcpy(buf, tmp.data(), tmp.size() * sizeof(*tmp.data()));
 #else
     std::random_device dev;
     std::uniform_int_distribution<unsigned char> dist;
@@ -1160,12 +1191,14 @@ void os_gen_rand_bytes(unsigned char* buf, size_t len)
  * Allocating sprintf and vsprintf.
  */
 // Currently, this is not used anywhere.
-// int
-// os_asprintf( char** bufptr, const char* fmt, ... )
-//{}
+// auto os_asprintf(char** bufptr, const char* fmt, ...) -> int
+// { }
 
-auto os_vasprintf(char** bufptr, const char* fmt, va_list ap) -> int
+auto os_vasprintf(char** const bufptr, const char* const fmt, va_list ap) -> int
 {
+    Q_ASSERT(bufptr != nullptr);
+    Q_ASSERT(fmt != nullptr);
+
     return vasprintf(bufptr, fmt, ap);
 }
 
@@ -1178,7 +1211,7 @@ auto os_vasprintf(char** bufptr, const char* fmt, va_list ap) -> int
  * some time.  On today's computers this takes milliseconds, so it doesn't make
  * sense to provide a "busy cursor".
  */
-void os_csr_busy(int /*flag*/)
+void os_csr_busy(const int /*flag*/)
 {
     /*
     if (flag) {
@@ -1197,12 +1230,12 @@ void os_csr_busy(int /*flag*/)
  * other mechanism.
  */
 auto os_askfile(
-    const char* prompt, char* fname_buf, int fname_buf_len, int prompt_type,
-    os_filetype_t file_type) -> int
+    const char* const prompt, char* const fname_buf, const int fname_buf_len, const int prompt_type,
+    const os_filetype_t file_type) -> int
 {
-    Q_ASSERT(prompt_type == OS_AFP_SAVE or prompt_type == OS_AFP_OPEN);
     Q_ASSERT(prompt != nullptr);
     Q_ASSERT(fname_buf != nullptr);
+    Q_ASSERT(prompt_type == OS_AFP_SAVE or prompt_type == OS_AFP_OPEN);
 
     QString filter;
     QString ext;
@@ -1233,40 +1266,33 @@ auto os_askfile(
         filter += ";;" + QObject::tr("All Files") + " (*)";
     }
 
-    QString promptStr;
-    if (qFrame->tads3()) {
-        promptStr = QString::fromUtf8(prompt);
-    } else {
-        // TADS 2 does not use UTF-8; use the encoding from our settings for the
-        // prompt message.
-        QTextCodec* codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
-        promptStr = codec->toUnicode(prompt);
-    }
-
-    QString filename;
-    if (prompt_type == OS_AFP_OPEN) {
-        filename = QFileDialog::getOpenFileName(
+    const auto promptStr = qFrame->tads3()
+        ? QString::fromUtf8(prompt)
+        : QTextCodec::codecForName(qFrame->settings().tads2Encoding)->toUnicode(prompt);
+    const auto filename = prompt_type == OS_AFP_OPEN
+        ? QFileDialog::getOpenFileName(qFrame->gameWindow(), promptStr, QDir::currentPath(), filter)
+        : QFileDialog::getSaveFileName(
             qFrame->gameWindow(), promptStr, QDir::currentPath(), filter);
-    } else {
-        filename = QFileDialog::getSaveFileName(
-            qFrame->gameWindow(), promptStr, QDir::currentPath(), filter);
-    }
 
     if (filename.isEmpty()) {
         // User cancelled.
         return OS_AFE_CANCEL;
     }
 
-    const QByteArray& result = qStrToFname(filename);
-    if (fname_buf_len <= result.length()) {
+    const auto result = qStrToFname(filename);
+    if (result.size() >= fname_buf_len) {
         return OS_AFE_FAILURE;
     }
-    strcpy(fname_buf, result.constData());
+    std::memcpy(fname_buf, result.constData(), result.size() + 1);
     if (not ext.isEmpty()) {
         // Since `ext' is not empty, an extension should be
         // appended (if none exists already).
-        os_defext(fname_buf, qStrToFname(ext).constData());
-        fname_buf[fname_buf_len - 1] = '\0';
+        const auto encoded_ext = qStrToFname(ext);
+        // +1 to account for the "."
+        if (result.size() + encoded_ext.size() + 1 >= fname_buf_len) {
+            return OS_AFE_FAILURE;
+        }
+        os_defext(fname_buf, encoded_ext.constData());
     }
     return OS_AFE_SUCCESS;
 }
@@ -1276,10 +1302,12 @@ auto os_askfile(
 /* Ask for input through a dialog.
  */
 auto os_input_dialog(
-    int icon_id, const char* prompt, int standard_button_set, const char** buttons,
-    int button_count, int default_index, int cancel_index) -> int
+    const int icon_id, const char* const prompt, const int standard_button_set,
+    const char** const buttons, const int button_count, const int default_index,
+    const int cancel_index) -> int
 {
     Q_ASSERT(prompt != nullptr);
+    Q_ASSERT(buttons != nullptr);
     Q_ASSERT(
         icon_id == OS_INDLG_ICON_NONE or icon_id == OS_INDLG_ICON_WARNING
         or icon_id == OS_INDLG_ICON_INFO or icon_id == OS_INDLG_ICON_QUESTION
@@ -1292,7 +1320,7 @@ auto os_input_dialog(
     QMessageBox dialog(qWinGroup);
 
     // We'll use that if we're running a T2 game.
-    QTextCodec* t2Codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
+    const auto* const t2Codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
 
     dialog.setText(qFrame->tads3() ? QString::fromUtf8(prompt) : t2Codec->toUnicode(prompt));
 
@@ -1336,13 +1364,14 @@ auto os_input_dialog(
         default:
             qWarning("os_input_dialog: unrecognized button set");
         }
-    } else
+    } else {
         for (int i = 0; i < button_count; ++i) {
             Q_ASSERT(buttons[i] != nullptr);
-            const QString& buttonText =
+            const auto buttonText =
                 qFrame->tads3() ? QString::fromUtf8(buttons[i]) : t2Codec->toUnicode(buttons[i]);
             buttonList += dialog.addButton(buttonText, QMessageBox::AcceptRole);
         }
+    }
 
     if (default_index != 0) {
         dialog.setDefaultButton(buttonList[default_index - 1]);
@@ -1354,7 +1383,7 @@ auto os_input_dialog(
     // otherwise be appended automatically by some window managers (like KDE.)
     dialog.setWindowTitle(qWinGroup->windowTitle() + ' ');
     dialog.exec();
-    QAbstractButton* result = dialog.clickedButton();
+    auto* const result = dialog.clickedButton();
     if (result == nullptr) {
         return cancel_index;
     }
@@ -1367,8 +1396,11 @@ auto os_input_dialog(
 
 /* Higher-precision time (nanosecond precision).
  */
-void os_time_ns(os_time_t* seconds, long* nanoseconds)
+void os_time_ns(os_time_t* const seconds, long* const nanoseconds)
 {
+    Q_ASSERT(seconds != nullptr);
+    Q_ASSERT(nanoseconds != nullptr);
+
     namespace cr = std::chrono;
 
     // C++ does not guarantee that the system clock's epoch is the same as
@@ -1380,14 +1412,14 @@ void os_time_ns(os_time_t* seconds, long* nanoseconds)
 
 /* Get the current system high-precision timer.
  */
-auto os_get_sys_clock_ms(void) -> long
+auto os_get_sys_clock_ms() -> long
 {
     return os_get_time();
 }
 
 /* Sleep for a while.
  */
-void os_sleep_ms(long ms)
+void os_sleep_ms(const long ms)
 {
     if (not qFrame->gameRunning() or ms < 1) {
         return;
@@ -1406,7 +1438,7 @@ void os_sleep_ms(long ms)
  *
  * TODO: Find out if this can be empty on all systems Qt supports.
  */
-void os_settype(const char*, os_filetype_t)
+void os_settype(const char* const /*file*/, const os_filetype_t /*type*/)
 { }
 
 /* --------------------------------------------------------------------
@@ -1416,14 +1448,14 @@ void os_settype(const char*, os_filetype_t)
  *
  * TODO: Find out what this is supposed to do.
  */
-auto os_paramfile(char * /*buf*/) -> int
+auto os_paramfile(char* const /*buf*/) -> int
 {
     return false;
 }
 
 /* Terminate the program and exit with the given exit status.
  */
-void os_term(int /*status*/)
+void os_term(const int /*status*/)
 {
     qDebug() << Q_FUNC_INFO;
 }
@@ -1432,7 +1464,7 @@ void os_term(int /*status*/)
  *
  * TODO: Find out if this can be empty on all systems Qt supports.
  */
-void os_tzset(void)
+void os_tzset()
 { }
 
 /* Set the default saved-game extension.
@@ -1441,7 +1473,7 @@ void os_tzset(void)
  * invoked only if the interpreter is running as a stand-alone game,
  * and this isn't possible in QTads.
  */
-void os_set_save_ext(const char*)
+void os_set_save_ext(const char* const)
 { }
 
 /* --------------------------------------------------------------------
@@ -1452,33 +1484,34 @@ void os_set_save_ext(const char*)
  *
  * We use UTF-8 for everything, which should work on all platforms.
  */
-void os_get_charmap(char* mapname, int charmap_id)
+void os_get_charmap(char* const mapname, const int charmap_id)
 {
     // qDebug() << Q_FUNC_INFO;
 
     Q_ASSERT(qFrame->tads3());
+    Q_ASSERT(mapname != nullptr);
 
     switch (charmap_id) {
+    default:
+        qWarning("os_get_charmap() got an unknown charmap id");
+        Q_FALLTHROUGH();
     case OS_CHARMAP_DISPLAY:
     case OS_CHARMAP_FILENAME:
     case OS_CHARMAP_FILECONTENTS:
         strcpy(mapname, "utf-8");
         break;
-    default:
-        qWarning("os_get_charmap() got an unknown charmap id");
-        strcpy(mapname, "utf-8");
     }
 }
 
 /* Generate a filename for a character-set mapping file.
  */
-void os_gen_charmap_filename(char* filename, char* internal_id, char* /*argv0*/)
+void os_gen_charmap_filename(char* const filename, char* const internal_id, char* const /*argv0*/)
 {
     qDebug() << Q_FUNC_INFO;
     Q_ASSERT(filename != nullptr);
+    Q_ASSERT(internal_id != nullptr);
 
-    strncpy(filename, qStrToFname(QString::fromLatin1(internal_id) + ".tcp").constData(), OSFNMAX);
-    filename[OSFNMAX - 1] = '\0';
+    qstrncpy(filename, qStrToFname(QString::fromLatin1(internal_id) + ".tcp").constData(), OSFNMAX);
 }
 
 /* Receive notification that a character mapping file has been loaded.
@@ -1486,7 +1519,7 @@ void os_gen_charmap_filename(char* filename, char* internal_id, char* /*argv0*/)
  * We simply switch the codec that QString uses to convert to and from
  * char* and QCString.
  */
-void os_advise_load_charmap(char* /*id*/, char* /*ldesc*/, char* /*sysinfo*/)
+void os_advise_load_charmap(char* const /*id*/, char* const /*ldesc*/, char* const /*sysinfo*/)
 {
     qDebug() << Q_FUNC_INFO;
     // QTextCodec::setCodecForCStrings(QTextCodec::codecForName(sysinfo));
@@ -1497,7 +1530,7 @@ void os_advise_load_charmap(char* /*id*/, char* /*ldesc*/, char* /*sysinfo*/)
 
 /* Get system information.
  */
-auto os_get_sysinfo(int code, void* /*param*/, long* result) -> int
+auto os_get_sysinfo(const int code, void* const /*param*/, long* const result) -> int
 {
     Q_ASSERT(result != nullptr);
 
@@ -1543,35 +1576,19 @@ auto os_get_sysinfo(int code, void* /*param*/, long* result) -> int
         break;
 
     case SYSINFO_PREF_IMAGES:
-        if (qFrame->settings().enableGraphics) {
-            *result = 1;
-        } else {
-            *result = 0;
-        }
+        *result = qFrame->settings().enableGraphics;
         break;
 
     case SYSINFO_PREF_SOUNDS:
-        if (qFrame->settings().enableSoundEffects) {
-            *result = 1;
-        } else {
-            *result = 0;
-        }
+        *result = qFrame->settings().enableSoundEffects;
         break;
 
     case SYSINFO_PREF_MUSIC:
-        if (qFrame->settings().enableMusic) {
-            *result = 1;
-        } else {
-            *result = 0;
-        }
+        *result = qFrame->settings().enableMusic;
         break;
 
     case SYSINFO_PREF_LINKS:
-        if (qFrame->settings().enableLinks) {
-            *result = 1;
-        } else {
-            *result = 0;
-        }
+        *result = qFrame->settings().enableLinks;
         break;
 
     case SYSINFO_TEXT_COLORS:
@@ -1583,12 +1600,9 @@ auto os_get_sysinfo(int code, void* /*param*/, long* result) -> int
         break;
 
     default:
-        // We didn't recognize the code, which means that this
-        // QTads version is too old.
         qWarning("Game specified an unknown os_get_sysinfo() code.");
         return false;
     }
-    // We recognized the code.
     return true;
 }
 
@@ -1599,8 +1613,8 @@ auto os_get_sysinfo(int code, void* /*param*/, long* result) -> int
  */
 // FIXME: Just a dummy implementation for now.
 auto os_show_popup_menu(
-    int /*default_pos*/, int /*x*/, int /*y*/, const char* /*txt*/, size_t /*txtlen*/,
-    union os_event_info_t * /*evt*/) -> int
+    const int /*default_pos*/, const int /*x*/, const int /*y*/, const char* const /*txt*/,
+    const size_t /*txtlen*/, os_event_info_t* const /*evt*/) -> int
 {
     if (qFrame->gameRunning()) {
         return OSPOP_FAIL;
@@ -1611,10 +1625,11 @@ auto os_show_popup_menu(
 /* Enable/disable a System Menu Command event in os_get_event().
  */
 // FIXME: Just a dummy implementation for now.
-void os_enable_cmd_event(int /*id*/, unsigned int /*status*/)
+void os_enable_cmd_event(const int /*id*/, const unsigned int /*status*/)
 { }
 
-void os_init_ui_after_load(class CVmBifTable* /*bif_table*/, class CVmMetaTable* /*meta_table*/)
+void os_init_ui_after_load(
+    class CVmBifTable* const /*bif_table*/, class CVmMetaTable* const /*meta_table*/)
 { }
 
 /*

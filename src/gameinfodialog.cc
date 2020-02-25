@@ -1,10 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
 #include "gameinfodialog.h"
-#include "ui_gameinfodialog.h"
-
-#include <QDebug>
-#include <QFileInfo>
-#include <QMessageBox>
 
 #include "globals.h"
 #include "htmlfmt.h"
@@ -12,6 +7,10 @@
 #include "settings.h"
 #include "sysframe.h"
 #include "syswininput.h"
+#include "ui_gameinfodialog.h"
+#include <QDebug>
+#include <QFileInfo>
+#include <QMessageBox>
 
 void QTadsGameInfoEnum::tads_enum_game_info(const char* const name, const char* const val)
 {
@@ -102,30 +101,30 @@ static auto loadCoverArtImage() -> QImage
     QFile file(fnameToQStr(strBuf.get()));
     if (not file.open(QIODevice::ReadOnly)) {
         qWarning() << "ERROR: Can't open file" << file.fileName();
-        return QImage();
+        return {};
     }
     if (not file.seek(offset)) {
         qWarning() << "ERROR: Can't seek in file" << file.fileName();
-        return QImage();
+        return {};
     }
 
     // Load the image data.
-    const QByteArray& data(file.read(size));
+    const auto data = file.read(size);
     file.close();
     if (data.isEmpty() or static_cast<unsigned long>(data.size()) < size) {
         qWarning() << "ERROR: Could not read" << size << "bytes from file" << file.fileName();
-        return QImage();
+        return {};
     }
     QImage image;
     if (not image.loadFromData(data)) {
         qWarning() << "ERROR: Could not parse image data";
-        return QImage();
+        return {};
     }
 
     // If we got here, all went well.  Return the image scaled to a
     // 200 pixels width if it's too large.  Otherwise, return it as-is.
     if (image.width() > 200) {
-        Qt::TransformationMode mode =
+        const auto mode =
             qFrame->settings().useSmoothScaling ? Qt::SmoothTransformation : Qt::FastTransformation;
         return image.scaledToWidth(200, mode);
     } else {
@@ -139,19 +138,18 @@ GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* const parent)
 {
     ui->setupUi(this);
 
-    CTadsGameInfo info;
-    QTadsGameInfoEnum cb;
-
     // Try to load the cover art.  If there is one, insert it into the text
     // browser as the "CoverArt" resource.
-    const QImage& image = loadCoverArtImage();
+    const auto image = loadCoverArtImage();
     if (not image.isNull()) {
         ui->description->document()->addResource(
             QTextDocument::ImageResource, QUrl("CoverArt"), image);
         resize(width(), height() + image.height());
     }
 
+    CTadsGameInfo info;
     info.read_from_file(fname.constData());
+    QTadsGameInfoEnum cb;
     info.enum_values(&cb);
 
     // Fill out the description.
@@ -219,8 +217,8 @@ GameInfoDialog::GameInfoDialog(const QByteArray& fname, QWidget* const parent)
     // There's no point in having the tableview widget be any higher than the
     // sum of all rows.  This will also make sure that the widget is not shown
     // at all in case we have zero rows.
-    auto margins = ui->table->contentsMargins();
-    int maxHeight = ui->table->rowCount() * ui->table->rowHeight(0);
+    const auto margins = ui->table->contentsMargins();
+    auto maxHeight = ui->table->rowCount() * ui->table->rowHeight(0);
     if (maxHeight > 0) {
         // Only add the margins to the maximum height if we're going to show
         // the table at all.

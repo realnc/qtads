@@ -1,18 +1,17 @@
 // This is copyrighted software. More information is at the end of this file.
+#include "dispwidget.h"
+
+#include "htmlattr.h"
+#include "htmldisp.h"
+#include "htmlfmt.h"
+#include "settings.h"
+#include "syswininput.h"
 #include <QClipboard>
 #include <QDebug>
 #include <QDrag>
 #include <QMimeData>
 #include <QPaintEvent>
 #include <QStatusBar>
-
-#include "htmlattr.h"
-#include "htmldisp.h"
-#include "htmlfmt.h"
-
-#include "dispwidget.h"
-#include "settings.h"
-#include "syswininput.h"
 
 DisplayWidget* DisplayWidget::curSelWidget = nullptr;
 
@@ -30,9 +29,9 @@ DisplayWidget::~DisplayWidget()
 {
     // If we currently have an active selection, make sure no one tries to
     // access it anymore.
-    if (DisplayWidget::curSelWidget == this) {
+    if (curSelWidget == this) {
         qWinGroup->enableCopyAction(false);
-        DisplayWidget::curSelWidget = nullptr;
+        curSelWidget = nullptr;
     }
 }
 
@@ -85,9 +84,9 @@ void DisplayWidget::fHandleDoubleOrTripleClick(const QMouseEvent& e, const bool 
     {
         CStringBuf strBuf;
         formatter_.extract_text(&strBuf, start, end);
-        QString txt(QString::fromUtf8(strBuf.get()).trimmed());
-        if (not txt.isEmpty()) {
-            qFrame->gameWindow()->insertText(txt + ' ');
+        auto text = QString::fromUtf8(strBuf.get()).trimmed();
+        if (not text.isEmpty()) {
+            qFrame->gameWindow()->insertText(text + ' ');
         }
     } else if (~QApplication::keyboardModifiers() & Qt::ControlModifier) {
         formatter_.set_sel_range(start, end);
@@ -100,11 +99,11 @@ void DisplayWidget::fHandleDoubleOrTripleClick(const QMouseEvent& e, const bool 
 
 void DisplayWidget::fSyncClipboard() const
 {
-    const QString txt(fMySelectedText());
-    if (txt.isEmpty() or not QApplication::clipboard()->supportsSelection()) {
+    const auto text = fMySelectedText();
+    if (text.isEmpty() or not QApplication::clipboard()->supportsSelection()) {
         return;
     }
-    QApplication::clipboard()->setText(txt, QClipboard::Selection);
+    QApplication::clipboard()->setText(text, QClipboard::Selection);
 }
 
 void DisplayWidget::paintEvent(QPaintEvent* const e)
@@ -112,7 +111,7 @@ void DisplayWidget::paintEvent(QPaintEvent* const e)
     // qDebug() << Q_FUNC_INFO << "called";
 
     // qDebug() << "repainting" << e->rect();
-    const QRect& qRect = e->region().boundingRect();
+    const auto qRect = e->region().boundingRect();
     CHtmlRect cRect(
         qRect.left(), qRect.top(), qRect.left() + qRect.width(), qRect.top() + qRect.height());
     formatter_.draw(&cRect, false, nullptr);
@@ -121,14 +120,14 @@ void DisplayWidget::paintEvent(QPaintEvent* const e)
 void DisplayWidget::mouseMoveEvent(QMouseEvent* const e)
 {
     // Avoid registering a triple click directly after the mouse was moved.
-    fLastDoubleClick = QTime();
+    fLastDoubleClick = {};
 
     if (e->buttons() & Qt::LeftButton) {
         // If we're tracking a selection, update the selection range.
         if (inSelectMode) {
             formatter_.set_sel_range(
-                CHtmlPoint(fSelectOrigin.x(), fSelectOrigin.y()),
-                CHtmlPoint(e->pos().x(), e->pos().y()), nullptr, nullptr);
+                {fSelectOrigin.x(), fSelectOrigin.y()}, {e->pos().x(), e->pos().y()}, nullptr,
+                nullptr);
             fSyncClipboard();
             return;
         }
@@ -138,8 +137,8 @@ void DisplayWidget::mouseMoveEvent(QMouseEvent* const e)
         if (fHasSelection
             and (e->pos() - fDragStartPos).manhattanLength() > QApplication::startDragDistance())
         {
-            QDrag* drag = new QDrag(this);
-            QMimeData* mime = new QMimeData;
+            auto* const drag = new QDrag(this);
+            auto* const mime = new QMimeData;
             mime->setText(fMySelectedText());
             drag->setMimeData(mime);
             drag->exec(Qt::CopyAction);
@@ -249,7 +248,7 @@ void DisplayWidget::mouseReleaseEvent(QMouseEvent* const e)
 
     // If we're still hovering over the clicked link, process it.
     if (fClickedLink == fHoverLink) {
-        const textchar_t* cmd = fClickedLink->href_.get_url();
+        const auto* cmd = fClickedLink->href_.get_url();
         qFrame->gameWindow()->processCommand(
             cmd, strlen(cmd), fClickedLink->get_append(), not fClickedLink->get_noenter(),
             OS_CMD_NONE);
@@ -282,7 +281,7 @@ void DisplayWidget::clearSelection()
     // of the range to the maximum text offset in the formatter's
     // display list.
     fHasSelection = false;
-    unsigned long start = formatter_.get_text_ofs_max();
+    const auto start = formatter_.get_text_ofs_max();
     formatter_.set_sel_range(start, start);
     // If we're the widget with the active selection, also disable the copy
     // action, since clearing the selection means there's nothing to copy.
@@ -307,12 +306,12 @@ void DisplayWidget::updateLinkTracking(const QPoint mousePos)
     // If specified mouse position is invalid, map it from the current global
     // position.
     if (mousePos.isNull()) {
-        const QPoint pos(mapFromGlobal(QCursor::pos()));
+        const auto pos = mapFromGlobal(QCursor::pos());
         docPos.set(pos.x(), pos.y());
     } else {
         docPos.set(mousePos.x(), mousePos.y());
     }
-    CHtmlDisp* disp = formatter_.find_by_pos(docPos, true);
+    const auto* const disp = formatter_.find_by_pos(docPos, true);
 
     // If there's nothing, no need to continue.
     if (disp == nullptr) {
@@ -330,7 +329,7 @@ void DisplayWidget::updateLinkTracking(const QPoint mousePos)
 
     // It could be a link.
     if (qFrame->settings().enableLinks) {
-        CHtmlDispLink* link = disp->get_link(&formatter_, docPos.x, docPos.y);
+        auto* const link = disp->get_link(&formatter_, docPos.x, docPos.y);
 
         // If we're already tracking a hover over this link, we don't need to
         // do anything else.

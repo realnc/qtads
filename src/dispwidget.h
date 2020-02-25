@@ -1,10 +1,9 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
+#include "config.h"
 #include <QDebug>
 #include <QTime>
 #include <QWidget>
-
-#include "config.h"
 
 class CHtmlDispLink;
 class CHtmlFormatter;

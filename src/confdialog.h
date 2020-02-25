@@ -1,9 +1,8 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
+#include "config.h"
 #include <QDialog>
 #include <memory>
-
-#include "config.h"
 
 class CHtmlSysWinGroupQt;
 class Settings;

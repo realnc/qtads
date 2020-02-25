@@ -92,8 +92,7 @@ extern "C" {
 /* Link error messages into the application. */
 #define ERR_LINK_MESSAGES
 
-/* System identifier and system descriptive name.  We also state "Windows"
- * since we compile and run just fine under MS Windows. */
+/* System identifier and system descriptive name. */
 #define OS_SYSTEM_NAME "Qt"
 #define OS_SYSTEM_LDESC "Qt (Unix/MacOSX/MS-Windows)"
 
@@ -138,7 +137,7 @@ extern "C" {
 
 /* File handle structure for osfxxx functions. */
 #ifdef __cplusplus
-typedef class QFile osfildef;
+using osfildef = class QFile;
 #else
 typedef struct QFile osfildef;
 #endif
@@ -194,7 +193,7 @@ typedef struct QFile osfildef;
 #define OSFATTR_WRITE 0x0008
 
 #ifdef __cplusplus
-typedef class QDirIterator* osdirhdl_t;
+using osdirhdl_t = class QDirIterator*;
 #else
 typedef struct QDirIterator* osdirhdl_t;
 #endif

@@ -1,18 +1,17 @@
 // This is copyrighted software. More information is at the end of this file.
-#include <QDebug>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QTimer>
+#include "dispwidgetinput.h"
 
 #include "htmldisp.h"
 #include "htmlfmt.h"
 #include "htmlinp.h"
 #include "htmltags.h"
-
-#include "dispwidgetinput.h"
 #include "settings.h"
 #include "syswin.h"
 #include "syswingroup.h"
+#include <QDebug>
+#include <QPaintEvent>
+#include <QPainter>
+#include <QTimer>
 
 DisplayWidgetInput::DisplayWidgetInput(
     CHtmlSysWinQt& parent, CHtmlFormatter& formatter, CHtmlInputBuf& tadsBuffer)
@@ -53,7 +52,7 @@ void DisplayWidgetInput::mousePressEvent(QMouseEvent* const e)
 
     // We have a current input tag. If the mouse press was inside it, update
     // the input caret position.
-    unsigned long offs = formatter_.find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
+    const auto offs = formatter_.find_textofs_by_pos(CHtmlPoint(e->x(), e->y()));
     if (offs >= fInpTag->get_text_ofs()) {
         fTadsBuffer.set_caret(offs - fInpTag->get_text_ofs());
         updateCursorPos(formatter_, false, true);
@@ -78,24 +77,17 @@ void DisplayWidgetInput::mouseMoveEvent(QMouseEvent* const e)
     }
 
     // Figure out where to put the caret.
-    auto offs = formatter_.find_textofs_by_pos({e->x(), e->y()});
-    size_t caretPos = 0;
-    if (offs > fInpTag->get_text_ofs()) {
-        caretPos = offs - fInpTag->get_text_ofs();
-    }
+    const auto offs = formatter_.find_textofs_by_pos({e->x(), e->y()});
+    const auto caretPos = offs > fInpTag->get_text_ofs() ? offs - fInpTag->get_text_ofs() : 0;
 
     // If there's no selection, just update the caret position. Otherwise,
     // also sync the input tag's selection with the formatter's.
     if (selStart == selEnd) {
         fTadsBuffer.set_caret(caretPos);
     } else {
-        unsigned long inpSelStart;
-        if (selStart > fInpTag->get_text_ofs()) {
-            inpSelStart = selStart - fInpTag->get_text_ofs();
-        } else {
-            inpSelStart = 0;
-        }
-        unsigned long inpSelEnd = selEnd - fInpTag->get_text_ofs();
+        const auto inpSelStart =
+            selStart > fInpTag->get_text_ofs() ? selStart - fInpTag->get_text_ofs() : 0;
+        const auto inpSelEnd = selEnd - fInpTag->get_text_ofs();
         fTadsBuffer.set_sel_range(inpSelStart, inpSelEnd, caretPos);
     }
     updateCursorPos(formatter_, true, false);

@@ -38,7 +38,7 @@ namespace Ui {
 class GameInfoDialog;
 }
 
-class GameInfoDialog: public QDialog
+class GameInfoDialog final: public QDialog
 {
     Q_OBJECT
 
@@ -46,9 +46,7 @@ public:
     explicit GameInfoDialog(const QByteArray& fname, QWidget* parent = nullptr);
     ~GameInfoDialog() override;
 
-    // Checks whether a game file contains any embedded meta information.
     static auto gameHasMetaInfo(const QByteArray& fname) -> bool;
-
     static auto getMetaInfo(const QByteArray& fname) -> QTadsGameInfoEnum;
 
 private:

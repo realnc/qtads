@@ -1,10 +1,10 @@
 // This is copyrighted software. More information is at the end of this file.
 #include "aboutqtadsdialog.h"
-#include "ui_aboutqtadsdialog.h"
 
 #include "globals.h"
 #include "htmlver.h"
 #include "trd.h"
+#include "ui_aboutqtadsdialog.h"
 #include "vmvsn.h"
 
 AboutQtadsDialog::AboutQtadsDialog(QWidget* const parent)

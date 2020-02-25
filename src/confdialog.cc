@@ -1,18 +1,18 @@
 // This is copyrighted software. More information is at the end of this file.
-#include <QCheckBox>
-#include <QColorDialog>
-#include <QPushButton>
-#include <QTextCodec>
-#include <algorithm>
-#include <vector>
-
 #include "confdialog.h"
+
 #include "globals.h"
 #include "settings.h"
 #include "sysframe.h"
 #include "syswingroup.h"
 #include "ui_confdialog.h"
 #include "util.h"
+#include <QCheckBox>
+#include <QColorDialog>
+#include <QPushButton>
+#include <QTextCodec>
+#include <algorithm>
+#include <vector>
 
 ConfDialog::ConfDialog(CHtmlSysWinGroupQt* const parent)
     : QDialog(
@@ -71,7 +71,7 @@ ConfDialog::ConfDialog(CHtmlSysWinGroupQt* const parent)
         ui->useMainFontCheckBox, &QAbstractButton::toggled, ui->inputFontSizeSpinBox,
         &QWidget::setDisabled);
 
-    QString txt(QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText));
+    auto txt = QKeySequence(Qt::CTRL).toString(QKeySequence::NativeText);
     if (txt.endsWith('+')) {
         txt.truncate(txt.length() - 1);
     }
@@ -80,9 +80,8 @@ ConfDialog::ConfDialog(CHtmlSysWinGroupQt* const parent)
     connect(
         ui->limitWidthCheckBox, &QCheckBox::toggled, ui->limitWidthSpinBox, &QSpinBox::setEnabled);
 
-    auto& sett = qFrame->settings();
-    sett.loadFromDisk();
-    fLoadSettings(sett);
+    qFrame->settings().loadFromDisk();
+    fLoadSettings(qFrame->settings());
 
     const auto layoutPolicy = QDialogButtonBox::ButtonLayout(
         ui->buttonBox->style()->styleHint(QStyle::SH_DialogButtonLayout));
@@ -432,8 +431,7 @@ void ConfDialog::fApplySettings()
 
 void ConfDialog::fRestoreDefaults()
 {
-    const Settings sett;
-    fLoadSettings(sett);
+    fLoadSettings({});
     if (is_instant_apply_) {
         fApplySettings();
     }
