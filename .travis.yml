@@ -1,21 +1,23 @@
 dist: xenial
-sudo: required
 language: cpp
+osx_image: xcode11.3
 
 addons:
     apt:
         sources:
-            - sourceline: 'ppa:beineri/opt-qt-5.12.7-xenial'
+            - sourceline: 'ppa:beineri/opt-qt-5.14.1-xenial'
 
         packages:
             - libmpg123-dev
             - libsdl2-dev
             - libsndfile1-dev
             - libvorbis-dev
-            - qt512base
+            - qt514base
 
     homebrew:
+        update: true
         packages:
+            - fluidsynth
             - glib
             - libsndfile
             - libvorbis
@@ -33,7 +35,7 @@ matrix:
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-        source /opt/qt512/bin/qt512-env.sh;
+        source /opt/qt514/bin/qt514-env.sh;
       fi
 
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -45,15 +47,17 @@ before_install:
     #
     # Install fluidsynth
     #
-    - cd "$HOME"
-    - wget 'https://github.com/FluidSynth/fluidsynth/archive/v2.1.1.tar.gz'
-    - tar xf 'v2.1.1.tar.gz'
-    - cd fluidsynth-2.1.1
-    - mkdir build
-    - cd build
-    - cmake -Denable-framework=off ..
-    - make -j2
-    - sudo make install
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        cd "$HOME";
+        wget 'https://github.com/FluidSynth/fluidsynth/archive/v2.1.1.tar.gz';
+        tar xf 'v2.1.1.tar.gz';
+        cd fluidsynth-2.1.1;
+        mkdir build;
+        cd build;
+        cmake -Denable-framework=off ..;
+        make -j2;
+        sudo make install;
+      fi
 
 before_script:
     - qmake -version
