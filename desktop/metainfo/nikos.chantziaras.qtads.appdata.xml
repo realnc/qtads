@@ -15,7 +15,7 @@
     <categories>
         <category>Game</category>
         <category>AdventureGame</category>
-    ​</categories>
+    </categories>
 
     <description>
         <p>QTads is a cross-platform, multimedia interpreter for TADS games. It is fully compatible
@@ -36,12 +36,11 @@
 
     <url type="homepage">https://realnc.github.io/qtads</url>
     <url type="bugtracker">https://github.com/realnc/qtads/issues</url>
-    <url type="contact">mailto:realnc@gmail.com</url>
 
     <releases>
     <release version="3.0" date="2020-02-08">
         <description>
-            <p>Too many changes and bug fixes to list them all. Some important ones:</p>            
+            <p>Too many changes and bug fixes to list them all. Some important ones:</p>
             <ul>
                 <li>Improved audio engine with better sound quality.</li>
                 <li>Audio is now streamed in real-time where in the past it had to be decoded in
