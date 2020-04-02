@@ -1,0 +1,67 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build_linux:
+    runs-on: ubuntu-16.04
+    env:
+      CMAKE_GENERATOR: Ninja
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Add PPAs
+      run: |
+        sudo add-apt-repository ppa:beineri/opt-qt-5.14.1-xenial
+        sudo apt-get update
+
+    - name: Install deps
+      run: sudo apt-get -y install
+        libmpg123-dev
+        libsdl2-dev
+        libsndfile1-dev
+        libvorbis-dev
+        ninja-build
+        qt514base
+
+    - run: sudo ln -s /usr/local/lib /usr/local/lib64
+
+    - name: Build FluidSynth
+      working-directory: ../
+      run: |
+        wget -q 'https://github.com/FluidSynth/fluidsynth/archive/v2.1.1.tar.gz' -O- | tar xz
+        mkdir fluidsynth-2.1.1/build
+        cd fluidsynth-2.1.1/build
+        cmake -Denable-framework=off ..
+        sudo cmake --build . --target install
+
+    - name: Build
+      run: |
+        source /opt/qt514/bin/qt514-env.sh \
+        && qmake \
+        && make -j`nproc` \
+        && sudo make install
+
+  build_macOS:
+    runs-on: macos-10.15
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install deps
+      run: brew install
+        fluidsynth
+        libsndfile
+        libvorbis
+        mpg123
+        pkg-config
+        qt5
+        sdl2
+
+    - run: brew link qt5 --force
+
+    - name: Build
+      run: |
+        qmake qtads.pro
+        make -j`sysctl -n hw.ncpu`
