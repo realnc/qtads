@@ -432,8 +432,8 @@ OTHER_FILES *= \
     $$desktop.files \
     $$docs.files \
     .clang-format \
+    .github/workflows/main.yml \
     .gitignore \
-    .travis.yml \
     INSTALL \
     LICENSE.TXT
 
