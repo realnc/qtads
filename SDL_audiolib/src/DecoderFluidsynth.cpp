@@ -11,6 +11,10 @@
 #include <cstdio>
 #include <fluidsynth.h>
 
+#if FLUIDSYNTH_VERSION_MAJOR > 2 || FLUIDSYNTH_VERSION_MAJOR == 2 && FLUIDSYNTH_VERSION_MINOR >= 2
+#define FLUIDSYNTH_CALLBACKS_LONG_LONG
+#endif
+
 namespace chrono = std::chrono;
 
 static fluid_settings_t* settings = nullptr;
@@ -36,7 +40,11 @@ static void* sfontOpenCb(const char* filename)
     return rwops;
 }
 
+#ifdef FLUIDSYNTH_CALLBACKS_LONG_LONG
+static int sfontReadCb(void* dst, fluid_long_long_t count, void* rwops)
+#else
 static int sfontReadCb(void* dst, int count, void* rwops)
+#endif
 {
     Buffer<char> buf(count);
     if (SDL_RWread(static_cast<SDL_RWops*>(rwops), buf.get(), 1, count) <= 0) {
@@ -46,7 +54,11 @@ static int sfontReadCb(void* dst, int count, void* rwops)
     return FLUID_OK;
 }
 
+#ifdef FLUIDSYNTH_CALLBACKS_LONG_LONG
+static int sfontSeekCb(void* rwops, fluid_long_long_t offset, int whence)
+#else
 static int sfontSeekCb(void* rwops, long offset, int whence)
+#endif
 {
     switch (whence) {
     case SEEK_SET:
@@ -72,7 +84,11 @@ static int sfontCloseCb(void* rwops)
     return FLUID_OK;
 }
 
+#ifdef FLUIDSYNTH_CALLBACKS_LONG_LONG
+static fluid_long_long_t sfontTellCb(void* rwops)
+#else
 static long sfontTellCb(void* rwops)
+#endif
 {
     auto pos = SDL_RWtell(static_cast<SDL_RWops*>(rwops));
     if (pos == -1) {
