@@ -1,7 +1,7 @@
 QT += network widgets
 QT_CONFIG -= no-pkg-config
 TEMPLATE = app
-CONFIG += silent warn_off strict_c strict_c++ c11 c++14 gc_binaries
+CONFIG += silent warn_off strict_c strict_c++ c11 c++17 gc_binaries
 
 VERSION_MAJOR = 3
 VERSION_MINOR = 0
