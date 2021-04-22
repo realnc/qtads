@@ -32,8 +32,8 @@ Aulib::DecoderWildmidi::DecoderWildmidi()
 
 Aulib::DecoderWildmidi::~DecoderWildmidi() = default;
 
-bool Aulib::DecoderWildmidi::init(const std::string& configFile, int rate, bool hqResampling,
-                                  bool reverb)
+auto Aulib::DecoderWildmidi::init(const std::string& configFile, int rate, bool hqResampling,
+                                  bool reverb) -> bool
 {
     if (DecoderWildmidi_priv::initialized) {
         return true;
@@ -59,7 +59,7 @@ void Aulib::DecoderWildmidi::quit()
     WildMidi_Shutdown();
 }
 
-bool Aulib::DecoderWildmidi::open(SDL_RWops* rwops)
+auto Aulib::DecoderWildmidi::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -87,17 +87,17 @@ bool Aulib::DecoderWildmidi::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderWildmidi::getChannels() const
+auto Aulib::DecoderWildmidi::getChannels() const -> int
 {
     return 2;
 }
 
-int Aulib::DecoderWildmidi::getRate() const
+auto Aulib::DecoderWildmidi::getRate() const -> int
 {
     return DecoderWildmidi_priv::rate;
 }
 
-int Aulib::DecoderWildmidi::doDecoding(float buf[], int len, bool& callAgain)
+auto Aulib::DecoderWildmidi::doDecoding(float buf[], int len, bool& callAgain) -> int
 {
     callAgain = false;
     if (not d->midiHandle or d->eof) {
@@ -128,12 +128,12 @@ int Aulib::DecoderWildmidi::doDecoding(float buf[], int len, bool& callAgain)
     return res / 2;
 }
 
-bool Aulib::DecoderWildmidi::rewind()
+auto Aulib::DecoderWildmidi::rewind() -> bool
 {
     return seekToTime(chrono::microseconds::zero());
 }
 
-chrono::microseconds Aulib::DecoderWildmidi::duration() const
+auto Aulib::DecoderWildmidi::duration() const -> chrono::microseconds
 {
     _WM_Info* info;
     if (not d->midiHandle or (info = WildMidi_GetInfo(d->midiHandle.get())) == nullptr) {
@@ -143,7 +143,7 @@ chrono::microseconds Aulib::DecoderWildmidi::duration() const
     return chrono::duration_cast<chrono::microseconds>(chrono::duration<double>(sec));
 }
 
-bool Aulib::DecoderWildmidi::seekToTime(chrono::microseconds pos)
+auto Aulib::DecoderWildmidi::seekToTime(chrono::microseconds pos) -> bool
 {
     if (not d->midiHandle) {
         return false;

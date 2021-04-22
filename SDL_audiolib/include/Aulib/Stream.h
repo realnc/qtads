@@ -69,7 +69,7 @@ public:
     virtual ~Stream();
 
     Stream(const Stream&) = delete;
-    Stream& operator=(const Stream&) = delete;
+    auto operator=(const Stream&) -> Stream& = delete;
 
     /*!
      * \brief Open the stream and prepare it for playback.
@@ -81,7 +81,7 @@ public:
      *  \retval true Stream was opened successfully.
      *  \retval false The stream could not be opened.
      */
-    virtual bool open();
+    virtual auto open() -> bool;
 
     /*!
      * \brief Start playback.
@@ -96,7 +96,7 @@ public:
      *  \retval true Playback was started successfully, or it was already started.
      *  \retval false Playback could not be started.
      */
-    virtual bool play(int iterations = 1, std::chrono::microseconds fadeTime = {});
+    virtual auto play(int iterations = 1, std::chrono::microseconds fadeTime = {}) -> bool;
 
     /*!
      * \brief Stop playback.
@@ -131,7 +131,7 @@ public:
      *  \retval true Stream was rewound successfully.
      *  \retval false Stream could not be rewound.
      */
-    virtual bool rewind();
+    virtual auto rewind() -> bool;
 
     /*!
      * \brief Change playback volume.
@@ -149,7 +149,7 @@ public:
      * \return
      *  Current playback volume.
      */
-    virtual float volume() const;
+    virtual auto volume() const -> float;
 
     /*!
      * \brief Mute the stream.
@@ -166,7 +166,7 @@ public:
     /*!
      * \brief Returns true if the stream is muted, false otherwise.
      */
-    virtual bool isMuted() const;
+    virtual auto isMuted() const -> bool;
 
     /*!
      * \brief Get current playback state.
@@ -177,7 +177,7 @@ public:
      *  \retval true Playback has been started.
      *  \retval false Playback has not been started yet, or was stopped.
      */
-    virtual bool isPlaying() const;
+    virtual auto isPlaying() const -> bool;
 
     /*!
      * \brief Get current pause state.
@@ -189,7 +189,7 @@ public:
      *  \retval true The stream is currently paused.
      *  \retval false The stream is currently not paused.
      */
-    virtual bool isPaused() const;
+    virtual auto isPaused() const -> bool;
 
     /*!
      * \brief Get stream duration.
@@ -202,7 +202,7 @@ public:
      * Stream duration. If the stream does not provide duration information, a zero duration is
      * returned.
      */
-    virtual std::chrono::microseconds duration() const;
+    virtual auto duration() const -> std::chrono::microseconds;
 
     /*!
      * \brief Seek to a time position in the stream.
@@ -220,7 +220,7 @@ public:
      *  \retval true The playback position was changed successfully.
      *  \retval false This stream does not support seeking.
      */
-    virtual bool seekToTime(std::chrono::microseconds pos);
+    virtual auto seekToTime(std::chrono::microseconds pos) -> bool;
 
     /*!
      * \brief Set a callback for when the stream finishes playback.
@@ -297,7 +297,7 @@ protected:
 
 private:
     friend struct Stream_priv;
-    friend bool Aulib::init(int, SDL_AudioFormat, int, int);
+    friend auto Aulib::init(int, SDL_AudioFormat, int, int) -> bool;
 
     const std::unique_ptr<struct Stream_priv> d;
 };

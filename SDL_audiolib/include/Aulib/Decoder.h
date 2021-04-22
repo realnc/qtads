@@ -2,9 +2,12 @@
 #pragma once
 
 #include "aulib_export.h"
+#include <SDL_rwops.h>
 #include <SDL_stdinc.h>
 #include <chrono>
 #include <memory>
+#include <string>
+#include <type_traits>
 
 struct SDL_RWops;
 
@@ -20,28 +23,82 @@ public:
     virtual ~Decoder();
 
     Decoder(const Decoder&) = delete;
-    Decoder& operator=(const Decoder&) = delete;
+    auto operator=(const Decoder&) -> Decoder& = delete;
 
-    static std::unique_ptr<Decoder> decoderFor(const std::string& filename);
-    static std::unique_ptr<Decoder> decoderFor(SDL_RWops* rwops);
+    /*!
+     * \brief Find and return an instance of the first decoder that can open the specified file.
+     *
+     * Only the specified decoder types will be tried.
+     *
+     * \return A suitable decoder or nullptr if none of the decoders can open the file.
+     */
+    template <class... Decoders>
+    static auto decoderFor(const std::string& filename) -> std::unique_ptr<Decoder>;
+    //! \overload
+    template <class... Decoders>
+    static auto decoderFor(SDL_RWops* rwops) -> std::unique_ptr<Decoder>;
 
-    bool isOpen() const;
-    int decode(float buf[], int len, bool& callAgain);
+    /*!
+     * \brief Find and return an instance of the first decoder that can open the specified file.
+     *
+     * All decoders known by SDL_Audiolib will be tried. If you want to try your own decoders or
+     * limit the list of tried decoders, then use the templated version of this function instead.
+     *
+     * \return A suitable decoder or nullptr if none of the decoders can open the file.
+     */
+    static auto decoderFor(const std::string& filename) -> std::unique_ptr<Decoder>;
+    //! \overload
+    static auto decoderFor(SDL_RWops* rwops) -> std::unique_ptr<Decoder>;
 
-    virtual bool open(SDL_RWops* rwops) = 0;
-    virtual int getChannels() const = 0;
-    virtual int getRate() const = 0;
-    virtual bool rewind() = 0;
-    virtual std::chrono::microseconds duration() const = 0;
-    virtual bool seekToTime(std::chrono::microseconds pos) = 0;
+    auto isOpen() const -> bool;
+    auto decode(float buf[], int len, bool& callAgain) -> int;
+
+    virtual auto open(SDL_RWops* rwops) -> bool = 0;
+    virtual auto getChannels() const -> int = 0;
+    virtual auto getRate() const -> int = 0;
+    virtual auto rewind() -> bool = 0;
+    virtual auto duration() const -> std::chrono::microseconds = 0;
+    virtual auto seekToTime(std::chrono::microseconds pos) -> bool = 0;
 
 protected:
     void setIsOpen(bool f);
-    virtual int doDecoding(float buf[], int len, bool& callAgain) = 0;
+    virtual auto doDecoding(float buf[], int len, bool& callAgain) -> int = 0;
 
 private:
     const std::unique_ptr<struct Decoder_priv> d;
 };
+
+template <class... Decoders>
+inline auto Decoder::decoderFor(const std::string& filename) -> std::unique_ptr<Decoder>
+{
+    auto rwopsClose = [](SDL_RWops* rwops) { SDL_RWclose(rwops); };
+    std::unique_ptr<SDL_RWops, decltype(rwopsClose)> rwops(SDL_RWFromFile(filename.c_str(), "rb"),
+                                                           rwopsClose);
+    return Decoder::decoderFor<Decoders...>(rwops.get());
+}
+
+template <class... Decoders>
+inline auto Decoder::decoderFor(SDL_RWops* rwops) -> std::unique_ptr<Decoder>
+{
+    static_assert(sizeof...(Decoders) > 0, "Need at least one decoder type.");
+    static_assert((std::is_base_of_v<Aulib::Decoder, Decoders> && ...),
+                  "Decoders must derive from Aulib::Decoder.");
+
+    const auto rwPos = SDL_RWtell(rwops);
+
+    auto rewindRwops = [rwops, rwPos] { SDL_RWseek(rwops, rwPos, RW_SEEK_SET); };
+
+    auto tryDecoder = [rwops, &rewindRwops](auto dec) {
+        rewindRwops();
+        bool ret = dec->open(rwops);
+        rewindRwops();
+        return ret;
+    };
+
+    std::unique_ptr<Decoder> decoder;
+    ((tryDecoder(std::make_unique<Decoders>()) && (decoder = std::make_unique<Decoders>())) || ...);
+    return decoder;
+}
 
 } // namespace Aulib
 

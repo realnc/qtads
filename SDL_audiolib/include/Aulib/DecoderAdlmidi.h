@@ -40,7 +40,7 @@ public:
      *
      * \return \c true on success, \c false otherwise.
      */
-    bool setEmulator(Emulator emulator);
+    auto setEmulator(Emulator emulator) -> bool;
 
     /*!
      * \brief Set amount of emulated OPL chips.
@@ -54,7 +54,7 @@ public:
      *
      * \return \c true on success, \c false otherwise.
      */
-    bool setChipAmount(int chip_amount);
+    auto setChipAmount(int chip_amount) -> bool;
 
     /*!
      * \brief Load and set an FM patch bank.
@@ -68,10 +68,10 @@ public:
      *
      * \return \c true on success, \c false otherwise.
      */
-    bool loadBank(SDL_RWops* rwops);
+    auto loadBank(SDL_RWops* rwops) -> bool;
 
     //! \overload
-    bool loadBank(const std::string& filename);
+    auto loadBank(const std::string& filename) -> bool;
 
     /*!
      * \brief Load and set one of the FM patch banks embedded in libADLMIDI.
@@ -86,7 +86,7 @@ public:
      *
      * \return \c true on success, \c false otherwise.
      */
-    bool loadEmbeddedBank(int bank_number);
+    auto loadEmbeddedBank(int bank_number) -> bool;
 
     /*!
      * \brief Get a list of all libADLMIDI embedded FM patch banks.
@@ -96,17 +96,17 @@ public:
      *
      * \return List of embedded banks.
      */
-    static const std::vector<std::string>& getEmbeddedBanks();
+    static auto getEmbeddedBanks() -> const std::vector<std::string>&;
 
-    bool open(SDL_RWops* rwops) override;
-    int getChannels() const override;
-    int getRate() const override;
-    bool rewind() override;
-    std::chrono::microseconds duration() const override;
-    bool seekToTime(std::chrono::microseconds pos) override;
+    auto open(SDL_RWops* rwops) -> bool override;
+    auto getChannels() const -> int override;
+    auto getRate() const -> int override;
+    auto rewind() -> bool override;
+    auto duration() const -> std::chrono::microseconds override;
+    auto seekToTime(std::chrono::microseconds pos) -> bool override;
 
 protected:
-    int doDecoding(float buf[], int len, bool& callAgain) override;
+    auto doDecoding(float buf[], int len, bool& callAgain) -> int override;
 
 private:
     std::unique_ptr<struct DecoderAdlmidi_priv> d;

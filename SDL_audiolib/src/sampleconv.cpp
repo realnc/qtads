@@ -11,7 +11,7 @@
  * unsigned.)
  */
 template <typename T>
-static constexpr T floatSampleToInt(const float src) noexcept
+static constexpr auto floatSampleToInt(const float src) noexcept -> T
 {
     if (src >= 1.f) {
         return std::numeric_limits<T>::max();

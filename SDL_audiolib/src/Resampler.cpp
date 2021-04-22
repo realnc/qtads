@@ -61,7 +61,7 @@ struct Resampler_priv final
      *
      * Returns the amount of samples that were actually moved.
      */
-    int fMoveFromOutBuffer(float dst[], int dstLen);
+    auto fMoveFromOutBuffer(float dst[], int dstLen) -> int;
 
     /* Adjust all internal buffer sizes for the current source and target
      * sampling rates.
@@ -80,7 +80,7 @@ Aulib::Resampler_priv::Resampler_priv(Resampler* pub)
     : q(pub)
 {}
 
-int Aulib::Resampler_priv::fMoveFromOutBuffer(float dst[], int dstLen)
+auto Aulib::Resampler_priv::fMoveFromOutBuffer(float dst[], int dstLen) -> int
 {
     if (fOutBufferEnd == 0) {
         return 0;
@@ -165,7 +165,7 @@ void Aulib::Resampler::setDecoder(std::shared_ptr<Decoder> decoder)
     d->fDecoder = std::move(decoder);
 }
 
-int Aulib::Resampler::setSpec(int dstRate, int channels, int chunkSize)
+auto Aulib::Resampler::setSpec(int dstRate, int channels, int chunkSize) -> int
 {
     d->fDstRate = dstRate;
     d->fChannels = channels;
@@ -178,22 +178,22 @@ int Aulib::Resampler::setSpec(int dstRate, int channels, int chunkSize)
     return 0;
 }
 
-int Aulib::Resampler::currentRate() const
+auto Aulib::Resampler::currentRate() const -> int
 {
     return d->fDstRate;
 }
 
-int Aulib::Resampler::currentChannels() const
+auto Aulib::Resampler::currentChannels() const -> int
 {
     return d->fChannels;
 }
 
-int Aulib::Resampler::currentChunkSize() const
+auto Aulib::Resampler::currentChunkSize() const -> int
 {
     return d->fChunkSize;
 }
 
-int Aulib::Resampler::resample(float dst[], int dstLen)
+auto Aulib::Resampler::resample(float dst[], int dstLen) -> int
 {
     int totalSamples = 0;
     bool decEOF = false;

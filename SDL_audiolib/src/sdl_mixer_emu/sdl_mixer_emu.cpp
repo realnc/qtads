@@ -6,7 +6,7 @@
 #include "aulib_global.h"
 //#include "stream.h"
 
-const SDL_version* Mix_Linked_Version()
+auto Mix_Linked_Version() -> const SDL_version*
 {
     AM_debugPrintLn(__func__);
 
@@ -14,7 +14,7 @@ const SDL_version* Mix_Linked_Version()
     return &v;
 }
 
-int Mix_Init(int flags)
+auto Mix_Init(int flags) -> int
 {
     AM_debugPrintLn(__func__);
 
@@ -28,21 +28,21 @@ void Mix_Quit()
     Aulib::quit();
 }
 
-int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)
+auto Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize) -> int
 {
     AM_debugPrintLn(__func__);
 
     return Aulib::init(frequency, format, channels, chunksize);
 }
 
-int Mix_AllocateChannels(int numchans)
+auto Mix_AllocateChannels(int numchans) -> int
 {
     AM_debugPrintLn(__func__);
 
     return numchans;
 }
 
-int Mix_QuerySpec(int* frequency, Uint16* format, int* channels)
+auto Mix_QuerySpec(int* frequency, Uint16* format, int* channels) -> int
 {
     AM_debugPrintLn(__func__);
 
@@ -58,21 +58,21 @@ int Mix_QuerySpec(int* frequency, Uint16* format, int* channels)
     return 1; // TODO
 }
 
-Mix_Chunk* Mix_LoadWAV_RW(SDL_RWops* /*src*/, int /*freesrc*/)
+auto Mix_LoadWAV_RW(SDL_RWops* /*src*/, int /*freesrc*/) -> Mix_Chunk*
 {
     AM_debugPrintLn(__func__);
 
     return nullptr;
 }
 
-Mix_Chunk* Mix_QuickLoad_WAV(Uint8* /*mem*/)
+auto Mix_QuickLoad_WAV(Uint8* /*mem*/) -> Mix_Chunk*
 {
     AM_debugPrintLn(__func__);
 
     return nullptr;
 }
 
-Mix_Chunk* Mix_QuickLoad_RAW(Uint8* /*mem*/, Uint32 /*len*/)
+auto Mix_QuickLoad_RAW(Uint8* /*mem*/, Uint32 /*len*/) -> Mix_Chunk*
 {
     AM_debugPrintLn(__func__);
 
@@ -84,14 +84,14 @@ void Mix_FreeChunk(Mix_Chunk* /*chunk*/)
     AM_debugPrintLn(__func__);
 }
 
-int Mix_GetNumChunkDecoders()
+auto Mix_GetNumChunkDecoders() -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-const char* Mix_GetChunkDecoder(int /*index*/)
+auto Mix_GetChunkDecoder(int /*index*/) -> const char*
 {
     AM_debugPrintLn(__func__);
 
@@ -108,169 +108,171 @@ void Mix_ChannelFinished(void (*/*channel_finished*/)(int))
     AM_debugPrintLn(__func__);
 }
 
-int Mix_RegisterEffect(int /*chan*/, Mix_EffectFunc_t /*f*/, Mix_EffectDone_t /*d*/, void* /*arg*/)
+auto Mix_RegisterEffect(int /*chan*/, Mix_EffectFunc_t /*f*/, Mix_EffectDone_t /*d*/, void* /*arg*/)
+    -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_UnregisterEffect(int /*channel*/, Mix_EffectFunc_t /*f*/)
+auto Mix_UnregisterEffect(int /*channel*/, Mix_EffectFunc_t /*f*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_UnregisterAllEffects(int /*channel*/)
+auto Mix_UnregisterAllEffects(int /*channel*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_SetPanning(int /*channel*/, Uint8 /*left*/, Uint8 /*right*/)
+auto Mix_SetPanning(int /*channel*/, Uint8 /*left*/, Uint8 /*right*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_SetPosition(int /*channel*/, Sint16 /*angle*/, Uint8 /*distance*/)
+auto Mix_SetPosition(int /*channel*/, Sint16 /*angle*/, Uint8 /*distance*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_SetDistance(int /*channel*/, Uint8 /*distance*/)
+auto Mix_SetDistance(int /*channel*/, Uint8 /*distance*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_SetReverseStereo(int /*channel*/, int /*flip*/)
+auto Mix_SetReverseStereo(int /*channel*/, int /*flip*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_ReserveChannels(int /*num*/)
+auto Mix_ReserveChannels(int /*num*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_GroupChannel(int /*which*/, int /*tag*/)
+auto Mix_GroupChannel(int /*which*/, int /*tag*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_GroupChannels(int /*from*/, int /*to*/, int /*tag*/)
+auto Mix_GroupChannels(int /*from*/, int /*to*/, int /*tag*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_GroupAvailable(int /*tag*/)
+auto Mix_GroupAvailable(int /*tag*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return -1;
 }
 
-int Mix_GroupCount(int /*tag*/)
+auto Mix_GroupCount(int /*tag*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_GroupOldest(int /*tag*/)
+auto Mix_GroupOldest(int /*tag*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_GroupNewer(int /*tag*/)
+auto Mix_GroupNewer(int /*tag*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_PlayChannelTimed(int /*channel*/, Mix_Chunk* /*chunk*/, int /*loops*/, int /*ticks*/)
+auto Mix_PlayChannelTimed(int /*channel*/, Mix_Chunk* /*chunk*/, int /*loops*/, int /*ticks*/)
+    -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_FadeInChannelTimed(int /*channel*/, Mix_Chunk* /*chunk*/, int /*loops*/, int /*ms*/,
-                           int /*ticks*/)
+auto Mix_FadeInChannelTimed(int /*channel*/, Mix_Chunk* /*chunk*/, int /*loops*/, int /*ms*/,
+                            int /*ticks*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_Volume(int /*channel*/, int /*volume*/)
+auto Mix_Volume(int /*channel*/, int /*volume*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_VolumeChunk(Mix_Chunk* /*chunk*/, int /*volume*/)
+auto Mix_VolumeChunk(Mix_Chunk* /*chunk*/, int /*volume*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_HaltChannel(int /*channel*/)
+auto Mix_HaltChannel(int /*channel*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_HaltGroup(int /*tag*/)
+auto Mix_HaltGroup(int /*tag*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_ExpireChannel(int /*channel*/, int /*ticks*/)
+auto Mix_ExpireChannel(int /*channel*/, int /*ticks*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_FadeOutChannel(int /*which*/, int /*ms*/)
+auto Mix_FadeOutChannel(int /*which*/, int /*ms*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_FadeOutGroup(int /*tag*/, int /*ms*/)
+auto Mix_FadeOutGroup(int /*tag*/, int /*ms*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-Mix_Fading Mix_FadingChannel(int /*which*/)
+auto Mix_FadingChannel(int /*which*/) -> Mix_Fading
 {
     AM_debugPrintLn(__func__);
 
@@ -287,21 +289,21 @@ void Mix_Resume(int /*channel*/)
     AM_debugPrintLn(__func__);
 }
 
-int Mix_Paused(int /*channel*/)
+auto Mix_Paused(int /*channel*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-int Mix_Playing(int /*channel*/)
+auto Mix_Playing(int /*channel*/) -> int
 {
     AM_debugPrintLn(__func__);
 
     return 0;
 }
 
-Mix_Chunk* Mix_GetChunk(int /*channel*/)
+auto Mix_GetChunk(int /*channel*/) -> Mix_Chunk*
 {
     AM_debugPrintLn(__func__);
 

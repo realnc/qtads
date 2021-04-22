@@ -40,7 +40,7 @@ namespace Aulib {
  *  \retval true The audio system was initialized successfully.
  *  \retval false The audio system could not be initialized.
  */
-AULIB_EXPORT bool init(int freq, SDL_AudioFormat format, int channels, int frameSize);
+AULIB_EXPORT auto init(int freq, SDL_AudioFormat format, int channels, int frameSize) -> bool;
 
 /*!
  *  \brief Shuts down the SDL_audiolib library.
@@ -55,28 +55,28 @@ AULIB_EXPORT void quit();
  *
  * This can be different than the format that was requested.
  */
-AULIB_EXPORT SDL_AudioFormat sampleFormat() noexcept;
+AULIB_EXPORT auto sampleFormat() noexcept -> SDL_AudioFormat;
 
 /*!
  * \brief Sample rate the audio device is actually using.
  *
  * This can be different than the sample rate that was requested.
  */
-AULIB_EXPORT int sampleRate() noexcept;
+AULIB_EXPORT auto sampleRate() noexcept -> int;
 
 /*!
  * \brief Number of output channels.
  *
  * This always matches the amount of channels that was requested.
  */
-AULIB_EXPORT int channelCount() noexcept;
+AULIB_EXPORT auto channelCount() noexcept -> int;
 
 /*!
  * \brief Number of frames (samples per channel) the audio device is actually using.
  *
  * This can be different than the frame size that was requested.
  */
-AULIB_EXPORT int frameSize() noexcept;
+AULIB_EXPORT auto frameSize() noexcept -> int;
 
 } // namespace Aulib
 

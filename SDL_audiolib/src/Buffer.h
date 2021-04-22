@@ -21,14 +21,14 @@ public:
     }
 
     Buffer(const Buffer&) = delete;
-    Buffer& operator=(const Buffer&) = delete;
+    auto operator=(const Buffer&) -> Buffer& = delete;
 
-    int size() const noexcept
+    auto size() const noexcept -> int
     {
         return fSize;
     }
 
-    size_t usize() const noexcept
+    auto usize() const noexcept -> size_t
     {
         return size();
     }
@@ -56,44 +56,44 @@ public:
     }
 
     // unique_ptr::operator[] is not noexcept, but in reality, it can't throw.
-    const T& operator[](const int pos) const noexcept
+    auto operator[](const int pos) const noexcept -> const T&
     {
         AM_debugAssert(pos >= 0 and pos < fSize);
         return fData[pos];
     }
 
-    T& operator[](const int pos) noexcept
+    auto operator[](const int pos) noexcept -> T&
     {
         AM_debugAssert(pos >= 0 and pos < fSize);
         return fData[pos];
     }
 
-    T* get() noexcept
+    auto get() noexcept -> T*
     {
         return fData.get();
     }
 
-    const T* get() const noexcept
+    auto get() const noexcept -> const T*
     {
         return fData.get();
     }
 
-    T* begin() noexcept
+    auto begin() noexcept -> T*
     {
         return get();
     }
 
-    T* end() noexcept
+    auto end() noexcept -> T*
     {
         return begin() + size();
     }
 
-    const T* begin() const noexcept
+    auto begin() const noexcept -> const T*
     {
         return get();
     }
 
-    const T* end() const noexcept
+    auto end() const noexcept -> const T*
     {
         return begin() + size();
     }

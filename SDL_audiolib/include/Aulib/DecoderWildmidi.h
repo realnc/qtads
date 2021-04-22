@@ -43,7 +43,8 @@ public:
      *  \retval true WildMIDI was initialized sucessfully.
      *  \retval false WildMIDI could not be initialized.
      */
-    static bool init(const std::string& configFile, int rate, bool hqResampling, bool reverb);
+    static auto init(const std::string& configFile, int rate, bool hqResampling, bool reverb)
+        -> bool;
 
     /*!
      * \brief Shut down the WildMIDI library.
@@ -55,15 +56,15 @@ public:
      */
     static void quit();
 
-    bool open(SDL_RWops* rwops) override;
-    int getChannels() const override;
-    int getRate() const override;
-    bool rewind() override;
-    std::chrono::microseconds duration() const override;
-    bool seekToTime(std::chrono::microseconds pos) override;
+    auto open(SDL_RWops* rwops) -> bool override;
+    auto getChannels() const -> int override;
+    auto getRate() const -> int override;
+    auto rewind() -> bool override;
+    auto duration() const -> std::chrono::microseconds override;
+    auto seekToTime(std::chrono::microseconds pos) -> bool override;
 
 protected:
-    int doDecoding(float buf[], int len, bool& callAgain) override;
+    auto doDecoding(float buf[], int len, bool& callAgain) -> int override;
 
 private:
     const std::unique_ptr<struct DecoderWildmidi_priv> d;

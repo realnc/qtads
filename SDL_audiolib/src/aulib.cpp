@@ -18,7 +18,7 @@ static void sdlCallback(void* /*unused*/, Uint8 out[], int outLen)
 }
 }
 
-bool Aulib::init(int freq, SDL_AudioFormat format, int channels, int frameSize)
+auto Aulib::init(int freq, SDL_AudioFormat format, int channels, int frameSize) -> bool
 {
     if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
         return false;
@@ -114,22 +114,22 @@ void Aulib::quit()
     gInitialized = false;
 }
 
-SDL_AudioFormat Aulib::sampleFormat() noexcept
+auto Aulib::sampleFormat() noexcept -> SDL_AudioFormat
 {
     return Stream_priv::fAudioSpec.format;
 }
 
-int Aulib::sampleRate() noexcept
+auto Aulib::sampleRate() noexcept -> int
 {
     return Stream_priv::fAudioSpec.freq;
 }
 
-int Aulib::channelCount() noexcept
+auto Aulib::channelCount() noexcept -> int
 {
     return Stream_priv::fAudioSpec.channels;
 }
 
-int Aulib::frameSize() noexcept
+auto Aulib::frameSize() noexcept -> int
 {
     return Stream_priv::fAudioSpec.samples;
 }

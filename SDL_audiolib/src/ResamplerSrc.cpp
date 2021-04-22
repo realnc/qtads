@@ -26,7 +26,7 @@ Aulib::ResamplerSrc::ResamplerSrc(Quality quality)
 
 Aulib::ResamplerSrc::~ResamplerSrc() = default;
 
-Aulib::ResamplerSrc::Quality Aulib::ResamplerSrc::quality() const noexcept
+auto Aulib::ResamplerSrc::quality() const noexcept -> Aulib::ResamplerSrc::Quality
 {
     return d->fQuality;
 }
@@ -51,7 +51,7 @@ void Aulib::ResamplerSrc::doResampling(float dst[], const float src[], int& dstL
     srcLen = d->fData.input_frames_used * channels;
 }
 
-int Aulib::ResamplerSrc::adjustForOutputSpec(int dstRate, int srcRate, int channels)
+auto Aulib::ResamplerSrc::adjustForOutputSpec(int dstRate, int srcRate, int channels) -> int
 {
     int err;
     d->fData.src_ratio = static_cast<double>(dstRate) / srcRate;

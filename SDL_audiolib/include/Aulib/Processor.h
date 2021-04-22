@@ -17,7 +17,7 @@ public:
     virtual ~Processor();
 
     Processor(const Processor&) = delete;
-    Processor& operator=(const Processor&) = delete;
+    auto operator=(const Processor&) -> Processor& = delete;
 
     /*!
      * \brief Process input samples and write output samples.

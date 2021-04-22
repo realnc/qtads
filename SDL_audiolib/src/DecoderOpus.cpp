@@ -10,12 +10,12 @@ namespace chrono = std::chrono;
 
 extern "C" {
 
-static int opusReadCb(void* rwops, unsigned char* ptr, int nbytes)
+static auto opusReadCb(void* rwops, unsigned char* ptr, int nbytes) -> int
 {
     return SDL_RWread(static_cast<SDL_RWops*>(rwops), ptr, 1, nbytes);
 }
 
-static int opusSeekCb(void* rwops, opus_int64 offset, int whence)
+static auto opusSeekCb(void* rwops, opus_int64 offset, int whence) -> int
 {
     if (SDL_RWseek(static_cast<SDL_RWops*>(rwops), offset, whence) < 0) {
         return -1;
@@ -23,7 +23,7 @@ static int opusSeekCb(void* rwops, opus_int64 offset, int whence)
     return 0;
 }
 
-static opus_int64 opusTellCb(void* rwops)
+static auto opusTellCb(void* rwops) -> opus_int64
 {
     return SDL_RWtell(static_cast<SDL_RWops*>(rwops));
 }
@@ -48,7 +48,7 @@ Aulib::DecoderOpus::DecoderOpus()
 
 Aulib::DecoderOpus::~DecoderOpus() = default;
 
-bool Aulib::DecoderOpus::open(SDL_RWops* rwops)
+auto Aulib::DecoderOpus::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -74,17 +74,17 @@ bool Aulib::DecoderOpus::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderOpus::getChannels() const
+auto Aulib::DecoderOpus::getChannels() const -> int
 {
     return 2;
 }
 
-int Aulib::DecoderOpus::getRate() const
+auto Aulib::DecoderOpus::getRate() const -> int
 {
     return 48000;
 }
 
-int Aulib::DecoderOpus::doDecoding(float buf[], int len, bool& callAgain)
+auto Aulib::DecoderOpus::doDecoding(float buf[], int len, bool& callAgain) -> int
 {
     callAgain = false;
 
@@ -122,7 +122,7 @@ int Aulib::DecoderOpus::doDecoding(float buf[], int len, bool& callAgain)
     return decSamples;
 }
 
-bool Aulib::DecoderOpus::rewind()
+auto Aulib::DecoderOpus::rewind() -> bool
 {
     if (op_raw_seek(d->fOpusHandle.get(), 0) != 0) {
         return false;
@@ -131,12 +131,12 @@ bool Aulib::DecoderOpus::rewind()
     return true;
 }
 
-chrono::microseconds Aulib::DecoderOpus::duration() const
+auto Aulib::DecoderOpus::duration() const -> chrono::microseconds
 {
     return d->fDuration;
 }
 
-bool Aulib::DecoderOpus::seekToTime(chrono::microseconds pos)
+auto Aulib::DecoderOpus::seekToTime(chrono::microseconds pos) -> bool
 {
     if (op_pcm_seek(d->fOpusHandle.get(), chrono::duration<double>(pos).count() * 48000) != 0) {
         return false;

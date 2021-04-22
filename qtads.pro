@@ -87,7 +87,7 @@ disable-audio {
     INCLUDEPATH += \
         SDL_audiolib \
         SDL_audiolib/include \
-        SDL_audiolib/resampler \
+        SDL_audiolib/3rdparty/speex_resampler \
         SDL_audiolib/src \
         SDL_audiolib/missing
 
@@ -100,7 +100,7 @@ disable-audio {
         src/rwopsbundle.h
 
     SOURCES += \
-        SDL_audiolib/resampler/resample.c \
+        SDL_audiolib/3rdparty/speex_resampler/resample.c \
         SDL_audiolib/src/missing/sdl_load_file_rw.c \
         SDL_audiolib/src/Decoder.cpp \
         SDL_audiolib/src/DecoderFluidsynth.cpp \

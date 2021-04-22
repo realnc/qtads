@@ -22,8 +22,10 @@ Most popular audio formats are supported:
   * Opus
   * MP3
   * Musepack
+  * FLAC (built-in through bundled
+    [dr_flac](https://mackron.github.io/dr_flac), or through external
+    libsndfile)
   * WAV (and related formats through libsndfile)
-  * FLAC (through libsndfile)
   * MIDI (FluidSynth, BASSMIDI, WildMIDI, libADLMIDI)
   * MOD-based music formats (libopenmpt, libxmp, libmodplug)
 
@@ -39,11 +41,11 @@ Using the library is fairly simple:
 #include <SDL.h>
 #include <iostream>
 
-// The library uses std::chrono for durations, seeking and fading.
-using namespace std::chrono_literals;
-
 int main()
 {
+    // The library uses std::chrono for durations, seeking and fading.
+    using namespace std::chrono_literals;
+
     // Initialize the SDL_audiolib library. Set the output sample rate to
     // 44.1kHz, the audio format to 16-bit signed, use 2 output channels
     // (stereo), and an 8kB output buffer.
@@ -65,6 +67,10 @@ int main()
     while (music.isPlaying()) {
         SDL_Delay(200);
     }
+    
+    // Shut down and clean up. Calling this manually is optional, since the
+    // library will call this automatically when the program exits.
+    Aulib::quit();
 }
 ```
 

@@ -10,7 +10,7 @@ namespace chrono = std::chrono;
 
 extern "C" {
 
-static sf_count_t sfLenCb(void* rwops)
+static auto sfLenCb(void* rwops) -> sf_count_t
 {
     Sint64 size = SDL_RWsize(static_cast<SDL_RWops*>(rwops));
     if (size < 0) {
@@ -19,7 +19,7 @@ static sf_count_t sfLenCb(void* rwops)
     return size;
 }
 
-static sf_count_t sfSeekCb(sf_count_t offset, int whence, void* rwops)
+static auto sfSeekCb(sf_count_t offset, int whence, void* rwops) -> sf_count_t
 {
     switch (whence) {
     case SEEK_SET:
@@ -35,13 +35,13 @@ static sf_count_t sfSeekCb(sf_count_t offset, int whence, void* rwops)
     return pos;
 }
 
-static sf_count_t sfReadCb(void* dst, sf_count_t count, void* rwops)
+static auto sfReadCb(void* dst, sf_count_t count, void* rwops) -> sf_count_t
 {
     int ret = SDL_RWread(static_cast<SDL_RWops*>(rwops), dst, 1, count);
     return ret;
 }
 
-static sf_count_t sfTellCb(void* rwops)
+static auto sfTellCb(void* rwops) -> sf_count_t
 {
     return SDL_RWtell(static_cast<SDL_RWops*>(rwops));
 }
@@ -66,7 +66,7 @@ Aulib::DecoderSndfile::DecoderSndfile()
 
 Aulib::DecoderSndfile::~DecoderSndfile() = default;
 
-bool Aulib::DecoderSndfile::open(SDL_RWops* rwops)
+auto Aulib::DecoderSndfile::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -88,17 +88,17 @@ bool Aulib::DecoderSndfile::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderSndfile::getChannels() const
+auto Aulib::DecoderSndfile::getChannels() const -> int
 {
     return d->fInfo.channels;
 }
 
-int Aulib::DecoderSndfile::getRate() const
+auto Aulib::DecoderSndfile::getRate() const -> int
 {
     return d->fInfo.samplerate;
 }
 
-int Aulib::DecoderSndfile::doDecoding(float buf[], int len, bool& callAgain)
+auto Aulib::DecoderSndfile::doDecoding(float buf[], int len, bool& callAgain) -> int
 {
     callAgain = false;
     if (d->fEOF) {
@@ -111,17 +111,17 @@ int Aulib::DecoderSndfile::doDecoding(float buf[], int len, bool& callAgain)
     return ret;
 }
 
-bool Aulib::DecoderSndfile::rewind()
+auto Aulib::DecoderSndfile::rewind() -> bool
 {
     return seekToTime(chrono::microseconds::zero());
 }
 
-std::chrono::microseconds Aulib::DecoderSndfile::duration() const
+auto Aulib::DecoderSndfile::duration() const -> std::chrono::microseconds
 {
     return d->fDuration;
 }
 
-bool Aulib::DecoderSndfile::seekToTime(std::chrono::microseconds pos)
+auto Aulib::DecoderSndfile::seekToTime(std::chrono::microseconds pos) -> bool
 {
     using chrono::duration;
     if (sf_seek(d->fSndfile.get(), duration<double>(pos).count() * getRate(), SEEK_SET) == -1) {

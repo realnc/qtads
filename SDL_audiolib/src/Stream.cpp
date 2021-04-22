@@ -58,7 +58,7 @@ Aulib::Stream::~Stream()
     stop_impl(d.get(), std::chrono::microseconds::zero());
 }
 
-bool Aulib::Stream::open()
+auto Aulib::Stream::open() -> bool
 {
     if (d->fIsOpen) {
         return true;
@@ -73,7 +73,7 @@ bool Aulib::Stream::open()
     return true;
 }
 
-bool Aulib::Stream::play(int iterations, std::chrono::microseconds fadeTime)
+auto Aulib::Stream::play(int iterations, std::chrono::microseconds fadeTime) -> bool
 {
     if (not open()) {
         return false;
@@ -140,7 +140,7 @@ void Aulib::Stream::resume(std::chrono::microseconds fadeTime)
     d->fIsPaused = false;
 }
 
-bool Aulib::Stream::rewind()
+auto Aulib::Stream::rewind() -> bool
 {
     if (not open()) {
         return false;
@@ -158,7 +158,7 @@ void Aulib::Stream::setVolume(float volume)
     d->fVolume = volume;
 }
 
-float Aulib::Stream::volume() const
+auto Aulib::Stream::volume() const -> float
 {
     return d->fVolume;
 }
@@ -175,27 +175,27 @@ void Aulib::Stream::unmute()
     d->fIsMuted = false;
 }
 
-bool Aulib::Stream::isMuted() const
+auto Aulib::Stream::isMuted() const -> bool
 {
     return d->fIsMuted;
 }
 
-bool Aulib::Stream::isPlaying() const
+auto Aulib::Stream::isPlaying() const -> bool
 {
     return d->fIsPlaying;
 }
 
-bool Aulib::Stream::isPaused() const
+auto Aulib::Stream::isPaused() const -> bool
 {
     return d->fIsPaused;
 }
 
-std::chrono::microseconds Aulib::Stream::duration() const
+auto Aulib::Stream::duration() const -> std::chrono::microseconds
 {
     return d->fDecoder->duration();
 }
 
-bool Aulib::Stream::seekToTime(std::chrono::microseconds pos)
+auto Aulib::Stream::seekToTime(std::chrono::microseconds pos) -> bool
 {
     return d->fDecoder->seekToTime(pos);
 }

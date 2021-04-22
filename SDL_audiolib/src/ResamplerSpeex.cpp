@@ -29,7 +29,7 @@ Aulib::ResamplerSpeex::ResamplerSpeex(int quality)
 
 Aulib::ResamplerSpeex::~ResamplerSpeex() = default;
 
-int Aulib::ResamplerSpeex::quality() const noexcept
+auto Aulib::ResamplerSpeex::quality() const noexcept -> int
 {
     return d->fQuality;
 }
@@ -64,7 +64,7 @@ void Aulib::ResamplerSpeex::doResampling(float dst[], const float src[], int& ds
     srcLen = static_cast<int>(spxInLen) * channels;
 }
 
-int Aulib::ResamplerSpeex::adjustForOutputSpec(int dstRate, int srcRate, int channels)
+auto Aulib::ResamplerSpeex::adjustForOutputSpec(int dstRate, int srcRate, int channels) -> int
 {
     int err;
     d->fResampler.reset(speex_resampler_init(

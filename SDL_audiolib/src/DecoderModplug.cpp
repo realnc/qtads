@@ -53,7 +53,7 @@ Aulib::DecoderModplug::DecoderModplug()
 
 Aulib::DecoderModplug::~DecoderModplug() = default;
 
-bool Aulib::DecoderModplug::open(SDL_RWops* rwops)
+auto Aulib::DecoderModplug::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -77,17 +77,17 @@ bool Aulib::DecoderModplug::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderModplug::getChannels() const
+auto Aulib::DecoderModplug::getChannels() const -> int
 {
     return modplugSettings.mChannels;
 }
 
-int Aulib::DecoderModplug::getRate() const
+auto Aulib::DecoderModplug::getRate() const -> int
 {
     return modplugSettings.mFrequency;
 }
 
-int Aulib::DecoderModplug::doDecoding(float buf[], int len, bool& callAgain)
+auto Aulib::DecoderModplug::doDecoding(float buf[], int len, bool& callAgain) -> int
 {
     callAgain = false;
     if (d->atEOF) {
@@ -105,17 +105,17 @@ int Aulib::DecoderModplug::doDecoding(float buf[], int len, bool& callAgain)
     return ret / static_cast<int>(sizeof(*buf));
 }
 
-bool Aulib::DecoderModplug::rewind()
+auto Aulib::DecoderModplug::rewind() -> bool
 {
     return seekToTime(chrono::microseconds::zero());
 }
 
-chrono::microseconds Aulib::DecoderModplug::duration() const
+auto Aulib::DecoderModplug::duration() const -> chrono::microseconds
 {
     return d->fDuration;
 }
 
-bool Aulib::DecoderModplug::seekToTime(chrono::microseconds pos)
+auto Aulib::DecoderModplug::seekToTime(chrono::microseconds pos) -> bool
 {
     ModPlug_Seek(d->mpHandle.get(), chrono::duration_cast<chrono::milliseconds>(pos).count());
     d->atEOF = false;

@@ -22,12 +22,12 @@ public:
     explicit ResamplerSpeex(int quality = 5);
     ~ResamplerSpeex() override;
 
-    int quality() const noexcept;
+    auto quality() const noexcept -> int;
     void setQuality(int quality);
 
 protected:
     void doResampling(float dst[], const float src[], int& dstLen, int& srcLen) override;
-    int adjustForOutputSpec(int dstRate, int srcRate, int channels) override;
+    auto adjustForOutputSpec(int dstRate, int srcRate, int channels) -> int override;
 
 private:
     const std::unique_ptr<ResamplerSpeex_priv> d;

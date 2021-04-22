@@ -26,7 +26,7 @@ public:
     virtual ~Resampler();
 
     Resampler(const Resampler&) = delete;
-    Resampler& operator=(const Resampler&) = delete;
+    auto operator=(const Resampler&) -> Resampler& = delete;
 
     /*! \brief Sets the decoder that is to be used as source.
      *
@@ -46,11 +46,11 @@ public:
      *  function. It is recommended to set this to the same value that was used as buffer size in
      *  the call to Aulib::init().
      */
-    int setSpec(int dstRate, int channels, int chunkSize);
+    auto setSpec(int dstRate, int channels, int chunkSize) -> int;
 
-    int currentRate() const;
-    int currentChannels() const;
-    int currentChunkSize() const;
+    auto currentRate() const -> int;
+    auto currentChannels() const -> int;
+    auto currentChunkSize() const -> int;
 
     /*! \brief Fills an output buffer with resampled audio samples.
      *
@@ -61,7 +61,7 @@ public:
      * \return The amount of samples that were stored in the buffer. This can be smaller than
      *         'dstLen' if the decoder has no more samples left.
      */
-    int resample(float dst[], int dstLen);
+    auto resample(float dst[], int dstLen) -> int;
 
 protected:
     /*! \brief Change sample rate and amount of channels.
@@ -75,7 +75,7 @@ protected:
      *
      * \param channels Amount of channels in both the source as well as the target audio buffers.
      */
-    virtual int adjustForOutputSpec(int dstRate, int srcRate, int channels) = 0;
+    virtual auto adjustForOutputSpec(int dstRate, int srcRate, int channels) -> int = 0;
 
     /*! This function must be implemented when subclassing. It must resample
      * the audio contained in 'src' containing 'srcLen' samples, and store the

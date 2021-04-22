@@ -63,11 +63,11 @@ public:
     explicit ResamplerSrc(Quality quality = Quality::SincMedium);
     ~ResamplerSrc() override;
 
-    Quality quality() const noexcept;
+    auto quality() const noexcept -> Quality;
 
 protected:
     void doResampling(float dst[], const float src[], int& dstLen, int& srcLen) override;
-    int adjustForOutputSpec(int dstRate, int srcRate, int channels) override;
+    auto adjustForOutputSpec(int dstRate, int srcRate, int channels) -> int override;
 
 private:
     const std::unique_ptr<struct ResamplerSrc_priv> d;

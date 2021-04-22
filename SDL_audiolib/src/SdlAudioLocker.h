@@ -22,7 +22,7 @@ public:
     }
 
     SdlAudioLocker(const SdlAudioLocker&) = delete;
-    SdlAudioLocker& operator=(const SdlAudioLocker&) = delete;
+    auto operator=(const SdlAudioLocker&) -> SdlAudioLocker& = delete;
 
     void unlock()
     {

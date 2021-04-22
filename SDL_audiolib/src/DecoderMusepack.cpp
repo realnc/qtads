@@ -17,27 +17,27 @@ namespace chrono = std::chrono;
 
 extern "C" {
 
-static mpc_int32_t mpcReadCb(mpc_reader* reader, void* ptr, mpc_int32_t size)
+static auto mpcReadCb(mpc_reader* reader, void* ptr, mpc_int32_t size) -> mpc_int32_t
 {
     return SDL_RWread(static_cast<SDL_RWops*>(reader->data), ptr, 1, size);
 }
 
-static mpc_bool_t mpcSeekCb(mpc_reader* reader, mpc_int32_t offset)
+static auto mpcSeekCb(mpc_reader* reader, mpc_int32_t offset) -> mpc_bool_t
 {
     return SDL_RWseek(static_cast<SDL_RWops*>(reader->data), offset, RW_SEEK_SET) >= 0;
 }
 
-static mpc_int32_t mpcTellCb(mpc_reader* reader)
+static auto mpcTellCb(mpc_reader* reader) -> mpc_int32_t
 {
     return SDL_RWtell(static_cast<SDL_RWops*>(reader->data));
 }
 
-static mpc_int32_t mpcGetSizeCb(mpc_reader* reader)
+static auto mpcGetSizeCb(mpc_reader* reader) -> mpc_int32_t
 {
     return SDL_RWsize(static_cast<SDL_RWops*>(reader->data));
 }
 
-static mpc_bool_t mpcCanseekCb(mpc_reader* reader)
+static auto mpcCanseekCb(mpc_reader* reader) -> mpc_bool_t
 {
     return SDL_RWseek(static_cast<SDL_RWops*>(reader->data), 0, RW_SEEK_CUR) > -1;
 }
@@ -66,7 +66,7 @@ Aulib::DecoderMusepack::DecoderMusepack()
 
 Aulib::DecoderMusepack::~DecoderMusepack() = default;
 
-bool Aulib::DecoderMusepack::open(SDL_RWops* rwops)
+auto Aulib::DecoderMusepack::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -82,17 +82,17 @@ bool Aulib::DecoderMusepack::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderMusepack::getChannels() const
+auto Aulib::DecoderMusepack::getChannels() const -> int
 {
     return d->demuxer ? d->strmInfo.channels : 0;
 }
 
-int Aulib::DecoderMusepack::getRate() const
+auto Aulib::DecoderMusepack::getRate() const -> int
 {
     return d->demuxer ? d->strmInfo.sample_freq : 0;
 }
 
-int Aulib::DecoderMusepack::doDecoding(float buf[], int len, bool& callAgain)
+auto Aulib::DecoderMusepack::doDecoding(float buf[], int len, bool& callAgain) -> int
 {
     callAgain = false;
     int totalSamples = 0;
@@ -140,12 +140,12 @@ int Aulib::DecoderMusepack::doDecoding(float buf[], int len, bool& callAgain)
     return totalSamples;
 }
 
-bool Aulib::DecoderMusepack::rewind()
+auto Aulib::DecoderMusepack::rewind() -> bool
 {
     return seekToTime(chrono::microseconds::zero());
 }
 
-chrono::microseconds Aulib::DecoderMusepack::duration() const
+auto Aulib::DecoderMusepack::duration() const -> chrono::microseconds
 {
     if (d->demuxer == nullptr) {
         return chrono::microseconds::zero();
@@ -155,7 +155,7 @@ chrono::microseconds Aulib::DecoderMusepack::duration() const
     return duration_cast<microseconds>(duration<double>(mpc_streaminfo_get_length(&d->strmInfo)));
 }
 
-bool Aulib::DecoderMusepack::seekToTime(chrono::microseconds pos)
+auto Aulib::DecoderMusepack::seekToTime(chrono::microseconds pos) -> bool
 {
     using namespace std::chrono;
     using std::chrono::duration;

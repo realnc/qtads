@@ -27,7 +27,7 @@ Aulib::DecoderOpenmpt::DecoderOpenmpt()
 
 Aulib::DecoderOpenmpt::~DecoderOpenmpt() = default;
 
-bool Aulib::DecoderOpenmpt::open(SDL_RWops* rwops)
+auto Aulib::DecoderOpenmpt::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -58,34 +58,34 @@ bool Aulib::DecoderOpenmpt::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderOpenmpt::getChannels() const
+auto Aulib::DecoderOpenmpt::getChannels() const -> int
 {
     return Aulib::channelCount();
 }
 
-int Aulib::DecoderOpenmpt::getRate() const
+auto Aulib::DecoderOpenmpt::getRate() const -> int
 {
     return Aulib::sampleRate();
 }
 
-bool Aulib::DecoderOpenmpt::rewind()
+auto Aulib::DecoderOpenmpt::rewind() -> bool
 {
     return seekToTime(chrono::microseconds::zero());
 }
 
-chrono::microseconds Aulib::DecoderOpenmpt::duration() const
+auto Aulib::DecoderOpenmpt::duration() const -> chrono::microseconds
 {
     return d->fDuration;
 }
 
-bool Aulib::DecoderOpenmpt::seekToTime(chrono::microseconds pos)
+auto Aulib::DecoderOpenmpt::seekToTime(chrono::microseconds pos) -> bool
 {
     d->fModule->set_position_seconds(chrono::duration<double>(pos).count());
     d->atEOF = false;
     return true;
 }
 
-int Aulib::DecoderOpenmpt::doDecoding(float buf[], int len, bool& callAgain)
+auto Aulib::DecoderOpenmpt::doDecoding(float buf[], int len, bool& callAgain) -> int
 {
     callAgain = false;
     if (d->atEOF) {

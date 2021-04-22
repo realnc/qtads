@@ -26,8 +26,8 @@ public:
 
     HstreamWrapper(const HstreamWrapper&) = delete;
     HstreamWrapper(HstreamWrapper&&) = delete;
-    HstreamWrapper& operator=(const HstreamWrapper&) = delete;
-    HstreamWrapper& operator=(HstreamWrapper&&) = delete;
+    auto operator=(const HstreamWrapper&) -> HstreamWrapper& = delete;
+    auto operator=(HstreamWrapper&&) -> HstreamWrapper& = delete;
 
     ~HstreamWrapper()
     {
@@ -39,7 +39,7 @@ public:
         return hstream != 0;
     }
 
-    HSTREAM get() const noexcept
+    auto get() const noexcept -> HSTREAM
     {
         return hstream;
     }
@@ -106,7 +106,7 @@ Aulib::DecoderBassmidi::DecoderBassmidi()
 
 Aulib::DecoderBassmidi::~DecoderBassmidi() = default;
 
-bool Aulib::DecoderBassmidi::setDefaultSoundfont(const std::string& filename)
+auto Aulib::DecoderBassmidi::setDefaultSoundfont(const std::string& filename) -> bool
 {
     if (BASS_SetConfigPtr(BASS_CONFIG_MIDI_DEFFONT, filename.c_str()) != 0) {
         return true;
@@ -116,7 +116,7 @@ bool Aulib::DecoderBassmidi::setDefaultSoundfont(const std::string& filename)
     return false;
 }
 
-bool Aulib::DecoderBassmidi::open(SDL_RWops* rwops)
+auto Aulib::DecoderBassmidi::open(SDL_RWops* rwops) -> bool
 {
     if (isOpen()) {
         return true;
@@ -143,12 +143,12 @@ bool Aulib::DecoderBassmidi::open(SDL_RWops* rwops)
     return true;
 }
 
-int Aulib::DecoderBassmidi::getChannels() const
+auto Aulib::DecoderBassmidi::getChannels() const -> int
 {
     return 2;
 }
 
-int Aulib::DecoderBassmidi::getRate() const
+auto Aulib::DecoderBassmidi::getRate() const -> int
 {
     BASS_CHANNELINFO inf;
     if (BASS_ChannelGetInfo(d->hstream.get(), &inf) != 0) {
@@ -159,7 +159,7 @@ int Aulib::DecoderBassmidi::getRate() const
     return 0;
 }
 
-int Aulib::DecoderBassmidi::doDecoding(float buf[], int len, bool& /*callAgain*/)
+auto Aulib::DecoderBassmidi::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
     if (d->eof or not d->hstream) {
         return 0;
@@ -177,12 +177,12 @@ int Aulib::DecoderBassmidi::doDecoding(float buf[], int len, bool& /*callAgain*/
     return ret / static_cast<int>(sizeof(*buf));
 }
 
-bool Aulib::DecoderBassmidi::rewind()
+auto Aulib::DecoderBassmidi::rewind() -> bool
 {
     return seekToTime(chrono::microseconds::zero());
 }
 
-chrono::microseconds Aulib::DecoderBassmidi::duration() const
+auto Aulib::DecoderBassmidi::duration() const -> chrono::microseconds
 {
     if (not d->hstream) {
         return {};
@@ -204,7 +204,7 @@ chrono::microseconds Aulib::DecoderBassmidi::duration() const
     return chrono::duration_cast<chrono::microseconds>(chrono::duration<double>(sec));
 }
 
-bool Aulib::DecoderBassmidi::seekToTime(chrono::microseconds pos)
+auto Aulib::DecoderBassmidi::seekToTime(chrono::microseconds pos) -> bool
 {
     if (not d->hstream) {
         return false;

@@ -25,7 +25,7 @@ Aulib::ResamplerSox::ResamplerSox(Quality quality)
 
 Aulib::ResamplerSox::~ResamplerSox() = default;
 
-Aulib::ResamplerSox::Quality Aulib::ResamplerSox::quality() const noexcept
+auto Aulib::ResamplerSox::quality() const noexcept -> Aulib::ResamplerSox::Quality
 {
     return d->fQuality;
 }
@@ -51,7 +51,7 @@ void Aulib::ResamplerSox::doResampling(float dst[], const float src[], int& dstL
     srcLen = static_cast<int>(srcDone) * channels;
 }
 
-int Aulib::ResamplerSox::adjustForOutputSpec(int dstRate, int srcRate, int channels)
+auto Aulib::ResamplerSox::adjustForOutputSpec(int dstRate, int srcRate, int channels) -> int
 {
     soxr_io_spec_t io_spec{};
     io_spec.itype = io_spec.otype = SOXR_FLOAT32_I;
