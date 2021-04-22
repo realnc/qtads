@@ -13,7 +13,7 @@ jobs:
 
     - name: Add PPAs
       run: |
-        sudo add-apt-repository ppa:beineri/opt-qt-5.14.1-xenial
+        sudo add-apt-repository ppa:beineri/opt-qt-5.15.2-xenial
         sudo apt-get update
 
     - name: Install deps
@@ -23,22 +23,22 @@ jobs:
         libsndfile1-dev
         libvorbis-dev
         ninja-build
-        qt514base
+        qt515base
 
     - run: sudo ln -s /usr/local/lib /usr/local/lib64
 
     - name: Build FluidSynth
       working-directory: ../
       run: |
-        wget -q 'https://github.com/FluidSynth/fluidsynth/archive/v2.1.1.tar.gz' -O- | tar xz
-        mkdir fluidsynth-2.1.1/build
-        cd fluidsynth-2.1.1/build
+        wget -q 'https://github.com/FluidSynth/fluidsynth/archive/v2.2.0.tar.gz' -O- | tar xz
+        mkdir fluidsynth-2.2.0/build
+        cd fluidsynth-2.2.0/build
         cmake -Denable-framework=off ..
         sudo cmake --build . --target install
 
     - name: Build
       run: |
-        source /opt/qt514/bin/qt514-env.sh \
+        source /opt/qt515/bin/qt515-env.sh \
         && qmake \
         && make -j`nproc` \
         && sudo make install
