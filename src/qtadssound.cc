@@ -17,6 +17,7 @@
     #include <cerrno>
     #include <cstdio>
     #include <cstring>
+    #include <mutex>
 #endif
 
 #include "globals.h"
@@ -31,6 +32,11 @@
 
 namespace chrono = std::chrono;
 using namespace std::chrono_literals;
+
+#ifndef NO_AUDIO
+static std::vector<Aulib::Stream*> streamsPendingDeletion;
+static std::mutex streamsPendingDeletion_mutex;
+#endif
 
 auto initSound() -> bool
 {
@@ -48,6 +54,13 @@ auto initSound() -> bool
 void quitSound()
 {
 #ifndef NO_AUDIO
+    {
+        std::lock_guard<std::mutex> guard(streamsPendingDeletion_mutex);
+        for (auto* stream : streamsPendingDeletion) {
+            delete stream;
+        }
+        streamsPendingDeletion.clear();
+    }
     Aulib::quit();
     SDL_Quit();
 #endif
@@ -85,7 +98,11 @@ QTadsSound::~QTadsSound()
 {
     // qDebug() << Q_FUNC_INFO;
     fRepeatsWanted = -1;
-    delete fAudStream;
+    fAudStream->unsetFinishCallback();
+    fAudStream->unsetLoopCallback();
+
+    std::lock_guard<std::mutex> guard(streamsPendingDeletion_mutex);
+    streamsPendingDeletion.push_back(fAudStream);
 }
 
 void QTadsSound::fFinishCallback(Aulib::Stream& strm)
@@ -238,6 +255,20 @@ void QTadsSound::addCrossFade(int ms)
         fFadeOutTimer.start(timeFromNow);
     }
 }
+
+static void deletePendingStreams()
+{
+    std::lock_guard<std::mutex> guard(streamsPendingDeletion_mutex);
+    const auto streamsCopy = streamsPendingDeletion;
+    for (auto* stream : streamsCopy) {
+        if (!stream->isPlaying()) {
+            const auto pos = std::find(streamsPendingDeletion.begin(), streamsPendingDeletion.end(), stream);
+            Q_ASSERT(pos != streamsPendingDeletion.end());
+            streamsPendingDeletion.erase(pos);
+            delete stream;
+        }
+    }
+}
 #endif
 
 auto QTadsSound::createSound(
@@ -247,6 +278,8 @@ auto QTadsSound::createSound(
 {
     // qDebug() << "Loading sound from" << filename << "offset:" << seekpos << "size:" << filesize
     //      << "url:" << url->get_url();
+
+    deletePendingStreams();
 
     // Check if the file exists and is readable.
     QFileInfo inf(fnameToQStr(filename));
