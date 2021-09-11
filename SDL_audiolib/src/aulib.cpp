@@ -3,6 +3,7 @@
 
 #include "Aulib/Stream.h"
 #include "aulib_debug.h"
+#include "missing.h"
 #include "sampleconv.h"
 #include "stream_p.h"
 #include <SDL.h>
@@ -18,7 +19,8 @@ static void sdlCallback(void* /*unused*/, Uint8 out[], int outLen)
 }
 }
 
-auto Aulib::init(int freq, SDL_AudioFormat format, int channels, int frameSize) -> bool
+auto Aulib::init(int freq, AudioFormat format, int channels, int frameSize,
+                 const std::string& device) -> bool
 {
     if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
         return false;
@@ -34,16 +36,23 @@ auto Aulib::init(int freq, SDL_AudioFormat format, int channels, int frameSize) 
     requestedSpec.samples = frameSize;
     requestedSpec.callback = ::sdlCallback;
     Stream_priv::fAudioSpec = requestedSpec;
+#if SDL_VERSION_ATLEAST(2, 0, 0)
     auto flags = SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_FORMAT_CHANGE;
-#if SDL_VERSION_ATLEAST(2, 0, 9)
+#    if SDL_VERSION_ATLEAST(2, 0, 9)
     flags |= SDL_AUDIO_ALLOW_SAMPLES_CHANGE;
-#endif
-    Stream_priv::fDeviceId =
-        SDL_OpenAudioDevice(nullptr, false, &requestedSpec, &Stream_priv::fAudioSpec, flags);
+#    endif
+    Stream_priv::fDeviceId = SDL_OpenAudioDevice(device.empty() ? nullptr : device.c_str(), false,
+                                                 &requestedSpec, &Stream_priv::fAudioSpec, flags);
     if (Stream_priv::fDeviceId == 0) {
         Aulib::quit();
         return false;
     }
+#else
+    if (SDL_OpenAudio(&requestedSpec, &Stream_priv::fAudioSpec) == -1) {
+        Aulib::quit();
+        return false;
+    }
+#endif
 
     AM_debugPrint("SDL initialized with sample format: ");
     switch (Stream_priv::fAudioSpec.format) {
@@ -71,6 +80,7 @@ auto Aulib::init(int freq, SDL_AudioFormat format, int channels, int frameSize) 
         AM_debugPrintLn("U16MSB");
         Stream_priv::fSampleConverter = Aulib::floatToU16MSB;
         break;
+#if SDL_VERSION_ATLEAST(2, 0, 0)
     case AUDIO_S32LSB:
         AM_debugPrintLn("S32LSB");
         Stream_priv::fSampleConverter = Aulib::floatToS32LSB;
@@ -87,13 +97,18 @@ auto Aulib::init(int freq, SDL_AudioFormat format, int channels, int frameSize) 
         AM_debugPrintLn("F32MSB");
         Stream_priv::fSampleConverter = Aulib::floatToFloatMSB;
         break;
+#endif
     default:
         AM_warnLn("Unknown audio format spec: " << Stream_priv::fAudioSpec.format);
         Aulib::quit();
         return false;
     }
 
+#if SDL_VERSION_ATLEAST(2, 0, 0)
     SDL_PauseAudioDevice(Stream_priv::fDeviceId, false);
+#else
+    SDL_PauseAudio(/*pause_on=*/0);
+#endif
     gInitialized = true;
     std::atexit(Aulib::quit);
     return true;
@@ -104,17 +119,17 @@ void Aulib::quit()
     if (not gInitialized) {
         return;
     }
-    for (const auto stream : Stream_priv::fStreamList) {
-        if (stream->isPlaying()) {
-            stream->stop();
-        }
-    }
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    SDL_CloseAudioDevice(Stream_priv::fDeviceId);
+#else
+    SDL_CloseAudio();
+#endif
     SDL_QuitSubSystem(SDL_INIT_AUDIO);
     Stream_priv::fSampleConverter = nullptr;
     gInitialized = false;
 }
 
-auto Aulib::sampleFormat() noexcept -> SDL_AudioFormat
+auto Aulib::sampleFormat() noexcept -> AudioFormat
 {
     return Stream_priv::fAudioSpec.format;
 }

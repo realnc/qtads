@@ -1,38 +1,11 @@
 // This is copyrighted software. More information is at the end of this file.
-#pragma once
-
-#include <Aulib/Decoder.h>
-
-namespace Aulib {
-
-/*!
- * \brief dr_flac decoder.
- */
-class AULIB_EXPORT DecoderDrflac: public Decoder
-{
-public:
-    DecoderDrflac();
-    ~DecoderDrflac() override;
-
-    auto open(SDL_RWops* rwops) -> bool override;
-    auto getChannels() const -> int override;
-    auto getRate() const -> int override;
-    auto rewind() -> bool override;
-    auto duration() const -> std::chrono::microseconds override;
-    auto seekToTime(std::chrono::microseconds pos) -> bool override;
-
-protected:
-    auto doDecoding(float buf[], int len, bool& callAgain) -> int override;
-
-private:
-    std::unique_ptr<struct DecoderDrflac_priv> d;
-};
-
-} // namespace Aulib
+#define DR_MP3_IMPLEMENTATION
+#define DR_MP3_NO_STDIO
+#include "dr_mp3.h"
 
 /*
 
-Copyright (C) 2020 Nikos Chantziaras.
+Copyright (C) 2021 Nikos Chantziaras.
 
 This file is part of SDL_audiolib.
 

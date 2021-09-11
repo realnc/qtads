@@ -21,7 +21,7 @@ static void (*gMusicFinishHook)() = nullptr;
 
 static void musicFinishHookWrapper(Aulib::Stream& /*unused*/)
 {
-    if (gMusicFinishHook != nullptr) {
+    if (gMusicFinishHook) {
         gMusicFinishHook();
     }
 }
@@ -127,14 +127,14 @@ void Mix_HookMusicFinished(void (*music_finished)())
 {
     AM_debugPrintLn(__func__);
 
-    if (music_finished == nullptr) {
-        if (gMusic != nullptr) {
+    if (not music_finished) {
+        if (gMusic) {
             gMusic->unsetFinishCallback();
         }
         gMusicFinishHook = nullptr;
     } else {
         gMusicFinishHook = music_finished;
-        if (gMusic != nullptr) {
+        if (gMusic) {
             gMusic->setFinishCallback(musicFinishHookWrapper);
         }
     }
@@ -151,7 +151,7 @@ auto Mix_PlayMusic(Mix_Music* music, int loops) -> int
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         gMusic->stop();
         gMusic = nullptr;
     }
@@ -186,7 +186,7 @@ auto Mix_VolumeMusic(int volume) -> int
 
     if (volume >= 0) {
         gMusicVolume = (float)volume / (float)MIX_MAX_VOLUME;
-        if (gMusic != nullptr) {
+        if (gMusic) {
             gMusic->setVolume(gMusicVolume);
         }
     }
@@ -197,7 +197,7 @@ auto Mix_HaltMusic() -> int
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         gMusic->stop();
         gMusic = nullptr;
     }
@@ -222,7 +222,7 @@ void Mix_PauseMusic()
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         gMusic->pause();
     }
 }
@@ -231,7 +231,7 @@ void Mix_ResumeMusic()
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr and gMusic->isPaused()) {
+    if (gMusic and gMusic->isPaused()) {
         gMusic->resume();
     }
 }
@@ -240,7 +240,7 @@ void Mix_RewindMusic()
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         gMusic->rewind();
     }
 }
@@ -249,7 +249,7 @@ auto Mix_PausedMusic() -> int
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         return static_cast<int>(gMusic->isPaused());
     }
     return 0;
@@ -266,7 +266,7 @@ auto Mix_PlayingMusic() -> int
 {
     AM_debugPrintLn(__func__);
 
-    if (gMusic != nullptr) {
+    if (gMusic) {
         return static_cast<int>(gMusic->isPlaying());
     }
     return 0;

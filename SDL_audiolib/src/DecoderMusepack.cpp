@@ -4,6 +4,7 @@
 #include "Buffer.h"
 #include "aulib_config.h"
 #include "aulib_debug.h"
+#include "missing.h"
 #include <SDL_rwops.h>
 #include <cstring>
 #include <mpc/mpcdec.h>
@@ -84,23 +85,22 @@ auto Aulib::DecoderMusepack::open(SDL_RWops* rwops) -> bool
 
 auto Aulib::DecoderMusepack::getChannels() const -> int
 {
-    return d->demuxer ? d->strmInfo.channels : 0;
+    return d->strmInfo.channels;
 }
 
 auto Aulib::DecoderMusepack::getRate() const -> int
 {
-    return d->demuxer ? d->strmInfo.sample_freq : 0;
+    return d->strmInfo.sample_freq;
 }
 
-auto Aulib::DecoderMusepack::doDecoding(float buf[], int len, bool& callAgain) -> int
+auto Aulib::DecoderMusepack::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
-    callAgain = false;
-    int totalSamples = 0;
-    int wantedSamples = len;
-
-    if (d->eof) {
+    if (d->eof or not isOpen()) {
         return 0;
     }
+
+    int totalSamples = 0;
+    int wantedSamples = len;
 
     // If we have any left-over samples from the previous frame, copy them out.
     if (d->curFrame.samples > 0) {
@@ -147,11 +147,12 @@ auto Aulib::DecoderMusepack::rewind() -> bool
 
 auto Aulib::DecoderMusepack::duration() const -> chrono::microseconds
 {
-    if (d->demuxer == nullptr) {
-        return chrono::microseconds::zero();
-    }
     using namespace std::chrono;
     using std::chrono::duration;
+
+    if (not isOpen()) {
+        return microseconds::zero();
+    }
     return duration_cast<microseconds>(duration<double>(mpc_streaminfo_get_length(&d->strmInfo)));
 }
 
@@ -159,7 +160,7 @@ auto Aulib::DecoderMusepack::seekToTime(chrono::microseconds pos) -> bool
 {
     using namespace std::chrono;
     using std::chrono::duration;
-    if (d->demuxer == nullptr
+    if (not isOpen()
         or mpc_demux_seek_second(d->demuxer.get(), duration<double>(pos).count())
                != MPC_STATUS_OK) {
         return false;

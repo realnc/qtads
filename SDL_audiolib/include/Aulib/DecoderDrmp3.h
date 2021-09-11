@@ -6,13 +6,13 @@
 namespace Aulib {
 
 /*!
- * \brief dr_flac decoder.
+ * \brief dr_mp3 decoder.
  */
-class AULIB_EXPORT DecoderDrflac: public Decoder
+class AULIB_EXPORT DecoderDrmp3: public Decoder
 {
 public:
-    DecoderDrflac();
-    ~DecoderDrflac() override;
+    DecoderDrmp3();
+    ~DecoderDrmp3() override;
 
     auto open(SDL_RWops* rwops) -> bool override;
     auto getChannels() const -> int override;
@@ -25,14 +25,14 @@ protected:
     auto doDecoding(float buf[], int len, bool& callAgain) -> int override;
 
 private:
-    std::unique_ptr<struct DecoderDrflac_priv> d;
+    std::unique_ptr<struct DecoderDrmp3_priv> d;
 };
 
 } // namespace Aulib
 
 /*
 
-Copyright (C) 2020 Nikos Chantziaras.
+Copyright (C) 2021 Nikos Chantziaras.
 
 This file is part of SDL_audiolib.
 

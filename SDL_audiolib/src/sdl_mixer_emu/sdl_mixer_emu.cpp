@@ -46,13 +46,13 @@ auto Mix_QuerySpec(int* frequency, Uint16* format, int* channels) -> int
 {
     AM_debugPrintLn(__func__);
 
-    if (frequency != nullptr) {
+    if (frequency) {
         *frequency = Aulib::sampleRate();
     }
-    if (format != nullptr) {
+    if (format) {
         *format = Aulib::sampleFormat();
     }
-    if (channels != nullptr) {
+    if (channels) {
         *channels = Aulib::channelCount();
     }
     return 1; // TODO

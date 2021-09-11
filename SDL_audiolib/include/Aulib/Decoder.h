@@ -25,6 +25,7 @@ public:
     Decoder(const Decoder&) = delete;
     auto operator=(const Decoder&) -> Decoder& = delete;
 
+#if __cplusplus >= 201603
     /*!
      * \brief Find and return an instance of the first decoder that can open the specified file.
      *
@@ -37,6 +38,7 @@ public:
     //! \overload
     template <class... Decoders>
     static auto decoderFor(SDL_RWops* rwops) -> std::unique_ptr<Decoder>;
+#endif
 
     /*!
      * \brief Find and return an instance of the first decoder that can open the specified file.
@@ -68,6 +70,7 @@ private:
     const std::unique_ptr<struct Decoder_priv> d;
 };
 
+#if __cplusplus >= 201603
 template <class... Decoders>
 inline auto Decoder::decoderFor(const std::string& filename) -> std::unique_ptr<Decoder>
 {
@@ -99,6 +102,7 @@ inline auto Decoder::decoderFor(SDL_RWops* rwops) -> std::unique_ptr<Decoder>
     ((tryDecoder(std::make_unique<Decoders>()) && (decoder = std::make_unique<Decoders>())) || ...);
     return decoder;
 }
+#endif
 
 } // namespace Aulib
 

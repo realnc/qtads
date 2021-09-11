@@ -4,6 +4,7 @@
 #include "Buffer.h"
 #include "aulib.h"
 #include "aulib_debug.h"
+#include "missing.h"
 #include <SDL_audio.h>
 #include <SDL_rwops.h>
 #include <bass.h>
@@ -150,6 +151,10 @@ auto Aulib::DecoderBassmidi::getChannels() const -> int
 
 auto Aulib::DecoderBassmidi::getRate() const -> int
 {
+    if (not isOpen()) {
+        return 0;
+    }
+
     BASS_CHANNELINFO inf;
     if (BASS_ChannelGetInfo(d->hstream.get(), &inf) != 0) {
         return inf.freq;
@@ -161,7 +166,7 @@ auto Aulib::DecoderBassmidi::getRate() const -> int
 
 auto Aulib::DecoderBassmidi::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
-    if (d->eof or not d->hstream) {
+    if (d->eof or not isOpen()) {
         return 0;
     }
 
@@ -184,7 +189,7 @@ auto Aulib::DecoderBassmidi::rewind() -> bool
 
 auto Aulib::DecoderBassmidi::duration() const -> chrono::microseconds
 {
-    if (not d->hstream) {
+    if (not isOpen()) {
         return {};
     }
 
@@ -206,7 +211,7 @@ auto Aulib::DecoderBassmidi::duration() const -> chrono::microseconds
 
 auto Aulib::DecoderBassmidi::seekToTime(chrono::microseconds pos) -> bool
 {
-    if (not d->hstream) {
+    if (not isOpen()) {
         return false;
     }
 

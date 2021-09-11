@@ -1,14 +1,11 @@
 // This is copyrighted software. More information is at the end of this file.
-#pragma once
-#include <SDL_version.h>
-
-#if !SDL_VERSION_ATLEAST(2, 0, 6)
-#    include "sdl_load_file_rw.h"
-#endif
+#define DR_WAV_IMPLEMENTATION
+#define DR_WAV_NO_STDIO
+#include "dr_wav.h"
 
 /*
 
-Copyright (C) 2014, 2015, 2016, 2017, 2018, 2019 Nikos Chantziaras.
+Copyright (C) 2021 Nikos Chantziaras.
 
 This file is part of SDL_audiolib.
 

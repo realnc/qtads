@@ -4,6 +4,7 @@
 #include "Aulib/Processor.h"
 #include "Aulib/Stream.h"
 #include "Buffer.h"
+#include "SdlMutex.h"
 #include "aulib.h"
 #include <SDL_audio.h>
 #include <chrono>
@@ -32,6 +33,7 @@ struct Stream_priv final
     bool fIsPlaying = false;
     bool fIsPaused = false;
     float fVolume = 1.f;
+    float fStereoPos = 0.f;
     float fInternalVolume = 1.f;
     int fCurrentIteration = 0;
     int fWantedIterations = 0;
@@ -49,8 +51,11 @@ struct Stream_priv final
     Stream::Callback fLoopCallback;
 
     static ::SDL_AudioSpec fAudioSpec;
+#if SDL_VERSION_ATLEAST(2, 0, 0)
     static SDL_AudioDeviceID fDeviceId;
+#endif
     static std::vector<Stream*> fStreamList;
+    static SdlMutex fStreamListMutex;
 
     // This points to an appropriate converter for the current audio format.
     static void (*fSampleConverter)(Uint8[], const Buffer<float>& src);
@@ -60,7 +65,7 @@ struct Stream_priv final
     static Buffer<float> fStrmBuf;
     static Buffer<float> fProcessorBuf;
 
-    void fProcessFade();
+    auto fProcessFadeAndCheckIfFinished() -> bool;
     void fStop();
 
     static void fSdlCallbackImpl(void* /*unused*/, Uint8 out[], int outLen);

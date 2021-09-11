@@ -1,4 +1,5 @@
 // This is copyrighted software. More information is at the end of this file.
+
 #pragma once
 
 #include <Aulib/Decoder.h>
@@ -6,13 +7,13 @@
 namespace Aulib {
 
 /*!
- * \brief dr_flac decoder.
+ * \brief dr_wav decoder.
  */
-class AULIB_EXPORT DecoderDrflac: public Decoder
+class AULIB_EXPORT DecoderDrwav: public Decoder
 {
 public:
-    DecoderDrflac();
-    ~DecoderDrflac() override;
+    DecoderDrwav();
+    ~DecoderDrwav() override;
 
     auto open(SDL_RWops* rwops) -> bool override;
     auto getChannels() const -> int override;
@@ -25,14 +26,14 @@ protected:
     auto doDecoding(float buf[], int len, bool& callAgain) -> int override;
 
 private:
-    std::unique_ptr<struct DecoderDrflac_priv> d;
+    std::unique_ptr<struct DecoderDrwav_priv> d;
 };
 
 } // namespace Aulib
 
 /*
 
-Copyright (C) 2020 Nikos Chantziaras.
+Copyright (C) 2021 Nikos Chantziaras.
 
 This file is part of SDL_audiolib.
 

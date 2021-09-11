@@ -3,6 +3,7 @@
 
 #include "Buffer.h"
 #include "aulib.h"
+#include "missing.h"
 #include <SDL_rwops.h>
 #include <limits>
 #include <type_traits>
@@ -72,6 +73,10 @@ auto Aulib::DecoderXmp::getRate() const -> int
 
 auto Aulib::DecoderXmp::rewind() -> bool
 {
+    if (not isOpen()) {
+        return false;
+    }
+
     xmp_restart_module(d->fContext.get());
     d->fEof = false;
     return true;
@@ -85,17 +90,16 @@ auto Aulib::DecoderXmp::duration() const -> chrono::microseconds
 auto Aulib::DecoderXmp::seekToTime(chrono::microseconds pos) -> bool
 {
     auto pos_ms = chrono::duration_cast<chrono::milliseconds>(pos).count();
-    if (xmp_seek_time(d->fContext.get(), pos_ms) < 0) {
+    if (not isOpen() or xmp_seek_time(d->fContext.get(), pos_ms) < 0) {
         return false;
     }
     d->fEof = false;
     return true;
 }
 
-auto Aulib::DecoderXmp::doDecoding(float buf[], int len, bool& callAgain) -> int
+auto Aulib::DecoderXmp::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
-    callAgain = false;
-    if (d->fEof) {
+    if (d->fEof or not isOpen()) {
         return 0;
     }
     Buffer<Sint16> tmpBuf(len);

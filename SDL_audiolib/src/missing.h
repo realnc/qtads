@@ -1,48 +1,16 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
+#include <SDL_version.h>
 
-#include "stream_p.h"
-#include <SDL_audio.h>
-
-/*
- * RAII wrapper for SDL_LockAudio().
- */
-class SdlAudioLocker final
-{
-public:
-    SdlAudioLocker()
-    {
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-        SDL_LockAudioDevice(Aulib::Stream_priv::fDeviceId);
-#else
-        SDL_LockAudio();
+#if !SDL_VERSION_ATLEAST(2, 0, 6)
+#    include "missing/sdl_load_file_rw.h"
 #endif
-        fIsLocked = true;
-    }
 
-    ~SdlAudioLocker()
-    {
-        unlock();
-    }
-
-    SdlAudioLocker(const SdlAudioLocker&) = delete;
-    auto operator=(const SdlAudioLocker&) -> SdlAudioLocker& = delete;
-
-    void unlock()
-    {
-        if (fIsLocked) {
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-            SDL_UnlockAudioDevice(Aulib::Stream_priv::fDeviceId);
-#else
-            SDL_UnlockAudio();
+#if !SDL_VERSION_ATLEAST(2, 0, 0)
+#    include "missing/sdl_audio_format.h"
+#    include "missing/sdl_endian_float.h"
+#    include "missing/sdl_rwsize.h"
 #endif
-            fIsLocked = false;
-        }
-    }
-
-private:
-    bool fIsLocked;
-};
 
 /*
 

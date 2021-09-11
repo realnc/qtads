@@ -2,10 +2,15 @@
 #include <SDL_version.h>
 
 #if !SDL_VERSION_ATLEAST(2, 0, 6)
-#include "sdl_load_file_rw.h"
+#include "missing/sdl_load_file_rw.h"
+#include "missing/sdl_rwsize.h"
 #include <SDL_error.h>
 #include <SDL_rwops.h>
 #include <SDL_stdinc.h>
+
+#    if !SDL_VERSION_ATLEAST(2, 0, 0)
+#        define SDL_InvalidParamError(param) SDL_SetError("Parameter '%s' is invalid", (param))
+#    endif
 
 void* SDL_LoadFile_RW_missing(SDL_RWops* src, size_t* datasize, int freesrc)
 {

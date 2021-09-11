@@ -4,6 +4,8 @@
 #include "Aulib/DecoderAdlmidi.h"
 #include "Aulib/DecoderBassmidi.h"
 #include "Aulib/DecoderDrflac.h"
+#include "Aulib/DecoderDrmp3.h"
+#include "Aulib/DecoderDrwav.h"
 #include "Aulib/DecoderFluidsynth.h"
 #include "Aulib/DecoderModplug.h"
 #include "Aulib/DecoderMpg123.h"
@@ -51,7 +53,7 @@ auto Aulib::Decoder::decoderFor(SDL_RWops* rwops) -> std::unique_ptr<Aulib::Deco
 
     auto rewindRwops = [rwops, rwPos] { SDL_RWseek(rwops, rwPos, RW_SEEK_SET); };
 
-    auto tryDecoder = [rwops, &rewindRwops](auto dec) {
+    [[maybe_unused]] auto tryDecoder = [rwops, &rewindRwops](auto dec) {
         rewindRwops();
         bool ret = dec->open(rwops);
         rewindRwops();
@@ -103,6 +105,11 @@ auto Aulib::Decoder::decoderFor(SDL_RWops* rwops) -> std::unique_ptr<Aulib::Deco
         return std::make_unique<Aulib::DecoderSndfile>();
     }
 #endif
+#if USE_DEC_DRWAV
+    if (tryDecoder(std::make_unique<DecoderDrwav>())) {
+        return std::make_unique<Aulib::DecoderDrwav>();
+    }
+#endif
 #if USE_DEC_OPENMPT
     if (tryDecoder(std::make_unique<DecoderOpenmpt>())) {
         return std::make_unique<Aulib::DecoderOpenmpt>();
@@ -119,9 +126,16 @@ auto Aulib::Decoder::decoderFor(SDL_RWops* rwops) -> std::unique_ptr<Aulib::Deco
     // file, which would result in virtually everything we feed it giving a
     // false positive.
 #endif
+
+// The MP3 decoders have too many false positives. So try them last.
 #if USE_DEC_MPG123
     if (tryDecoder(std::make_unique<DecoderMpg123>())) {
         return std::make_unique<Aulib::DecoderMpg123>();
+    }
+#endif
+#if USE_DEC_DRMP3
+    if (tryDecoder(std::make_unique<DecoderDrmp3>())) {
+        return std::make_unique<Aulib::DecoderDrmp3>();
     }
 #endif
     return nullptr;
@@ -135,10 +149,10 @@ auto Aulib::Decoder::isOpen() const -> bool
 // Conversion happens in-place.
 static constexpr void monoToStereo(float buf[], int len)
 {
-    if (len < 1 or buf == nullptr) {
+    if (len < 1 or not buf) {
         return;
     }
-    for (int i = len / 2 - 1, j = len - 1; i > 0; --i) {
+    for (int i = len / 2 - 1, j = len - 1; i >= 0; --i) {
         buf[j--] = buf[i];
         buf[j--] = buf[i];
     }
@@ -146,7 +160,7 @@ static constexpr void monoToStereo(float buf[], int len)
 
 static constexpr void stereoToMono(float dst[], const float src[], int srcLen)
 {
-    if (srcLen < 1 or dst == nullptr or src == nullptr) {
+    if (srcLen < 1 or not dst or not src) {
         return;
     }
     for (int i = 0, j = 0; i < srcLen; i += 2, ++j) {

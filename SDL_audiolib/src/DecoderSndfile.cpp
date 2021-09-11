@@ -2,6 +2,7 @@
 #include <Aulib/DecoderSndfile.h>
 
 #include "aulib_debug.h"
+#include "missing.h"
 #include <SDL_rwops.h>
 #include <SDL_version.h>
 #include <sndfile.h>
@@ -98,10 +99,9 @@ auto Aulib::DecoderSndfile::getRate() const -> int
     return d->fInfo.samplerate;
 }
 
-auto Aulib::DecoderSndfile::doDecoding(float buf[], int len, bool& callAgain) -> int
+auto Aulib::DecoderSndfile::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
-    callAgain = false;
-    if (d->fEOF) {
+    if (d->fEOF or not isOpen()) {
         return 0;
     }
     sf_count_t ret = sf_read_float(d->fSndfile.get(), buf, len);
@@ -124,7 +124,8 @@ auto Aulib::DecoderSndfile::duration() const -> std::chrono::microseconds
 auto Aulib::DecoderSndfile::seekToTime(std::chrono::microseconds pos) -> bool
 {
     using chrono::duration;
-    if (sf_seek(d->fSndfile.get(), duration<double>(pos).count() * getRate(), SEEK_SET) == -1) {
+    if (not isOpen()
+        or sf_seek(d->fSndfile.get(), duration<double>(pos).count() * getRate(), SEEK_SET) == -1) {
         return false;
     }
     d->fEOF = false;

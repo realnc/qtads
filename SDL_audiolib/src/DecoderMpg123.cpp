@@ -136,8 +136,7 @@ auto Aulib::DecoderMpg123::getRate() const -> int
 
 auto Aulib::DecoderMpg123::doDecoding(float buf[], int len, bool& callAgain) -> int
 {
-    callAgain = false;
-    if (d->fEOF) {
+    if (d->fEOF or not isOpen()) {
         return 0;
     }
 
@@ -166,7 +165,7 @@ auto Aulib::DecoderMpg123::doDecoding(float buf[], int len, bool& callAgain) -> 
 
 auto Aulib::DecoderMpg123::rewind() -> bool
 {
-    if (mpg123_seek(d->fMpgHandle.get(), 0, SEEK_SET) < 0) {
+    if (not isOpen() or mpg123_seek(d->fMpgHandle.get(), 0, SEEK_SET) < 0) {
         return false;
     }
     d->fEOF = false;
@@ -181,6 +180,11 @@ auto Aulib::DecoderMpg123::duration() const -> chrono::microseconds
 auto Aulib::DecoderMpg123::seekToTime(chrono::microseconds pos) -> bool
 {
     using std::chrono::duration;
+
+    if (not isOpen()) {
+        return false;
+    }
+
     off_t targetFrame = mpg123_timeframe(d->fMpgHandle.get(), duration<double>(pos).count());
     if (targetFrame < 0 or mpg123_seek_frame(d->fMpgHandle.get(), targetFrame, SEEK_SET) < 0) {
         return false;

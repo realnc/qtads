@@ -3,10 +3,12 @@
 
 #include "aulib_export.h"
 #include <SDL_stdinc.h>
+#include <SDL_version.h>
 #include <aulib.h>
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <string>
 
 struct SDL_RWops;
 struct SDL_AudioSpec;
@@ -19,6 +21,16 @@ class Processor;
 
 /*!
  * \brief A \ref Stream handles playback for audio produced by a Decoder.
+ *
+ * All public functions of this class will lock the SDL audio device when they are called, and
+ * unlock it when they return. Therefore, it is safe to manipulate a Stream that is currently
+ * playing without having to manually lock the SDL audio device.
+ *
+ * This class is re-entrant but not thread-safe. You can call functions of this class from different
+ * threads only if those calls operate on different objects. If you need to control the same Stream
+ * object from multiple threads, you need to synchronize access to that object. This includes Stream
+ * destruction, meaning you should not create a Stream in one thread and destroy it in another
+ * without synchronization.
  */
 class AULIB_EXPORT Stream
 {
@@ -150,6 +162,24 @@ public:
      *  Current playback volume.
      */
     virtual auto volume() const -> float;
+
+    /*!
+     * \brief Set stereo position.
+     *
+     * This only attenuates the left or right channel. It does not mix one into the other. For
+     * example, when setting the position of a stereo stream all the way to the right, the left
+     * channel will be completely inaudible. It will not be mixed into the right channel.
+     *
+     * \param position
+     *  Must be between -1.0 (all the way to the left) and 1.0 (all the way to the right) with 0
+     *  being the center position.
+     */
+    virtual void setStereoPosition(float position);
+
+    /*!
+     * \brief Returns the currently set stereo position.
+     */
+    virtual auto getStereoPosition() const -> float;
 
     /*!
      * \brief Mute the stream.
@@ -297,7 +327,7 @@ protected:
 
 private:
     friend struct Stream_priv;
-    friend auto Aulib::init(int, SDL_AudioFormat, int, int) -> bool;
+    friend auto Aulib::init(int, AudioFormat, int, int, const std::string&) -> bool;
 
     const std::unique_ptr<struct Stream_priv> d;
 };

@@ -2,6 +2,7 @@
 #include "sampleconv.h"
 
 #include "Buffer.h"
+#include "missing.h"
 #include <SDL_endian.h>
 #include <SDL_version.h>
 #include <limits>

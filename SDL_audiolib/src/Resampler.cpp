@@ -3,7 +3,6 @@
 
 #include "Aulib/Decoder.h"
 #include "Buffer.h"
-#include "SdlAudioLocker.h"
 #include "aulib_debug.h"
 #include "aulib_global.h"
 #include <SDL_audio.h>
@@ -161,7 +160,6 @@ Aulib::Resampler::~Resampler() = default;
 
 void Aulib::Resampler::setDecoder(std::shared_ptr<Decoder> decoder)
 {
-    SdlAudioLocker locker;
     d->fDecoder = std::move(decoder);
 }
 

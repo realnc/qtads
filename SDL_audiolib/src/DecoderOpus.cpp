@@ -84,11 +84,9 @@ auto Aulib::DecoderOpus::getRate() const -> int
     return 48000;
 }
 
-auto Aulib::DecoderOpus::doDecoding(float buf[], int len, bool& callAgain) -> int
+auto Aulib::DecoderOpus::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
-    callAgain = false;
-
-    if (d->fEOF) {
+    if (d->fEOF or not isOpen()) {
         return 0;
     }
 
@@ -124,7 +122,7 @@ auto Aulib::DecoderOpus::doDecoding(float buf[], int len, bool& callAgain) -> in
 
 auto Aulib::DecoderOpus::rewind() -> bool
 {
-    if (op_raw_seek(d->fOpusHandle.get(), 0) != 0) {
+    if (not isOpen() or op_raw_seek(d->fOpusHandle.get(), 0) != 0) {
         return false;
     }
     d->fEOF = false;
@@ -138,7 +136,8 @@ auto Aulib::DecoderOpus::duration() const -> chrono::microseconds
 
 auto Aulib::DecoderOpus::seekToTime(chrono::microseconds pos) -> bool
 {
-    if (op_pcm_seek(d->fOpusHandle.get(), chrono::duration<double>(pos).count() * 48000) != 0) {
+    if (not isOpen()
+        or op_pcm_seek(d->fOpusHandle.get(), chrono::duration<double>(pos).count() * 48000) != 0) {
         return false;
     }
     d->fEOF = false;

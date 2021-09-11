@@ -41,7 +41,7 @@ void Aulib::ResamplerSox::doResampling(float dst[], const float src[], int& dstL
     soxr_error_t error;
     error = soxr_process(d->fResampler.get(), src, static_cast<size_t>(srcLen / channels), &srcDone,
                          dst, static_cast<size_t>(dstLen / channels), &dstDone);
-    if (error != nullptr) {
+    if (error) {
         // FIXME: What do we do?
         AM_warnLn("soxr_process() error: " << error);
         dstLen = srcLen = 0;
@@ -80,7 +80,7 @@ auto Aulib::ResamplerSox::adjustForOutputSpec(int dstRate, int srcRate, int chan
     soxr_error_t error;
     d->fResampler.reset(soxr_create(srcRate, dstRate, static_cast<unsigned>(channels), &error,
                                     &io_spec, &q_spec, nullptr));
-    if (error != nullptr) {
+    if (error) {
         d->fResampler = nullptr;
         return -1;
     }

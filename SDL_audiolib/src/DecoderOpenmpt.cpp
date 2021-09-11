@@ -3,6 +3,7 @@
 
 #include "Buffer.h"
 #include "aulib.h"
+#include "missing.h"
 #include <SDL_rwops.h>
 #include <libopenmpt/libopenmpt.hpp>
 #include <limits>
@@ -14,7 +15,7 @@ namespace Aulib {
 
 struct DecoderOpenmpt_priv final
 {
-    std::unique_ptr<openmpt::module> fModule = nullptr;
+    std::unique_ptr<openmpt::module> fModule;
     bool atEOF = false;
     chrono::microseconds fDuration{};
 };
@@ -42,7 +43,7 @@ auto Aulib::DecoderOpenmpt::open(SDL_RWops* rwops) -> bool
         return false;
     }
 
-    std::unique_ptr<openmpt::module> module(nullptr);
+    std::unique_ptr<openmpt::module> module;
     try {
         module = std::make_unique<openmpt::module>(data.get(), data.size());
     }
@@ -80,15 +81,18 @@ auto Aulib::DecoderOpenmpt::duration() const -> chrono::microseconds
 
 auto Aulib::DecoderOpenmpt::seekToTime(chrono::microseconds pos) -> bool
 {
+    if (not isOpen()) {
+        return false;
+    }
+
     d->fModule->set_position_seconds(chrono::duration<double>(pos).count());
     d->atEOF = false;
     return true;
 }
 
-auto Aulib::DecoderOpenmpt::doDecoding(float buf[], int len, bool& callAgain) -> int
+auto Aulib::DecoderOpenmpt::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
-    callAgain = false;
-    if (d->atEOF) {
+    if (d->atEOF or not isOpen()) {
         return 0;
     }
     int ret;

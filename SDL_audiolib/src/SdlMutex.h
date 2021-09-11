@@ -1,52 +1,56 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
-
-#include "stream_p.h"
-#include <SDL_audio.h>
+#include <SDL_error.h>
+#include <SDL_mutex.h>
+#include <SDL_version.h>
+#include <stdexcept>
 
 /*
- * RAII wrapper for SDL_LockAudio().
+ * RAII wrapper for SDL_mutex. Satisfies std's "Lockable" (SDL 2) or "BasicLockable" (SDL 1)
+ * requirements so it can be used with std::lock_guard and friends.
  */
-class SdlAudioLocker final
+class SdlMutex final
 {
 public:
-    SdlAudioLocker()
+    SdlMutex()
     {
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-        SDL_LockAudioDevice(Aulib::Stream_priv::fDeviceId);
-#else
-        SDL_LockAudio();
-#endif
-        fIsLocked = true;
-    }
-
-    ~SdlAudioLocker()
-    {
-        unlock();
-    }
-
-    SdlAudioLocker(const SdlAudioLocker&) = delete;
-    auto operator=(const SdlAudioLocker&) -> SdlAudioLocker& = delete;
-
-    void unlock()
-    {
-        if (fIsLocked) {
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-            SDL_UnlockAudioDevice(Aulib::Stream_priv::fDeviceId);
-#else
-            SDL_UnlockAudio();
-#endif
-            fIsLocked = false;
+        if (not mutex_) {
+            throw std::runtime_error(SDL_GetError());
         }
     }
 
+    ~SdlMutex()
+    {
+        SDL_DestroyMutex(mutex_);
+    }
+
+    SdlMutex(const SdlMutex&) = delete;
+    auto operator=(const SdlMutex&) -> SdlMutex& = delete;
+
+    void lock() noexcept
+    {
+        SDL_LockMutex(mutex_);
+    }
+
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    bool try_lock() noexcept
+    {
+        return SDL_TryLockMutex(mutex_) == 0;
+    }
+#endif
+
+    void unlock() noexcept
+    {
+        SDL_UnlockMutex(mutex_);
+    }
+
 private:
-    bool fIsLocked;
+    SDL_mutex* mutex_ = SDL_CreateMutex();
 };
 
 /*
 
-Copyright (C) 2014, 2015, 2016, 2017, 2018, 2019 Nikos Chantziaras.
+Copyright (C) 2021 Nikos Chantziaras.
 
 This file is part of SDL_audiolib.
 

@@ -3,6 +3,7 @@
 
 #include "Buffer.h"
 #include "aulib.h"
+#include "missing.h"
 #include <SDL_audio.h>
 #include <libmodplug/modplug.h>
 #include <limits>
@@ -87,10 +88,9 @@ auto Aulib::DecoderModplug::getRate() const -> int
     return modplugSettings.mFrequency;
 }
 
-auto Aulib::DecoderModplug::doDecoding(float buf[], int len, bool& callAgain) -> int
+auto Aulib::DecoderModplug::doDecoding(float buf[], int len, bool& /*callAgain*/) -> int
 {
-    callAgain = false;
-    if (d->atEOF) {
+    if (d->atEOF or not isOpen()) {
         return 0;
     }
     Buffer<Sint32> tmpBuf(len);
@@ -117,6 +117,9 @@ auto Aulib::DecoderModplug::duration() const -> chrono::microseconds
 
 auto Aulib::DecoderModplug::seekToTime(chrono::microseconds pos) -> bool
 {
+    if (not isOpen()) {
+        return false;
+    }
     ModPlug_Seek(d->mpHandle.get(), chrono::duration_cast<chrono::milliseconds>(pos).count());
     d->atEOF = false;
     return true;

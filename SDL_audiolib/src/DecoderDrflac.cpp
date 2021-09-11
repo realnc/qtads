@@ -1,9 +1,11 @@
 // This is copyrighted software. More information is at the end of this file.
 #include "Aulib/DecoderDrflac.h"
 
+#define DR_FLAC_NO_STDIO
+
 #include "aulib_debug.h"
-#define DR_FLAC_IMPLEMENTATION
 #include "dr_flac.h"
+#include "missing.h"
 #include <SDL_rwops.h>
 
 namespace chrono = std::chrono;
@@ -58,7 +60,7 @@ static auto drflacSeekCb(void* const rwops_void, const int offset, const drflac_
 
 namespace Aulib {
 
-struct DecoderFlac_priv final
+struct DecoderDrflac_priv final
 {
     std::unique_ptr<drflac, decltype(&drflac_close)> handle_{nullptr, drflac_close};
     bool fEOF = false;
@@ -67,7 +69,7 @@ struct DecoderFlac_priv final
 } // namespace Aulib
 
 Aulib::DecoderDrflac::DecoderDrflac()
-    : d(std::make_unique<DecoderFlac_priv>())
+    : d(std::make_unique<DecoderDrflac_priv>())
 {}
 
 Aulib::DecoderDrflac::~DecoderDrflac() = default;
@@ -87,10 +89,9 @@ auto Aulib::DecoderDrflac::open(SDL_RWops* const rwops) -> bool
     return true;
 }
 
-auto Aulib::DecoderDrflac::doDecoding(float* const buf, const int len, bool& callAgain) -> int
+auto Aulib::DecoderDrflac::doDecoding(float* const buf, const int len, bool& /*callAgain*/) -> int
 {
-    callAgain = false;
-    if (d->fEOF) {
+    if (d->fEOF or not isOpen()) {
         return 0;
     }
 
@@ -104,25 +105,30 @@ auto Aulib::DecoderDrflac::doDecoding(float* const buf, const int len, bool& cal
 
 auto Aulib::DecoderDrflac::getChannels() const -> int
 {
+    if (not isOpen()) {
+        return 0;
+    }
     return d->handle_.get()->channels;
 }
 
 auto Aulib::DecoderDrflac::getRate() const -> int
 {
+    if (not isOpen()) {
+        return 0;
+    }
     return d->handle_.get()->sampleRate;
 }
 
 auto Aulib::DecoderDrflac::rewind() -> bool
 {
-    if (drflac_seek_to_pcm_frame(d->handle_.get(), 0)) {
-        d->fEOF = false;
-        return true;
-    }
-    return false;
+    return seekToTime({});
 }
 
 auto Aulib::DecoderDrflac::duration() const -> chrono::microseconds
 {
+    if (not isOpen()) {
+        return {};
+    }
     return chrono::duration_cast<chrono::microseconds>(chrono::duration<double>(
         static_cast<double>(d->handle_.get()->totalPCMFrameCount) / getRate()));
 }
@@ -130,7 +136,7 @@ auto Aulib::DecoderDrflac::duration() const -> chrono::microseconds
 auto Aulib::DecoderDrflac::seekToTime(const chrono::microseconds pos) -> bool
 {
     const auto target_frame = chrono::duration<double>(pos).count() * getRate();
-    if (not drflac_seek_to_pcm_frame(d->handle_.get(), target_frame)) {
+    if (not isOpen() or not drflac_seek_to_pcm_frame(d->handle_.get(), target_frame)) {
         return false;
     }
     d->fEOF = false;
