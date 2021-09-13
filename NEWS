@@ -1,3 +1,29 @@
+git
+===
+
+  - Fixed sound not working correctly anymore after canceling a sound with a
+    crossfade.
+
+  - Fixed a Unicode parsing issue that could result in broken text matching due
+    to miscompilation on some systems resulting from C++ undefined behavior.
+    This could have all sorts of weird side effects, like verbs, nouns, etc,
+    not getting recognized, HTML tags not working, and anything in-between.
+
+  - Fixed lower-case conversion assuming the text is always UTF-8, even though
+    this is usually not true in Tads 2 games. This could in some cases cause
+    issues for non-ASCII Tads 2 games. Now the proper text codec is used.
+
+  - Fixed "unnamed" (from the point of view of Tads) temporary files being
+    created on the OS root directory (and thus usually failing since the user
+    doesn't have filesystem permission to write there.) Now those files will be
+    created in the proper, OS-configured directory for temp files.
+
+  - Various bugfixes in the audio engine. Due to this, FluidSynth 2.x is now
+    required for MIDI support. Ubuntu 20.04 ships it. 18.04 does not.
+
+  - QTads now requires a C++17 compiler.
+
+
 3.0 - 2020-02-15
 ================
 
