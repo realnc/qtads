@@ -150,7 +150,7 @@ Aulib::DecoderFluidsynth::~DecoderFluidsynth() = default;
 
 auto Aulib::DecoderFluidsynth::loadSoundfont(SDL_RWops* rwops) -> bool
 {
-    if (not isOpen()) {
+    if (not d->fSynth) {
         return false;
     }
     if (not rwops) {
@@ -181,7 +181,7 @@ auto Aulib::DecoderFluidsynth::loadSoundfont(SDL_RWops* rwops) -> bool
 
 auto Aulib::DecoderFluidsynth::loadSoundfont(const std::string& filename) -> bool
 {
-    if (not isOpen()) {
+    if (not d->fSynth) {
         return false;
     }
     if (fluid_synth_sfload(d->fSynth.get(), filename.c_str(), 1) == FLUID_FAILED) {
@@ -193,7 +193,7 @@ auto Aulib::DecoderFluidsynth::loadSoundfont(const std::string& filename) -> boo
 
 auto Aulib::DecoderFluidsynth::gain() const -> float
 {
-    if (not isOpen()) {
+    if (not d->fSynth) {
         return 0.f;
     }
     return fluid_synth_get_gain(d->fSynth.get());
@@ -201,7 +201,7 @@ auto Aulib::DecoderFluidsynth::gain() const -> float
 
 void Aulib::DecoderFluidsynth::setGain(float gain)
 {
-    if (isOpen()) {
+    if (not d->fSynth) {
         fluid_synth_set_gain(d->fSynth.get(), gain);
     }
 }
