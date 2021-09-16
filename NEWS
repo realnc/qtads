@@ -1,5 +1,5 @@
-git
-===
+3.1 - 2021-09-16
+================
 
   - Fixed sound not working correctly anymore after canceling a sound with a
     crossfade.
@@ -14,14 +14,23 @@ git
     issues for non-ASCII Tads 2 games. Now the proper text codec is used.
 
   - Fixed "unnamed" (from the point of view of Tads) temporary files being
-    created on the OS root directory (and thus usually failing since the user
+    created in the OS root directory (and thus usually failing since the user
     doesn't have filesystem permission to write there.) Now those files will be
     created in the proper, OS-configured directory for temp files.
 
   - Various bugfixes in the audio engine. Due to this, FluidSynth 2.x is now
     required for MIDI support. Ubuntu 20.04 ships it. 18.04 does not.
 
-  - QTads now requires a C++17 compiler.
+  - The Linux AppImage binary had a broken online update check on some systems.
+    This was due to an incompatibility caused by the AppImage bundling a copy
+    of OpenSSL 1.0 (from Ubuntu 16.04) and using that copy unconditionally.
+    We now bundle 1.1 but don't use it if the system already provides it. We
+    only use it on old distros that only provide OpenSSL 1.0. This is necessary
+    because 1.0 and 1.1 are incompatibile with each other; an application built
+    using 1.1 won't run with 1.0 and vice versa.
+
+  - A C++17 compiler is now required. GCC 5.4 (Ubuntu 16.04) is the oldest GCC
+    version that is verified to still be able to build QTads.
 
 
 3.0 - 2020-02-15

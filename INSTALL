@@ -49,7 +49,7 @@ If audio support is enabled, you'll also need:
 
   SDL 2
   libsndfile
-  libfluidsynth
+  libfluidsynth (version 2.x)
   libvorbisfile
   libmpg123
 
