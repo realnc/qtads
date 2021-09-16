@@ -1,0 +1,8 @@
+case "$(openssl version -v)" in
+    'OpenSSL 1.1.'*)
+        true
+        ;;
+    *)
+        export LD_LIBRARY_PATH="$LD_LIBRARY_PATH":"$(readlink -f "$(dirname "$0")")"/usr/openssl
+        ;;
+esac

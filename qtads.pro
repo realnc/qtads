@@ -463,13 +463,20 @@ linux {
     appimage.commands = \
         rm -f QTads.AppImage \
         && rm -rf AppDir \
-        && "$$QMAKE_QMAKE" PREFIX="$$OUT_PWD/AppDir/usr" -config release "$$_PRO_FILE_" \
-        && make -j$$QMAKE_HOST.cpu_count install \
+        && "$$QMAKE_QMAKE" PREFIX="$$OUT_PWD"/AppDir/usr -config release "$$_PRO_FILE_" \
+        && make -j"$$QMAKE_HOST.cpu_count install" \
+        && mkdir "$$OUT_PWD"/AppDir/usr/openssl \
+        && cp -a "$(shell ldconfig -p | grep libssl.so.1 | head -n1 | tr ' ' '\n' | grep /)" "$$OUT_PWD"/AppDir/usr/openssl \
+        && cp -a "$(shell ldconfig -p | grep libcrypto.so.1 | head -n1 | tr ' ' '\n' | grep /)" "$$OUT_PWD"/AppDir/usr/openssl \
         && rm -rf AppDir/usr/share/metainfo \
-        && env PATH="$$(PATH)" QMAKE="$$QMAKE_QMAKE" OUTPUT=QTads.AppImage linuxdeploy \
+        && env PATH="$$(PATH)" QMAKE="$$QMAKE_QMAKE" linuxdeploy \
             -v2 \
             --appdir AppDir \
             --plugin qt \
+        && cat "$$_PRO_FILE_PWD_"/appimage_openssl_hook >> AppDir/apprun-hooks/linuxdeploy-plugin-qt-hook.sh \
+        && env PATH="$$(PATH)" QMAKE="$$QMAKE_QMAKE" OUTPUT=QTads.AppImage linuxdeploy \
+            -v2 \
+            --appdir AppDir \
             --output appimage
 
     QMAKE_EXTRA_TARGETS += appimage
