@@ -32,9 +32,12 @@ win32 {
     QMAKE_TARGET_DESCRIPTION = "QTads - A TADS Interpreter"
     QMAKE_TARGET_COPYRIGHT = "Copyright 2016 Michael J. Roberts; 2020 Nikos Chantziaras"
 
-    *-g++* {
+    contains(QT_ARCH, i386):*-g++* {
         QMAKE_CFLAGS += -march=i686 -mtune=generic
         QMAKE_CXXFLAGS += -march=i686 -mtune=generic
+    } else:contains(QT_ARCH, x86_64):*-g++* {
+        QMAKE_CFLAGS += -march=x86-64 -mtune=generic
+        QMAKE_CXXFLAGS += -march=x86-64 -mtune=generic
     }
 }
 
