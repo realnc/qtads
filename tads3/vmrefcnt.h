@@ -20,6 +20,8 @@ Modified
 #ifndef VMREFCNT_H
 #define VMREFCNT_H
 
+#include <cinttypes>
+#include <cstdint>
 
 /* ------------------------------------------------------------------------ */
 /*
@@ -59,13 +61,13 @@ public:
     void add_ref(void *from, const char *msg)
     {
         add_ref();
-        printf("add_ref(this=%lx, cnt=%ld, from=%lx, %s)\n",
-               (long)this, cnt.get(), (long)from, msg);
+        printf("add_ref(this=%" PRIXPTR "x, cnt=%ld, from=%" PRIXPTR "x, %s)\n",
+               (std::uintptr_t)this, cnt.get(), (std::uintptr_t)from, msg);
     }
     void release_ref(void *from, const char *msg)
     {
-        printf("release_ref(this=%lx, cnt=%ld, from=%lx, %s)\n",
-               (long)this, cnt.get()-1, (long)from, msg);
+        printf("release_ref(this=%" PRIXPTR ", cnt=%ld, from=%" PRIXPTR ", %s)\n",
+               (std::uintptr_t)this, cnt.get()-1, (std::uintptr_t)from, msg);
         release_ref();
     }
     
@@ -164,8 +166,8 @@ public:
     /* debugging version */
     void release_ref(void *from, const char *msg)
     {
-        printf("release_ref(this=%lx, cnt=%ld, from=%lx, %s)\n",
-               (long)this, cnt.get()-1, (long)from, msg);
+        printf("release_ref(this=%" PRIXPTR ", cnt=%ld, from=%" PRIXPTR ", %s)\n",
+               (std::uintptr_t)this, cnt.get()-1, (std::uintptr_t)from, msg);
         release_ref();
     }
 
