@@ -472,7 +472,7 @@ linux {
         && cp -a "$(shell ldconfig -p | grep libssl.so.1 | head -n1 | tr ' ' '\n' | grep /)" "$$OUT_PWD"/AppDir/usr/openssl \
         && cp -a "$(shell ldconfig -p | grep libcrypto.so.1 | head -n1 | tr ' ' '\n' | grep /)" "$$OUT_PWD"/AppDir/usr/openssl \
         && rm -rf AppDir/usr/share/metainfo \
-        && env PATH="$$(PATH)" QMAKE="$$QMAKE_QMAKE" linuxdeploy \
+        && env PATH="$$(PATH)" QMAKE="$$QMAKE_QMAKE" EXTRA_QT_PLUGINS=svg linuxdeploy \
             -v2 \
             --appdir AppDir \
             --plugin qt \
