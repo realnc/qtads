@@ -1,4 +1,4 @@
-QT += network widgets
+QT += network svg widgets
 QT_CONFIG -= no-pkg-config
 TEMPLATE = app
 CONFIG += silent warn_off strict_c strict_c++ c11 c++17 gc_binaries
