@@ -1,60 +1,40 @@
 name: CI
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build_linux:
-    runs-on: ubuntu-20.04
-    env:
-      CMAKE_GENERATOR: Ninja
+    strategy:
+      matrix:
+        docker_image: ['realnc/qtads-build:linux-x86', 'realnc/qtads-build:linux-x64']
+
+    runs-on: ubuntu-latest
+    container: ${{ matrix.docker_image }}
 
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Install deps
-      run: sudo apt-get -y install
-        libmpg123-dev
-        libsdl2-dev
-        libsndfile1-dev
-        libvorbis-dev
-        ninja-build
-        qtbase5-dev
-
-    - run: sudo ln -s /usr/local/lib /usr/local/lib64
-
-    - name: Build FluidSynth
-      working-directory: ../
-      run: |
-        wget -q 'https://github.com/FluidSynth/fluidsynth/archive/v2.2.0.tar.gz' -O- | tar xz
-        mkdir fluidsynth-2.2.0/build
-        cd fluidsynth-2.2.0/build
-        cmake -Denable-framework=off ..
-        sudo cmake --build . --target install
-
+    - uses: actions/checkout@v1
     - name: Build
       run: |
-        qmake \
-        && make -j`nproc` \
-        && sudo make install
+        qmake
+        make appimage
 
   build_macOS:
     runs-on: macos-10.15
 
     steps:
-    - uses: actions/checkout@v2
-
     - name: Install deps
-      run: brew install
-        fluidsynth
-        libsndfile
-        libvorbis
-        mpg123
-        pkg-config
-        qt5
-        sdl2
+      run: |
+        brew install \
+          fluidsynth \
+          libsndfile \
+          libvorbis \
+          mpg123 \
+          pkg-config \
+          qt5 \
+          sdl2
+        brew link qt5 --force
 
-    - run: brew link qt5 --force
-
+    - uses: actions/checkout@v2
     - name: Build
       run: |
         qmake qtads.pro
