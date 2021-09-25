@@ -22,20 +22,30 @@ jobs:
     runs-on: macos-10.15
 
     steps:
-    - name: Install deps
+    - name: Replace homebrew
       run: |
-        brew install \
-          fluidsynth \
-          libsndfile \
-          libvorbis \
-          mpg123 \
-          pkg-config \
-          qt5 \
-          sdl2
-        brew link qt5 --force
+        cd ~
+        mkdir newbrew
+        cd newbrew
+        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/homebrew-10.13.tar.zst' | zstd -d | sudo tar x
+        rm -f bin/brew
+        mkdir ~/oldbrew
+        sudo mv /usr/local/* ~/oldbrew/
+        sudo mv * /usr/local/
+
+    - name: Download Qt
+      working-directory: /opt
+      run: |
+        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/qt-5.15.2-macos-static.tar.zst' | zstd -d | sudo tar x
+
+    - name: Enable 10.15 SDK
+      run: |
+        sudo mv \
+          "/Applications/Xcode_12.1.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" \
+          "`xcode-select -p`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk"
 
     - uses: actions/checkout@v2
     - name: Build
       run: |
-        qmake qtads.pro
-        make -j`sysctl -n hw.ncpu`
+        /opt/qt/bin/qmake -after CONFIG-=silent
+        make macdist
