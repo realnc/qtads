@@ -1,4 +1,2 @@
-3.1.0
-Version 3.1 is now available. A list of changes since 3.0 is available at:
-
-https://github.com/realnc/qtads/releases/latest
+3.2.0
+Version 3.2 is now available. It fixes a regression introduced in 3.1 where MIDI music volume was very low. Also, a 64-bit Windows version is now also available.
