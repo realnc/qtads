@@ -132,18 +132,17 @@ void Aulib::Stream_priv::fSdlCallbackImpl(void* /*unused*/, Uint8 out[], int out
 
         bool has_finished = false;
         bool has_looped = false;
-        int cur_pos = 0;
         const int out_offset = [&] {
-            if (ticks_since_play_start < wanted_ticks) {
-                const int out_offset_ticks = wanted_ticks - ticks_since_play_start;
-                const int offset = out_offset_ticks * fAudioSpec.channels * fAudioSpec.freq / 1000;
-                return offset - (offset % fAudioSpec.channels);
+            if (!stream->d->fStarting || ticks_since_play_start >= wanted_ticks) {
+                return 0;
             }
-            return 0;
+
+            const int out_offset_ticks = wanted_ticks - ticks_since_play_start;
+            const int offset = out_offset_ticks * fAudioSpec.channels * fAudioSpec.freq / 1000;
+            return offset - (offset % fAudioSpec.channels);
         }();
-        if (ticks_since_play_start < wanted_ticks) {
-            cur_pos = out_offset;
-        }
+        int cur_pos = out_offset;
+        stream->d->fStarting = false;
 
         while (cur_pos < out_len_samples) {
             if (stream->d->fResampler) {

@@ -202,8 +202,9 @@ auto Aulib::DecoderFluidsynth::gain() const -> float
 void Aulib::DecoderFluidsynth::setGain(float gain)
 {
     if (not d->fSynth) {
-        fluid_synth_set_gain(d->fSynth.get(), gain);
+        return;
     }
+    fluid_synth_set_gain(d->fSynth.get(), gain);
 }
 
 auto Aulib::DecoderFluidsynth::open(SDL_RWops* rwops) -> bool

@@ -72,6 +72,7 @@ auto Aulib::Stream::play(int iterations, std::chrono::microseconds fadeTime) -> 
     d->fCurrentIteration = 0;
     d->fWantedIterations = iterations;
     d->fPlaybackStartTick = SDL_GetTicks();
+    d->fStarting = true;
     if (fadeTime.count() > 0) {
         d->fInternalVolume = 0.f;
         d->fFadingIn = true;
