@@ -1,3 +1,9 @@
+3.2 - 2021-09-25
+================
+
+  - Fixed a regression in 3.1 where the volume of MIDI music was too low.
+
+
 3.1 - 2021-09-16
 ================
 
