@@ -26,6 +26,7 @@
 #include "settings.h"
 #include "sysframe.h"
 #include "syswininput.h"
+#include "util.h"
 #include <QApplication>
 #include <QDebug>
 #include <QDir>

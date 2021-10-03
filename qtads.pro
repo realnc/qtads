@@ -1,7 +1,7 @@
 QT += network svg widgets
 QT_CONFIG -= no-pkg-config
 TEMPLATE = app
-CONFIG += silent warn_off strict_c strict_c++ c11 c++17 gc_binaries
+CONFIG += silent warn_off strict_c strict_c++ c11 c++1z gc_binaries
 
 VERSION_MAJOR = 3
 VERSION_MINOR = 2
@@ -12,8 +12,13 @@ DEFINES += QTADS_VERSION=\\\"$$VERSION\\\"
 lessThan(QT_MAJOR_VERSION, 5) {
     error(Qt 4 is not supported. You need at least Qt 5.5.)
 }
-contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 5) {
-    error(Qt 5.5 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION")
+equals(QT_MAJOR_VERSION, 5) {
+    lessThan(QT_MINOR_VERSION, 5) {
+        error(Qt 5.5 or higher is required. You are using Qt "$$QT_MAJOR_VERSION"."$$QT_MINOR_VERSION")
+    }
+    lessThan(QT_MINOR_VERSION, 6) {
+        QMAKE_CXXFLAGS += -std=c++1z
+    }
 }
 
 # Mac OS application and file icons.
