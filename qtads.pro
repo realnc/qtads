@@ -21,16 +21,17 @@ equals(QT_MAJOR_VERSION, 5) {
     }
 }
 
-# Mac OS application and file icons.
 macx {
     ICON = QTads.icns
     OtherIcons.files = QTadsGameFile.icns
     OtherIcons.path = Contents/Resources
     QMAKE_BUNDLE_DATA += OtherIcons
     QMAKE_INFO_PLIST = Info.plist
+    gc_binaries:contains(QT_MAJOR_VERSION, 5):lessThan(QT_MINOR_VERSION, 12) {
+        QMAKE_LFLAGS += -Wl,-dead_strip
+    }
 }
 
-# MS Windows executable resource.
 win32 {
     RC_ICONS = qtads.ico
     QMAKE_TARGET_COMPANY = "Nikos Chantziaras"
@@ -500,5 +501,18 @@ macx {
         && "$$dirname(QMAKE_QMAKE)/macdeployqt" "$${TARGET}.app" \
         && ditto -v -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 "$${TARGET}.app" "$${TARGET}.zip"
 
-    QMAKE_EXTRA_TARGETS += macdist
+    legacymacdist.target = legacymacdist
+    legacymacdist.commands = \
+        rm -rf "$${TARGET}.app" \
+        && rm -f "$${TARGET}.zip" \
+        && "$$QMAKE_QMAKE" -config release "$$_PRO_FILE_" \
+        && make -j$$QMAKE_HOST.cpu_count \
+        && sed -i \'\' \'s/\$${MACOSX_DEPLOYMENT_TARGET}/10.9/g\' "$${TARGET}.app"/Contents/Info.plist \
+        && dylibbundler -x "$${TARGET}.app"/Contents/MacOS/"$${TARGET}" -b -cd -d "$${TARGET}.app"/Contents/Frameworks -p '@rpath' \
+        && install_name_tool -add_rpath '@executable_path/../Frameworks/' "$${TARGET}.app"/Contents/MacOS/"$${TARGET}" \
+        && strip "$${TARGET}.app"/Contents/MacOS/"$${TARGET}" \
+        && find "$${TARGET}.app"/Contents/Frameworks/ -type f -name "*.dylib" -exec strip -x '{}' \; \
+        && ditto -v -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 "$${TARGET}.app" "$${TARGET}.zip"
+
+    QMAKE_EXTRA_TARGETS += macdist legacymacdist
 }
