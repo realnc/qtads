@@ -5,7 +5,7 @@ CONFIG += silent warn_off strict_c strict_c++ c11 c++1z gc_binaries
 
 VERSION_MAJOR = 3
 VERSION_MINOR = 2
-VERSION_PATCH = 0
+VERSION_PATCH = 99
 VERSION = "$$VERSION_MAJOR"."$$VERSION_MINOR"."$$VERSION_PATCH"
 DEFINES += QTADS_VERSION=\\\"$$VERSION\\\"
 
