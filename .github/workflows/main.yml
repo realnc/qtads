@@ -18,25 +18,51 @@ jobs:
         qmake
         make appimage
 
-  build_macOS:
-    runs-on: macos-10.15
+  build_mxe:
+    strategy:
+      matrix:
+        config:
+          - {image: 'realnc/qtads-build:mxe-x86', mxe_target: i686-w64-mingw32.static}
+          - {image: 'realnc/qtads-build:mxe-x64', mxe_target: x86_64-w64-mingw32.static}
+
+    runs-on: ubuntu-latest
+    container: ${{ matrix.config.image }}
 
     steps:
-    - name: Replace homebrew
+    - uses: actions/checkout@v1
+    - name: Build
       run: |
-        cd ~
-        mkdir newbrew
-        cd newbrew
-        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/homebrew-10.13.tar.zst' | zstd -d | sudo tar x
-        rm -f bin/brew
-        mkdir ~/oldbrew
-        sudo mv /usr/local/* ~/oldbrew/
-        sudo mv * /usr/local/
+        ${{ matrix.config.mxe_target }}-qmake-qt5
+        make -j`nproc`
+
+  build_macOS:
+    runs-on: macos-10.15
+    env:
+      HOMEBREW_PREFIX: /Users/Shared/homebrew-qtads-hugor
+      HOMEBREW_CELLAR: /Users/Shared/homebrew-qtads-hugor/Cellar
+      HOMEBREW_SHELLENV_PREFIX: /Users/Shared/homebrew-qtads-hugor
+      PKG_CONFIG_PATH: /Users/Shared/homebrew-qtads-hugor/opt/readline/lib/pkgconfig
+
+    steps:
+    - run: echo "${HOMEBREW_PREFIX}/bin:${HOMEBREW_PREFIX}/sbin:${PATH}" >> $GITHUB_PATH
+
+    - name: Install custom homebrew
+      run: |
+        rm -rf "${HOMEBREW_PREFIX}"
+        mkdir "${HOMEBREW_PREFIX}"
+        cd "${HOMEBREW_PREFIX}"/..
+        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/homebrew-qtads-hugor.tar.zst' | zstd -d | tar x
+
+    - name: Remove /usr/local homebrew
+      working-directory: /usr/local
+      run: |
+        sudo mkdir ~/oldbrew
+        sudo mv * ~/oldbrew/
 
     - name: Download Qt
       working-directory: /opt
       run: |
-        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/qt-5.15.2-macos-static.tar.zst' | zstd -d | sudo tar x
+        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/qt-5.15-macos-static.tar.zst' | zstd -d | sudo tar x
 
     - name: Enable 10.15 SDK
       run: |
@@ -47,5 +73,11 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build
       run: |
-        /opt/qt/bin/qmake -after CONFIG-=silent
+        /opt/qt-5.15/bin/qmake -after CONFIG-=silent
         make macdist
+
+    - name: Restore /usr/local homebrew
+      working-directory: /usr/local
+      run: |
+        sudo rm -rf *
+        sudo mv ~/oldbrew/* .
