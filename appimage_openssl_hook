@@ -1,8 +1,23 @@
+#! /bin/sh
+
+HERE="$(dirname "$(readlink -f "${0}")")"
+
+# try to make Qt apps more "native looking" on Gtk-based desktops, if possible
+# see https://github.com/AppImage/AppImageKit/issues/977#issue-462374883
+case "${XDG_CURRENT_DESKTOP}" in
+    *GNOME*|*gnome*|*XFCE*)
+        export QT_QPA_PLATFORMTHEME=gtk2
+        ;;
+esac
+
+# If a system provided openssl library cannot be found, or is not 1.1.x, use the bundled one.
 case "$(openssl version -v)" in
     'OpenSSL 1.1.'*)
         true
         ;;
     *)
-        export LD_LIBRARY_PATH="$LD_LIBRARY_PATH":"$(readlink -f "$(dirname "$0")")"/usr/openssl
+        export LD_LIBRARY_PATH="$LD_LIBRARY_PATH":"${HERE}/usr/openssl"
         ;;
 esac
+
+exec "${HERE}/usr/bin/qtads" "$@"

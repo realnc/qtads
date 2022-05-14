@@ -465,28 +465,39 @@ desktop.path = "$$DATADIR"
 INSTALLS += desktop docs target
 
 # Makefile target for AppImage creation (make appimage).
-# Needs https://github.com/linuxdeploy and a binary called "linuxdeploy" (can be a symlink to the
-# linuxdeploy AppImage.) Also needs the linuxdeploy "qt" and "appimage" plugins.
+# Needs https://github.com/probonopd/linuxdeployqt with the executable called "linuxdeployqt" (can
+# be a symlink to the linuxdeployqt AppImage.) Also needs appimagetool from
+# https://github.com/AppImage/AppImageKit. The executable name needs to be "appimagetool".
 linux {
+    LIBSSL = $$system(ldconfig -p | grep -F libssl.so.1 | head -n1 | tr $$shell_quote(' ') $$shell_quote('\n') | grep /)
+    LIBCRYPTO = $$system(ldconfig -p | grep -F libcrypto.so.1 | head -n1 | tr $$shell_quote(' ') $$shell_quote('\n') | grep /)
+
     appimage.target = appimage
     appimage.commands = \
         rm -f QTads.AppImage \
         && rm -rf AppDir \
-        && "$$QMAKE_QMAKE" PREFIX="$$OUT_PWD"/AppDir/usr -config release "$$_PRO_FILE_" \
-        && make -j"$$QMAKE_HOST.cpu_count install" \
-        && mkdir "$$OUT_PWD"/AppDir/usr/openssl \
-        && cp -a "$(shell ldconfig -p | grep libssl.so.1 | head -n1 | tr ' ' '\n' | grep /)" "$$OUT_PWD"/AppDir/usr/openssl \
-        && cp -a "$(shell ldconfig -p | grep libcrypto.so.1 | head -n1 | tr ' ' '\n' | grep /)" "$$OUT_PWD"/AppDir/usr/openssl \
+        && $$shell_quote($$QMAKE_QMAKE) \
+            PREFIX=$$shell_quote($$OUT_PWD/AppDir/usr) \
+            -config release \
+            $$shell_quote($$_PRO_FILE_) \
+        && make -j$$QMAKE_HOST.cpu_count install \
+        && mkdir $$shell_quote($$OUT_PWD/AppDir/usr/openssl) \
+        && cp -a $$shell_quote($$LIBSSL) $$shell_quote($$OUT_PWD/AppDir/usr/openssl) \
+        && cp -a $$shell_quote($$LIBCRYPTO) $$shell_quote($$OUT_PWD/AppDir/usr/openssl) \
         && rm -rf AppDir/usr/share/metainfo \
-        && env PATH="$$(PATH)" QMAKE="$$QMAKE_QMAKE" EXTRA_QT_PLUGINS=svg linuxdeploy \
-            -v2 \
-            --appdir AppDir \
-            --plugin qt \
-        && cat "$$_PRO_FILE_PWD_"/appimage_openssl_hook >> AppDir/apprun-hooks/linuxdeploy-plugin-qt-hook.sh \
-        && env PATH="$$(PATH)" QMAKE="$$QMAKE_QMAKE" OUTPUT=QTads.AppImage linuxdeploy \
-            -v2 \
-            --appdir AppDir \
-            --output appimage
+        && linuxdeployqt \
+            $$shell_quote($$OUT_PWD/AppDir/usr/share/applications/nikos.chantziaras.qtads.desktop) \
+            -no-copy-copyright-files \
+            -no-translations \
+            -qmake=$$shell_quote($$QMAKE_QMAKE) \
+            -extra-plugins=iconengines,platformthemes \
+            -bundle-non-qt-libs \
+            -exclude-libs=libssl.so.1,libcrypto.so.1 \
+        && rm -f AppDir/usr/lib/libssl.* AppDir/usr/lib/libcrypto.* \
+        && rm -f AppDir/AppRun \
+        && cp $$shell_quote($$_PRO_FILE_PWD_/appimage_openssl_hook) AppDir/AppRun \
+        && chmod +x AppDir/AppRun \
+        && appimagetool -v AppDir
 
     QMAKE_EXTRA_TARGETS += appimage
 }
