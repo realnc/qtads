@@ -493,8 +493,8 @@ linux {
             -qmake=$$shell_quote($$QMAKE_QMAKE) \
             -extra-plugins=iconengines,platformthemes \
             -bundle-non-qt-libs \
-            -exclude-libs=libssl.so.1,libcrypto.so.1 \
-        && rm -f AppDir/usr/lib/libssl.* AppDir/usr/lib/libcrypto.* \
+            -exclude-libs=libssl.so.1,libcrypto.so.1,libglib-2.0.so.0 \
+        && rm -f AppDir/usr/lib/libssl.* AppDir/usr/lib/libcrypto.* AppDir/usr/lib/libglib-*\
         && rm -f AppDir/AppRun \
         && cp $$shell_quote($$_PRO_FILE_PWD_/appimage_apprun_wrapper) AppDir/AppRun \
         && chmod +x AppDir/AppRun \
