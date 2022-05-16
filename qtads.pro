@@ -470,11 +470,9 @@ INSTALLS += desktop docs target
 # be a symlink to the linuxdeployqt AppImage.) Also needs appimagetool from
 # https://github.com/AppImage/AppImageKit. The executable name needs to be "appimagetool".
 linux {
-    LIBSSL =
-    LIBCRYPTO =
+    LIBSSL += $$system(ldconfig -p | grep -F libssl.so.1.1 | head -n1 | tr $$shell_quote(' ') $$shell_quote('\n') | grep /)
+    LIBCRYPTO += $$system(ldconfig -p | grep -F libcrypto.so.1.1 | head -n1 | tr $$shell_quote(' ') $$shell_quote('\n') | grep /)
     appimage {
-        LIBSSL = $$system(ldconfig -p | grep -F libssl.so.1.1 | head -n1 | tr $$shell_quote(' ') $$shell_quote('\n') | grep /)
-        LIBCRYPTO = $$system(ldconfig -p | grep -F libcrypto.so.1.1 | head -n1 | tr $$shell_quote(' ') $$shell_quote('\n') | grep /)
         exists($$LIBSSL):exists($$LIBCRYPTO) {
             message("Will bundle OpenSSL libraries: $$LIBSSL, $$LIBCRYPTO")
         } else {
