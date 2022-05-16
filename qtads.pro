@@ -444,7 +444,8 @@ OTHER_FILES *= \
     .github/workflows/main.yml \
     .gitignore \
     INSTALL \
-    LICENSE.TXT
+    LICENSE.TXT \
+    appimage_apprun_wrapper
 
 isEmpty(PREFIX) {
     PREFIX = /usr/local
@@ -495,7 +496,7 @@ linux {
             -exclude-libs=libssl.so.1,libcrypto.so.1 \
         && rm -f AppDir/usr/lib/libssl.* AppDir/usr/lib/libcrypto.* \
         && rm -f AppDir/AppRun \
-        && cp $$shell_quote($$_PRO_FILE_PWD_/appimage_openssl_hook) AppDir/AppRun \
+        && cp $$shell_quote($$_PRO_FILE_PWD_/appimage_apprun_wrapper) AppDir/AppRun \
         && chmod +x AppDir/AppRun \
         && appimagetool -v AppDir
 
