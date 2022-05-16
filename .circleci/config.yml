@@ -1,0 +1,61 @@
+version: 2.1
+
+parameters:
+  GHA_Actor:
+    type: string
+    default: ""
+  GHA_Action:
+    type: string
+    default: ""
+  GHA_Event:
+    type: string
+    default: ""
+  GHA_Meta:
+    type: string
+    default: ""
+
+workflows:
+  build:
+    when:
+      equal: ['build-linux-arm', << pipeline.parameters.GHA_Action >>]
+    jobs:
+      - build-linux:
+          name: 'Linux arm64v8'
+          image_tag: 'linux-arm64v8'
+          arch: 'arm64'
+      - build-linux:
+          name: 'Linux arm32v7'
+          image_tag: 'linux-arm32v7'
+          arch: 'arm32v7'
+
+jobs:
+  build-linux:
+    parameters:
+      image_tag:
+        type: string
+      arch:
+        type: string
+
+    resource_class: arm.medium
+    machine:
+      image: ubuntu-2004:current
+
+    steps:
+      - checkout
+      - run:
+          name: "Build"
+          command: |
+            docker run \
+                -v "$PWD":/build \
+                -w /build \
+                realnc/qtads-build:<< parameters.image_tag >> \
+                bash -c '(
+                    set -ex
+                    qmake
+                    make appimage
+                )'
+            mv *.AppImage /tmp/QTads-Linux-<< parameters.arch >>.AppImage
+
+      - store_artifacts:
+          path: /tmp/QTads-Linux-<< parameters.arch >>.AppImage
+          destination: QTads-Linux-<< parameters.arch >>.AppImage

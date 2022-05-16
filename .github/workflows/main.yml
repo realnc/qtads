@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  build_linux:
+  build_linux_intel:
     strategy:
       matrix:
         docker_image: ['realnc/qtads-build:linux-x86', 'realnc/qtads-build:linux-x64']
@@ -17,6 +17,15 @@ jobs:
       run: |
         qmake
         make appimage
+
+  trigger-circleci-arm:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Trigger CircleCI ARM builds
+      id: 'build-linux-arm'
+      uses: CircleCI-Public/trigger-circleci-pipeline-action@v1.0.4
+      env:
+        CCI_TOKEN: ${{ secrets.CCI_TOKEN }}
 
   build_mxe:
     strategy:
