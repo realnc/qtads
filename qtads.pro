@@ -475,7 +475,7 @@ linux {
 
     appimage.target = appimage
     appimage.commands = \
-        rm -f QTads.AppImage \
+        rm -f *.AppImage \
         && rm -rf AppDir \
         && $$shell_quote($$QMAKE_QMAKE) \
             PREFIX=$$shell_quote($$OUT_PWD/AppDir/usr) \
