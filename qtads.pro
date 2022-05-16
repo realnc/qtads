@@ -482,7 +482,8 @@ linux {
 
     appimage.target = appimage
     appimage.commands = \
-        rm -f *.AppImage \
+        set -x \
+        && rm -f *.AppImage \
         && rm -rf AppDir \
         && $$shell_quote($$QMAKE_QMAKE) \
             PREFIX=$$shell_quote($$OUT_PWD/AppDir/usr) \
@@ -513,7 +514,8 @@ linux {
 macx {
     macdist.target = macdist
     macdist.commands = \
-        rm -rf "$${TARGET}.app" \
+        set -x \
+        && rm -rf "$${TARGET}.app" \
         && rm -f "$${TARGET}.zip" \
         && "$$QMAKE_QMAKE" -config release "$$_PRO_FILE_" \
         && make -j$$QMAKE_HOST.cpu_count \
@@ -522,7 +524,8 @@ macx {
 
     legacymacdist.target = legacymacdist
     legacymacdist.commands = \
-        rm -rf "$${TARGET}.app" \
+        set -x \
+        && rm -rf "$${TARGET}.app" \
         && rm -f "$${TARGET}.zip" \
         && "$$QMAKE_QMAKE" -config release "$$_PRO_FILE_" \
         && make -j$$QMAKE_HOST.cpu_count \
