@@ -1,2 +1,2 @@
-3.2.0
-Version 3.2 is now available. It fixes a regression introduced in 3.1 where MIDI music volume was very low. Also, a 64-bit Windows version is now also available.
+3.3.0
+No user-visible changes since 3.2. The main reason for this release is to provide ARM builds for Linux (arm64 and arm32v7.)
