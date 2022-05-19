@@ -4,12 +4,6 @@ with:
 
   emerge games-engines/qtads
 
-A live ebuild (building from the latest in-development source code) can be found
-in the "interactive-fiction" overlay; simply add it with the "layman" utility:
-
-  layman -a interactive-fiction
-  emerge games-engines/qtads
-
 For all other Linux distributions, a self-contained AppImage binary is provided
 on the download page. If you still want to build QTads yourself from source,
 read on.

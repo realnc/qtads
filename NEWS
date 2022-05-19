@@ -1,3 +1,10 @@
+3.3 - 2022-05-19
+================
+
+No user-visible changes since 3.2. The main reason for this release is
+to provide ARM builds for Linux (arm64 and arm32v7.)
+
+
 3.2 - 2021-09-25
 ================
 
