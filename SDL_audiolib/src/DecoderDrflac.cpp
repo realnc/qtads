@@ -3,7 +3,7 @@
 
 #define DR_FLAC_NO_STDIO
 
-#include "aulib_debug.h"
+#include "aulib_log.h"
 #include "dr_flac.h"
 #include "missing.h"
 #include <SDL_rwops.h>
@@ -32,12 +32,12 @@ static auto drflacSeekCb(void* const rwops_void, const int offset, const drflac_
     };
 
     if (rwops_size < 0) {
-        AM_warnLn("dr_flac: Cannot determine rwops size: " << (rwops_size == -1 ? "unknown error"
-                                                                                : SDL_GetError()));
+        aulib::log::warnLn("dr_flac: Cannot determine rwops size: {}",
+                           rwops_size == -1 ? "unknown error" : SDL_GetError());
         return false;
     }
     if (cur_pos < 0) {
-        AM_warnLn("dr_flac: Cannot tell current rwops position.");
+        aulib::log::warnLn("dr_flac: Cannot tell current rwops position.");
         return false;
     }
 
@@ -50,7 +50,7 @@ static auto drflacSeekCb(void* const rwops_void, const int offset, const drflac_
         whence = RW_SEEK_CUR;
         break;
     default:
-        AM_warnLn("dr_flac: Unrecognized origin in seek callback.");
+        aulib::log::warnLn("dr_flac: Unrecognized origin in seek callback.");
         return false;
     }
     return not seekIsPastEof() and SDL_RWseek(rwops, offset, whence) >= 0;

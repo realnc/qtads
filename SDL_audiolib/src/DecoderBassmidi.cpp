@@ -3,7 +3,7 @@
 
 #include "Buffer.h"
 #include "aulib.h"
-#include "aulib_debug.h"
+#include "aulib_log.h"
 #include "missing.h"
 #include <SDL_audio.h>
 #include <SDL_rwops.h>
@@ -50,8 +50,8 @@ public:
         freeStream();
         hstream = BASS_MIDI_StreamCreateFile(mem, file, offset, len, flags, freq);
         if (hstream == 0) {
-            AM_debugPrintLn("DecoderBassmidi: got BASS error " << BASS_ErrorGetCode()
-                                                               << " while creating HSTREAM.");
+            aulib::log::debugLn("DecoderBassmidi: got BASS error {} while creating HSTREAM.",
+                                BASS_ErrorGetCode());
         }
     }
 
@@ -69,8 +69,8 @@ private:
             return;
         }
         if (BASS_StreamFree(hstream) == 0) {
-            AM_debugPrintLn("DecoderBassmidi: got BASS error " << BASS_ErrorGetCode()
-                                                               << " while freeing HSTREAM.");
+            aulib::log::debugLn("DecoderBassmidi: got BASS error {} while freeing HSTREAM.",
+                                BASS_ErrorGetCode());
         }
     }
 };
@@ -97,8 +97,8 @@ Aulib::DecoderBassmidi_priv::DecoderBassmidi_priv()
         bassIsInitialized = true;
         return;
     }
-    AM_debugPrintLn("DecoderBassmidi: got BASS error " << BASS_ErrorGetCode()
-                                                       << " while initializing.");
+    aulib::log::debugLn("DecoderBassmidi: got BASS error {} while initializing.",
+                        BASS_ErrorGetCode());
 }
 
 Aulib::DecoderBassmidi::DecoderBassmidi()
@@ -112,8 +112,8 @@ auto Aulib::DecoderBassmidi::setDefaultSoundfont(const std::string& filename) ->
     if (BASS_SetConfigPtr(BASS_CONFIG_MIDI_DEFFONT, filename.c_str()) != 0) {
         return true;
     }
-    AM_debugPrintLn("DecoderBassmidi: got BASS error " << BASS_ErrorGetCode()
-                                                       << " while setting default soundfont.");
+    aulib::log::debugLn("DecoderBassmidi: got BASS error {} while setting default soundfont.",
+                        BASS_ErrorGetCode());
     return false;
 }
 
@@ -159,8 +159,8 @@ auto Aulib::DecoderBassmidi::getRate() const -> int
     if (BASS_ChannelGetInfo(d->hstream.get(), &inf) != 0) {
         return inf.freq;
     }
-    AM_debugPrintLn("DecoderBassmidi: got BASS error " << BASS_ErrorGetCode()
-                                                       << " while getting BASS_CHANNELINFO");
+    aulib::log::debugLn("DecoderBassmidi: got BASS error {} while getting BASS_CHANNELINFO.",
+                        BASS_ErrorGetCode());
     return 0;
 }
 
@@ -195,15 +195,16 @@ auto Aulib::DecoderBassmidi::duration() const -> chrono::microseconds
 
     QWORD pos = BASS_ChannelGetLength(d->hstream.get(), BASS_POS_BYTE);
     if (pos == static_cast<QWORD>(-1)) {
-        AM_debugPrintLn("DecoderBassmidi: got BASS error " << BASS_ErrorGetCode()
-                                                           << " while getting channel length.");
+        aulib::log::debugLn("DecoderBassmidi: got BASS error {} while getting channel length.",
+                            BASS_ErrorGetCode());
         return {};
     }
     double sec = BASS_ChannelBytes2Seconds(d->hstream.get(), pos);
     if (sec < 0) {
-        AM_debugPrintLn("DecoderBassmidi: got BASS error "
-                        << BASS_ErrorGetCode()
-                        << " while translating duration from bytes to seconds.");
+        aulib::log::debugLn(
+            "DecoderBassmidi: got BASS error {} while translating duration from bytes to "
+            "seconds.",
+            BASS_ErrorGetCode());
         return {};
     }
     return chrono::duration_cast<chrono::microseconds>(chrono::duration<double>(sec));

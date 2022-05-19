@@ -63,6 +63,14 @@ public:
      */
     auto resample(float dst[], int dstLen) -> int;
 
+    /*! \brief Discards any samples that have not yet been retrieved with resample().
+     *
+     * This is especially useful after seeking the decoder to a different position and you want
+     * resample() to immediately give you samples from the new position rather than the ones from
+     * the old position that were previously resampled but not yet retrieved.
+     */
+    void discardPendingSamples();
+
 protected:
     /*! \brief Change sample rate and amount of channels.
      *
@@ -109,6 +117,18 @@ protected:
      * it.
      */
     virtual void doResampling(float dst[], const float src[], int& dstLen, int& srcLen) = 0;
+
+    /*! \brief Discard any internally held samples.
+     *
+     * This function must be implemented when subclassing. It should discard any internally held
+     * samples. Note that even if you don't actually buffer any samples in your subclass but are
+     * using some external resampling library that you delegate resampling to, that external
+     * resampler might be holding samples in an internal buffer. Those will need to be discarded as
+     * well.
+     *
+     * If none of the above applies, this can be implemented as an empty function.
+     */
+    virtual void doDiscardPendingSamples() = 0;
 
 private:
     friend Resampler_priv;

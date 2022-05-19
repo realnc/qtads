@@ -2,7 +2,7 @@
 #include "aulib.h"
 
 #include "Aulib/Stream.h"
-#include "aulib_debug.h"
+#include "aulib_log.h"
 #include "missing.h"
 #include "sampleconv.h"
 #include "stream_p.h"
@@ -10,7 +10,14 @@
 #include <SDL_audio.h>
 #include <SDL_version.h>
 
-static bool gInitialized = false;
+enum class InitType
+{
+    None,
+    NoOutput,
+    Full,
+};
+
+static InitType gInitType = InitType::None;
 
 extern "C" {
 static void sdlCallback(void* /*unused*/, Uint8 out[], int outLen)
@@ -22,6 +29,11 @@ static void sdlCallback(void* /*unused*/, Uint8 out[], int outLen)
 auto Aulib::init(int freq, AudioFormat format, int channels, int frameSize,
                  const std::string& device) -> bool
 {
+    if (gInitType != InitType::None) {
+        SDL_SetError("SDL_audiolib already initialized, cannot initialize again.");
+        return false;
+    }
+
     if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
         return false;
     }
@@ -54,52 +66,52 @@ auto Aulib::init(int freq, AudioFormat format, int channels, int frameSize,
     }
 #endif
 
-    AM_debugPrint("SDL initialized with sample format: ");
+    aulib::log::debug("SDL initialized with sample format: ");
     switch (Stream_priv::fAudioSpec.format) {
     case AUDIO_S8:
-        AM_debugPrintLn("S8");
+        aulib::log::debugLn("S8");
         Stream_priv::fSampleConverter = Aulib::floatToS8;
         break;
     case AUDIO_U8:
-        AM_debugPrintLn("U8");
+        aulib::log::debugLn("U8");
         Stream_priv::fSampleConverter = Aulib::floatToU8;
         break;
     case AUDIO_S16LSB:
-        AM_debugPrintLn("S16LSB");
+        aulib::log::debugLn("S16LSB");
         Stream_priv::fSampleConverter = Aulib::floatToS16LSB;
         break;
     case AUDIO_U16LSB:
-        AM_debugPrintLn("U16LSB");
+        aulib::log::debugLn("U16LSB");
         Stream_priv::fSampleConverter = Aulib::floatToU16LSB;
         break;
     case AUDIO_S16MSB:
-        AM_debugPrintLn("S16MSB");
+        aulib::log::debugLn("S16MSB");
         Stream_priv::fSampleConverter = Aulib::floatToS16MSB;
         break;
     case AUDIO_U16MSB:
-        AM_debugPrintLn("U16MSB");
+        aulib::log::debugLn("U16MSB");
         Stream_priv::fSampleConverter = Aulib::floatToU16MSB;
         break;
 #if SDL_VERSION_ATLEAST(2, 0, 0)
     case AUDIO_S32LSB:
-        AM_debugPrintLn("S32LSB");
+        aulib::log::debugLn("S32LSB");
         Stream_priv::fSampleConverter = Aulib::floatToS32LSB;
         break;
     case AUDIO_S32MSB:
-        AM_debugPrintLn("S32MSB");
+        aulib::log::debugLn("S32MSB");
         Stream_priv::fSampleConverter = Aulib::floatToS32MSB;
         break;
     case AUDIO_F32LSB:
-        AM_debugPrintLn("F32LSB");
+        aulib::log::debugLn("F32LSB");
         Stream_priv::fSampleConverter = Aulib::floatToFloatLSB;
         break;
     case AUDIO_F32MSB:
-        AM_debugPrintLn("F32MSB");
+        aulib::log::debugLn("F32MSB");
         Stream_priv::fSampleConverter = Aulib::floatToFloatMSB;
         break;
 #endif
     default:
-        AM_warnLn("Unknown audio format spec: " << Stream_priv::fAudioSpec.format);
+        aulib::log::warnLn("Unknown audio format spec: {}", Stream_priv::fAudioSpec.format);
         Aulib::quit();
         return false;
     }
@@ -109,14 +121,28 @@ auto Aulib::init(int freq, AudioFormat format, int channels, int frameSize,
 #else
     SDL_PauseAudio(/*pause_on=*/0);
 #endif
-    gInitialized = true;
+    gInitType = InitType::Full;
+    std::atexit(Aulib::quit);
+    return true;
+}
+
+auto Aulib::initWithoutOutput(const int freq, const int channels) -> bool
+{
+    if (gInitType != InitType::None) {
+        SDL_SetError("SDL_audiolib already initialized, cannot initialize again.");
+        return false;
+    }
+
+    Stream_priv::fAudioSpec.freq = freq;
+    Stream_priv::fAudioSpec.channels = channels;
+    gInitType = InitType::NoOutput;
     std::atexit(Aulib::quit);
     return true;
 }
 
 void Aulib::quit()
 {
-    if (not gInitialized) {
+    if (gInitType == InitType::None) {
         return;
     }
 #if SDL_VERSION_ATLEAST(2, 0, 0)
@@ -126,7 +152,7 @@ void Aulib::quit()
 #endif
     SDL_QuitSubSystem(SDL_INIT_AUDIO);
     Stream_priv::fSampleConverter = nullptr;
-    gInitialized = false;
+    gInitType = InitType::None;
 }
 
 auto Aulib::sampleFormat() noexcept -> AudioFormat

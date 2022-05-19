@@ -3,7 +3,7 @@
 
 #include "Buffer.h"
 #include "aulib.h"
-#include "aulib_debug.h"
+#include "aulib_log.h"
 #include "missing.h"
 #include <SDL_audio.h>
 #include <SDL_rwops.h>
@@ -36,9 +36,9 @@ static auto sfontOpenCb(const char* filename) -> void*
     }
     void* rwops;
     if (sscanf(filename, "&%p", &rwops) != 1) {
-        AM_warnLn(
-            "failed to extract rwops pointer from string - rwops might have leaked (please "
-            "file a bug)");
+        aulib::log::warnLn(
+            "failed to extract rwops pointer from string - rwops might have leaked (please file a "
+            "bug)");
         return nullptr;
     }
     return rwops;
@@ -160,7 +160,7 @@ auto Aulib::DecoderFluidsynth::loadSoundfont(SDL_RWops* rwops) -> bool
 
     auto closeRwops = [rwops] {
         if (SDL_RWclose(rwops) != 0) {
-            AM_warnLn("failed to close rwops: " << SDL_GetError());
+            aulib::log::warnLn("failed to close rwops: {}", SDL_GetError());
         }
     };
 

@@ -3,6 +3,7 @@
 
 #include "Buffer.h"
 #include "aulib.h"
+#include "aulib_log.h"
 #include "missing.h"
 #include <SDL_rwops.h>
 #include <adlmidi.h>
@@ -46,26 +47,29 @@ struct DecoderAdlmidi_priv final
     auto setEmulator() -> bool
     {
         using Emulator = DecoderAdlmidi::Emulator;
-        ADL_Emulator adl_emu;
 
-        switch (emulator) {
-        case Emulator::Nuked:
-            adl_emu = ADLMIDI_EMU_NUKED;
-            break;
-        case Emulator::Nuked_174:
-            adl_emu = ADLMIDI_EMU_NUKED_174;
-            break;
-        case Emulator::Dosbox:
-            adl_emu = ADLMIDI_EMU_DOSBOX;
-            break;
-        case Emulator::Opal:
-            adl_emu = ADLMIDI_EMU_OPAL;
-            break;
-        case Emulator::Java:
-            adl_emu = ADLMIDI_EMU_JAVA;
-            break;
+        const ADL_Emulator adl_emu = [&] {
+            switch (emulator) {
+            case Emulator::Nuked:
+                return ADLMIDI_EMU_NUKED;
+            case Emulator::Nuked_174:
+                return ADLMIDI_EMU_NUKED_174;
+            case Emulator::Dosbox:
+                return ADLMIDI_EMU_DOSBOX;
+            case Emulator::Opal:
+                return ADLMIDI_EMU_OPAL;
+            case Emulator::Java:
+                return ADLMIDI_EMU_JAVA;
+            }
+            return ADLMIDI_EMU_end;
+        }();
+
+        if (adl_emu == ADLMIDI_EMU_end) {
+            SDL_SetError(
+                "DecoderAdlmidi: Unrecognized DecoderAdlmidi::Emulator value: %d",
+                static_cast<int>(emulator));
+            return false;
         }
-
         if (adl_switchEmulator(adl_player.get(), adl_emu) < 0) {
             SDL_SetError("libADLMIDI failed to set emulator. %s", adl_errorInfo(adl_player.get()));
             return false;

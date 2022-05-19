@@ -86,19 +86,20 @@ disable-audio {
 
     DEFINES += \
         AULIB_STATIC_DEFINE \
-        SPX_RESAMPLE_EXPORT= \
+        FMT_HEADER_ONLY \
+        OUTSIDE_SPEEX \
         RANDOM_PREFIX=SDL_audiolib \
-        OUTSIDE_SPEEX
+        SPX_RESAMPLE_EXPORT=
 
     CONFIG += link_pkgconfig
     PKGCONFIG += sdl2 sndfile libmpg123 fluidsynth vorbisfile
 
     INCLUDEPATH += \
         SDL_audiolib \
-        SDL_audiolib/include \
+        SDL_audiolib/3rdparty/fmt/include \
         SDL_audiolib/3rdparty/speex_resampler \
-        SDL_audiolib/src \
-        SDL_audiolib/missing
+        SDL_audiolib/include \
+        SDL_audiolib/src
 
     HEADERS += \
         $$files(SDL_audiolib/include/*.h) \

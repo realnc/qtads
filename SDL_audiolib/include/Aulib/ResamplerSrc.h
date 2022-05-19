@@ -68,6 +68,7 @@ public:
 protected:
     void doResampling(float dst[], const float src[], int& dstLen, int& srcLen) override;
     auto adjustForOutputSpec(int dstRate, int srcRate, int channels) -> int override;
+    void doDiscardPendingSamples() override;
 
 private:
     const std::unique_ptr<struct ResamplerSrc_priv> d;

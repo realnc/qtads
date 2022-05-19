@@ -3,7 +3,7 @@
 
 #include "Buffer.h"
 #include "aulib_config.h"
-#include "aulib_debug.h"
+#include "aulib_log.h"
 #include "missing.h"
 #include <SDL_rwops.h>
 #include <cstring>
@@ -122,7 +122,7 @@ auto Aulib::DecoderMusepack::doDecoding(float buf[], int len, bool& /*callAgain*
     // Decode one frame at a time, until we have enough samples.
     while (totalSamples < wantedSamples) {
         if (mpc_demux_decode(d->demuxer.get(), &d->curFrame) != MPC_STATUS_OK) {
-            AM_warnLn("DecoderMusepack decoding error.");
+            aulib::log::warnLn("DecoderMusepack decoding error.");
             return 0;
         }
         int copyLen = std::min(static_cast<int>(d->curFrame.samples * d->strmInfo.channels), len);

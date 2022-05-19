@@ -1,7 +1,7 @@
 // This is copyrighted software. More information is at the end of this file.
 #include "Aulib/DecoderVorbis.h"
 
-#include "aulib_debug.h"
+#include "aulib_log.h"
 #include <SDL_rwops.h>
 #include <vorbis/vorbisfile.h>
 
@@ -104,19 +104,19 @@ auto Aulib::DecoderVorbis::doDecoding(float buf[], int len, bool& callAgain) -> 
             break;
         }
         if (ret < 0) {
-            AM_debugPrint("libvorbis stream error: ");
+            aulib::log::debug("libvorbis stream error: ");
             switch (ret) {
             case OV_HOLE:
-                AM_debugPrintLn("OV_HOLE");
+                aulib::log::debugLn("OV_HOLE");
                 break;
             case OV_EBADLINK:
-                AM_debugPrintLn("OV_EBADLINK");
+                aulib::log::debugLn("OV_EBADLINK");
                 break;
             case OV_EINVAL:
-                AM_debugPrintLn("OV_EINVAL");
+                aulib::log::debugLn("OV_EINVAL");
                 break;
             default:
-                AM_debugPrintLn("unknown error: " << ret);
+                aulib::log::debugLn("unknown error: {}", ret);
             }
             break;
         }
@@ -141,14 +141,8 @@ auto Aulib::DecoderVorbis::rewind() -> bool
         return false;
     }
 
-    int ret;
-    if (d->fEOF) {
-        ret = ov_raw_seek(d->fVFHandle.get(), 0);
-        d->fEOF = false;
-    } else {
-        ret = ov_raw_seek_lap(d->fVFHandle.get(), 0);
-    }
-    return ret == 0;
+    d->fEOF = false;
+    return ov_raw_seek(d->fVFHandle.get(), 0) == 0;
 }
 
 auto Aulib::DecoderVorbis::duration() const -> chrono::microseconds
@@ -159,7 +153,7 @@ auto Aulib::DecoderVorbis::duration() const -> chrono::microseconds
 auto Aulib::DecoderVorbis::seekToTime(chrono::microseconds pos) -> bool
 {
     if (not isOpen()
-        or ov_time_seek_lap(d->fVFHandle.get(), chrono::duration<double>(pos).count()) != 0) {
+        or ov_time_seek(d->fVFHandle.get(), chrono::duration<double>(pos).count()) != 0) {
         return false;
     }
     d->fEOF = false;

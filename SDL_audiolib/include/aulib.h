@@ -60,6 +60,29 @@ AULIB_EXPORT auto init(int freq, AudioFormat format, int channels, int frameSize
                        const std::string& device = {}) -> bool;
 
 /*!
+ * \brief Initializes the library for decoding and resampling only.
+ *
+ * Use this instead of the normal init function if you only want to decode and/or resample without
+ * actually playing any audio, or if you want to handle audio playback yourself.
+ *
+ * SDL_InitSubSystem() will not be called and thus the SDL audio subsystem is left uninitialized.
+ *
+ * You cannot use Aulib::Stream objects. Trying to do so will result in undefined behavior.
+ *
+ * \param freq
+ * Target sample rate for decoders that generate audio themselves (like the MIDI and MOD decoders.)
+ *
+ * \param channels
+ * Target channel count for decoders that generate audio themselves (like the MIDI and MOD
+ * decoders.)
+ *
+ * \return
+ *  \retval true The library was initialized successfully.
+ *  \retval false The library could not be initialized.
+ */
+AULIB_EXPORT auto initWithoutOutput(int freq, int channels) -> bool;
+
+/*!
  *  \brief Shuts down the SDL_audiolib library.
  *
  *  It is not required to call this function manually, as this happens automatically at program

@@ -3,8 +3,8 @@
 
 #include "Aulib/Decoder.h"
 #include "Buffer.h"
-#include "aulib_debug.h"
 #include "aulib_global.h"
+#include "aulib_log.h"
 #include <SDL_audio.h>
 #include <algorithm>
 #include <cmath>
@@ -248,6 +248,12 @@ auto Aulib::Resampler::resample(float dst[], int dstLen) -> int
         relocateBuffer(d->fOutBuffer.get(), d->fOutBufferPos, d->fOutBufferEnd);
     }
     return totalSamples;
+}
+
+void Aulib::Resampler::discardPendingSamples()
+{
+    d->fOutBufferPos = d->fOutBufferEnd = d->fInBufferPos = d->fInBufferEnd = 0;
+    doDiscardPendingSamples();
 }
 
 /*

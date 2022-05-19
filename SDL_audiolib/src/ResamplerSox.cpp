@@ -1,7 +1,7 @@
 // This is copyrighted software. More information is at the end of this file.
 #include "Aulib/ResamplerSox.h"
 
-#include "aulib_debug.h"
+#include "aulib_log.h"
 #include <cstring>
 #include <soxr.h>
 
@@ -43,7 +43,7 @@ void Aulib::ResamplerSox::doResampling(float dst[], const float src[], int& dstL
                          dst, static_cast<size_t>(dstLen / channels), &dstDone);
     if (error) {
         // FIXME: What do we do?
-        AM_warnLn("soxr_process() error: " << error);
+        aulib::log::warnLn("soxr_process() error: {}", error);
         dstLen = srcLen = 0;
         return;
     }
@@ -57,25 +57,25 @@ auto Aulib::ResamplerSox::adjustForOutputSpec(int dstRate, int srcRate, int chan
     io_spec.itype = io_spec.otype = SOXR_FLOAT32_I;
     io_spec.scale = 1.0;
 
-    int sox_q;
-    switch (d->fQuality) {
-    case Quality::Quick:
-        sox_q = SOXR_QQ;
-        break;
-    case Quality::Low:
-        sox_q = SOXR_LQ;
-        break;
-    case Quality::Medium:
-        sox_q = SOXR_MQ;
-        break;
-    case Quality::High:
-        sox_q = SOXR_HQ;
-        break;
-    case Quality::VeryHigh:
-        sox_q = SOXR_VHQ;
-        break;
-    }
-    auto q_spec = soxr_quality_spec(sox_q, 0);
+    const int sox_quality = [&] {
+        switch (d->fQuality) {
+        case Quality::Quick:
+            return SOXR_QQ;
+        case Quality::Low:
+            return SOXR_LQ;
+        case Quality::Medium:
+            return SOXR_MQ;
+        case Quality::High:
+            return SOXR_HQ;
+        case Quality::VeryHigh:
+            return SOXR_VHQ;
+        }
+        aulib::log::warnLn(
+            "ResamplerSox: Unrecognized ResamplerSox::Quality value {}. Will use Quality::High.",
+            static_cast<int>(d->fQuality));
+        return SOXR_HQ;
+    }();
+    auto q_spec = soxr_quality_spec(sox_quality, 0);
 
     soxr_error_t error;
     d->fResampler.reset(soxr_create(srcRate, dstRate, static_cast<unsigned>(channels), &error,
@@ -85,6 +85,13 @@ auto Aulib::ResamplerSox::adjustForOutputSpec(int dstRate, int srcRate, int chan
         return -1;
     }
     return 0;
+}
+
+void Aulib::ResamplerSox::doDiscardPendingSamples()
+{
+    if (d->fResampler) {
+        soxr_clear(d->fResampler.get());
+    }
 }
 
 /*

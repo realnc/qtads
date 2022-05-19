@@ -26,7 +26,7 @@ Most popular audio formats are supported:
   * Musepack (libmpcdec)
   * FLAC (built-in through bundled
     [dr_flac](https://mackron.github.io/dr_flac), or through external
-    libsndfile)
+    libFLAC or libsndfile)
   * WAV and related formats (built-in through bundled
     [dr_wav](https://mackron.github.io/dr_wav), or through external
     libsndfile)

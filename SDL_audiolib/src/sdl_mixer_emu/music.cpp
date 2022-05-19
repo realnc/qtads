@@ -7,8 +7,8 @@
 #include "Aulib/ResamplerSpeex.h"
 #include "Aulib/Stream.h"
 #include "aulib_config.h"
-#include "aulib_debug.h"
 #include "aulib_global.h"
+#include "aulib_log.h"
 #include "sdl_mixer_emu.h"
 
 // Currently active global music stream (SDL_mixer only supports one.)
@@ -28,7 +28,7 @@ static void musicFinishHookWrapper(Aulib::Stream& /*unused*/)
 
 auto Mix_LoadMUS(const char* file) -> Mix_Music*
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     auto strm = new Aulib::Stream(file, Aulib::Decoder::decoderFor(file),
                                   std::make_unique<Aulib::ResamplerSpeex>());
@@ -38,7 +38,7 @@ auto Mix_LoadMUS(const char* file) -> Mix_Music*
 
 auto Mix_LoadMUS_RW(SDL_RWops* rw) -> Mix_Music*
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     auto strm = new Aulib::Stream(rw, Aulib::Decoder::decoderFor(rw),
                                   std::make_unique<Aulib::ResamplerSpeex>(), false);
@@ -48,7 +48,7 @@ auto Mix_LoadMUS_RW(SDL_RWops* rw) -> Mix_Music*
 
 auto Mix_LoadMUSType_RW(SDL_RWops* rw, Mix_MusicType type, int freesrc) -> Mix_Music*
 {
-    AM_debugPrintLn(__func__ << " type: " << type);
+    aulib::log::debugLn("{} type: {}", __func__, type);
 
     auto decoder = std::unique_ptr<Aulib::Decoder>(nullptr);
     switch (type) {
@@ -76,7 +76,7 @@ auto Mix_LoadMUSType_RW(SDL_RWops* rw, Mix_MusicType type, int freesrc) -> Mix_M
         break;
 
     default:
-        AM_debugPrintLn("NO DECODER FOUND");
+        aulib::log::debugLn("NO DECODER FOUND");
         return nullptr;
     }
 
@@ -88,7 +88,7 @@ auto Mix_LoadMUSType_RW(SDL_RWops* rw, Mix_MusicType type, int freesrc) -> Mix_M
 
 void Mix_FreeMusic(Mix_Music* music)
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     auto* strm = (Aulib::Stream*)music;
     if (gMusic == strm) {
@@ -99,33 +99,33 @@ void Mix_FreeMusic(Mix_Music* music)
 
 auto Mix_GetNumMusicDecoders() -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return 0;
 }
 
 auto Mix_GetMusicDecoder(int /*index*/) -> const char*
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return nullptr;
 }
 
 auto Mix_GetMusicType(const Mix_Music* /*music*/) -> Mix_MusicType
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return MUS_NONE;
 }
 
 void Mix_HookMusic(void (*/*mix_func*/)(void*, Uint8*, int), void* /*arg*/)
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 }
 
 void Mix_HookMusicFinished(void (*music_finished)())
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     if (not music_finished) {
         if (gMusic) {
@@ -142,14 +142,14 @@ void Mix_HookMusicFinished(void (*music_finished)())
 
 auto Mix_GetMusicHookData() -> void*
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return nullptr;
 }
 
 auto Mix_PlayMusic(Mix_Music* music, int loops) -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     if (gMusic) {
         gMusic->stop();
@@ -165,21 +165,21 @@ auto Mix_PlayMusic(Mix_Music* music, int loops) -> int
 
 auto Mix_FadeInMusic(Mix_Music* music, int loops, int /*ms*/) -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return Mix_PlayMusic(music, loops);
 }
 
 auto Mix_FadeInMusicPos(Mix_Music* /*music*/, int /*loops*/, int /*ms*/, double /*position*/) -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return 0;
 }
 
 auto Mix_VolumeMusic(int volume) -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     int prevVol = gMusicVolume * MIX_MAX_VOLUME;
     volume = std::min(std::max(-1, volume), MIX_MAX_VOLUME);
@@ -195,7 +195,7 @@ auto Mix_VolumeMusic(int volume) -> int
 
 auto Mix_HaltMusic() -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     if (gMusic) {
         gMusic->stop();
@@ -206,21 +206,21 @@ auto Mix_HaltMusic() -> int
 
 auto Mix_FadeOutMusic(int /*ms*/) -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return 0;
 }
 
 auto Mix_FadingMusic() -> Mix_Fading
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return MIX_NO_FADING;
 }
 
 void Mix_PauseMusic()
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     if (gMusic) {
         gMusic->pause();
@@ -229,7 +229,7 @@ void Mix_PauseMusic()
 
 void Mix_ResumeMusic()
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     if (gMusic and gMusic->isPaused()) {
         gMusic->resume();
@@ -238,7 +238,7 @@ void Mix_ResumeMusic()
 
 void Mix_RewindMusic()
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     if (gMusic) {
         gMusic->rewind();
@@ -247,7 +247,7 @@ void Mix_RewindMusic()
 
 auto Mix_PausedMusic() -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     if (gMusic) {
         return static_cast<int>(gMusic->isPaused());
@@ -257,14 +257,14 @@ auto Mix_PausedMusic() -> int
 
 auto Mix_SetMusicPosition(double /*position*/) -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return -1;
 }
 
 auto Mix_PlayingMusic() -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     if (gMusic) {
         return static_cast<int>(gMusic->isPlaying());
@@ -274,42 +274,42 @@ auto Mix_PlayingMusic() -> int
 
 auto Mix_SetMusicCMD(const char* /*command*/) -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return -1;
 }
 
 auto Mix_SetSynchroValue(int /*value*/) -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return -1;
 }
 
 auto Mix_GetSynchroValue() -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return -1;
 }
 
 auto Mix_SetSoundFonts(const char* /*paths*/) -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return 0;
 }
 
 auto Mix_GetSoundFonts() -> const char*
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return nullptr;
 }
 
 auto Mix_EachSoundFont(int (*/*function*/)(const char*, void*), void* /*data*/) -> int
 {
-    AM_debugPrintLn(__func__);
+    aulib::log::debugLn("{}", __func__);
 
     return 0;
 }

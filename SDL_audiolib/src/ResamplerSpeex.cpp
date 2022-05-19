@@ -17,6 +17,7 @@ struct ResamplerSpeex_priv final
 
     std::unique_ptr<SpeexResamplerState, decltype(&speex_resampler_destroy)> fResampler{
         nullptr, &speex_resampler_destroy};
+    int fSrcRate = 0;
     int fQuality;
 };
 
@@ -72,7 +73,17 @@ auto Aulib::ResamplerSpeex::adjustForOutputSpec(int dstRate, int srcRate, int ch
         d->fResampler = nullptr;
         return -1;
     }
+    d->fSrcRate = srcRate;
     return 0;
+}
+
+void Aulib::ResamplerSpeex::doDiscardPendingSamples()
+{
+    // The speex resampler does not offer a way to clear its internal state.
+    // speex_resampler_reset_mem() does not work. We are forced to allocate a new resampler handle.
+    if (d->fResampler) {
+        adjustForOutputSpec(currentRate(), d->fSrcRate, currentChannels());
+    }
 }
 
 /*

@@ -5,6 +5,7 @@
 #include "Aulib/Resampler.h"
 #include "Aulib/Stream.h"
 #include "aulib_debug.h"
+#include "aulib_log.h"
 #include "missing.h"
 #include <SDL_timer.h>
 #include <algorithm>
@@ -149,11 +150,12 @@ void Aulib::Stream_priv::fSdlCallbackImpl(void* /*unused*/, Uint8 out[], int out
                 cur_pos += stream->d->fResampler->resample(fStrmBuf.get() + cur_pos,
                                                            out_len_samples - cur_pos);
             } else {
-                bool callAgain = true;
-                while (cur_pos < out_len_samples and callAgain) {
+                bool callAgain = false;
+                do {
+                    callAgain = false;
                     cur_pos += stream->d->fDecoder->decode(fStrmBuf.get() + cur_pos,
                                                            out_len_samples - cur_pos, callAgain);
-                }
+                } while (cur_pos < out_len_samples and callAgain);
             }
             for (const auto& proc : stream->d->processors) {
                 const int len = cur_pos - out_offset;

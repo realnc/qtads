@@ -2,6 +2,7 @@
 #include "Aulib/ResamplerSrc.h"
 
 #include "aulib_debug.h"
+#include "aulib_log.h"
 #include <cstring>
 #include <samplerate.h>
 
@@ -56,30 +57,38 @@ auto Aulib::ResamplerSrc::adjustForOutputSpec(int dstRate, int srcRate, int chan
     int err;
     d->fData.src_ratio = static_cast<double>(dstRate) / srcRate;
 
-    int src_q;
-    switch (d->fQuality) {
-    case Quality::Linear:
-        src_q = SRC_LINEAR;
-        break;
-    case Quality::ZeroOrderHold:
-        src_q = SRC_ZERO_ORDER_HOLD;
-        break;
-    case Quality::SincFastest:
-        src_q = SRC_SINC_FASTEST;
-        break;
-    case Quality::SincMedium:
-        src_q = SRC_SINC_MEDIUM_QUALITY;
-        break;
-    case Quality::SincBest:
-        src_q = SRC_SINC_BEST_QUALITY;
-        break;
-    }
+    const int src_quality = [&] {
+        switch (d->fQuality) {
+        case Quality::Linear:
+            return SRC_LINEAR;
+        case Quality::ZeroOrderHold:
+            return SRC_ZERO_ORDER_HOLD;
+        case Quality::SincFastest:
+            return SRC_SINC_FASTEST;
+        case Quality::SincMedium:
+            return SRC_SINC_MEDIUM_QUALITY;
+        case Quality::SincBest:
+            return SRC_SINC_BEST_QUALITY;
+        }
+        aulib::log::warnLn(
+            "ResamplerSrc: Unrecognized ResamplerSrc::Quality value {}. Will use "
+            "Quality::SincMedium.",
+            static_cast<int>(d->fQuality));
+        return SRC_SINC_MEDIUM_QUALITY;
+    }();
 
-    d->fResampler.reset(src_new(src_q, channels, &err));
+    d->fResampler.reset(src_new(src_quality, channels, &err));
     if (not d->fResampler) {
         return -1;
     }
     return 0;
+}
+
+void Aulib::ResamplerSrc::doDiscardPendingSamples()
+{
+    if (d->fResampler) {
+        src_reset(d->fResampler.get());
+    }
 }
 
 /*

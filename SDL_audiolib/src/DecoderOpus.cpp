@@ -1,7 +1,7 @@
 // This is copyrighted software. More information is at the end of this file.
 #include "Aulib/DecoderOpus.h"
 
-#include "aulib_debug.h"
+#include "aulib_log.h"
 #include <SDL_rwops.h>
 #include <cstring>
 #include <opusfile.h>
@@ -56,9 +56,9 @@ auto Aulib::DecoderOpus::open(SDL_RWops* rwops) -> bool
     int error;
     d->fOpusHandle.reset(op_open_callbacks(rwops, &d->fCbs, nullptr, 0, &error));
     if (not d->fOpusHandle) {
-        AM_debugPrintLn("ERROR:" << error);
+        aulib::log::debugLn("ERROR: {}", error);
         if (error == OP_ENOTFORMAT) {
-            AM_debugPrintLn("OP_ENOTFORMAT");
+            aulib::log::debugLn("OP_ENOTFORMAT");
         }
         return false;
     }
@@ -99,19 +99,19 @@ auto Aulib::DecoderOpus::doDecoding(float buf[], int len, bool& /*callAgain*/) -
             break;
         }
         if (ret < 0) {
-            AM_debugPrint("libopusfile stream error: ");
+            aulib::log::debug("libopusfile stream error: ");
             switch (ret) {
             case OP_HOLE:
-                AM_debugPrintLn("OP_HOLE");
+                aulib::log::debugLn("OP_HOLE");
                 break;
             case OP_EBADLINK:
-                AM_debugPrintLn("OP_EBADLINK");
+                aulib::log::debugLn("OP_EBADLINK");
                 break;
             case OP_EINVAL:
-                AM_debugPrintLn("OP_EINVAL");
+                aulib::log::debugLn("OP_EINVAL");
                 break;
             default:
-                AM_debugPrintLn("unknown error: " << ret);
+                aulib::log::debugLn("unknown error: {}", ret);
             }
             break;
         }

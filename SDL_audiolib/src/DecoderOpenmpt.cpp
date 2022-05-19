@@ -3,6 +3,7 @@
 
 #include "Buffer.h"
 #include "aulib.h"
+#include "aulib_log.h"
 #include "missing.h"
 #include <SDL_rwops.h>
 #include <libopenmpt/libopenmpt.hpp>
@@ -48,7 +49,7 @@ auto Aulib::DecoderOpenmpt::open(SDL_RWops* rwops) -> bool
         module = std::make_unique<openmpt::module>(data.get(), data.size());
     }
     catch (const openmpt::exception& e) {
-        AM_warnLn("libopenmpt failed to load mod: " << e.what());
+        aulib::log::warnLn("libopenmpt failed to load mod: {}", e.what());
         return false;
     }
 
