@@ -26,7 +26,7 @@
 	</ul>
 	<ul>
 		<li><a href="https://github.com/realnc/qtads">View on GitHub</a></li>
-        </ul>
+	</ul>
 </div>
 
 <div class="section">
@@ -51,28 +51,38 @@
 <div class="section">
 <h1 id="downloads">Downloads</h1>
 	<p>
-	The current version is 3.2, released on 2021-09-25. The list of changes since 3.1 can be found on the
-	<a target="_blank" rel="noopener noreferrer" href="https://github.com/realnc/qtads/releases/tag/v3.2.0">GitHub release page</a>.
+	The current version is 3.3, released on 2022-05-19. The list of changes since 3.2 can be found on the
+	<a target="_blank" rel="noopener noreferrer" href="https://github.com/realnc/qtads/releases/tag/v3.3.0">GitHub release page</a>.
 	</p>
 	<p>
 	The Linux downloads are self-contained AppImages and do not require any uncommon external
 	dependencies. They should work on all Linux distributions that are at least as recent as
 	Ubuntu 16.04.
 	</p>
+	<p>
+	Please note that Ubuntu 22.04 has decided to remove libfuse2 from its default installation. To be able to run
+	current AppImages, you need to manually install it with "sudo apt install libfuse2". This might affect other
+	distributions as well. Make sure you install that library using your package manager if running the AppImage
+	results in an error about "libfuse2" not being found.
+	</p>
 
-	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.2.0/QTads-3.2-Linux-x86_64-AppImage.tar.gz">
-	Linux 64-bit</a></h3>
-	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.2.0/QTads-3.2-Linux-x86-AppImage.tar.gz">
-	Linux 32-bit</a></h3>
-	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.2.0/QTads-3.2-Windows.zip">
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.3.0/QTads-3.3-Linux-x86_64-AppImage.tar.gz">
+	Linux x86-64</a></h3>
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.3.0/QTads-3.3-Linux-x86-AppImage.tar.gz">
+	Linux x86</a></h3>
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.3.0/QTads-3.3-Linux-arm64-AppImage.tar.gz">
+	Linux ARM64</a></h3>
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.3.0/QTads-3.3-Linux-arm32v7-AppImage.tar.gz">
+	Linux ARM32v7</a></h3>
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.3.0/QTads-3.3-Windows.zip">
 	Microsoft Windows 7 or later (32-bit)</a></h3>
-	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.2.0/QTads-3.2-Windows-x64.zip">
-	Microsoft Windows 7 or later (64-bit, not as well tested as the 32-bit version)</a></h3>
-	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.2.0/QTads-3.2-macOS.zip">
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.3.0/QTads-3.3-Windows-x64.zip">
+	Microsoft Windows 7 or later (64-bit)</a></h3>
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.3.0/QTads-3.3-macOS.zip">
 	macOS 10.13 (High Sierra) or later </a></h3>
-	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.2.0/QTads-3.2-macOS-Mavericks.zip">
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.3.0/QTads-3.3-macOS-Legacy.zip">
 	Legacy macOS from 10.9 (Mavericks) to 10.12 (Sierra) </a></h3>
-	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.2.0/qtads-3.2.0-source.tar.xz">
+	<h3><a href="https://github.com/realnc/qtads/releases/download/v3.3.0/qtads-3.3.0-source.tar.xz">
 	Source code</a></h3>
 
 	<h3>Gentoo Linux (and other Portage-based distros)</h3>
@@ -80,12 +90,6 @@
 	QTads is included in Portage; simply emerge &ldquo;games-engines/qtads&rdquo;. If you're not on ~arch (aka
 	&ldquo;testing&rdquo;), you might want to keyword it in your package.keywords to ensure that you get the
 	latest version available.
-	</p>
-	<p>Sometimes Portage (even ~arch) does not offer the absolutely newest version
-	though. In that case, an ebuild for the most recent version (including a live ebuild) can be found in the
-	<a href="https://repo.or.cz/w/gentoo-interactive-fiction.git">interactive-fiction overlay</a>. It is
-	accessible with the &ldquo;layman&rdquo; utility (app-portage/layman). If you don't already have layman
-	installed, please read its documentation on how to configure your make.conf before adding overlays.
 	</p>
 </div>
 
