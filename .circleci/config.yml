@@ -56,6 +56,9 @@ jobs:
                 )'
             mv *.AppImage /tmp/QTads-Linux-<< parameters.arch >>.AppImage
 
-      - store_artifacts:
-          path: /tmp/QTads-Linux-<< parameters.arch >>.AppImage
-          destination: QTads-Linux-<< parameters.arch >>.AppImage
+      - when:
+          condition: << pipeline.git.tag >>
+          steps:
+            - store_artifacts:
+                path: /tmp/QTads-Linux-<< parameters.arch >>.AppImage
+                destination: QTads-Linux-<< parameters.arch >>.AppImage
