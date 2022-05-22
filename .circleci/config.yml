@@ -27,7 +27,6 @@ workflows:
           image_tag: 'linux-arm64v8'
           arch: 'arm64'
       - build-linux:
-      - build-linux:
           filters:
             tags:
               only: /.*/
