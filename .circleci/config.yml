@@ -20,10 +20,17 @@ workflows:
       equal: ['build-linux-arm', << pipeline.parameters.GHA_Action >>]
     jobs:
       - build-linux:
+          filters:
+            tags:
+              only: /.*/
           name: 'Linux arm64v8'
           image_tag: 'linux-arm64v8'
           arch: 'arm64'
       - build-linux:
+      - build-linux:
+          filters:
+            tags:
+              only: /.*/
           name: 'Linux arm32v7'
           image_tag: 'linux-arm32v7'
           arch: 'arm32v7'
