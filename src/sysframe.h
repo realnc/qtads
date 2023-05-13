@@ -73,6 +73,8 @@ private:
     // Are we in non-stop mode?
     bool fNonStopMode;
 
+    int fPendingWaitForKeystrokeCmd = 0;
+
     // Run the game file contained in fNextGame.
     void fRunGame();
 

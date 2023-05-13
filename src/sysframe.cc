@@ -273,6 +273,8 @@ void CHtmlSysFrameQt::fRunGame()
             fFormatter->cancel_sound(HTML_Attrib_invalid, 0.0, false, false);
             fFormatter->cancel_playback();
 
+            fPendingWaitForKeystrokeCmd = 0;
+
             // Display a "game has ended" message. We use HTML, so Make sure
             // the parser is in markup mode.
             fParser->obey_markups(true);
@@ -919,14 +921,13 @@ auto CHtmlSysFrameQt::wait_for_keystroke(int pause_only) -> textchar_t
 {
     // qDebug() << Q_FUNC_INFO;
 
-    static int pendingCmd = 0;
     int ret;
 
     // If we have a pending keystroke command from out last call, return it
     // now.
-    if (pendingCmd != 0) {
-        ret = pendingCmd;
-        pendingCmd = 0;
+    if (fPendingWaitForKeystrokeCmd != 0) {
+        ret = fPendingWaitForKeystrokeCmd;
+        fPendingWaitForKeystrokeCmd = 0;
         // qDebug() << ret;
         return ret;
     }
@@ -953,14 +954,14 @@ auto CHtmlSysFrameQt::wait_for_keystroke(int pause_only) -> textchar_t
     qWinGroup->statusBar()->setUpdatesEnabled(true);
 
     if (ret == OS_EVT_EOF) {
-        pendingCmd = CMD_EOF;
+        fPendingWaitForKeystrokeCmd = CMD_EOF;
         return 0;
     }
 
     if (ret == OS_EVT_KEY and info.key[0] == 0) {
         // It was an extended character.  Prepare to return it on our next
         // call.
-        pendingCmd = info.key[1];
+        fPendingWaitForKeystrokeCmd = info.key[1];
         return 0;
     }
     return info.key[0];
@@ -971,14 +972,16 @@ void CHtmlSysFrameQt::pause_for_exit()
     qDebug() << Q_FUNC_INFO;
 
     // Just wait for a keystroke and discard it.
-    wait_for_keystroke(true);
+    while (wait_for_keystroke(true) == 0)
+        ;
 }
 
 void CHtmlSysFrameQt::pause_for_more()
 {
     // qDebug() << Q_FUNC_INFO;
 
-    wait_for_keystroke(true);
+    while (wait_for_keystroke(true) == 0)
+        ;
 }
 
 void CHtmlSysFrameQt::dbg_print(const char* /*msg*/)
