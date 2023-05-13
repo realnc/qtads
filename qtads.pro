@@ -36,7 +36,7 @@ win32 {
     RC_ICONS = qtads.ico
     QMAKE_TARGET_COMPANY = "Nikos Chantziaras"
     QMAKE_TARGET_DESCRIPTION = "QTads - A TADS Interpreter"
-    QMAKE_TARGET_COPYRIGHT = "Copyright 2016 Michael J. Roberts; 2020 Nikos Chantziaras"
+    QMAKE_TARGET_COPYRIGHT = "Copyright 2016 Michael J. Roberts; 2023 Nikos Chantziaras"
 
     contains(QT_ARCH, i386):*-g++* {
         QMAKE_CFLAGS += -march=i686 -mtune=generic

@@ -28,7 +28,7 @@ AboutQtadsDialog::AboutQtadsDialog(QWidget* const parent)
 
         <p>
         TADS Copyright © 2016 Michael J. Roberts<br>
-        QTads Copyright © 2020 Nikos Chantziaras
+        QTads Copyright © 2023 Nikos Chantziaras
         </p>
 
         <p>
