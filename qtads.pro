@@ -496,7 +496,7 @@ linux {
         && rm -f AppDir/AppRun \
         && cp $$shell_quote($$_PRO_FILE_PWD_/appimage_apprun_wrapper) AppDir/AppRun \
         && chmod +x AppDir/AppRun \
-        && appimagetool -v AppDir
+        && appimagetool AppDir
 
     QMAKE_EXTRA_TARGETS += appimage
 }
