@@ -50,7 +50,7 @@ jobs:
         make -j`nproc`
 
   build_macOS:
-    runs-on: macos-10.15
+    runs-on: macos-12
     env:
       HOMEBREW_PREFIX: /Users/Shared/homebrew-qtads-hugor
       HOMEBREW_CELLAR: /Users/Shared/homebrew-qtads-hugor/Cellar
@@ -78,11 +78,10 @@ jobs:
       run: |
         curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/qt-5.15-macos-static.tar.zst' | zstd -d | sudo tar x
 
-    - name: Enable 10.15 SDK
+    - name: Add 10.15 SDK
       run: |
-        sudo mv \
-          "/Applications/Xcode_12.1.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" \
-          "`xcode-select -p`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk"
+        curl -s -S -L 'https://github.com/realnc/stuff/releases/download/stuff/MacOSX10.15.sdk.tar.zst' | zstd -d | tar x
+        sudo mv MacOSX10.15.sdk "`xcode-select -p`/Platforms/MacOSX.platform/Developer/SDKs/"
 
     - uses: actions/checkout@v2
     - name: Build
