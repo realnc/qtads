@@ -1,2 +1,9 @@
-3.3.0
-No user-visible changes since 3.2. The main reason for this release is to provide ARM builds for Linux (arm64 and arm32v7.)
+3.4.0
+UNDO buffer sizes have been increased, allowing for more UNDO steps.
+
+Quitting a game while its waiting for a keypress (like a MORE prompt) should not longer result in the next loaded game skipping past its first such "wait for keypess" prompt.
+
+(Linux) The QTads AppImage is now based on Ubuntu 18.04 and will no longer
+work on Linux distros older than that.
+
+(Linux) The QTads AppImage no longer requires libfuse to be installed.
