@@ -678,7 +678,7 @@ void os_get_special_path(
 
     case OS_GSP_T3_APP_DATA:
     case OS_GSP_LOGFILE: {
-        const auto dirStr = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+        const auto dirStr = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         QDir dir(dirStr);
         QByteArray result;
         // Create the directory if it doesn't exist.

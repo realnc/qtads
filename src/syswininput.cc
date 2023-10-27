@@ -326,7 +326,7 @@ void CHtmlSysWinInputQt::inputMethodEvent(QInputMethodEvent* e)
 
     if (fInputMode == SingleKeyInput) {
         fLastKeyEvent = static_cast<Qt::Key>(0);
-        fLastKeyText = 0;
+        fLastKeyText = '\0';
         // If the keypress doesn't correspond to exactly one character, ignore
         // it.
         if (e->commitString().size() != 1) {
@@ -349,7 +349,7 @@ void CHtmlSysWinInputQt::singleKeyPressEvent(QKeyEvent* event)
     Q_ASSERT(fInputMode == SingleKeyInput);
 
     fLastKeyEvent = static_cast<Qt::Key>(0);
-    fLastKeyText = 0;
+    fLastKeyText = '\0';
 
     switch (event->key()) {
     case 0:
@@ -681,7 +681,7 @@ auto CHtmlSysWinInputQt::getKeypress(unsigned long timeout, bool useTimeout, boo
         default:
             // If we got here, something went wrong.  Just report a
             // space.
-            qWarning() << Q_FUNC_INFO << "unrecognized key event in switch:" << hex
+            qWarning() << Q_FUNC_INFO << "unrecognized key event in switch:" << Qt::hex
                        << fLastKeyEvent;
             return ' ';
         }

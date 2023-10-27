@@ -1,8 +1,8 @@
 // This is copyrighted software. More information is at the end of this file.
 #pragma once
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QScrollArea>
+#include <QScreen>
 
 #include "config.h"
 #include "globals.h"
@@ -154,7 +154,7 @@ public:
 
     auto get_pix_per_inch() -> long override
     {
-        return QApplication::desktop()->logicalDpiX();
+        return QApplication::primaryScreen()->logicalDotsPerInchX();
     }
 
     auto measure_text(class CHtmlSysFont* font, const textchar_t* str, size_t len, int* ascent)

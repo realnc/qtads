@@ -539,7 +539,7 @@ auto CHtmlSysWinQt::measure_text(CHtmlSysFont* font, const textchar_t* str, size
     // subsequent text should be drawn.  This is really what our caller needs
     // to know, otherwise letters will start jumping left and right when
     // selecting text or moving the text cursor.
-    return {tmpMetr.width(QString::fromUtf8(str, len)), tmpMetr.height()};
+    return {tmpMetr.horizontalAdvance(QString::fromUtf8(str, len)), tmpMetr.height()};
 }
 
 auto CHtmlSysWinQt::get_max_chars_in_width(
@@ -614,7 +614,7 @@ void CHtmlSysWinQt::draw_text_space(int hilite, long x, long y, CHtmlSysFont* fo
     // Construct a string of spaces that's at least 'width' pixels wide.
     QString str(' ');
     const QFontMetrics& metr = painter.fontMetrics();
-    while (metr.width(str) < wid) {
+    while (metr.horizontalAdvance(str) < wid) {
         str.append(' ');
     }
 

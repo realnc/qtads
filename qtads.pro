@@ -20,6 +20,9 @@ equals(QT_MAJOR_VERSION, 5) {
         QMAKE_CXXFLAGS += -std=c++1z
     }
 }
+greaterThan(QT_MAJOR_VERSION,5) {
+    QT += core5compat
+}
 
 macx {
     ICON = QTads.icns
