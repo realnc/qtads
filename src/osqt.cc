@@ -10,6 +10,7 @@
  */
 
 // Make sure we get vasprintf() from cstdio, which in mingw is a GNU extension.
+#include "qstringconverter_base.h"
 #if defined(__MINGW32__) and not defined(_GNU_SOURCE)
     #define _GNU_SOURCE
     #define GNU_SOURCE_DEFINED
@@ -35,9 +36,11 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QStandardPaths>
+#include <QStringConverter>
+#include <QStringDecoder>
+#include <QStringEncoder>
 #include <QSysInfo>
 #include <QTemporaryFile>
-#include <QTextCodec>
 #include <QTimer>
 #include <algorithm>
 #include <chrono>
@@ -615,8 +618,18 @@ auto os_strlwr(char* const s) -> char*
     if (qFrame->tads3()) {
         lower = QString::fromUtf8(s).toLower().toUtf8();
     } else {
-        const auto* const codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
-        lower = codec->fromUnicode(codec->toUnicode(s).toLower());
+        auto codec = QStringConverter::encodingForName(qFrame->settings().tads2Encoding);
+        if (codec.has_value()) {
+            QStringEncoder toUnicode{codec.value()};
+            const QByteArray encoded = toUnicode.encode(QString::fromLocal8Bit(s));
+            if (!toUnicode.hasError()) {
+                QStringDecoder fromUnicode{codec.value()};
+                auto decoded = fromUnicode.decode(encoded.toLower());
+                if (!fromUnicode.hasError()) {
+                    lower = decoded.data;
+                }
+            }
+        }
     }
     std::memcpy(s, lower.constData(), lower.size() + 1);
     return s;
@@ -1304,9 +1317,10 @@ auto os_askfile(
         filter += ";;" + QObject::tr("All Files") + " (*)";
     }
 
-    const auto promptStr = qFrame->tads3()
-        ? QString::fromUtf8(prompt)
-        : QTextCodec::codecForName(qFrame->settings().tads2Encoding)->toUnicode(prompt);
+    QStringEncoder toUnicode{
+        QStringConverter::encodingForName(qFrame->settings().tads2Encoding).value()};
+    const auto promptStr = qFrame->tads3() ? QString::fromUtf8(prompt)
+                                           : toUnicode(QString::fromLocal8Bit(prompt)).data;
     const auto filename = prompt_type == OS_AFP_OPEN
         ? QFileDialog::getOpenFileName(qFrame->gameWindow(), promptStr, QDir::currentPath(), filter)
         : QFileDialog::getSaveFileName(
@@ -1358,9 +1372,12 @@ auto os_input_dialog(
     QMessageBox dialog(qWinGroup);
 
     // We'll use that if we're running a T2 game.
-    const auto* const t2Codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
+    QStringEncoder t2ToUnicode{
+        QStringConverter::encodingForName(qFrame->settings().tads2Encoding).value()};
 
-    dialog.setText(qFrame->tads3() ? QString::fromUtf8(prompt) : t2Codec->toUnicode(prompt));
+    dialog.setText(
+        qFrame->tads3() ? QString::fromUtf8(prompt)
+                        : t2ToUnicode(QString::fromLocal8Bit(prompt)).data);
 
     switch (icon_id) {
     case OS_INDLG_ICON_NONE:
@@ -1405,8 +1422,9 @@ auto os_input_dialog(
     } else {
         for (int i = 0; i < button_count; ++i) {
             Q_ASSERT(buttons[i] != nullptr);
-            const auto buttonText =
-                qFrame->tads3() ? QString::fromUtf8(buttons[i]) : t2Codec->toUnicode(buttons[i]);
+            const auto buttonText = qFrame->tads3()
+                ? QString::fromUtf8(buttons[i])
+                : t2ToUnicode(QString::fromLocal8Bit(buttons[i])).data;
             buttonList += dialog.addButton(buttonText, QMessageBox::AcceptRole);
         }
     }

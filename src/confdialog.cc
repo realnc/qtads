@@ -2,6 +2,7 @@
 #include "confdialog.h"
 
 #include "globals.h"
+#include "qstringconverter_base.h"
 #include "settings.h"
 #include "sysframe.h"
 #include "syswingroup.h"
@@ -10,7 +11,9 @@
 #include <QCheckBox>
 #include <QColorDialog>
 #include <QPushButton>
-#include <QTextCodec>
+#include <QStringConverter>
+#include <QStringDecoder>
+#include <QStringEncoder>
 #include <algorithm>
 #include <vector>
 
@@ -40,27 +43,20 @@ ConfDialog::ConfDialog(CHtmlSysWinGroupQt* const parent)
     ui->linkClickedColorButton->setFixedSize(macSize);
 #endif
 
-    const auto aliases = QTextCodec::availableCodecs();
-    std::vector<QByteArray> codecs;
-    for (const auto& alias : aliases) {
-        auto codecName = QTextCodec::codecForName(alias)->name();
-        // Only allow some of the possible sets, otherwise we would get a big
-        // list with most of the encodings being irrelevant.  The only Unicode
-        // encoding we allow is UTF-8, since it's a single-byte character set
-        // and therefore can be used by TADS 2 games (though I'm not aware of
-        // any that actually use UTF-8.)
-        if (codecName == "UTF-8" or codecName.startsWith("windows-") or codecName.startsWith("ISO-")
-            or codecName.startsWith("KOI8-") or codecName.startsWith("IBM")
-            or codecName.startsWith("EUC-") or codecName.startsWith("jisx020")
-            or codecName.startsWith("cp949"))
-        {
-            codecs.emplace_back(std::move(codecName));
-        }
-    }
-    std::sort(codecs.begin(), codecs.end());
+    const QStringConverter::Encoding codecs[9]{
+        QStringConverter::Encoding::System,  QStringConverter::Encoding::Latin1,
+        QStringConverter::Encoding::Utf16,   QStringConverter::Encoding::Utf16BE,
+        QStringConverter::Encoding::Utf16LE, QStringConverter::Encoding::Utf32,
+        QStringConverter::Encoding::Utf32BE, QStringConverter::Encoding::Utf32LE,
+        QStringConverter::Encoding::Utf8,
+    };
     for (const auto& codec : codecs) {
-        if (ui->encodingComboBox->findText(QString::fromLatin1(codec)) == -1) {
-            ui->encodingComboBox->addItem(QString::fromLatin1(codec));
+        if (ui->encodingComboBox->findText(
+                QString::fromLatin1(QStringConverter::nameForEncoding(codec)))
+            == -1)
+        {
+            ui->encodingComboBox->addItem(
+                QString::fromLatin1(QStringConverter::nameForEncoding(codec)));
         }
     }
 

@@ -1,7 +1,9 @@
 // This is copyrighted software. More information is at the end of this file.
 #include <QDebug>
 #include <QString>
-#include <QTextCodec>
+#include <QStringConverter>
+#include <QStringDecoder>
+#include <QStringEncoder>
 #include <cctype>
 #include <cstdlib>
 #include <cstring>

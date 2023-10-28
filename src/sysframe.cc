@@ -8,11 +8,14 @@
 #include <QMessageBox>
 #include <QScreen>
 #include <QStatusBar>
-#include <QTextCodec>
+#include <QStringConverter>
+#include <QStringDecoder>
+#include <QStringEncoder>
 #include <Qt>
 #include <cstdlib>
 
 #include "gameinfodialog.h"
+#include "qstringconverter_base.h"
 #include "qtadshostifc.h"
 #include "qtadssound.h"
 #include "syswinaboutbox.h"
@@ -811,8 +814,9 @@ void CHtmlSysFrameQt::display_output(const textchar_t* buf, size_t len)
         fBuffer.append(buf, len);
     } else {
         // TADS 2 does not use UTF-8; use the encoding from our settings.
-        QTextCodec* codec = QTextCodec::codecForName(fSettings.tads2Encoding);
-        fBuffer.append(codec->toUnicode(buf, len).toUtf8().constData());
+        QStringEncoder toUnicode{
+            QStringConverter::encodingForName(fSettings.tads2Encoding).value()};
+        fBuffer.append(toUnicode(QString::fromLocal8Bit(buf, len)).data.toLocal8Bit());
     }
 }
 
@@ -899,9 +903,10 @@ auto CHtmlSysFrameQt::get_input_event(unsigned long timeout, int use_timeout, os
                 info->href, fGameWin->pendingHrefEvent().toUtf8().constData(),
                 sizeof(info->href) - 1);
         } else {
-            QTextCodec* codec = QTextCodec::codecForName(fSettings.tads2Encoding);
+            QStringDecoder fromUnicode{
+                QStringConverter::encodingForName(fSettings.tads2Encoding).value()};
             strncpy(
-                info->href, codec->fromUnicode(fGameWin->pendingHrefEvent()).constData(),
+                info->href, fromUnicode(fGameWin->pendingHrefEvent().toUtf8()).data,
                 sizeof(info->href) - 1);
         }
         info->href[sizeof(info->href) - 1] = '\0';
