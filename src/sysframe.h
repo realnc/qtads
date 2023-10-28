@@ -75,6 +75,10 @@ private:
 
     int fPendingWaitForKeystrokeCmd = 0;
 
+    // Are we running in embed mode (i.e. do we need to print out our window ID
+    // so another application can capture it?)
+    bool fEmbedMode;
+
     // Run the game file contained in fNextGame.
     void fRunGame();
 
@@ -108,7 +112,7 @@ signals:
 public slots:
     // Replacement for main().  We need this so that we can start the Tads VM
     // after the QApplication main event loop has started.
-    void entryPoint(QString gameFileName);
+    void entryPoint(QString gameFileName, bool embed = false);
 
 public:
     CHtmlSysFrameQt(
@@ -181,6 +185,11 @@ public:
     auto nonStopMode() -> bool
     {
         return fNonStopMode;
+    }
+
+    void setEmbedMode(bool fmode)
+    {
+        fEmbedMode = fmode;
     }
 
     // Recalculate and adjust the sizes of all HTML banners.

@@ -5,7 +5,9 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QStatusBar>
-#include <QTextCodec>
+#include <QStringConverter>
+#include <QStringDecoder>
+#include <QStringEncoder>
 #include <QTime>
 #include <QTimer>
 #include <QUrl>
@@ -215,7 +217,8 @@ void CHtmlSysWinInputQt::keyPressEvent(QKeyEvent* e)
         fTadsBuffer.start_of_line(false);
         fCastDispWidget->clearSelection();
     } else if (
-        e->matches(QKeySequence::MoveToEndOfLine) or e->matches(QKeySequence::MoveToEndOfBlock)) {
+        e->matches(QKeySequence::MoveToEndOfLine) or e->matches(QKeySequence::MoveToEndOfBlock))
+    {
         fTadsBuffer.end_of_line(false);
         fCastDispWidget->clearSelection();
     } else if (e->matches(QKeySequence::InsertParagraphSeparator)) {
@@ -285,7 +288,8 @@ void CHtmlSysWinInputQt::keyPressEvent(QKeyEvent* e)
         }
         fTadsBuffer.start_of_line(true);
     } else if (
-        e->matches(QKeySequence::SelectEndOfLine) or e->matches(QKeySequence::SelectEndOfBlock)) {
+        e->matches(QKeySequence::SelectEndOfLine) or e->matches(QKeySequence::SelectEndOfBlock))
+    {
         if (not fTadsBuffer.has_sel_range()) {
             fCastDispWidget->clearSelection();
         }
@@ -326,7 +330,7 @@ void CHtmlSysWinInputQt::inputMethodEvent(QInputMethodEvent* e)
 
     if (fInputMode == SingleKeyInput) {
         fLastKeyEvent = static_cast<Qt::Key>(0);
-        fLastKeyText = 0;
+        fLastKeyText = '\0';
         // If the keypress doesn't correspond to exactly one character, ignore
         // it.
         if (e->commitString().size() != 1) {
@@ -349,7 +353,7 @@ void CHtmlSysWinInputQt::singleKeyPressEvent(QKeyEvent* event)
     Q_ASSERT(fInputMode == SingleKeyInput);
 
     fLastKeyEvent = static_cast<Qt::Key>(0);
-    fLastKeyText = 0;
+    fLastKeyText = '\0';
 
     switch (event->key()) {
     case 0:
@@ -484,11 +488,11 @@ void CHtmlSysWinInputQt::getInput(
     if (qFrame->tads3()) {
         strncpy(buf, fTadsBuffer.getbuf(), len);
     } else {
-        QTextCodec* codec = QTextCodec::codecForName(qFrame->settings().tads2Encoding);
+        QStringDecoder fromUnicode{
+            QStringConverter::encodingForName(qFrame->settings().tads2Encoding).value()};
         strncpy(
             buf,
-            codec->fromUnicode(QString::fromUtf8(fTadsBuffer.getbuf(), fTadsBuffer.getlen()))
-                .constData(),
+            fromUnicode(QByteArray::fromRawData(fTadsBuffer.getbuf(), fTadsBuffer.getlen())).data,
             len);
     }
     buf[len] = '\0';
@@ -681,7 +685,7 @@ auto CHtmlSysWinInputQt::getKeypress(unsigned long timeout, bool useTimeout, boo
         default:
             // If we got here, something went wrong.  Just report a
             // space.
-            qWarning() << Q_FUNC_INFO << "unrecognized key event in switch:" << hex
+            qWarning() << Q_FUNC_INFO << "unrecognized key event in switch:" << Qt::hex
                        << fLastKeyEvent;
             return ' ';
         }

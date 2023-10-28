@@ -10,3 +10,5 @@
 /qtads.pro.user*
 /qrc_resources.cpp
 /.qmake.stash
+.cache
+compile_commands.json

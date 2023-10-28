@@ -8,10 +8,14 @@
 #include <QMessageBox>
 #include <QScreen>
 #include <QStatusBar>
-#include <QTextCodec>
+#include <QStringConverter>
+#include <QStringDecoder>
+#include <QStringEncoder>
+#include <Qt>
 #include <cstdlib>
 
 #include "gameinfodialog.h"
+#include "qstringconverter_base.h"
 #include "qtadshostifc.h"
 #include "qtadssound.h"
 #include "syswinaboutbox.h"
@@ -335,7 +339,7 @@ bool CHtmlSysFrameQt::event(QEvent* e)
 }
 #endif
 
-void CHtmlSysFrameQt::entryPoint(QString gameFileName)
+void CHtmlSysFrameQt::entryPoint(QString gameFileName, bool embed)
 {
     // Restore the application's size and position.
     if (not fSettings.appGeometry.isEmpty()) {
@@ -344,6 +348,8 @@ void CHtmlSysFrameQt::entryPoint(QString gameFileName)
         auto h = QApplication::primaryScreen()->availableSize().height() / 1.1;
         fMainWin->resize(h, h);
     }
+    if (embed)
+        qInfo() << "WinId: " << fMainWin->winId();
     fMainWin->show();
 
     // Do an online update check.
@@ -392,8 +398,10 @@ static auto find_font_match(const std::vector<QString>& font_names) -> QString
                 return system_font;
             }
             // Also try the font name without the "[foundry]" part.
-            auto clean_font_name = font_name.leftRef(font_name.lastIndexOf('[')).trimmed();
-            auto clean_system_font = system_font.leftRef(system_font.lastIndexOf('[')).trimmed();
+            QStringView font_view{font_name};
+            auto clean_font_name = font_view.left(font_name.lastIndexOf('[')).trimmed();
+            QStringView system_font_view{system_font};
+            auto clean_system_font = system_font_view.left(system_font.lastIndexOf('[')).trimmed();
             if (clean_font_name.compare(clean_system_font, Qt::CaseInsensitive) == 0) {
                 return system_font;
             }
@@ -457,7 +465,7 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
         // The face name field can contain multiple face names separated by
         // commas.  We split them into a list and try each one individualy.
         const auto strList =
-            QString(QString::fromLatin1(newFontDesc.face)).split(',', QString::SkipEmptyParts);
+            QString(QString::fromLatin1(newFontDesc.face)).split(',', Qt::SkipEmptyParts);
         for (int i = 0; i < strList.size(); ++i) {
             auto s = strList.at(i).simplified().toLower();
             if (s == QString::fromLatin1(HTMLFONT_TADS_SERIF).toLower()) {
@@ -591,8 +599,7 @@ auto CHtmlSysFrameQt::createFont(const CHtmlFontDesc* font_desc) -> CHtmlSysFont
     // Workaround for QTBUG-76908 (wrong font variant is used and is out of sync with font metrics.)
     new_font.setStyleName({});
 
-    new_font.setStyleStrategy(QFont::StyleStrategy(
-        QFont::PreferOutline | QFont::PreferQuality | QFont::ForceIntegerMetrics));
+    new_font.setStyleStrategy(QFont::StyleStrategy(QFont::PreferOutline | QFont::PreferQuality));
     new_font.setUnderline(newFontDesc.underline);
     new_font.setStrikeOut(newFontDesc.strikeout);
     if (use_bold and weight < QFont::Bold) {
@@ -807,8 +814,9 @@ void CHtmlSysFrameQt::display_output(const textchar_t* buf, size_t len)
         fBuffer.append(buf, len);
     } else {
         // TADS 2 does not use UTF-8; use the encoding from our settings.
-        QTextCodec* codec = QTextCodec::codecForName(fSettings.tads2Encoding);
-        fBuffer.append(codec->toUnicode(buf, len).toUtf8().constData());
+        QStringEncoder toUnicode{
+            QStringConverter::encodingForName(fSettings.tads2Encoding).value()};
+        fBuffer.append(toUnicode(QString::fromLocal8Bit(buf, len)).data.toLocal8Bit());
     }
 }
 
@@ -895,9 +903,10 @@ auto CHtmlSysFrameQt::get_input_event(unsigned long timeout, int use_timeout, os
                 info->href, fGameWin->pendingHrefEvent().toUtf8().constData(),
                 sizeof(info->href) - 1);
         } else {
-            QTextCodec* codec = QTextCodec::codecForName(fSettings.tads2Encoding);
+            QStringDecoder fromUnicode{
+                QStringConverter::encodingForName(fSettings.tads2Encoding).value()};
             strncpy(
-                info->href, codec->fromUnicode(fGameWin->pendingHrefEvent()).constData(),
+                info->href, fromUnicode(fGameWin->pendingHrefEvent().toUtf8()).data,
                 sizeof(info->href) - 1);
         }
         info->href[sizeof(info->href) - 1] = '\0';
@@ -1076,7 +1085,7 @@ void CHtmlSysFrameQt::remove_banner_window(CHtmlSysWin* win)
 
 auto CHtmlSysFrameQt::get_exe_resource(
     const textchar_t* /*resname*/, size_t /*resnamelen*/, textchar_t* /*fname_buf*/,
-    size_t /*fname_buf_len*/, unsigned long* /*seek_pos*/, unsigned long * /*siz*/) -> int
+    size_t /*fname_buf_len*/, unsigned long* /*seek_pos*/, unsigned long* /*siz*/) -> int
 {
     // qDebug() << Q_FUNC_INFO;
     // qDebug() << "resname:" << resname << "fname_buf:" << fname_buf << "seek_pos:" << seek_pos;

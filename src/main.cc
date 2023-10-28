@@ -21,29 +21,63 @@
 auto main(int argc, char** argv) -> int
 {
     CHtmlResType::add_basic_types();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    // No need to enable High Dpi scaling because it's always on
+#elif QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-    CHtmlSysFrameQt* app = new CHtmlSysFrameQt(
-        argc, argv, "QTads", QTADS_VERSION, "Nikos Chantziaras", {});
+    CHtmlSysFrameQt* app =
+        new CHtmlSysFrameQt(argc, argv, "QTads", QTADS_VERSION, "Nikos Chantziaras", {});
+#if QT_VERSION <= QT_VERSION_CHECK(6, 0, 0)
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     QApplication::setDesktopFileName("nikos.chantziaras.qtads");
 #endif
 
     // Filename of the game to run.
     QString gameFileName;
+    bool embed = false;
 
     const QStringList& args = app->arguments();
-    if (args.size() == 2) {
-        if (QFile::exists(args.at(1))) {
-            gameFileName = args.at(1);
-        } else if (QFile::exists(args.at(1) + ".gam")) {
-            gameFileName = args.at(1) + ".gam";
-        } else if (QFile::exists(args.at(1) + ".t3")) {
-            gameFileName = args.at(1) + ".t3";
-        } else {
-            qWarning() << "File" << args.at(1) << "not found.";
+    if (args.size() >= 1) {
+        bool prevNonFlagArgument = false;
+
+        for (int i = 1; i < args.size(); ++i) {
+            const auto& arg = args.at(i);
+
+            if (!arg.startsWith("-")) {
+                if (prevNonFlagArgument) {
+                    qWarning() << "It looks like you specified more than one non-flag command-line"
+                               << "argument at" << arg
+                               << "but QTADS can only accept one game file, so only the"
+                               << "first non flag argument will be used.";
+                } else if (gameFileName.isNull()) {
+                    if (QFile::exists(arg)) {
+                        gameFileName = arg;
+                    } else if (QFile::exists(arg + ".gam")) {
+                        gameFileName = arg + ".gam";
+                    } else if (QFile::exists(arg + ".t3")) {
+                        gameFileName = arg + ".t3";
+                    } else {
+                        qWarning() << "File" << arg << "not found.";
+                    }
+                }
+
+                prevNonFlagArgument = true;
+            } else if (arg == "--help" || arg == "-h") {
+                qInfo() << "qtads [OPTIONS] [FILE]\n"
+                        << "\t--help\t\tThis help message\n"
+                        << "\t--embed\t\tPrint out the window id on startup so that qtads can be "
+                           "embedded\n"
+                        << "\t-h\t\tSame as --help\n"
+                        << "\t-e\t\tSame as --embed";
+            } else if (arg == "--embed" || arg == "-e") {
+                embed = true;
+            } else {
+                qWarning() << "Unrecognized command line argument " << arg << ".";
+                return 1;
+            }
         }
     }
 
@@ -60,7 +94,8 @@ auto main(int argc, char** argv) -> int
     }
 #endif
 
-    QTimer::singleShot(0, app, [app, gameFileName] { app->entryPoint(gameFileName); });
+    QTimer::singleShot(
+        0, app, [app, embed, gameFileName] { app->entryPoint(gameFileName, embed); });
     int ret = CHtmlSysFrameQt::exec();
 
     delete app;
