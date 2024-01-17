@@ -8,6 +8,24 @@ For all other Linux distributions, a self-contained AppImage binary is provided
 on the download page. If you still want to build QTads yourself from source,
 read on.
 
+# Dependencies
+
+For QTads to build correctly, you will need to have the Qt5 libraries along with
+their development headers/tools installed. You need at least Qt 5.5.
+
+If audio support is enabled, you'll also need:
+
+    SDL 2
+    libsndfile
+    libfluidsynth (version 2.x)
+    libvorbisfile
+    libmpg123
+
+Most Linux distributions provide the development versions in packages that have
+"-dev" appended to the package name.
+
+# Building
+
 QTads uses qmake as its build system.  To build it:
 
     cd <directory where you unpacked the QTads sources>
@@ -35,17 +53,3 @@ You can disable audio support when building by running qmake like this instead:
     qmake -config disable-audio
 
 This will produce a version of QTads that does not support audio.
-
-For it to build correctly, you will need to have the Qt5 libraries along with
-their development headers/tools installed. You need at least Qt 5.5.
-
-If audio support is enabled, you'll also need:
-
-    SDL 2
-    libsndfile
-    libfluidsynth (version 2.x)
-    libvorbisfile
-    libmpg123
-
-Most Linux distributions provide the development versions in packages that have
-"-dev" appended to the package name.
