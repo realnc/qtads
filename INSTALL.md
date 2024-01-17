@@ -26,6 +26,15 @@ If audio support is enabled, you'll also need:
 Most Linux distributions provide the development versions in packages that have
 "-dev" appended to the package name.
 
+On macOS, you can use Homebrew to install dependencies. https://brew.sh/
+
+    brew install qt@5
+
+Homebrew installs QT 5 "keg-only," and it will include a line like this,
+explaining how to add it to your $PATH.
+
+    export PATH="/opt/homebrew/opt/qt@5/bin:$PATH"
+
 # Building
 
 QTads uses qmake as its build system.  To build it:
