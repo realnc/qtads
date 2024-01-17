@@ -11,7 +11,9 @@ read on.
 # Dependencies
 
 For QTads to build correctly, you will need to have the Qt5 libraries along with
-their development headers/tools installed. You need at least Qt 5.5.
+their development headers/tools installed. You need at least Qt 5.5. (As of
+January 2024, QTads is not compatible with Qt6.) 
+https://github.com/realnc/qtads/issues/23
 
 If audio support is enabled, you'll also need:
 
